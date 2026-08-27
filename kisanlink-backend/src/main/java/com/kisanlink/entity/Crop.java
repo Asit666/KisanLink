@@ -18,6 +18,10 @@ public class Crop {
     @Column(nullable = false, unique = true)
     private String name;
 
-    private String category;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private CropCategory category;
+
     private String unit = "kg";
 }
+

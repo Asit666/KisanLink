@@ -1,6 +1,7 @@
 package com.kisanlink.controller;
 
 import com.kisanlink.dto.MarketRequest;
+import com.kisanlink.dto.NearbyMarketResponse;
 import com.kisanlink.entity.Market;
 import com.kisanlink.service.MarketService;
 import jakarta.validation.Valid;
@@ -21,6 +22,15 @@ public class MarketController {
     @GetMapping
     public List<Market> findAll() {
         return marketService.findAll();
+    }
+
+    @GetMapping("/nearby")
+    public List<NearbyMarketResponse> findNearby(
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
+            @RequestParam(required = false) Double maxDistanceKm,
+            @RequestParam(defaultValue = "10") Integer limit) {
+        return marketService.findNearbyMarkets(latitude, longitude, maxDistanceKm, limit);
     }
 
     @GetMapping("/{id}")

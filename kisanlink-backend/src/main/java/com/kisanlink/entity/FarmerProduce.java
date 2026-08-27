@@ -36,5 +36,13 @@ public class FarmerProduce {
     private LocalDate harvestDate;
     private LocalDate availableUntil;
     private BigDecimal expectedPrice;
+
+    @Column(length = 2048)
+    private String imageUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     private Instant createdAt = Instant.now();
 }
+

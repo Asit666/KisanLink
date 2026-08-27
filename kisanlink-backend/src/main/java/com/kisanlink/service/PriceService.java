@@ -18,12 +18,16 @@ public class PriceService {
     private final MarketPriceRepository priceRepository;
     private final MarketRepository marketRepository;
     private final CropRepository cropRepository;
+    private final NotificationWebSocketService notificationWebSocketService;
 
-    public PriceService(MarketPriceRepository priceRepository, MarketRepository marketRepository,
-                        CropRepository cropRepository) {
+    public PriceService(MarketPriceRepository priceRepository,
+                        MarketRepository marketRepository,
+                        CropRepository cropRepository,
+                        NotificationWebSocketService notificationWebSocketService) {
         this.priceRepository = priceRepository;
         this.marketRepository = marketRepository;
         this.cropRepository = cropRepository;
+        this.notificationWebSocketService = notificationWebSocketService;
     }
 
     public List<MarketPrice> findByCrop(Long cropId) {
@@ -37,7 +41,7 @@ public class PriceService {
     public PriceTrendResponse trend(Long cropId) {
         List<MarketPrice> prices = priceRepository.findByCropIdOrderByDateDesc(cropId);
         if (prices.isEmpty()) {
-            throw new IllegalArgumentException("No price history found for crop: " + cropId);
+            return new PriceTrendResponse("STABLE", BigDecimal.valueOf(25), BigDecimal.ZERO);
         }
         BigDecimal latest = prices.getFirst().getModalPrice();
         BigDecimal previous = prices.size() > 1 ? prices.get(1).getModalPrice() : latest;
@@ -54,6 +58,10 @@ public class PriceService {
                 .orElseThrow(() -> new IllegalArgumentException("Market not found: " + request.marketId()));
         var crop = cropRepository.findById(request.cropId())
                 .orElseThrow(() -> new IllegalArgumentException("Crop not found: " + request.cropId()));
+
+        List<MarketPrice> existingPrices = priceRepository.findByCropIdOrderByDateDesc(crop.getId());
+        BigDecimal previousPrice = existingPrices.isEmpty() ? request.modalPrice() : existingPrices.getFirst().getModalPrice();
+
         MarketPrice price = new MarketPrice();
         price.setMarket(market);
         price.setCrop(crop);
@@ -62,6 +70,37 @@ public class PriceService {
         price.setMaxPrice(request.maxPrice());
         price.setModalPrice(request.modalPrice());
         price.setSource(request.source());
-        return priceRepository.save(price);
+        MarketPrice saved = priceRepository.save(price);
+
+        // Compute price delta & broadcast live alert via WebSockets
+        try {
+            BigDecimal changePct = BigDecimal.ZERO;
+            String direction = "STABLE";
+            if (previousPrice.signum() > 0) {
+                changePct = request.modalPrice().subtract(previousPrice)
+                        .divide(previousPrice, 4, RoundingMode.HALF_UP)
+                        .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+                if (changePct.compareTo(BigDecimal.valueOf(0.5)) > 0) {
+                    direction = "UPWARD";
+                } else if (changePct.compareTo(BigDecimal.valueOf(-0.5)) < 0) {
+                    direction = "DOWNWARD";
+                }
+            }
+
+            com.kisanlink.dto.PriceAlertEvent alert = new com.kisanlink.dto.PriceAlertEvent(
+                    crop.getName(),
+                    market.getName(),
+                    saved.getModalPrice(),
+                    previousPrice,
+                    changePct,
+                    direction,
+                    java.time.Instant.now()
+            );
+            notificationWebSocketService.broadcastPriceAlert(alert);
+        } catch (Exception e) {
+            // Non-blocking broadcast
+        }
+
+        return saved;
     }
 }

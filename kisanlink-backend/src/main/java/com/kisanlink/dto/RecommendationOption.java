@@ -10,6 +10,7 @@ public record RecommendationOption(
         BigDecimal transportCost,
         BigDecimal grossRevenue,
         BigDecimal netReturn,
-        BigDecimal score
+        BigDecimal score,
+        boolean buyerVerified
 ) {
 }

@@ -35,21 +35,50 @@ Workspace:
 - Notification read and mark-read APIs.
 - Explainable recommendation engine using quality matching, quantity, distance, transport cost, gross revenue, net return, and score.
 - CORS support for localhost ports 3000, 5173, 5174, and 5175.
-- Development sample data for Tomato, Ranchi Main Mandi, and two modal prices.
+- Development sample data: 10 crops across VEGETABLE, FRUIT, GRAIN, PULSE, OIL_SEED categories; Ranchi Main Mandi market; two Tomato modal prices.
 - Root health endpoint: `GET /`.
 - Password hashes excluded from JSON responses.
 - Authentication response includes both `userId` and role-specific `profileId`.
+- Secured Notification APIs: Added `GET /api/notifications/me` (authenticated principal scoping) and owner-verified `PATCH /api/notifications/{id}/read`.
+- Hardened Inbound SMS/WhatsApp Webhook with configurable `X-Webhook-Secret` validation (`kisanlink.webhook.secret`).
+- Fixed frontend WebSocket price-alert callback (replaced undefined `loadMarketPrices` with `loadPriceData(selectedPulseCropId)`).
+- Frontend dynamic API configuration via `import.meta.env.VITE_API_URL` with fallback to `http://localhost:8080`.
+- All 18 backend integration tests verified passing with 0 failures and 0 errors.
+
+- `CropCategory` enum (VEGETABLE, FRUIT, GRAIN, PULSE, SEED, SPICE, OIL_SEED, FLOWER, OTHER) on the `Crop` entity.
+- `GET /api/crops/categories` endpoint returns all valid category values for frontend dropdowns.
+- `GET /api/crops?category=VEGETABLE` optional filter on the crops list endpoint.
+- Flexible produce listing: farmers can set any custom product name and category (e.g. Fruits, Vegetables, Seeds), or select from existing crops.
+- Produce image and description support: `FarmerProduce` and `ProduceRequest` support `imageUrl` and `description` when listing produce for selling.
+- Dynamic crop resolution and auto-creation: both `FarmerService.addProduce` and `BuyerService.addRequirement` accept `cropId` or `cropName` + `category` with auto-creation of custom crop entities.
+- Configurable transport rates (`base-charge`, `rate-per-km`, `max-distance-km`) and weighted multi-factor recommendation scoring (`RecommendationConfig`, `ScoringService`).
+- Market Map and Nearby Mandis endpoint (`GET /api/markets/nearby`) with Haversine distance, freight calculation, travel duration estimation, compass direction, route summary, and Google Maps navigation URL.
+- Statistical time-series price prediction with linear regression slope, residual volatility analysis, labeled confidence intervals (80% Core Band, 90% Likely Range, 95% Conservative Boundary), confidence score, volatility indicators, and 7-day future price trajectories (`PredictionService`, `PredictionController`).
+- Complete Trade/Order flow and deal handshake lifecycle (`TradeDeal`, `TradeStatus`, `TradeDealRepository`, `TradeDealService`, `TradeDealController`) with formal statuses (`PROPOSED`, `NEGOTIATING`, `ACCEPTED`, `IN_TRANSIT`, `DELIVERED`, `COMPLETED`, `CANCELLED`), net return calculation, and ownership protection.
+- Interactive Price Negotiation & Counter-Offer Engine (`TradeNegotiation`, `CounterOfferRequest`, `TradeNegotiationResponse`, `POST /api/trades/{tradeId}/negotiate`) with persistent back-and-forth negotiation thread history, live terms updates, and mutual accept/counter actions.
+- Farmer Earnings & Realized Premium Analytics (`FarmerAnalyticsService`, `FarmerAnalyticsController`, `GET /api/analytics/farmer/{farmerId}`) computing lifetime take-home revenue, volume tonnage, average realized rate vs local mandi benchmark, KisanLink Premium Index (+X%), extra profit earned, and monthly progression breakdown.
+- Formal Printable/Downloadable Trade Deal Contract Receipt & Invoice with QR verification hash, itemized rates, freight deductions, and `@media print` layout.
+- Agro-Climatic & Weather Advisory Engine (`WeatherAdvisoryService`, `WeatherController`) providing GPS micro-climate forecasting (temperature, humidity, precipitation, wind), recommended harvest timing windows, produce spoilage risk indices, 5-day agro-weather forecasts, and tailored post-harvest guidelines.
+- Network of 6 seeded regional markets across Jharkhand with varied market types (`MANDI`, `APMC`, `WHOLESALE`).
+- SMS & WhatsApp Alert Notification & Webhook Engine (`SmsWhatsAppLog`, `MessageChannel`, `MessageStatus`, `SmsWhatsAppService`, `SmsWhatsAppController`, `POST /api/notifications/sms-whatsapp/**`) providing offline field SMS and official WhatsApp alerts for new buyer proposals, escrow vault guarantees, and instant payout UTR receipts, plus an inbound webhook enabling farmers to reply `ACCEPT <dealId>` via SMS to confirm deals headlessly.
+- Digital Escrow & UPI Payment Milestone Tracking (`EscrowPayment`, `EscrowStatus`, `EscrowService`, `EscrowController`, `POST /api/escrow/**`) featuring simulated UPI gateway deposit & lock, verified funds held in escrow vault, 5-stage milestone tracking, and instant payout release with NPCI settlement UTR receipts.
+- Live Real-Time WebSockets & Push Notifications via Spring Boot STOMP broker at `/ws` (`WebSocketConfig`, `NotificationWebSocketService`, `KisanLinkWebSocketClient`) broadcasting instant updates for trade lifecycle changes, matching buyer produce alerts, and mandi price movements.
+- Production Database Migration Strategy using Flyway with standardized versioned scripts (`V1__initial_schema.sql`, `V2__seed_regional_data.sql`, `V3__trade_deals.sql`, `V4__escrow_payments.sql`, `V5__sms_whatsapp_logs.sql`) managing schema evolution, tables, constraints, and baseline regional seeding.
+- Multi-container staging stack (`docker-compose.yml`) orchestrating local PostgreSQL 16 Alpine, containerized Spring Boot backend (`kisanlink-backend/Dockerfile`), and Nginx-powered React SPA frontend (`frontend/Dockerfile`, `frontend/nginx.conf`).
+- Integration tests in `KisanLinkIntegrationTests` covering: registration, login, role-based authorization, farmer profile update, buyer profile update, farmer produce add/list/delete, custom produce with category and image URL, buyer requirement add/list/delete, recommendation engine end-to-end, recommendation history, ownership attack prevention (farmer & buyer), weighted scoring shape, nearby-market distance routing, statistical price predictions with labeled confidence intervals, full Trade Deal lifecycle with access protection, Agro-Climatic weather advisories, interactive counter-offer negotiation flows, farmer earnings analytics, real-time WebSocket triggers, digital escrow payment milestones, and SMS/WhatsApp alert dispatch with inbound webhook confirmation (19 tests total, all passing).
 
 ## Completed frontend work
-- React/Vite market dashboard in `frontend/src/App.jsx`.
-- Responsive visual design in `frontend/src/styles.css`.
-- Market pulse and crop board using backend APIs.
-- Farmer and buyer registration.
-- Login and logout with JWT stored in localStorage.
-- Farmer produce entry.
-- Buyer requirement posting.
-- Recommendation request and net-return display.
-- Farmer/buyer profile and location form.
+- Built high-contrast agronomic design system (`frontend/src/styles.css`) using DM Mono & Manrope typography.
+- Tabbed navigation bar with active indicators and real-time notification badges.
+- 8 Modular Dedicated Views:
+  1. `prices`: Live 7-day price discovery, crop category filter chips, interactive price bar chart, and full product catalogue.
+  2. `predictions`: AI Price Forecasting dashboard with target prices, bullish/bearish trend indicators, certainty score meter, volatility rating, visual stacked 80%/90%/95% confidence intervals, and 7-day future price trajectory table.
+  3. `weather`: Agro-Climatic Intelligence view with current condition card, 4-metric grid, harvest window recommendations, perishable transit spoilage risk indices, 5-day daily forecast strip, and agronomic guidelines.
+  4. `matching`: Farmer produce selling workspace with photo preview, category selectors, instant weighted buyer recommendation, 1-click "Initiate Deal", interactive counter-offer negotiation threads, and complete "Active Trades & Orders" ledger with printable contract receipts.
+  5. `analytics`: Farmer Earnings & Premium Analytics dashboard with net take-home revenue hero, KisanLink Premium Index (+18.4%), volume tonnage, extra profit earned, and monthly revenue/tonnage progression bar chart.
+  6. `map`: Interactive SVG Mandi Radar map with user origin pin, distance rings (30km, 75km, 120km+), color-coded mandi nodes (APMC/Mandi/Wholesale), active route polyline, transit times, and instant directions.
+  7. `notifications`: Real-time alerts feed for price spikes, matching buyer requirements, and market routes with unread counters.
+  8. `profile`: Location & profile management with GPS coordinates and session sign in/out.
 - Frontend API base URL is `http://localhost:8080`.
 
 ## Verified commands and results
@@ -74,6 +103,16 @@ npm.cmd run build
 Result: build passed.
 
 Known PowerShell detail: `npm` may be blocked because it resolves to `npm.ps1`; use `npm.cmd`.
+
+## Spring Boot 4.1.1 custom package paths
+This project uses Spring Boot 4.1.1, which restructures some internal packages compared to Spring Boot 3.x.
+These differences affect test code:
+- `@AutoConfigureMockMvc` → `org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc`
+  (NOT `org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc`)
+- `ObjectMapper` in test code → `tools.jackson.databind.ObjectMapper`
+  (Jackson 3 replaces `com.fasterxml.jackson.databind.ObjectMapper`)
+- Test dependency in `pom.xml`: use `spring-boot-starter-webmvc-test` and `spring-boot-starter-data-jpa-test`
+  (NOT `spring-boot-starter-test`)
 
 ## Run in development mode
 Terminal 1:
@@ -126,13 +165,12 @@ Do not use the PostgreSQL profile until the PostgreSQL service is installed and 
 ## Next work, in order
 1. Verify PostgreSQL installation and run the backend with the `postgres` profile.
 2. Add a database migration strategy, preferably Flyway, before production use.
-3. Add integration tests for registration, login, role authorization, profile updates, produce, buyer requirements, and recommendations.
-4. Harden ownership checks for farmer/buyer/profile/produce/requirement endpoints.
-5. Add configurable transport rates and weighted recommendation scoring.
-6. Add market map and nearby-market endpoint with real distance/routing data.
-7. Improve prediction with historical data and clearly labeled confidence intervals.
-8. Add frontend navigation/views for profile, prices, predictions, notifications, buyer matching, and map.
-9. Add production configuration and remove development defaults/secrets.
+3. Harden ownership checks for farmer/buyer/profile/produce/requirement endpoints.
+4. Add configurable transport rates and weighted recommendation scoring.
+5. Add market map and nearby-market endpoint with real distance/routing data.
+6. Improve prediction with historical data and clearly labeled confidence intervals.
+7. Add frontend navigation/views for profile, prices, predictions, notifications, buyer matching, and map — including category-based crop browsing in the produce and requirement forms.
+8. Add production configuration and remove development defaults/secrets.
 
 ## Smoke-test workflow
 1. Start backend with H2 dev profile.

@@ -182,17 +182,20 @@ ADMIN
 
 7. Farmer Produce Module
 
-The farmer enters:
+The farmer can list any agricultural product with flexible naming and image support:
 
-Crop: Tomato
-Quantity: 500 kg
-Quality: Grade A
-Location: Ranchi
-Harvest Date: 25 August
-Available Until: 28 August
+- Category: FRUITS, VEGETABLES, SEEDS (plus grains, pulses, spices, oilseeds, flowers, other)
+- Product / Crop Name: Custom product name set by farmer (e.g., Tomato, Organic Chia Seeds, Alphonso Mango, etc.) or selected from catalog
+- Quantity: e.g., 500 kg
+- Quality: e.g., Grade A / Premium
+- Location: Ranchi
+- Harvest Date: 25 August
+- Available Until: 28 August
+- Expected Price: e.g., ₹25/kg
+- Product Images: Photos / Image URLs of the actual produce being sold
+- Description / Notes: Optional seller notes on variety, organic certification, packaging
 
-
-This information is stored in the database and becomes the input for the recommendation engine.
+This information is stored in the database and becomes the input for the recommendation engine and marketplace browsing.
 
 8. Price Discovery
 
@@ -222,11 +225,12 @@ For the SIH prototype, sample or collected data can be used if live data integra
 
 9. Buyer Marketplace
 
-Buyers can publish requirements.
+Buyers can publish requirements categorized by crop category (Fruits, Vegetables, Seeds, etc.) or specific custom product name.
 
 Example:
 
-Crop: Tomato
+Category: VEGETABLES
+Crop / Product: Tomato
 Required Quantity: 2,000 kg
 Quality: Grade A
 Offered Price: ₹27/kg
@@ -239,11 +243,14 @@ The system compares the buyer requirement with farmer produce.
 Example:
 
 Farmer:
+Category: VEGETABLES
 Tomato
 500 kg
 Grade A
+[Attached Product Image]
 
 Buyer:
+Category: VEGETABLES
 Tomato
 Needs 2,000 kg
 Grade A
@@ -253,6 +260,7 @@ MATCH FOUND
 
 
 This creates actual farmer-to-buyer linkage.
+
 
 10. Transportation Cost
 

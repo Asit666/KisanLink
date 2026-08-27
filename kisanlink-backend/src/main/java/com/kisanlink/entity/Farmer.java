@@ -24,4 +24,5 @@ public class Farmer {
     private String state;
     private Double latitude;
     private Double longitude;
+    private String alertEmail;
 }

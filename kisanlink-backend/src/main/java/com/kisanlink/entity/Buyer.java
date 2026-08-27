@@ -29,4 +29,5 @@ public class Buyer {
     private Double latitude;
     private Double longitude;
     private boolean verified;
+    private String alertEmail;
 }

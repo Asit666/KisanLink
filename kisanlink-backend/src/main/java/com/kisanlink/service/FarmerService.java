@@ -42,6 +42,11 @@ public class FarmerService {
         farmer.setState(request.state());
         farmer.setLatitude(request.latitude());
         farmer.setLongitude(request.longitude());
+        if (request.alertEmail() != null) farmer.setAlertEmail(request.alertEmail());
+        // Also update the linked User phone
+        if (request.phone() != null && !request.phone().isBlank()) {
+            farmer.getUser().setPhone(request.phone());
+        }
         return farmerRepository.save(farmer);
     }
 
@@ -49,8 +54,25 @@ public class FarmerService {
     public FarmerProduce addProduce(Long farmerId, ProduceRequest request) {
         var farmer = farmerRepository.findById(farmerId)
                 .orElseThrow(() -> new IllegalArgumentException("Farmer not found: " + farmerId));
-        var crop = cropRepository.findById(request.cropId())
-                .orElseThrow(() -> new IllegalArgumentException("Crop not found: " + request.cropId()));
+
+        com.kisanlink.entity.Crop crop;
+        if (request.cropId() != null) {
+            crop = cropRepository.findById(request.cropId())
+                    .orElseThrow(() -> new IllegalArgumentException("Crop not found: " + request.cropId()));
+        } else if (request.cropName() != null && !request.cropName().isBlank()) {
+            String trimmedName = request.cropName().trim();
+            crop = cropRepository.findByNameIgnoreCase(trimmedName)
+                    .orElseGet(() -> {
+                        com.kisanlink.entity.Crop newCrop = new com.kisanlink.entity.Crop();
+                        newCrop.setName(trimmedName);
+                        newCrop.setCategory(request.category() != null ? request.category() : com.kisanlink.entity.CropCategory.OTHER);
+                        newCrop.setUnit("kg");
+                        return cropRepository.save(newCrop);
+                    });
+        } else {
+            throw new IllegalArgumentException("Either cropId or cropName must be provided");
+        }
+
         FarmerProduce produce = new FarmerProduce();
         produce.setFarmer(farmer);
         produce.setCrop(crop);
@@ -59,8 +81,11 @@ public class FarmerService {
         produce.setHarvestDate(request.harvestDate());
         produce.setAvailableUntil(request.availableUntil());
         produce.setExpectedPrice(request.expectedPrice());
+        produce.setImageUrl(request.imageUrl());
+        produce.setDescription(request.description());
         return produceRepository.save(produce);
     }
+
 
     public void deleteProduce(Long id) {
         if (!produceRepository.existsById(id)) {

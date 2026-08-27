@@ -1,6 +1,7 @@
 package com.kisanlink.controller;
 
 import com.kisanlink.entity.Crop;
+import com.kisanlink.entity.CropCategory;
 import com.kisanlink.service.CropService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -17,8 +18,24 @@ public class CropController {
         this.cropService = cropService;
     }
 
+    /**
+     * Returns all valid crop categories. Intended for populating dropdowns
+     * in the farmer produce entry and buyer requirement forms.
+     */
+    @GetMapping("/categories")
+    public List<CropCategory> listCategories() {
+        return cropService.findAllCategories();
+    }
+
+    /**
+     * Returns all crops, optionally filtered by category.
+     * Example: GET /api/crops?category=VEGETABLE
+     */
     @GetMapping
-    public List<Crop> findAll() {
+    public List<Crop> findAll(@RequestParam(required = false) CropCategory category) {
+        if (category != null) {
+            return cropService.findByCategory(category);
+        }
         return cropService.findAll();
     }
 
@@ -33,3 +50,4 @@ public class CropController {
         return cropService.create(crop);
     }
 }
+

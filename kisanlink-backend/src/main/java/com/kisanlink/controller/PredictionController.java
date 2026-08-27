@@ -26,6 +26,17 @@ public class PredictionController {
         return predictionService.findByCropAndMarket(cropId, marketId);
     }
 
+    @GetMapping("/{cropId}/estimate")
+    public PredictionResponse getEstimate(@PathVariable Long cropId) {
+        return predictionService.estimate(cropId);
+    }
+
+    @GetMapping("/{cropId}/forecast")
+    public PredictionResponse getForecast(@PathVariable Long cropId,
+                                          @RequestParam(defaultValue = "7") int days) {
+        return predictionService.forecast(cropId, days);
+    }
+
     @PostMapping("/{cropId}/estimate")
     public PredictionResponse estimate(@PathVariable Long cropId) {
         return predictionService.estimate(cropId);

@@ -1,0 +1,74 @@
+services:
+  # ──────────────────────────────────────────────────────────────────────────
+  # 1. PostgreSQL Production Database with Persistent Storage & Healthcheck
+  # ──────────────────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: kisanlink-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-kisanlink}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-kisanlink}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - kisanlink-net
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 2. KisanLink Spring Boot Backend (Automated Flyway Migrations on startup)
+  # ──────────────────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./kisanlink-backend
+      dockerfile: Dockerfile
+    container_name: kisanlink-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-kisanlink}
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      PORT: 8080
+      JWT_SECRET: ${JWT_SECRET:-kisanlink-production-secure-jwt-secret-key-at-least-256-bits-long}
+      JWT_EXPIRATION: 86400000
+    ports:
+      - "8080:8080"
+    networks:
+      - kisanlink-net
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 3. KisanLink React Frontend (Vite + Nginx Production Reverse Proxy)
+  # ──────────────────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: kisanlink-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+      - "80:80"
+    networks:
+      - kisanlink-net
+
+volumes:
+  postgres_data:
+    name: kisanlink-postgres-data
+
+networks:
+  kisanlink-net:
+    name: kisanlink-network
+    driver: bridge
