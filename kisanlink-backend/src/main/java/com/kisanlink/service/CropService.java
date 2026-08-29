@@ -33,8 +33,16 @@ public class CropService {
                 .orElseThrow(() -> new IllegalArgumentException("Crop not found: " + id));
     }
 
+    public List<Crop> search(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return findAll();
+        }
+        return cropRepository.findByNameContainingIgnoreCase(query.trim());
+    }
+
     public Crop create(Crop crop) {
         return cropRepository.save(crop);
     }
 }
+
 

@@ -25,11 +25,14 @@ public class FarmerController {
         this.ownershipService = ownershipService;
     }
 
-    /** Public read — any authenticated farmer may view any profile. */
+    /** Ownership-protected: only the farmer who owns this profile may view it. */
     @GetMapping("/{farmerId}")
-    public Farmer getProfile(@PathVariable Long farmerId) {
+    public Farmer getProfile(@PathVariable Long farmerId,
+                             @AuthenticationPrincipal UserDetails principal) {
+        ownershipService.checkFarmerOwnership(farmerId, principal.getUsername());
         return farmerService.getProfile(farmerId);
     }
+
 
     /** Ownership-protected: only the farmer who owns this profile may update it. */
     @PutMapping("/{farmerId}")

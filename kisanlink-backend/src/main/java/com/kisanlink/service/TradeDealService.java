@@ -61,11 +61,41 @@ public class TradeDealService {
         FarmerProduce produce = null;
         if (request.produceId() != null) {
             produce = produceRepository.findById(request.produceId()).orElse(null);
+            if (produce != null) {
+                if (!produce.getFarmer().getId().equals(farmer.getId())) {
+                    throw new IllegalArgumentException("Produce listing #" + request.produceId() + " does not belong to Farmer #" + farmer.getId());
+                }
+                BigDecimal reservedQuantity = tradeDealRepository.findByFarmerIdOrderByCreatedAtDesc(farmer.getId()).stream()
+                        .filter(d -> d.getProduce() != null && d.getProduce().getId().equals(request.produceId()))
+                        .filter(d -> d.getStatus() != TradeStatus.CANCELLED)
+                        .map(TradeDeal::getQuantity)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal totalDemanded = reservedQuantity.add(request.quantity());
+                if (totalDemanded.compareTo(produce.getQuantity()) > 0) {
+                    BigDecimal available = produce.getQuantity().subtract(reservedQuantity);
+                    if (available.compareTo(BigDecimal.ZERO) < 0) available = BigDecimal.ZERO;
+                    throw new IllegalArgumentException(String.format("Requested trade quantity %s kg exceeds available unreserved produce inventory %s kg (%s kg already locked in active deals).",
+                            request.quantity().stripTrailingZeros().toPlainString(),
+                            available.stripTrailingZeros().toPlainString(),
+                            reservedQuantity.stripTrailingZeros().toPlainString()));
+                }
+            }
         }
+
 
         BuyerRequirement requirement = null;
         if (request.requirementId() != null) {
             requirement = requirementRepository.findById(request.requirementId()).orElse(null);
+            if (requirement != null) {
+                if (!requirement.getBuyer().getId().equals(buyer.getId())) {
+                    throw new IllegalArgumentException("Procurement requirement #" + request.requirementId() + " does not belong to Buyer #" + buyer.getId());
+                }
+                if (request.quantity().compareTo(requirement.getRequiredQuantity()) > 0) {
+                    throw new IllegalArgumentException(String.format("Requested trade quantity %s kg exceeds buyer required quantity %s kg.",
+                            request.quantity().stripTrailingZeros().toPlainString(),
+                            requirement.getRequiredQuantity().stripTrailingZeros().toPlainString()));
+                }
+            }
         }
 
         Crop crop = null;
@@ -82,7 +112,18 @@ public class TradeDealService {
             throw new IllegalArgumentException("A valid Crop must be specified or associated with produce/requirement.");
         }
 
+        if (produce != null && produce.getCrop() != null && !produce.getCrop().getId().equals(crop.getId())) {
+            throw new IllegalArgumentException("Produce crop (" + produce.getCrop().getName() + ") does not match deal crop (" + crop.getName() + ").");
+        }
+        if (requirement != null && requirement.getCrop() != null && !requirement.getCrop().getId().equals(crop.getId())) {
+            throw new IllegalArgumentException("Requirement crop (" + requirement.getCrop().getName() + ") does not match deal crop (" + crop.getName() + ").");
+        }
+
         BigDecimal transportCost = request.transportCost() != null ? request.transportCost() : BigDecimal.ZERO;
+        if (transportCost.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Transport cost cannot be negative.");
+        }
+
         BigDecimal totalAmount = request.agreedPricePerKg().multiply(request.quantity());
         BigDecimal netFarmerReturn = totalAmount.subtract(transportCost);
 
@@ -97,12 +138,14 @@ public class TradeDealService {
         deal.setTransportCost(transportCost);
         deal.setTotalAmount(totalAmount);
         deal.setNetFarmerReturn(netFarmerReturn);
-        deal.setStatus(request.status() != null ? request.status() : TradeStatus.PROPOSED);
+        // Initial lifecycle state is strictly server-governed as PROPOSED
+        deal.setStatus(TradeStatus.PROPOSED);
         deal.setInitiatedBy(initiatorRole);
         deal.setDeliveryAddress(request.deliveryAddress() != null ? request.deliveryAddress() : buyer.getAddress());
         deal.setNotes(request.notes());
 
         TradeDeal saved = tradeDealRepository.save(deal);
+
 
         // Real-time notification dispatch
         User targetUser = (initiatorRole == Role.FARMER) ? buyer.getUser() : farmer.getUser();
@@ -130,6 +173,21 @@ public class TradeDealService {
 
         ownershipService.checkTradeDealAccess(deal, userEmail);
         validateStatusTransition(deal.getStatus(), newStatus);
+
+        boolean isFarmer = deal.getFarmer() != null && deal.getFarmer().getUser().getEmail().equalsIgnoreCase(userEmail);
+        boolean isBuyer = deal.getBuyer() != null && deal.getBuyer().getUser().getEmail().equalsIgnoreCase(userEmail);
+        Role actorRole = isFarmer ? Role.FARMER : (isBuyer ? Role.BUYER : Role.ADMIN);
+
+        if (newStatus == TradeStatus.ACCEPTED) {
+            Role lastSender = deal.getNegotiations().isEmpty() ? deal.getInitiatedBy() : deal.getNegotiations().get(deal.getNegotiations().size() - 1).getSenderRole();
+            if (actorRole == lastSender) {
+                throw new IllegalStateException("You cannot accept your own trade proposal or counter-offer.");
+            }
+        }
+
+        if (newStatus == TradeStatus.COMPLETED && actorRole != Role.BUYER && actorRole != Role.ADMIN) {
+            throw new IllegalStateException("Only the buyer can mark a trade deal as COMPLETED.");
+        }
 
         deal.setStatus(newStatus);
         TradeDeal updated = tradeDealRepository.save(deal);
@@ -160,6 +218,12 @@ public class TradeDealService {
         if (deal.getStatus() != TradeStatus.PROPOSED && deal.getStatus() != TradeStatus.NEGOTIATING) {
             throw new IllegalStateException("Cannot negotiate terms on a " + deal.getStatus() + " trade deal.");
         }
+
+        Role lastSender = deal.getNegotiations().isEmpty() ? deal.getInitiatedBy() : deal.getNegotiations().get(deal.getNegotiations().size() - 1).getSenderRole();
+        if (userRole == lastSender) {
+            throw new IllegalStateException("It is not your turn to submit a counter-offer. Please wait for the counterparty response.");
+        }
+
 
         deal.setAgreedPricePerKg(request.proposedPricePerKg());
         deal.setQuantity(request.proposedQuantity());
@@ -231,13 +295,19 @@ public class TradeDealService {
         if (current == TradeStatus.COMPLETED || current == TradeStatus.CANCELLED) {
             throw new IllegalStateException("Cannot change status of a " + current + " trade deal.");
         }
-        // Allowed transitions:
-        // PROPOSED -> NEGOTIATING, ACCEPTED, CANCELLED
-        // NEGOTIATING -> ACCEPTED, CANCELLED
-        // ACCEPTED -> IN_TRANSIT, CANCELLED
-        // IN_TRANSIT -> DELIVERED, CANCELLED
-        // DELIVERED -> COMPLETED
+        boolean valid = switch (current) {
+            case PROPOSED -> target == TradeStatus.NEGOTIATING || target == TradeStatus.ACCEPTED || target == TradeStatus.CANCELLED;
+            case NEGOTIATING -> target == TradeStatus.ACCEPTED || target == TradeStatus.CANCELLED;
+            case ACCEPTED -> target == TradeStatus.IN_TRANSIT || target == TradeStatus.CANCELLED;
+            case IN_TRANSIT -> target == TradeStatus.DELIVERED || target == TradeStatus.CANCELLED;
+            case DELIVERED -> target == TradeStatus.COMPLETED;
+            default -> false;
+        };
+        if (!valid) {
+            throw new IllegalStateException(String.format("Invalid status transition from %s to %s", current, target));
+        }
     }
+
 
     private TradeDealResponse mapToResponse(TradeDeal deal) {
         List<com.kisanlink.dto.TradeNegotiationResponse> negResponses = (deal.getNegotiations() != null)

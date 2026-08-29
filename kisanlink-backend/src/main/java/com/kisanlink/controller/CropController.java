@@ -44,6 +44,12 @@ public class CropController {
         return cropService.findById(id);
     }
 
+    @GetMapping("/search")
+    public List<Crop> search(@RequestParam String query) {
+        return cropService.search(query);
+    }
+
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Crop create(@Valid @RequestBody Crop crop) {

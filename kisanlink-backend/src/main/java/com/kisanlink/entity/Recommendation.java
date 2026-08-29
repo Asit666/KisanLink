@@ -42,8 +42,9 @@ public class Recommendation {
     @Column(nullable = false, precision = 5, scale = 2)
     private BigDecimal score;
 
-    @Column(nullable = false, length = 1000)
+    @Column(name = "explanation", nullable = false, length = 1000)
     private String reason;
+
 
     private Instant createdAt = Instant.now();
 }

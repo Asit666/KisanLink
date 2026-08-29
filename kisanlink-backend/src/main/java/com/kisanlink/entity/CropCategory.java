@@ -1,9 +1,9 @@
 package com.kisanlink.entity;
 
 /**
- * Category classification for crops.
- * Used by farmers when listing produce and by buyers when posting requirements,
- * enabling category-based browsing and filtering.
+ * Category classification for crops and agricultural inputs.
+ * Used by farmers and agro-dealers when listing produce or farm inputs,
+ * and by buyers when posting requirements.
  */
 public enum CropCategory {
     VEGETABLE,
@@ -14,5 +14,10 @@ public enum CropCategory {
     SPICE,
     OIL_SEED,
     FLOWER,
+    FERTILIZER,
+    PESTICIDE,
+    BIO_INPUT,
+    FARM_EQUIPMENT,
     OTHER
 }
+

@@ -5,8 +5,11 @@ import com.kisanlink.entity.*;
 import com.kisanlink.repository.EscrowRepository;
 import com.kisanlink.repository.TradeDealRepository;
 import com.kisanlink.security.OwnershipService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -34,10 +37,19 @@ public class EscrowService {
         this.smsWhatsAppService = smsWhatsAppService;
     }
 
+    @Transactional
     public EscrowResponse getOrCreateEscrow(Long dealId, String userEmail) {
         TradeDeal deal = tradeDealRepository.findById(dealId)
                 .orElseThrow(() -> new IllegalArgumentException("Trade deal not found: " + dealId));
         ownershipService.checkTradeDealAccess(deal, userEmail);
+
+        if (deal.getStatus() != TradeStatus.ACCEPTED &&
+            deal.getStatus() != TradeStatus.IN_TRANSIT &&
+            deal.getStatus() != TradeStatus.DELIVERED &&
+            deal.getStatus() != TradeStatus.COMPLETED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Escrow account cannot be opened until trade contract is ACCEPTED. Current status: " + deal.getStatus());
+        }
+
 
         EscrowPayment escrow = escrowRepository.findByTradeDealId(dealId)
                 .orElseGet(() -> {
@@ -47,12 +59,16 @@ public class EscrowService {
                     newEscrow.setFarmerPayout(deal.getNetFarmerReturn());
                     newEscrow.setStatus(EscrowStatus.PENDING_DEPOSIT);
                     newEscrow.setPaymentMethod(PaymentMethod.UPI_INSTANT);
-                    newEscrow.setFarmerUpiId(deal.getFarmer().getUser().getPhone() + "@upi");
+                    String phone = (deal.getFarmer() != null && deal.getFarmer().getUser() != null)
+                            ? deal.getFarmer().getUser().getPhone()
+                            : null;
+                    newEscrow.setFarmerUpiId(phone != null && !phone.isBlank() ? phone + "@upi" : "farmer@upi");
                     return escrowRepository.save(newEscrow);
                 });
 
         return mapToResponse(escrow);
     }
+
 
     public EscrowResponse depositFunds(Long escrowId, EscrowDepositRequest request, String userEmail) {
         EscrowPayment escrow = escrowRepository.findById(escrowId)
@@ -64,6 +80,16 @@ public class EscrowService {
         if (escrow.getStatus() != EscrowStatus.PENDING_DEPOSIT) {
             throw new IllegalStateException("Escrow deposit already processed. Current status: " + escrow.getStatus());
         }
+
+        if (request.amount() == null || request.amount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be strictly positive.");
+        }
+
+        if (request.amount().compareTo(escrow.getTotalAmount()) != 0) {
+            throw new IllegalArgumentException(String.format("Deposit amount ₹%s must exactly match required deal total ₹%s",
+                    request.amount().toPlainString(), escrow.getTotalAmount().toPlainString()));
+        }
+
 
         String upiRef = (request.upiTransactionRef() != null && !request.upiTransactionRef().isBlank())
                 ? request.upiTransactionRef()
@@ -107,10 +133,15 @@ public class EscrowService {
                 .orElseThrow(() -> new IllegalArgumentException("Escrow account not found: " + escrowId));
 
         TradeDeal deal = escrow.getTradeDeal();
-        ownershipService.checkTradeDealAccess(deal, userEmail);
+        // Escrow payout release can only be authorized by the Buyer who funded the deal
+        ownershipService.checkBuyerOwnership(deal.getBuyer().getId(), userEmail);
 
-        if (escrow.getStatus() != EscrowStatus.FUNDS_HELD_IN_ESCROW && escrow.getStatus() != EscrowStatus.DISPUTED) {
-            throw new IllegalStateException("Cannot release funds when status is " + escrow.getStatus());
+        if (escrow.getStatus() == EscrowStatus.DISPUTED) {
+            throw new IllegalStateException("Escrow funds are frozen under DISPUTED status. Resolution required before funds can be released.");
+        }
+
+        if (escrow.getStatus() != EscrowStatus.FUNDS_HELD_IN_ESCROW) {
+            throw new IllegalStateException("Cannot release funds when escrow status is " + escrow.getStatus());
         }
 
         String settlementUtr = "UTR-NPCI-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
@@ -147,6 +178,7 @@ public class EscrowService {
 
         return mapToResponse(saved);
     }
+
 
     public EscrowResponse raiseDispute(Long escrowId, EscrowDisputeRequest request, String userEmail) {
         EscrowPayment escrow = escrowRepository.findById(escrowId)

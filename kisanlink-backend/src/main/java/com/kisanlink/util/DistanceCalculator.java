@@ -10,7 +10,7 @@ public final class DistanceCalculator {
     public static BigDecimal between(Double firstLatitude, Double firstLongitude,
                                      Double secondLatitude, Double secondLongitude) {
         if (firstLatitude == null || firstLongitude == null || secondLatitude == null || secondLongitude == null) {
-            return BigDecimal.ZERO.setScale(2);
+            return null;
         }
         double latDistance = Math.toRadians(secondLatitude - firstLatitude);
         double lonDistance = Math.toRadians(secondLongitude - firstLongitude);
@@ -20,4 +20,5 @@ public final class DistanceCalculator {
         return BigDecimal.valueOf(6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)))
                 .setScale(2, RoundingMode.HALF_UP);
     }
+
 }

@@ -39,10 +39,10 @@ public class PriceService {
     }
 
     public PriceTrendResponse trend(Long cropId) {
-        List<MarketPrice> prices = priceRepository.findByCropIdOrderByDateDesc(cropId);
         if (prices.isEmpty()) {
-            return new PriceTrendResponse("STABLE", BigDecimal.valueOf(25), BigDecimal.ZERO);
+            return new PriceTrendResponse("NO_DATA", BigDecimal.ZERO, BigDecimal.ZERO);
         }
+
         BigDecimal latest = prices.getFirst().getModalPrice();
         BigDecimal previous = prices.size() > 1 ? prices.get(1).getModalPrice() : latest;
         BigDecimal change = previous.signum() == 0 ? BigDecimal.ZERO
@@ -54,13 +54,28 @@ public class PriceService {
     }
 
     public MarketPrice create(MarketPriceRequest request) {
+        if (request.minPrice() == null || request.modalPrice() == null || request.maxPrice() == null ||
+            request.minPrice().compareTo(BigDecimal.ZERO) <= 0 ||
+            request.modalPrice().compareTo(BigDecimal.ZERO) <= 0 ||
+            request.maxPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Market prices must be strictly positive.");
+        }
+        if (request.minPrice().compareTo(request.modalPrice()) > 0 ||
+            request.modalPrice().compareTo(request.maxPrice()) > 0) {
+            throw new IllegalArgumentException(String.format(
+                    "Invalid price boundary: minPrice (₹%s) <= modalPrice (₹%s) <= maxPrice (₹%s) is required.",
+                    request.minPrice(), request.modalPrice(), request.maxPrice()));
+        }
+
         var market = marketRepository.findById(request.marketId())
                 .orElseThrow(() -> new IllegalArgumentException("Market not found: " + request.marketId()));
         var crop = cropRepository.findById(request.cropId())
                 .orElseThrow(() -> new IllegalArgumentException("Crop not found: " + request.cropId()));
 
-        List<MarketPrice> existingPrices = priceRepository.findByCropIdOrderByDateDesc(crop.getId());
-        BigDecimal previousPrice = existingPrices.isEmpty() ? request.modalPrice() : existingPrices.getFirst().getModalPrice();
+        List<MarketPrice> existingMarketPrices = priceRepository.findByCropIdOrderByDateDesc(crop.getId()).stream()
+                .filter(p -> p.getMarket() != null && p.getMarket().getId().equals(market.getId()))
+                .toList();
+        BigDecimal previousPrice = existingMarketPrices.isEmpty() ? request.modalPrice() : existingMarketPrices.getFirst().getModalPrice();
 
         MarketPrice price = new MarketPrice();
         price.setMarket(market);
@@ -71,6 +86,7 @@ public class PriceService {
         price.setModalPrice(request.modalPrice());
         price.setSource(request.source());
         MarketPrice saved = priceRepository.save(price);
+
 
         // Compute price delta & broadcast live alert via WebSockets
         try {

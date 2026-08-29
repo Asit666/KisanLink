@@ -37,11 +37,11 @@ public class FarmerService {
     @Transactional
     public Farmer updateProfile(Long farmerId, FarmerProfileRequest request) {
         Farmer farmer = getProfile(farmerId);
-        farmer.setAddress(request.address());
-        farmer.setDistrict(request.district());
-        farmer.setState(request.state());
-        farmer.setLatitude(request.latitude());
-        farmer.setLongitude(request.longitude());
+        if (request.address() != null) farmer.setAddress(request.address());
+        if (request.district() != null) farmer.setDistrict(request.district());
+        if (request.state() != null) farmer.setState(request.state());
+        if (request.latitude() != null) farmer.setLatitude(request.latitude());
+        if (request.longitude() != null) farmer.setLongitude(request.longitude());
         if (request.alertEmail() != null) farmer.setAlertEmail(request.alertEmail());
         // Also update the linked User phone
         if (request.phone() != null && !request.phone().isBlank()) {
@@ -49,6 +49,7 @@ public class FarmerService {
         }
         return farmerRepository.save(farmer);
     }
+
 
     @Transactional
     public FarmerProduce addProduce(Long farmerId, ProduceRequest request) {

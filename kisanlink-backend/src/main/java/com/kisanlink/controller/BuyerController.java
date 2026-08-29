@@ -25,11 +25,14 @@ public class BuyerController {
         this.ownershipService = ownershipService;
     }
 
-    /** Public read — any authenticated buyer may view any profile. */
+    /** Ownership-protected: only the buyer who owns this profile may view it. */
     @GetMapping("/{buyerId}")
-    public Buyer getProfile(@PathVariable Long buyerId) {
+    public Buyer getProfile(@PathVariable Long buyerId,
+                            @AuthenticationPrincipal UserDetails principal) {
+        ownershipService.checkBuyerOwnership(buyerId, principal.getUsername());
         return buyerService.getProfile(buyerId);
     }
+
 
     /** Ownership-protected: only the buyer who owns this profile may update it. */
     @PutMapping("/{buyerId}")

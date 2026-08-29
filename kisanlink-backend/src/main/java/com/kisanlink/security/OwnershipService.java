@@ -42,7 +42,7 @@ public class OwnershipService {
     public void checkFarmerOwnership(Long farmerId, String email) {
         Farmer farmer = farmerRepository.findById(farmerId)
                 .orElseThrow(() -> new IllegalArgumentException("Farmer not found: " + farmerId));
-        if (!farmer.getUser().getEmail().equals(email)) {
+        if (!farmer.getUser().getEmail().equalsIgnoreCase(email)) {
             throw new AccessDeniedException("Access denied: you do not own this farmer profile");
         }
     }
@@ -55,7 +55,7 @@ public class OwnershipService {
     public void checkBuyerOwnership(Long buyerId, String email) {
         Buyer buyer = buyerRepository.findById(buyerId)
                 .orElseThrow(() -> new IllegalArgumentException("Buyer not found: " + buyerId));
-        if (!buyer.getUser().getEmail().equals(email)) {
+        if (!buyer.getUser().getEmail().equalsIgnoreCase(email)) {
             throw new AccessDeniedException("Access denied: you do not own this buyer profile");
         }
     }
@@ -69,7 +69,7 @@ public class OwnershipService {
     public void checkProduceOwnership(Long produceId, String email) {
         FarmerProduce produce = produceRepository.findById(produceId)
                 .orElseThrow(() -> new IllegalArgumentException("Produce not found: " + produceId));
-        if (!produce.getFarmer().getUser().getEmail().equals(email)) {
+        if (!produce.getFarmer().getUser().getEmail().equalsIgnoreCase(email)) {
             throw new AccessDeniedException("Access denied: you do not own this produce listing");
         }
     }
@@ -83,7 +83,7 @@ public class OwnershipService {
     public void checkRequirementOwnership(Long requirementId, String email) {
         BuyerRequirement requirement = requirementRepository.findById(requirementId)
                 .orElseThrow(() -> new IllegalArgumentException("Requirement not found: " + requirementId));
-        if (!requirement.getBuyer().getUser().getEmail().equals(email)) {
+        if (!requirement.getBuyer().getUser().getEmail().equalsIgnoreCase(email)) {
             throw new AccessDeniedException("Access denied: you do not own this requirement");
         }
     }
@@ -94,8 +94,8 @@ public class OwnershipService {
      * @throws AccessDeniedException if the authenticated user is neither the farmer nor the buyer of this deal
      */
     public void checkTradeDealAccess(com.kisanlink.entity.TradeDeal deal, String email) {
-        boolean isFarmer = deal.getFarmer() != null && deal.getFarmer().getUser().getEmail().equals(email);
-        boolean isBuyer = deal.getBuyer() != null && deal.getBuyer().getUser().getEmail().equals(email);
+        boolean isFarmer = deal.getFarmer() != null && deal.getFarmer().getUser().getEmail().equalsIgnoreCase(email);
+        boolean isBuyer = deal.getBuyer() != null && deal.getBuyer().getUser().getEmail().equalsIgnoreCase(email);
         if (!isFarmer && !isBuyer) {
             throw new AccessDeniedException("Access denied: you are not a party in this trade deal");
         }

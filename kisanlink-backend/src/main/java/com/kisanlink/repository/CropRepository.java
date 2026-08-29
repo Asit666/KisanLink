@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface CropRepository extends JpaRepository<Crop, Long> {
     List<Crop> findByCategory(CropCategory category);
     Optional<Crop> findByNameIgnoreCase(String name);
+    List<Crop> findByNameContainingIgnoreCase(String name);
 }
+
 
 

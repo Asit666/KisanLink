@@ -69,15 +69,43 @@ public class SmsWhatsAppService {
                 try {
                     Long dealId = Long.parseLong(parts[1]);
                     TradeDeal deal = tradeDealRepository.findById(dealId).orElse(null);
-                    if (deal != null && (deal.getStatus() == TradeStatus.PROPOSED || deal.getStatus() == TradeStatus.NEGOTIATING)) {
-                        deal.setStatus(TradeStatus.ACCEPTED);
-                        tradeDealRepository.save(deal);
-                        responseText = String.format("KisanLink: Trade #%d for %s accepted via SMS. Buyer has been notified to lock funds in Escrow.",
-                                dealId, deal.getCrop().getName());
-                        notificationWebSocketService.sendTradeUpdate(deal.getFarmer().getUser(), deal, "Accepted via Field SMS");
-                        notificationWebSocketService.sendTradeUpdate(deal.getBuyer().getUser(), deal, "Accepted via Farmer SMS");
+                    if (deal != null) {
+                        String fromNorm = normalizePhone(phone);
+                        String farmerPhone = deal.getFarmer() != null && deal.getFarmer().getUser() != null ? normalizePhone(deal.getFarmer().getUser().getPhone()) : "";
+                        String buyerPhone = deal.getBuyer() != null && deal.getBuyer().getUser() != null ? normalizePhone(deal.getBuyer().getUser().getPhone()) : "";
+
+                        boolean matchesFarmer = !farmerPhone.isEmpty() && (fromNorm.endsWith(farmerPhone) || farmerPhone.endsWith(fromNorm));
+                        boolean matchesBuyer = !buyerPhone.isEmpty() && (fromNorm.endsWith(buyerPhone) || buyerPhone.endsWith(fromNorm));
+
+                        if (!matchesFarmer && !matchesBuyer) {
+                            responseText = "KisanLink Security: Sender phone " + phone + " is not registered for Trade #" + dealId;
+                            return dispatchAlert(null, phone, MessageChannel.SMS, messageType, responseText);
+                        }
+
+                        // Actor Turn Verification: The initiating party cannot accept their own proposal
+                        if (deal.getInitiatedBy() == Role.FARMER && matchesFarmer && !matchesBuyer) {
+                            responseText = "KisanLink Security: Farmer initiated Trade #" + dealId + ". Only the buyer can accept this offer.";
+                            return dispatchAlert(null, phone, MessageChannel.SMS, messageType, responseText);
+                        }
+                        if (deal.getInitiatedBy() == Role.BUYER && matchesBuyer && !matchesFarmer) {
+                            responseText = "KisanLink Security: Buyer initiated Trade #" + dealId + ". Only the farmer can accept this offer.";
+                            return dispatchAlert(null, phone, MessageChannel.SMS, messageType, responseText);
+                        }
+
+
+
+                        if (deal.getStatus() == TradeStatus.PROPOSED || deal.getStatus() == TradeStatus.NEGOTIATING) {
+                            deal.setStatus(TradeStatus.ACCEPTED);
+                            tradeDealRepository.save(deal);
+                            responseText = String.format("KisanLink: Trade #%d for %s accepted via SMS. Buyer has been notified to lock funds in Escrow.",
+                                    dealId, deal.getCrop().getName());
+                            notificationWebSocketService.sendTradeUpdate(deal.getFarmer().getUser(), deal, "Accepted via Field SMS");
+                            notificationWebSocketService.sendTradeUpdate(deal.getBuyer().getUser(), deal, "Accepted via Farmer SMS");
+                        } else {
+                            responseText = "KisanLink: Trade #" + dealId + " is already active or in status: " + deal.getStatus();
+                        }
                     } else {
-                        responseText = "KisanLink: Trade #" + dealId + " is already active or not found.";
+                        responseText = "KisanLink: Trade #" + dealId + " not found.";
                     }
                 } catch (NumberFormatException e) {
                     responseText = "KisanLink: Invalid Trade ID format. Send 'ACCEPT <deal_id>' to confirm.";
@@ -95,21 +123,25 @@ public class SmsWhatsAppService {
         return dispatchAlert(null, phone, MessageChannel.SMS, messageType, responseText);
     }
 
+    private String normalizePhone(String phone) {
+        if (phone == null) return "";
+        return phone.replaceAll("[^0-9]", "");
+    }
+
     @Transactional(readOnly = true)
     public List<SmsAlertResponse> getRecentLogs(String userEmail) {
         if (userEmail != null) {
             User user = userRepository.findByEmail(userEmail).orElse(null);
             if (user != null) {
-                List<SmsWhatsAppLog> userLogs = logRepository.findByUserIdOrderBySentAtDesc(user.getId());
-                if (!userLogs.isEmpty()) {
-                    return userLogs.stream().map(this::mapToResponse).toList();
-                }
+                return logRepository.findByUserIdOrderBySentAtDesc(user.getId())
+                        .stream()
+                        .map(this::mapToResponse)
+                        .toList();
             }
         }
-        return logRepository.findTop20ByOrderBySentAtDesc().stream()
-                .map(this::mapToResponse)
-                .toList();
+        return List.of();
     }
+
 
     public SmsAlertResponse sendTestAlert(SmsAlertRequest request, String userEmail) {
         User user = (userEmail != null) ? userRepository.findByEmail(userEmail).orElse(null) : null;

@@ -45,19 +45,18 @@ public class BuyerService {
     @Transactional
     public Buyer updateProfile(Long buyerId, BuyerProfileRequest request) {
         Buyer buyer = getProfile(buyerId);
-        buyer.setBusinessName(request.businessName());
-        buyer.setBusinessType(request.businessType());
-        buyer.setAddress(request.address());
-        buyer.setDistrict(request.district());
-        buyer.setState(request.state());
-        buyer.setLatitude(request.latitude());
-        buyer.setLongitude(request.longitude());
+        if (request.businessName() != null) buyer.setBusinessName(request.businessName());
+        if (request.businessType() != null) buyer.setBusinessType(request.businessType());
+        if (request.address() != null) buyer.setAddress(request.address());
+        if (request.district() != null) buyer.setDistrict(request.district());
+        if (request.state() != null) buyer.setState(request.state());
+        if (request.latitude() != null) buyer.setLatitude(request.latitude());
+        if (request.longitude() != null) buyer.setLongitude(request.longitude());
         if (request.alertEmail() != null) buyer.setAlertEmail(request.alertEmail());
         if (request.phone() != null && !request.phone().isBlank()) {
             buyer.getUser().setPhone(request.phone());
         }
         return buyerRepository.save(buyer);
-
     }
 
     @Transactional

@@ -24,27 +24,38 @@ public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final RecommendationConfig config;
     private final ScoringService scoringService;
+    private final com.kisanlink.security.OwnershipService ownershipService;
 
     public RecommendationService(FarmerRepository farmerRepository,
                                  FarmerProduceRepository produceRepository,
                                  BuyerRequirementRepository requirementRepository,
                                  RecommendationRepository recommendationRepository,
                                  RecommendationConfig config,
-                                 ScoringService scoringService) {
+                                 ScoringService scoringService,
+                                 com.kisanlink.security.OwnershipService ownershipService) {
         this.farmerRepository = farmerRepository;
         this.produceRepository = produceRepository;
         this.requirementRepository = requirementRepository;
         this.recommendationRepository = recommendationRepository;
         this.config = config;
         this.scoringService = scoringService;
+        this.ownershipService = ownershipService;
     }
 
     @Transactional
-    public RecommendationResponse recommend(RecommendationRequest request) {
+    public RecommendationResponse recommend(RecommendationRequest request, String userEmail) {
         Farmer farmer = farmerRepository.findById(request.farmerId())
                 .orElseThrow(() -> new IllegalArgumentException("Farmer not found: " + request.farmerId()));
+        if (userEmail != null) {
+            ownershipService.checkFarmerOwnership(farmer.getId(), userEmail);
+        }
+
         FarmerProduce produce = produceRepository.findById(request.produceId())
                 .orElseThrow(() -> new IllegalArgumentException("Produce not found: " + request.produceId()));
+
+        if (!produce.getFarmer().getId().equals(farmer.getId())) {
+            throw new IllegalArgumentException("Produce listing #" + request.produceId() + " does not belong to Farmer #" + farmer.getId());
+        }
 
         // 1. Build raw options — filter by validity, quality match, and max distance
         double maxDistKm = config.getTransport().getMaxDistanceKm();
@@ -52,9 +63,9 @@ public class RecommendationService {
                 .findByCropId(produce.getCrop().getId()).stream()
                 .filter(req -> req.getValidUntil() == null
                         || !req.getValidUntil().isBefore(LocalDate.now()))
-                .filter(req -> req.getQualityRequired().equalsIgnoreCase(produce.getQuality()))
+                .filter(req -> qualityMatches(produce.getQuality(), req.getQualityRequired()))
                 .map(req -> rawOption(farmer, produce, req))
-                .filter(opt -> opt.distanceKm().doubleValue() <= maxDistKm)
+                .filter(opt -> opt.distanceKm() != null && opt.distanceKm().doubleValue() <= maxDistKm)
                 .toList();
 
         if (raw.isEmpty()) {
@@ -96,8 +107,18 @@ public class RecommendationService {
         );
     }
 
-    public List<Recommendation> history(Long farmerId) {
+    public List<Recommendation> history(Long farmerId, String userEmail) {
+        if (userEmail != null) {
+            ownershipService.checkFarmerOwnership(farmerId, userEmail);
+        }
         return recommendationRepository.findByFarmerIdOrderByCreatedAtDesc(farmerId);
+    }
+
+    private boolean qualityMatches(String produceQuality, String reqQuality) {
+        if (produceQuality == null || reqQuality == null) return false;
+        String p = produceQuality.replace("_", " ").replace("-", " ").trim().toUpperCase();
+        String r = reqQuality.replace("_", " ").replace("-", " ").trim().toUpperCase();
+        return p.equalsIgnoreCase(r);
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
@@ -111,6 +132,10 @@ public class RecommendationService {
         BigDecimal distance = DistanceCalculator.between(
                 farmer.getLatitude(), farmer.getLongitude(),
                 requirement.getBuyer().getLatitude(), requirement.getBuyer().getLongitude());
+
+        if (distance == null) {
+            distance = BigDecimal.valueOf(config.getTransport().getMaxDistanceKm()).setScale(2, RoundingMode.HALF_UP);
+        }
 
         // Use configured transport rates
         BigDecimal transport = ProfitCalculator.transport(
@@ -145,3 +170,4 @@ public class RecommendationService {
         );
     }
 }
+

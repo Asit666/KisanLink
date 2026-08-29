@@ -1038,10 +1038,19 @@ public class KisanLinkIntegrationTests {
 
         Long dealId = objectMapper.readTree(dealJson).get("id").asLong();
 
+        // 4. Accept deal before initiating Escrow
+        mockMvc.perform(patch("/api/trades/" + dealId + "/status")
+                        .header("Authorization", "Bearer " + buyerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"ACCEPTED\"}"))
+                .andExpect(status().isOk());
+
+
         // 4. Initiate Escrow Account
         String escrowJson = mockMvc.perform(post("/api/escrow/initiate/" + dealId)
                         .header("Authorization", "Bearer " + buyerToken))
                 .andExpect(status().isOk())
+
                 .andExpect(jsonPath("$.tradeDealId").value(dealId))
                 .andExpect(jsonPath("$.totalAmount").value(18000.0))
                 .andExpect(jsonPath("$.farmerPayout").value(17500.0))
@@ -1092,11 +1101,22 @@ public class KisanLinkIntegrationTests {
                 .andExpect(jsonPath("$.status").value("COMPLETED"));
     }
 
+    private AuthResponse registerUserWithPhone(String name, String email, String phone, String password, Role role) throws Exception {
+        RegisterRequest request = new RegisterRequest(name, email, phone, password, role);
+        String responseJson = mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        return objectMapper.readValue(responseJson, AuthResponse.class);
+    }
+
     @Test
     void testSmsAndWhatsAppAlertsAndInboundWebhook() throws Exception {
-        // 1. Register Farmer & Buyer
-        AuthResponse farmerAuth = registerUser("SMS Farmer", "smsfarmer@test.com", "Password@123", Role.FARMER);
-        AuthResponse buyerAuth = registerUser("SMS Buyer", "smsbuyer@test.com", "Password@123", Role.BUYER);
+        // 1. Register Farmer & Buyer with distinct phone numbers
+        AuthResponse farmerAuth = registerUserWithPhone("SMS Farmer", "smsfarmer@test.com", "9876543210", "Password@123", Role.FARMER);
+        AuthResponse buyerAuth = registerUserWithPhone("SMS Buyer", "smsbuyer@test.com", "9876543211", "Password@123", Role.BUYER);
+
 
         String farmerToken = farmerAuth.token();
         String buyerToken = buyerAuth.token();
@@ -1176,7 +1196,61 @@ public class KisanLinkIntegrationTests {
                 .andExpect(jsonPath("$.status").value("DELIVERED"))
                 .andExpect(jsonPath("$.channel").value("WHATSAPP"));
     }
+
+    @Test
+    public void testCropHealthDiagnosticScanAndEscalation() throws Exception {
+        // 1. Register Farmer
+        AuthResponse farmerAuth = registerUser("Doctor Test Farmer", "doctorfarmer@kisanlink.com", "Secret@123", Role.FARMER);
+        String farmerToken = farmerAuth.token();
+        Long farmerId = farmerAuth.profileId();
+
+
+        // 2. Submit AI Leaf Scan for Tomato Early Blight
+        DiagnosticRequest req = new DiagnosticRequest();
+        req.setFarmerId(farmerId);
+        req.setCropName("Tomato");
+        req.setNotes("Target concentric brown rings on bottom leaves");
+        req.setImageUrl("https://images.unsplash.com/photo-1592841200221-a6898f307baa");
+
+        String scanRes = mockMvc.perform(post("/api/diagnostics/scan")
+                        .header("Authorization", "Bearer " + farmerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.detectedDisease").value(org.hamcrest.Matchers.containsString("Early Blight")))
+                .andExpect(jsonPath("$.severity").value("MODERATE"))
+                .andExpect(jsonPath("$.confidenceScore").value(org.hamcrest.Matchers.greaterThan(90.0)))
+                .andExpect(jsonPath("$.status").value("COMPLETED"))
+                .andExpect(jsonPath("$.recommendedInputs").value(org.hamcrest.Matchers.hasItem("Mancozeb 75% WP")))
+                .andReturn().getResponse().getContentAsString();
+
+        DiagnosticResponse response = objectMapper.readValue(scanRes, DiagnosticResponse.class);
+        Long reportId = response.getId();
+
+        // 3. Fetch Farmer's Diagnostic History
+        mockMvc.perform(get("/api/diagnostics/farmer/" + farmerId)
+                        .header("Authorization", "Bearer " + farmerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(reportId));
+
+        // 4. Fetch Single Report by ID
+        mockMvc.perform(get("/api/diagnostics/" + reportId)
+                        .header("Authorization", "Bearer " + farmerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cropName").value("Tomato"));
+
+        // 5. Escalate Case to Agronomist
+        mockMvc.perform(post("/api/diagnostics/" + reportId + "/escalate")
+                        .header("Authorization", "Bearer " + farmerToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"notes\": \"Please verify if Mancozeb or Copper Oxychloride is better in rainy week\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("ESCALATED"))
+                .andExpect(jsonPath("$.expertNotes").value(org.hamcrest.Matchers.containsString("Copper Oxychloride")));
+    }
 }
+
 
 
 

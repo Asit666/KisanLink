@@ -37,5 +37,27 @@ public class GlobalExceptionHandler {
                 : "Access denied: you do not own this resource";
         return Map.of("error", msg);
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleConflict(IllegalStateException exception) {
+        return Map.of("error", exception.getMessage() == null ? "State conflict" : exception.getMessage());
+    }
+
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    public org.springframework.http.ResponseEntity<Map<String, String>> handleResponseStatusException(org.springframework.web.server.ResponseStatusException exception) {
+        String msg = exception.getReason() != null ? exception.getReason() : exception.getMessage();
+        return org.springframework.http.ResponseEntity.status(exception.getStatusCode()).body(Map.of("error", msg));
+    }
+
+    /**
+     * Catches any unhandled exceptions to ensure structured JSON output and prevent stack trace leaks.
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handleGenericException(Exception exception) {
+        return Map.of("error", exception.getMessage() != null ? exception.getMessage() : "An internal server error occurred. Please try again later.");
+    }
 }
+
 

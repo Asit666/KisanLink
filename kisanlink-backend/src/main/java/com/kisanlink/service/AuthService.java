@@ -42,14 +42,15 @@ public class AuthService {
         if (request.role().name().equals("ADMIN")) {
             throw new IllegalArgumentException("Admin accounts cannot be created through public registration");
         }
-        if (userRepository.existsByEmail(request.email())) {
+        String normalizedEmail = request.email() != null ? request.email().trim().toLowerCase() : "";
+        if (userRepository.existsByEmail(normalizedEmail)) {
             throw new IllegalArgumentException("Email is already registered");
         }
 
         User user = new User();
-        user.setName(request.name());
-        user.setEmail(request.email().toLowerCase());
-        user.setPhone(request.phone());
+        user.setName(request.name().trim());
+        user.setEmail(normalizedEmail);
+        user.setPhone(request.phone() != null ? request.phone().trim() : null);
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(request.role());
         userRepository.save(user);
@@ -62,7 +63,7 @@ public class AuthService {
         } else if (request.role().name().equals("BUYER")) {
             Buyer buyer = new Buyer();
             buyer.setUser(user);
-            buyer.setBusinessName(request.name());
+            buyer.setBusinessName(request.name().trim());
             profileId = buyerRepository.save(buyer).getId();
         }
 
@@ -72,9 +73,10 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
+        String normalizedEmail = request.email() != null ? request.email().trim().toLowerCase() : "";
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email().toLowerCase(), request.password()));
-        User user = userRepository.findByEmail(request.email().toLowerCase())
+                new UsernamePasswordAuthenticationToken(normalizedEmail, request.password()));
+        User user = userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         UserDetails details = org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
                 .password(user.getPassword()).roles(user.getRole().name()).build();
@@ -83,6 +85,7 @@ public class AuthService {
             : buyerRepository.findByUserId(user.getId()).map(Buyer::getId).orElse(null);
         return response(user, profileId, jwtService.generateToken(details));
     }
+
 
     private AuthResponse response(User user, Long profileId, String token) {
         return new AuthResponse(token, user.getId(), profileId, user.getName(), user.getRole().name());
