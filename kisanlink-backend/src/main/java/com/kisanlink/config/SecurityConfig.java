@@ -37,6 +37,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/crops", "/api/markets", "/api/prices").hasRole("ADMIN")
                         .requestMatchers("/api/farmers/**").hasRole("FARMER")
                         .requestMatchers("/api/buyers/**").hasRole("BUYER")
+                        .requestMatchers("/api/transporters/**").hasRole("TRANSPORTER")
+                        .requestMatchers(HttpMethod.GET, "/api/transport/suggestions/**").authenticated()
+                        .requestMatchers("/api/transport/**").authenticated()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

@@ -5,6 +5,7 @@ import com.kisanlink.repository.CropRepository;
 import com.kisanlink.repository.MarketPriceRepository;
 import com.kisanlink.repository.MarketRepository;
 import com.kisanlink.repository.FarmerRepository;
+import com.kisanlink.repository.TransporterRepository;
 import com.kisanlink.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +26,7 @@ public class DevDataInitializer {
                                            MarketPriceRepository priceRepository,
                                            FarmerRepository farmerRepository,
                                            UserRepository userRepository,
+                                           TransporterRepository transporterRepository,
                                            com.kisanlink.repository.DiagnosticReportRepository diagnosticReportRepository) {
         return arguments -> {
             if (cropRepository.count() > 0) {
@@ -196,6 +198,10 @@ public class DevDataInitializer {
             r2.setExpertNotes("Agronomist Dr. R. Verma reviewed: Field drainage recommended alongside Tricyclazole spray.");
             diagnosticReportRepository.save(r2);
 
+            // --- Seed Sample Transporters ---
+            seedTransporters(userRepository, transporterRepository,
+                    new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder());
+
         };
     }
 
@@ -235,6 +241,54 @@ public class DevDataInitializer {
         price.setSource("KisanLink development sample");
         priceRepository.save(price);
     }
+
+    private void seedTransporters(UserRepository userRepository,
+                                  TransporterRepository transporterRepository,
+                                  org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder encoder) {
+        if (transporterRepository.count() > 0) return;
+
+        record T(String name, String email, String phone, String vNum, VehicleType vType,
+                 double cap, String dist, String state, double lat, double lon,
+                 double rate, double base, boolean verified) {}
+
+        List<T> transporters = List.of(
+            new T("Suresh Logistics", "transporter@kisanlink.in", "9001112222",
+                  "JH-01-AB-1234", VehicleType.MINI_TRUCK, 2000,
+                  "Ranchi", "Jharkhand", 23.3441, 85.3096, 15.0, 100.0, true),
+            new T("Ramesh Transport Co.", "ramesh.transport@kisanlink.in", "9002223333",
+                  "JH-05-CD-5678", VehicleType.FULL_TRUCK, 5000,
+                  "Bokaro", "Jharkhand", 23.6693, 86.1511, 18.0, 150.0, true),
+            new T("Gupta Tempo Service", "gupta.tempo@kisanlink.in", "9003334444",
+                  "JH-02-EF-9012", VehicleType.TEMPO, 1000,
+                  "Hazaribagh", "Jharkhand", 23.9925, 85.3637, 12.0, 80.0, false),
+            new T("Singh Pickup Express", "singh.pickup@kisanlink.in", "9004445555",
+                  "JH-03-GH-3456", VehicleType.PICKUP, 500,
+                  "Ramgarh", "Jharkhand", 23.6283, 85.5104, 10.0, 60.0, false),
+            new T("Jha Heavy Logistics", "jha.logistics@kisanlink.in", "9005556666",
+                  "JH-04-IJ-7890", VehicleType.FULL_TRUCK, 8000,
+                  "Dhanbad", "Jharkhand", 23.7957, 86.4304, 20.0, 200.0, true)
+        );
+
+        String encoded = encoder.encode("Pass123!");
+        for (T t : transporters) {
+            User u = new User();
+            u.setName(t.name()); u.setEmail(t.email()); u.setPhone(t.phone());
+            u.setPassword(encoded); u.setRole(Role.TRANSPORTER);
+            u = userRepository.save(u);
+
+            Transporter tr = new Transporter();
+            tr.setUser(u);
+            tr.setVehicleType(t.vType());
+            tr.setVehicleNumber(t.vNum());
+            tr.setCapacityKg(BigDecimal.valueOf(t.cap()));
+            tr.setBaseDistrict(t.dist()); tr.setBaseState(t.state());
+            tr.setBaseLatitude(t.lat()); tr.setBaseLongitude(t.lon());
+            tr.setRatePerKm(BigDecimal.valueOf(t.rate()));
+            tr.setBaseCharge(BigDecimal.valueOf(t.base()));
+            tr.setVerified(t.verified());
+            tr.setAvailable(true);
+            tr.setAlertPhone(t.phone());
+            transporterRepository.save(tr);
+        }
+    }
 }
-
-

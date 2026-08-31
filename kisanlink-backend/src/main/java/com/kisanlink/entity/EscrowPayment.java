@@ -32,6 +32,10 @@ public class EscrowPayment {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal farmerPayout;
 
+    /** Transport fee paid by Buyer — added to total escrow once a transporter is booked. */
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal transporterPayout = BigDecimal.ZERO;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EscrowStatus status = EscrowStatus.PENDING_DEPOSIT;

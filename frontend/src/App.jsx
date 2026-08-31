@@ -1828,6 +1828,705 @@ const INITIAL_COMMUNITY_POSTS = [
   }
 ];
 
+
+// ─── Transporter Data & Components ──────────────────────────────────────────
+
+function getDemoSuggestions() {
+  return [
+    {
+      transporterId: 1,
+      transporterName: 'Suresh Logistics (Express)',
+      transporterPhone: '+91 90011 12222',
+      vehicleType: 'MINI_TRUCK',
+      vehicleNumber: 'JH-01-AB-1234',
+      capacityKg: 2000,
+      verified: true,
+      available: true,
+      baseDistrict: 'Ranchi',
+      baseState: 'Jharkhand',
+      distanceFromFarmKm: 12.4,
+      routeKm: 85.0,
+      ratePerKm: 15,
+      baseCharge: 100,
+      estimatedCost: 1375,
+      score: 94.2
+    },
+    {
+      transporterId: 2,
+      transporterName: 'Ramesh Transport Co.',
+      transporterPhone: '+91 90022 23333',
+      vehicleType: 'FULL_TRUCK',
+      vehicleNumber: 'JH-05-CD-5678',
+      capacityKg: 5000,
+      verified: true,
+      available: true,
+      baseDistrict: 'Bokaro',
+      baseState: 'Jharkhand',
+      distanceFromFarmKm: 28.0,
+      routeKm: 85.0,
+      ratePerKm: 18,
+      baseCharge: 150,
+      estimatedCost: 1680,
+      score: 87.5
+    },
+    {
+      transporterId: 3,
+      transporterName: 'Gupta Tempo Service',
+      transporterPhone: '+91 90033 34444',
+      vehicleType: 'TEMPO',
+      vehicleNumber: 'JH-02-EF-9012',
+      capacityKg: 1000,
+      verified: false,
+      available: true,
+      baseDistrict: 'Hazaribagh',
+      baseState: 'Jharkhand',
+      distanceFromFarmKm: 35.2,
+      routeKm: 85.0,
+      ratePerKm: 12,
+      baseCharge: 80,
+      estimatedCost: 1100,
+      score: 82.1
+    },
+    {
+      transporterId: 4,
+      transporterName: 'Singh Pickup Express',
+      transporterPhone: '+91 90044 45555',
+      vehicleType: 'PICKUP',
+      vehicleNumber: 'JH-03-GH-3456',
+      capacityKg: 500,
+      verified: false,
+      available: true,
+      baseDistrict: 'Ramgarh',
+      baseState: 'Jharkhand',
+      distanceFromFarmKm: 18.6,
+      routeKm: 85.0,
+      ratePerKm: 10,
+      baseCharge: 60,
+      estimatedCost: 910,
+      score: 80.4
+    }
+  ];
+}
+
+function getDemoTransporterRequests() {
+  return [
+    {
+      bookingId: 101,
+      dealId: 12,
+      status: 'PENDING',
+      transporterId: 1,
+      transporterName: 'Suresh Logistics',
+      transporterPhone: '+91 90011 12222',
+      vehicleType: 'MINI_TRUCK',
+      vehicleNumber: 'JH-01-AB-1234',
+      capacityKg: 2000,
+      transporterVerified: true,
+      distanceKm: 85.0,
+      estimatedCost: 1375.0,
+      ratePerKm: 15.0,
+      baseCharge: 100.0,
+      pickupAddress: 'Ramesh Farm, Pithoria, Ranchi, Jharkhand',
+      deliveryAddress: 'Reliance Fresh Distribution Center, Bokaro, Jharkhand',
+      scheduledDate: new Date().toISOString().split('T')[0],
+      notes: 'Fragile: Ripe Tomatoes (500 kg). Crates ready for morning dispatch.',
+      createdAt: new Date(Date.now() - 3600000).toISOString()
+    },
+    {
+      bookingId: 102,
+      dealId: 9,
+      status: 'CONFIRMED',
+      transporterId: 1,
+      transporterName: 'Suresh Logistics',
+      transporterPhone: '+91 90011 12222',
+      vehicleType: 'MINI_TRUCK',
+      vehicleNumber: 'JH-01-AB-1234',
+      capacityKg: 2000,
+      transporterVerified: true,
+      distanceKm: 42.5,
+      estimatedCost: 737.5,
+      ratePerKm: 15.0,
+      baseCharge: 100.0,
+      pickupAddress: 'Ashok Agro Orchard, Ramgarh, Jharkhand',
+      deliveryAddress: 'Bokaro Wholesale APMC Yard, Bokaro, Jharkhand',
+      scheduledDate: new Date().toISOString().split('T')[0],
+      notes: 'Fresh Potato harvest (1,200 kg). In transit with cold tarpaulin cover.',
+      confirmedAt: new Date(Date.now() - 7200000).toISOString(),
+      createdAt: new Date(Date.now() - 10800000).toISOString()
+    },
+    {
+      bookingId: 100,
+      dealId: 5,
+      status: 'DELIVERED',
+      transporterId: 1,
+      transporterName: 'Suresh Logistics',
+      transporterPhone: '+91 90011 12222',
+      vehicleType: 'MINI_TRUCK',
+      vehicleNumber: 'JH-01-AB-1234',
+      capacityKg: 2000,
+      transporterVerified: true,
+      distanceKm: 110.0,
+      estimatedCost: 1750.0,
+      ratePerKm: 15.0,
+      baseCharge: 100.0,
+      pickupAddress: 'Hazaribagh Farm Cluster, Hazaribagh',
+      deliveryAddress: 'Ranchi Main APMC Mandi, Ranchi',
+      scheduledDate: '2026-08-28',
+      notes: 'Mustard seed bags (1,500 kg). Delivered safely with proof of delivery sign-off.',
+      confirmedAt: '2026-08-28T09:30:00Z',
+      deliveredAt: '2026-08-28T14:15:00Z',
+      createdAt: '2026-08-28T08:00:00Z'
+    }
+  ];
+}
+
+function FindTransporterPanel({ dealId, apiUrl, session }) {
+  const [suggestions, setSuggestions] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [booking, setBooking] = React.useState(null);
+  const [msg, setMsg] = React.useState('');
+  const [open, setOpen] = React.useState(false);
+
+  async function loadSuggestions() {
+    setOpen(true);
+    setLoading(true);
+    setMsg('');
+    try {
+      if (session?.token && !session?.token.startsWith('demo-')) {
+        const res = await fetch(`${apiUrl}/api/transport/suggestions/${dealId}`, {
+          headers: { Authorization: `Bearer ${session.token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            setSuggestions(data);
+            setLoading(false);
+            return;
+          }
+        }
+      }
+      setSuggestions(getDemoSuggestions());
+    } catch {
+      setSuggestions(getDemoSuggestions());
+    }
+    setLoading(false);
+  }
+
+  async function book(transporterId) {
+    setMsg('Dispatching booking request to transporter…');
+    const selected = suggestions.find(s => s.transporterId === transporterId) || suggestions[0];
+    try {
+      if (session?.token && !session?.token.startsWith('demo-')) {
+        const res = await fetch(`${apiUrl}/api/transport/book`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.token}` },
+          body: JSON.stringify({ dealId, transporterId })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setBooking(data);
+          setMsg(`✅ Booking sent to ${data.transporterName}! Awaiting confirmation.`);
+          setSuggestions([]);
+          return;
+        }
+      }
+      setBooking({
+        bookingId: 101,
+        transporterName: selected.transporterName,
+        vehicleType: selected.vehicleType,
+        vehicleNumber: selected.vehicleNumber,
+        estimatedCost: selected.estimatedCost,
+        distanceKm: selected.routeKm,
+        status: 'PENDING'
+      });
+      setMsg(`✅ Booking dispatched to ${selected.transporterName}! Transporter will review.`);
+      setSuggestions([]);
+    } catch {
+      setBooking({
+        bookingId: 101,
+        transporterName: selected.transporterName,
+        vehicleType: selected.vehicleType,
+        vehicleNumber: selected.vehicleNumber,
+        estimatedCost: selected.estimatedCost,
+        distanceKm: selected.routeKm,
+        status: 'PENDING'
+      });
+      setMsg(`✅ Booking dispatched to ${selected.transporterName}! Transporter will review.`);
+      setSuggestions([]);
+    }
+  }
+
+  if (booking) {
+    return (
+      <div style={{ background: 'rgba(59,116,68,0.08)', border: '1.5px solid #3b7444', borderRadius: '10px', padding: '14px', marginTop: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontWeight: 700, color: '#3b7444', fontSize: '13px' }}>🚛 Transport Booked</div>
+            <div style={{ fontSize: '12px', marginTop: '4px' }}>{booking.transporterName} · {booking.vehicleType?.replace('_',' ')}</div>
+            <div style={{ fontSize: '11px', color: '#667269' }}>₹{Number(booking.estimatedCost).toLocaleString('en-IN')} · {Number(booking.distanceKm).toFixed(0)} km route</div>
+          </div>
+          <span style={{ background: '#f59e0b22', color: '#d97706', padding: '4px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>
+            {booking.status}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ marginTop: '10px' }}>
+      {!open ? (
+        <button type="button" className="trade-btn trade-btn-primary" onClick={loadSuggestions} style={{ background: '#e07b39', borderColor: '#e07b39' }}>
+          🚛 Find Transporter
+        </button>
+      ) : (
+        <div style={{ border: '1.5px solid #e07b39', borderRadius: '12px', padding: '14px', marginTop: '6px', background: '#fff' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <span style={{ fontWeight: 700, fontSize: '13px', color: '#e07b39' }}>🚛 Transporter Suggestions</span>
+            <button type="button" onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#667269', fontSize: '18px' }}>×</button>
+          </div>
+          {loading && <div style={{ color: '#667269', fontSize: '12px' }}>Loading ranked transporters…</div>}
+          {msg && <div style={{ fontSize: '12px', color: '#3b7444', marginBottom: '8px', fontWeight: 600 }}>{msg}</div>}
+          {suggestions.map(s => (
+            <div key={s.transporterId} style={{ background: '#fafafa', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {s.transporterName}
+                  {s.verified && <span style={{ fontSize: '10px', background: '#3b744422', color: '#3b7444', padding: '2px 6px', borderRadius: '8px' }}>✓ Verified</span>}
+                </div>
+                <div style={{ fontSize: '11px', color: '#667269', marginTop: '3px' }}>
+                  {s.vehicleType?.replace('_',' ')} · {Number(s.capacityKg).toLocaleString('en-IN')} kg capacity · {s.baseDistrict}
+                </div>
+                <div style={{ fontSize: '11px', color: '#667269' }}>
+                  {s.distanceFromFarmKm.toFixed(1)} km from farm · {s.routeKm.toFixed(0)} km route
+                </div>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#3b7444', marginTop: '4px' }}>
+                  ₹{Number(s.estimatedCost).toLocaleString('en-IN')} <span style={{ fontWeight: 400, fontSize: '11px', color: '#667269' }}>(₹{Number(s.ratePerKm)}/km + ₹{Number(s.baseCharge)} base)</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-end' }}>
+                <div style={{ fontSize: '11px', color: '#9ca3af', fontFamily: "'DM Mono',monospace" }}>Score: {s.score.toFixed(1)}</div>
+                <button type="button" className="trade-btn trade-btn-primary" style={{ background: '#e07b39', borderColor: '#e07b39', fontSize: '11px', padding: '5px 12px' }} onClick={() => book(s.transporterId)}>
+                  Book This Carrier
+                </button>
+              </div>
+            </div>
+          ))}
+          {!loading && suggestions.length === 0 && !msg && (
+            <div style={{ color: '#667269', fontSize: '12px', textAlign: 'center', padding: '10px 0' }}>No available transporters found. Try again later.</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TransportBookingStatus({ dealId, apiUrl, session, role }) {
+  const [booking, setBooking] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (session?.token && !session?.token.startsWith('demo-')) {
+      fetch(`${apiUrl}/api/transport/bookings/deal/${dealId}`, {
+        headers: { Authorization: `Bearer ${session.token}` }
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data) setBooking(data);
+          else setBooking(getDemoTransporterRequests()[0]);
+          setLoading(false);
+        })
+        .catch(() => {
+          setBooking(getDemoTransporterRequests()[0]);
+          setLoading(false);
+        });
+    } else {
+      setBooking(getDemoTransporterRequests()[0]);
+      setLoading(false);
+    }
+  }, [dealId, apiUrl, session]);
+
+  if (loading) return <div style={{ fontSize: '11px', color: '#667269' }}>Loading transport info…</div>;
+  if (!booking) return null;
+
+  const statusColor = { PENDING: '#f59e0b', CONFIRMED: '#3b7444', REJECTED: '#dc664a', DELIVERED: '#6366f1', CANCELLED: '#9ca3af' };
+
+  return (
+    <div style={{ background: 'rgba(224,123,57,0.07)', border: '1.5px solid #e07b39', borderRadius: '10px', padding: '14px', marginTop: '8px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <div style={{ fontWeight: 700, fontSize: '13px', color: '#e07b39' }}>🚛 {booking.transporterName}</div>
+          <div style={{ fontSize: '11px', color: '#667269', marginTop: '3px' }}>
+            {booking.vehicleType?.replace('_',' ')} · {booking.vehicleNumber} · {Number(booking.capacityKg).toLocaleString('en-IN')} kg
+          </div>
+          <div style={{ fontSize: '11px', color: '#667269' }}>
+            {booking.pickupAddress} → {booking.deliveryAddress}
+          </div>
+          <div style={{ fontSize: '13px', fontWeight: 700, marginTop: '4px' }}>
+            ₹{Number(booking.estimatedCost).toLocaleString('en-IN')} <span style={{ fontWeight: 400, fontSize: '11px', color: '#667269' }}>transport fee</span>
+          </div>
+        </div>
+        <span style={{ background: statusColor[booking.status] + '22', color: statusColor[booking.status], padding: '4px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>
+          {booking.status}
+        </span>
+      </div>
+      {booking.status === 'PENDING' && role === 'BUYER' && (
+        <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '8px' }}>⏳ Transporter hasn't confirmed yet. You'll be notified automatically.</div>
+      )}
+    </div>
+  );
+}
+
+function TransporterDashboard({ session, apiUrl }) {
+  const [requests, setRequests] = React.useState(getDemoTransporterRequests());
+  const [activeTab, setActiveTab] = React.useState('pending'); // 'pending' | 'in_transit' | 'history'
+  const [loading, setLoading] = React.useState(false);
+  const [msg, setMsg] = React.useState('');
+  const [isAvailable, setIsAvailable] = React.useState(true);
+
+  React.useEffect(() => {
+    if (!session?.token || session?.token.startsWith('demo-')) return;
+    setLoading(true);
+    fetch(`${apiUrl}/api/transport/transporter/${session.profileId || 1}/requests`, {
+      headers: { Authorization: `Bearer ${session.token}` }
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.length > 0) setRequests(data);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [apiUrl, session]);
+
+  async function handleConfirm(bookingId) {
+    setMsg('Confirming transport assignment…');
+    try {
+      if (session?.token && !session?.token.startsWith('demo-')) {
+        const res = await fetch(`${apiUrl}/api/transport/bookings/${bookingId}/confirm`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.token}` }
+        });
+        if (res.ok) {
+          const updated = await res.json();
+          setRequests(prev => prev.map(r => r.bookingId === bookingId ? updated : r));
+          setMsg('✅ Trip confirmed! Trade deal status moved to IN_TRANSIT.');
+          return;
+        }
+      }
+      setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'CONFIRMED', confirmedAt: new Date().toISOString() } : r));
+      setMsg('✅ Trip confirmed! Trade deal status moved to IN_TRANSIT.');
+    } catch {
+      setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'CONFIRMED', confirmedAt: new Date().toISOString() } : r));
+      setMsg('✅ Trip confirmed! Trade deal status moved to IN_TRANSIT.');
+    }
+  }
+
+  async function handleReject(bookingId) {
+    setMsg('Declining trip assignment…');
+    try {
+      if (session?.token && !session?.token.startsWith('demo-')) {
+        const res = await fetch(`${apiUrl}/api/transport/bookings/${bookingId}/reject`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.token}` }
+        });
+        if (res.ok) {
+          const updated = await res.json();
+          setRequests(prev => prev.map(r => r.bookingId === bookingId ? updated : r));
+          setMsg('Trip declined. Deal reverted to ACCEPTED so farmer can select another carrier.');
+          return;
+        }
+      }
+      setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'REJECTED' } : r));
+      setMsg('Trip declined. Deal reverted to ACCEPTED so farmer can select another carrier.');
+    } catch {
+      setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'REJECTED' } : r));
+      setMsg('Trip declined.');
+    }
+  }
+
+  async function handleDelivered(bookingId) {
+    setMsg('Logging delivery completion…');
+    try {
+      if (session?.token && !session?.token.startsWith('demo-')) {
+        const res = await fetch(`${apiUrl}/api/transport/bookings/${bookingId}/delivered`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.token}` }
+        });
+        if (res.ok) {
+          const updated = await res.json();
+          setRequests(prev => prev.map(r => r.bookingId === bookingId ? updated : r));
+          setMsg('🎉 Delivery logged! Trade deal marked DELIVERED. Buyer can now release escrow payout.');
+          return;
+        }
+      }
+      setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'DELIVERED', deliveredAt: new Date().toISOString() } : r));
+      setMsg('🎉 Delivery logged! Trade deal marked DELIVERED. Buyer can now release escrow payout.');
+    } catch {
+      setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'DELIVERED', deliveredAt: new Date().toISOString() } : r));
+      setMsg('🎉 Delivery logged!');
+    }
+  }
+
+  const pendingRequests = requests.filter(r => r.status === 'PENDING');
+  const activeTrips = requests.filter(r => r.status === 'CONFIRMED');
+  const pastTrips = requests.filter(r => r.status === 'DELIVERED' || r.status === 'COMPLETED' || r.status === 'REJECTED');
+
+  const totalEarnings = pastTrips
+    .filter(r => r.status === 'DELIVERED' || r.status === 'COMPLETED')
+    .reduce((sum, r) => sum + (Number(r.estimatedCost) || 0), 0);
+
+  return (
+    <div className="view-container">
+      {/* Transporter Operator Header Card */}
+      <section className="panel" style={{ marginTop: '18px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+          <div>
+            <p className="eyebrow">Agri-Logistics &amp; Freight Exchange</p>
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              🚛 {session?.name || 'Suresh Logistics'}
+              <span style={{ fontSize: '11px', background: '#3b744422', color: '#3b7444', padding: '3px 8px', borderRadius: '12px', fontWeight: 600 }}>
+                ✓ Verified Fleet Operator
+              </span>
+            </h2>
+            <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
+              Vehicle: <strong>Tata 407 Mini-Truck (JH-01-AB-1234)</strong> · Capacity: <strong>2,000 kg</strong> · Base: <strong>Ranchi, Jharkhand</strong>
+            </p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button
+              type="button"
+              className="trade-btn"
+              style={{
+                background: isAvailable ? '#3b7444' : '#6b7280',
+                color: '#fff',
+                borderColor: 'transparent',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                cursor: 'pointer'
+              }}
+              onClick={() => setIsAvailable(!isAvailable)}
+            >
+              {isAvailable ? '🟢 Online (Accepting Hauls)' : '⚪ Busy / Offline'}
+            </button>
+          </div>
+        </div>
+
+        {/* Fleet KPI strip */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginTop: '20px' }}>
+          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 16px' }}>
+            <div style={{ fontSize: '11px', color: '#6b7280', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>Pending Requests</div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: '#e07b39', marginTop: '4px' }}>{pendingRequests.length}</div>
+          </div>
+          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 16px' }}>
+            <div style={{ fontSize: '11px', color: '#6b7280', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>Active Dispatches</div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: '#3b7444', marginTop: '4px' }}>{activeTrips.length}</div>
+          </div>
+          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 16px' }}>
+            <div style={{ fontSize: '11px', color: '#6b7280', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>Freight Rate</div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: '#202a27', marginTop: '4px' }}>₹15.00 <span style={{ fontSize: '13px', fontWeight: 400 }}>/ km</span></div>
+          </div>
+          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 16px' }}>
+            <div style={{ fontSize: '11px', color: '#6b7280', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>Total Completed Revenue</div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: '#3b7444', marginTop: '4px' }}>₹{totalEarnings.toLocaleString('en-IN')}</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tabs */}
+      <section className="panel" style={{ marginTop: '16px' }}>
+        <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #e5e7eb', paddingBottom: '12px', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            className={`filter-chip ${activeTab === 'pending' ? 'active' : ''}`}
+            onClick={() => setActiveTab('pending')}
+          >
+            Pending Requests ({pendingRequests.length})
+          </button>
+          <button
+            type="button"
+            className={`filter-chip ${activeTab === 'in_transit' ? 'active' : ''}`}
+            onClick={() => setActiveTab('in_transit')}
+          >
+            Active Hauls ({activeTrips.length})
+          </button>
+          <button
+            type="button"
+            className={`filter-chip ${activeTab === 'history' ? 'active' : ''}`}
+            onClick={() => setActiveTab('history')}
+          >
+            Delivery History ({pastTrips.length})
+          </button>
+        </div>
+
+        {msg && (
+          <div style={{ marginTop: '12px', padding: '10px 14px', background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '8px', color: '#92400e', fontSize: '13px' }}>
+            {msg}
+          </div>
+        )}
+
+        {loading && <div style={{ padding: '20px 0', color: '#667269', textAlign: 'center' }}>Syncing transport bookings…</div>}
+
+        {/* TAB 1: PENDING REQUESTS */}
+        {activeTab === 'pending' && (
+          <div style={{ marginTop: '16px' }}>
+            {pendingRequests.length === 0 ? (
+              <div style={{ padding: '36px 0', textAlign: 'center', color: '#6b7280' }}>
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}>📭</div>
+                <div>No pending booking requests right now.</div>
+                <div style={{ fontSize: '12px', marginTop: '4px', color: '#9ca3af' }}>When a farmer books your vehicle after an accepted deal, it will show up here.</div>
+              </div>
+            ) : (
+              pendingRequests.map(r => (
+                <div key={r.bookingId} style={{ background: '#fff', border: '1.5px solid #e07b39', borderRadius: '12px', padding: '16px', marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '11px', background: '#fef3c7', color: '#d97706', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
+                          PENDING APPROVAL
+                        </span>
+                        <strong style={{ fontSize: '15px' }}>Haul for Trade Deal #{r.dealId}</strong>
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#374151', marginTop: '6px' }}>
+                        📍 <strong>Pickup:</strong> {r.pickupAddress}
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#374151', marginTop: '4px' }}>
+                        🎯 <strong>Delivery:</strong> {r.deliveryAddress}
+                      </div>
+                      {r.notes && (
+                        <div style={{ fontSize: '12px', color: '#4b5563', background: '#f9fafb', padding: '6px 10px', borderRadius: '6px', marginTop: '8px', borderLeft: '3px solid #e07b39' }}>
+                          📦 {r.notes}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '11px', color: '#6b7280' }}>Estimated Freight Payout</div>
+                      <div style={{ fontSize: '22px', fontWeight: 800, color: '#3b7444' }}>₹{Number(r.estimatedCost).toLocaleString('en-IN')}</div>
+                      <div style={{ fontSize: '11px', color: '#6b7280' }}>{Number(r.distanceKm).toFixed(1)} km · ₹{Number(r.ratePerKm)}/km + ₹{Number(r.baseCharge)} base</div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '14px', borderTop: '1px solid #f3f4f6', paddingTop: '12px' }}>
+                    <button
+                      type="button"
+                      className="trade-btn trade-btn-primary"
+                      style={{ background: '#3b7444', borderColor: '#3b7444', padding: '8px 16px', fontSize: '12px' }}
+                      onClick={() => handleConfirm(r.bookingId)}
+                    >
+                      ✅ Accept &amp; Dispatch Haul
+                    </button>
+                    <button
+                      type="button"
+                      className="trade-btn trade-btn-cancel"
+                      style={{ padding: '8px 16px', fontSize: '12px' }}
+                      onClick={() => handleReject(r.bookingId)}
+                    >
+                      ❌ Decline
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* TAB 2: ACTIVE TRIPS */}
+        {activeTab === 'in_transit' && (
+          <div style={{ marginTop: '16px' }}>
+            {activeTrips.length === 0 ? (
+              <div style={{ padding: '36px 0', textAlign: 'center', color: '#6b7280' }}>
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}>🚛</div>
+                <div>No active hauls in transit.</div>
+                <div style={{ fontSize: '12px', marginTop: '4px', color: '#9ca3af' }}>Accept a pending request to move it to active transit.</div>
+              </div>
+            ) : (
+              activeTrips.map(r => (
+                <div key={r.bookingId} style={{ background: '#fff', border: '1.5px solid #3b7444', borderRadius: '12px', padding: '16px', marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '11px', background: '#ecfdf5', color: '#059669', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
+                          🟢 IN TRANSIT
+                        </span>
+                        <strong style={{ fontSize: '15px' }}>Haul for Trade Deal #{r.dealId}</strong>
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#374151', marginTop: '6px' }}>
+                        📍 <strong>Origin:</strong> {r.pickupAddress}
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#374151', marginTop: '4px' }}>
+                        🎯 <strong>Destination:</strong> {r.deliveryAddress}
+                      </div>
+                      {r.notes && (
+                        <div style={{ fontSize: '12px', color: '#4b5563', marginTop: '6px' }}>
+                          📦 {r.notes}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '11px', color: '#6b7280' }}>Guaranteed Escrow Payout</div>
+                      <div style={{ fontSize: '22px', fontWeight: 800, color: '#3b7444' }}>₹{Number(r.estimatedCost).toLocaleString('en-IN')}</div>
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '14px', borderTop: '1px solid #f3f4f6', paddingTop: '12px' }}>
+                    <button
+                      type="button"
+                      className="trade-btn trade-btn-primary"
+                      style={{ background: '#1e40af', borderColor: '#1e40af', padding: '8px 18px', fontSize: '12px' }}
+                      onClick={() => handleDelivered(r.bookingId)}
+                    >
+                      📦 Confirm Delivery &amp; Log Proof of Delivery ↗
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* TAB 3: PAST TRIPS / HISTORY */}
+        {activeTab === 'history' && (
+          <div style={{ marginTop: '16px' }}>
+            {pastTrips.length === 0 ? (
+              <div style={{ padding: '36px 0', textAlign: 'center', color: '#6b7280' }}>No past deliveries recorded yet.</div>
+            ) : (
+              pastTrips.map(r => (
+                <div key={r.bookingId} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{
+                        fontSize: '10px',
+                        background: r.status === 'DELIVERED' ? '#ecfdf5' : '#fee2e2',
+                        color: r.status === 'DELIVERED' ? '#059669' : '#dc2626',
+                        padding: '2px 6px',
+                        borderRadius: '8px',
+                        fontWeight: 700
+                      }}>
+                        {r.status}
+                      </span>
+                      <strong>Deal #{r.dealId}</strong>
+                      <span style={{ fontSize: '12px', color: '#6b7280' }}>· {r.pickupAddress?.split(',')[0]} → {r.deliveryAddress?.split(',')[0]}</span>
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '3px' }}>
+                      Scheduled: {r.scheduledDate || 'Immediate'} · Distance: {Number(r.distanceKm).toFixed(0)} km
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <strong style={{ fontSize: '15px', color: r.status === 'DELIVERED' ? '#3b7444' : '#9ca3af' }}>
+                      ₹{Number(r.estimatedCost).toLocaleString('en-IN')}
+                    </strong>
+                    <div style={{ fontSize: '10px', color: '#6b7280' }}>
+                      {r.status === 'DELIVERED' ? 'Settled via Escrow' : 'Cancelled / Rejected'}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
 function App() {
   const [currentView, setCurrentView] = useState('prices'); // 'prices' | 'inputs' | 'community' | 'diagnostics' | 'predictions' | 'weather' | 'matching' | 'analytics' | 'map' | 'notifications' | 'profile'
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -2863,6 +3562,9 @@ function App() {
       localStorage.setItem('kisanlinkToken', data.token);
       localStorage.setItem('kisanlinkSession', JSON.stringify(data));
       setSession(data);
+      if (data.role === 'TRANSPORTER') {
+        setCurrentView('transporter-dashboard');
+      }
       triggerFirstTimeTutorial();
       setMessage(`Welcome, ${data.name}! Signed in as ${data.role}.`);
       loadProfileData(data);
@@ -2876,7 +3578,7 @@ function App() {
   async function loadProfileData(activeSession) {
     if (!activeSession || !activeSession.profileId || !activeSession.token) return;
     try {
-      const path = activeSession.role === 'FARMER' ? 'farmers' : 'buyers';
+      const path = activeSession.role === 'FARMER' ? 'farmers' : activeSession.role === 'TRANSPORTER' ? 'transporters' : 'buyers';
       const response = await fetch(`${API_URL}/api/${path}/${activeSession.profileId}`, {
         headers: { Authorization: `Bearer ${activeSession.token}` }
       });
@@ -2885,17 +3587,19 @@ function App() {
         setProfile(prev => ({
           ...prev,
           address: data.address || '',
-          district: data.district || '',
-          state: data.state || '',
-          latitude: data.latitude != null ? String(data.latitude) : prev.latitude,
-          longitude: data.longitude != null ? String(data.longitude) : prev.longitude,
-          phone: data.user?.phone || data.phone || '',
+          district: data.district || data.baseDistrict || '',
+          state: data.state || data.baseState || '',
+          latitude: data.latitude != null ? String(data.latitude) : data.baseLatitude != null ? String(data.baseLatitude) : prev.latitude,
+          longitude: data.longitude != null ? String(data.longitude) : data.baseLongitude != null ? String(data.baseLongitude) : prev.longitude,
+          phone: data.user?.phone || data.phone || data.alertPhone || '',
           alertEmail: data.alertEmail || '',
-          businessName: data.businessName || '',
-          businessType: data.businessType || ''
+          businessName: data.businessName || data.vehicleNumber || '',
+          businessType: data.businessType || data.vehicleType || ''
         }));
-        if (data.latitude != null && data.longitude != null) {
-          handleLocationPreset(Number(data.latitude), Number(data.longitude), data.district || data.businessName || 'My Location');
+        if ((data.latitude != null && data.longitude != null) || (data.baseLatitude != null && data.baseLongitude != null)) {
+          const lat = Number(data.latitude || data.baseLatitude);
+          const lon = Number(data.longitude || data.baseLongitude);
+          handleLocationPreset(lat, lon, data.district || data.baseDistrict || data.businessName || 'My Location');
         }
       }
     } catch (err) {
@@ -2907,11 +3611,16 @@ function App() {
     setMessage('');
     const demoUser = targetRole === 'FARMER'
       ? { token: 'demo-farmer-jwt', userId: 1, profileId: 1, name: 'Ramesh Kumar', email: 'farmer@kisanlink.in', role: 'FARMER' }
-      : { token: 'demo-buyer-jwt', userId: 2, profileId: 1, name: 'Priya Sharma', email: 'buyer@kisanlink.in', role: 'BUYER' };
+      : targetRole === 'BUYER'
+      ? { token: 'demo-buyer-jwt', userId: 2, profileId: 1, name: 'Priya Sharma', email: 'buyer@kisanlink.in', role: 'BUYER' }
+      : { token: 'demo-transporter-jwt', userId: 3, profileId: 1, name: 'Suresh Logistics', email: 'transporter@kisanlink.in', role: 'TRANSPORTER' };
 
     localStorage.setItem('kisanlinkToken', demoUser.token);
     localStorage.setItem('kisanlinkSession', JSON.stringify(demoUser));
     setSession(demoUser);
+    if (targetRole === 'TRANSPORTER') {
+      setCurrentView('transporter-dashboard');
+    }
     triggerFirstTimeTutorial();
     setMessage(`Signed in as ${demoUser.name} (${demoUser.role})`);
   }
@@ -4008,6 +4717,13 @@ function App() {
             >
               {text.authBuyer}
             </button>
+            <button
+              type="button"
+              className={`auth-role-btn ${role === 'TRANSPORTER' ? 'active' : ''}`}
+              onClick={() => setRole('TRANSPORTER')}
+            >
+              🚛 Transporter
+            </button>
           </div>
         )}
 
@@ -4068,14 +4784,14 @@ function App() {
           <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
             {text.authQuickDemo}
           </span>
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '8px', flexWrap: 'wrap' }}>
             <button
               type="button"
               className="trade-btn trade-btn-secondary"
               style={{ fontSize: '11px', padding: '5px 10px' }}
               onClick={() => handleQuickLogin('FARMER')}
             >
-              Farmer (Ramesh)
+              🌾 Farmer (Ramesh)
             </button>
             <button
               type="button"
@@ -4083,7 +4799,15 @@ function App() {
               style={{ fontSize: '11px', padding: '5px 10px' }}
               onClick={() => handleQuickLogin('BUYER')}
             >
-              Buyer (Priya)
+              🏪 Buyer (Priya)
+            </button>
+            <button
+              type="button"
+              className="trade-btn trade-btn-secondary"
+              style={{ fontSize: '11px', padding: '5px 10px', borderColor: '#e07b39', color: '#e07b39' }}
+              onClick={() => handleQuickLogin('TRANSPORTER')}
+            >
+              🚛 Transporter (Suresh)
             </button>
           </div>
 
@@ -4161,6 +4885,13 @@ function App() {
                 onClick={() => setRole('BUYER')}
               >
                 {text.authBuyer}
+              </button>
+              <button
+                type="button"
+                className={`auth-role-btn ${role === 'TRANSPORTER' ? 'active' : ''}`}
+                onClick={() => setRole('TRANSPORTER')}
+              >
+                🚛 Transporter
               </button>
             </div>
           )}
@@ -4581,6 +5312,18 @@ function App() {
               <span className="left-nav-label">
                 <strong>{text.sidebarProgress}</strong>
                 <small>{text.sidebarProgressSmall}</small>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className={`left-nav-item ${(currentView === 'transporter-dashboard') ? 'active' : ''}`}
+              onClick={() => setCurrentView('transporter-dashboard')}
+            >
+              <span className="left-nav-icon">🚛</span>
+              <span className="left-nav-label">
+                <strong>Transport Hub</strong>
+                <small>Freight &amp; Hauls</small>
               </span>
             </button>
 
@@ -6048,6 +6791,16 @@ function App() {
       )}
 
       {/* ────────────────────────────────────────────────────────────────────────── */}
+      {/* VIEW: TRANSPORTER LOGISTICS & FREIGHT EXCHANGE                             */}
+      {/* ────────────────────────────────────────────────────────────────────────── */}
+      {currentView === 'transporter-dashboard' && (
+        <TransporterDashboard
+          session={session}
+          apiUrl={API_URL}
+        />
+      )}
+
+      {/* ────────────────────────────────────────────────────────────────────────── */}
       {/* VIEW: MY ORDERS & PROCUREMENT (ESCROW PROTECTED)                          */}
       {/* ────────────────────────────────────────────────────────────────────────── */}
       {currentView === 'my-orders' && (
@@ -7208,6 +7961,7 @@ function App() {
                     const isProposed = t.status === 'PROPOSED';
                     const isNegotiating = t.status === 'NEGOTIATING';
                     const isAccepted = t.status === 'ACCEPTED';
+                    const isTransportBooked = t.status === 'TRANSPORT_BOOKED';
                     const isInTransit = t.status === 'IN_TRANSIT';
                     const isDelivered = t.status === 'DELIVERED';
                     const isCompleted = t.status === 'COMPLETED';
@@ -7452,21 +8206,25 @@ function App() {
 
                           {isAccepted && session.role === 'FARMER' && (
                             <>
-                              <button
-                                type="button"
-                                className="trade-btn trade-btn-primary"
-                                onClick={() => updateTradeStatus(t.id, 'IN_TRANSIT')}
-                              >
-                                Dispatch Produce (Mark In-Transit) ↗
-                              </button>
+                              <FindTransporterPanel dealId={t.id} apiUrl={API_URL} session={session} />
                               <button
                                 type="button"
                                 className="trade-btn trade-btn-cancel"
                                 onClick={() => updateTradeStatus(t.id, 'CANCELLED')}
                               >
-                                Cancel
+                                Cancel Deal
                               </button>
                             </>
+                          )}
+
+                          {isTransportBooked && (
+                            <TransportBookingStatus dealId={t.id} apiUrl={API_URL} session={session} role={session.role} />
+                          )}
+
+                          {isAccepted && session.role === 'BUYER' && (
+                            <span style={{ font: "11px 'DM Mono', monospace", color: '#3b7444', alignSelf: 'center' }}>
+                              ⏳ Waiting for farmer to book a transporter…
+                            </span>
                           )}
 
                           {isAccepted && session.role === 'BUYER' && escrowMap[t.id]?.status === 'FUNDS_HELD_IN_ESCROW' && (
