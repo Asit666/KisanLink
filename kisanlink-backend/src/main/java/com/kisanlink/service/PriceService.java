@@ -39,6 +39,7 @@ public class PriceService {
     }
 
     public PriceTrendResponse trend(Long cropId) {
+        List<MarketPrice> prices = priceRepository.findByCropIdOrderByDateDesc(cropId);
         if (prices.isEmpty()) {
             return new PriceTrendResponse("NO_DATA", BigDecimal.ZERO, BigDecimal.ZERO);
         }

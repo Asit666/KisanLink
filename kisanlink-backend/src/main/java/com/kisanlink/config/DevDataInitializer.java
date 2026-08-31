@@ -4,6 +4,8 @@ import com.kisanlink.entity.*;
 import com.kisanlink.repository.CropRepository;
 import com.kisanlink.repository.MarketPriceRepository;
 import com.kisanlink.repository.MarketRepository;
+import com.kisanlink.repository.FarmerRepository;
+import com.kisanlink.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,11 +23,28 @@ public class DevDataInitializer {
     CommandLineRunner seedDevelopmentData(CropRepository cropRepository,
                                            MarketRepository marketRepository,
                                            MarketPriceRepository priceRepository,
+                                           FarmerRepository farmerRepository,
+                                           UserRepository userRepository,
                                            com.kisanlink.repository.DiagnosticReportRepository diagnosticReportRepository) {
         return arguments -> {
             if (cropRepository.count() > 0) {
                 return;
             }
+
+            // --- Create Sample User and Farmer ---
+            User user = new User();
+            user.setName("Ashok Kumar");
+            user.setEmail("ashok@example.com");
+            user.setPhone("9876543210");
+            user.setPassword("password123"); // Default password for dev
+            user.setRole(Role.FARMER); // Set role for user
+            user = userRepository.save(user);
+            
+            Farmer farmer = new Farmer();
+            farmer.setUser(user);
+            farmer.setDistrict("Ranchi");
+            farmer.setState("Jharkhand");
+            farmer = farmerRepository.save(farmer);
 
             // --- Vegetables ---
             Crop tomato = crop(cropRepository, "Tomato",    CropCategory.VEGETABLE, "kg");

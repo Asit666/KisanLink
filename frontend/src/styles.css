@@ -19,6 +19,35 @@ button, input, select, textarea { font: inherit; }
 .topbar, footer { display: flex; align-items: center; justify-content: space-between; }
 .topbar { flex-direction: column; align-items: stretch; border-bottom: none; padding-bottom: 0; }
 .topbar-row { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; }
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid #d9e4d6;
+  border-radius: 999px;
+  background: #eff3ec;
+  color: #526258;
+  font-size: 12px;
+  line-height: 1;
+  margin: 0;
+}
+.language-switcher span {
+  color: #526258;
+  font-size: 12px;
+}
+.language-switcher select {
+  width: auto;
+  min-width: 74px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #1f2a21;
+  font-size: 12px;
+  outline: none;
+  margin: 0;
+  appearance: auto;
+}
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .02em; cursor: pointer; }
 .brand-mark { display: grid; place-items: center; width: 30px; height: 30px; background: #dc664a; color: #fffaf1; font-family: 'DM Mono', monospace; }
 .connection, .eyebrow, .date-chip, .count, .crop-label, .trend-caption, .note-line, footer, .category-badge { font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; font-size: 10px; }
@@ -652,13 +681,17 @@ form { margin-top: 24px; }label { display: block; color: #69736b; font: 10px 'DM
 .category-farm_equipment { background: #ebf1f8; color: #26598e; }
 
 /* ── Crop Doctor AI Diagnostics & Leaf Scanner Studio ── */
-.source-toggle-bar { display: flex; gap: 6px; background: #ede7dc; padding: 4px; border-radius: 4px; border: 1px solid #d9d6cc; margin-bottom: 8px; }
-.source-toggle-btn { flex: 1; font: 11px 'DM Mono', monospace; background: transparent; border: 0; padding: 6px 10px; border-radius: 3px; cursor: pointer; color: #404f43; transition: all 0.15s; text-align: center; }
+.source-toggle-bar { display: flex; gap: 0; background: transparent; padding: 0; border: 0; border-bottom: 1px solid #d9d6cc; margin-bottom: 12px; }
+.source-toggle-btn { flex: 1; font: 10px 'DM Mono', monospace; background: transparent; border: 0; border-bottom: 2px solid transparent; padding: 8px 10px 9px; border-radius: 0; cursor: pointer; color: #778078; transition: all 0.15s; text-align: center; letter-spacing: 0.06em; text-transform: uppercase; }
 .source-toggle-btn:hover { color: #202a27; }
-.source-toggle-btn.active { background: #ffffff; color: #202a27; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.source-toggle-btn.active { background: transparent; color: #b45a42; border-bottom-color: #b45a42; font-weight: 700; }
 
-.upload-dropzone-box { border: 2px dashed #b8c4b4; background: #f9fbf8; border-radius: 4px; padding: 22px 14px; text-align: center; cursor: pointer; transition: all 0.15s; }
-.upload-dropzone-box:hover { border-color: #5a8e62; background: #f2f7f1; }
+.upload-dropzone-box { border: 1px dashed #c8c8bd; background: #fffdf9; border-radius: 4px; padding: 18px 14px; text-align: center; cursor: pointer; transition: all 0.15s; color: #35453e; }
+.upload-dropzone-box:hover { border-color: #b45a42; background: #fff8f5; }
+
+.diagnostic-url-row { display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; }
+.diagnostic-url-row .field-input { flex: 1; min-width: 0; }
+.diagnostic-url-load-btn { min-width: 90px; padding: 9px 12px; flex-shrink: 0; }
 
 .wasm-badge-bar { display: flex; align-items: center; gap: 12px; font: 11px 'DM Mono', monospace; color: #404f43; background: #eef3eb; border: 1px solid #c9d8c6; border-radius: 4px; padding: 8px 14px; margin-bottom: 12px; }
 .wasm-pill { font: 9px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; background: #2f6838; color: #ffffff; padding: 2px 6px; border-radius: 2px; font-weight: 700; }
@@ -671,11 +704,35 @@ form { margin-top: 24px; }label { display: block; color: #69736b; font: 10px 'DM
 .diagnostic-studio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
 @media (max-width: 900px) { .diagnostic-studio-grid { grid-template-columns: 1fr; } }
 
-.diagnostic-console-panel { background: #fdfbf7; border: 1px solid #d9d6cc; border-radius: 4px; padding: 20px; }
-.diagnostic-result-panel { background: #fdfbf7; border: 1px solid #d9d6cc; border-radius: 4px; padding: 20px; min-height: 480px; }
+.diagnostic-console-panel { background: #fdfbf7; border: 1px solid #d9d6cc; border-radius: 4px; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; }
+.diagnostic-result-panel { background: #fdfbf7; border: 1px solid #d9d6cc; border-radius: 4px; padding: 20px; min-height: 480px; display: flex; flex-direction: column; box-sizing: border-box; }
 
+.crop-doctor-submit-btn {
+  width: 100%;
+  margin-top: 0;
+  padding: 10px 14px;
+  border-radius: 0;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  border: 1px solid #202a27;
+  background: #202a27;
+  color: #fffaf1;
+  transition: all 0.15s ease;
+  box-shadow: none;
+  text-transform: uppercase;
+  display: inline-flex !important;
+  box-sizing: border-box;
+}
+.crop-doctor-submit-btn:hover:not(:disabled) {
+  background: #35423e;
+  border-color: #35423e;
+}
+.crop-doctor-submit-btn:disabled {
+  opacity: 0.72;
+  cursor: wait;
+}
 
-.leaf-preview-frame { position: relative; width: 100%; height: 180px; background: #ede7dc; border: 1px solid #d9d6cc; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.leaf-preview-frame { position: relative; width: 100%; height: 180px; background: #ede7dc; border: 1px solid #d9d6cc; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .leaf-img { width: 100%; height: 100%; object-fit: cover; }
 .leaf-tag { position: absolute; bottom: 8px; left: 8px; font: 9px 'DM Mono', monospace; text-transform: uppercase; background: rgba(32, 42, 39, 0.85); color: #ffffff; padding: 3px 8px; border-radius: 2px; }
 
@@ -707,6 +764,85 @@ form { margin-top: 24px; }label { display: block; color: #69736b; font: 10px 'DM
 
 .escalated-status-box { background: #fbf5ea; border: 1px solid #e8dbbe; border-radius: 4px; padding: 10px 14px; }
 .escalated-tag { font: 9px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; color: #9c681b; font-weight: 700; }
+
+.diagnostic-studio-grid {
+  grid-template-columns: minmax(260px, .85fr) minmax(0, 1.15fr);
+  gap: 42px;
+}
+.diagnostic-console-panel,
+.diagnostic-result-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  min-height: 0;
+}
+.source-toggle-bar {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #d9d6cc;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 14px;
+}
+.source-toggle-btn {
+  border-radius: 0;
+  padding: 8px 6px 9px;
+  color: #778078;
+}
+.source-toggle-btn.active {
+  background: transparent;
+  color: #b45a42;
+  box-shadow: inset 0 -2px 0 #b45a42;
+}
+.upload-dropzone-box {
+  width: 100%;
+  background: transparent;
+  border: 1px dashed #b8c4b4;
+  border-radius: 0;
+  padding: 18px 12px;
+  color: #35453e;
+}
+.leaf-preview-frame {
+  height: 220px;
+  background: #eeeae1;
+  border: 0;
+  border-top: 1px solid #d9d6cc;
+  border-bottom: 1px solid #d9d6cc;
+  border-radius: 0;
+}
+.diagnostic-card { gap: 16px; }
+.diagnostic-header { padding-bottom: 14px; }
+.confidence-meter-box {
+  background: transparent;
+  border: 0;
+  border-left: 1px solid #d9d6cc;
+  border-radius: 0;
+  padding: 4px 0 4px 14px;
+}
+.treatment-box {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid #e2ddd3;
+  border-bottom: 1px solid #e2ddd3;
+  border-radius: 0;
+  padding: 14px 0;
+}
+.prescription-item {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #e8e3d8;
+  border-radius: 0;
+  padding: 7px 0;
+}
+@media (max-width: 900px) {
+  .diagnostic-studio-grid { grid-template-columns: 1fr; gap: 28px; }
+  .diagnostic-result-panel { border-top: 1px solid #d9d6cc; padding-top: 24px; }
+}
+@media (max-width: 560px) {
+  .diagnostic-header { flex-direction: column; }
+  .confidence-meter-box { border-left: 0; border-top: 1px solid #d9d6cc; width: 100%; padding: 8px 0 0; text-align: left; }
+}
 
 .diagnostic-empty-state { display: flex; align-items: center; justify-content: center; height: 100%; border: 1px dashed #d9d6cc; border-radius: 4px; }
 
