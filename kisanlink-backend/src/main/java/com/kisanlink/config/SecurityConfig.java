@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/transporters/**").hasRole("TRANSPORTER")
                         .requestMatchers(HttpMethod.GET, "/api/transport/suggestions/**").authenticated()
                         .requestMatchers("/api/transport/**").authenticated()
+                        .requestMatchers("/api/chat/**").authenticated()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
