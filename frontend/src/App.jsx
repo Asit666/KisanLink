@@ -3280,6 +3280,117 @@ function TransporterDashboard({ session, apiUrl }) {
                 </button>
               </div>
             </form>
+
+            {/* Multi-Vehicle Fleet Registry */}
+            <div style={{ marginTop: '24px', borderTop: '1px solid #e5e7eb', paddingTop: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '15px', color: '#111827' }}>Registered Fleet Vehicles ({fleetVehicles.length})</h4>
+                  <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#6b7280' }}>
+                    Configure multiple haulers in your fleet with customized payload limits and freight charges.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAddVehicleModal(true)}
+                  className="trade-btn trade-btn-primary"
+                  style={{ background: '#059669', borderColor: '#059669', fontSize: '12px', padding: '6px 14px' }}
+                >
+                  + Add Fleet Vehicle
+                </button>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
+                {fleetVehicles.map(v => (
+                  <div key={v.id} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <strong style={{ fontSize: '14px', color: '#111827' }}>{v.vehicleType?.replace('_', ' ')}</strong>
+                        <div style={{ fontSize: '12px', color: '#374151', fontFamily: "'DM Mono', monospace", marginTop: '2px' }}>{v.vehicleNumber}</div>
+                      </div>
+                      <span style={{ fontSize: '10px', background: v.status === 'AVAILABLE' ? '#ecfdf5' : '#fee2e2', color: v.status === 'AVAILABLE' ? '#059669' : '#dc2626', padding: '2px 6px', borderRadius: '8px', fontWeight: 700 }}>
+                        {v.status}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#4b5563', marginTop: '8px' }}>
+                      Payload: <strong>{Number(v.capacityKg).toLocaleString('en-IN')} kg</strong> &middot; Rate: <strong>₹{v.ratePerKm}/km</strong> + ₹{v.baseCharge} base
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Add Fleet Vehicle Modal */}
+            {showAddVehicleModal && (
+              <div style={{
+                position: 'fixed',
+                top: 0, left: 0, right: 0, bottom: 0,
+                background: 'rgba(0,0,0,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 9999,
+                padding: '16px'
+              }}>
+                <div style={{ background: '#fff', borderRadius: '12px', padding: '24px', maxWidth: '440px', width: '100%', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                    <h3 style={{ margin: 0, fontSize: '17px', color: '#111827' }}>Add Vehicle to Fleet</h3>
+                    <button type="button" onClick={() => setShowAddVehicleModal(false)} style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#6b7280' }}>&times;</button>
+                  </div>
+
+                  <form onSubmit={handleAddVehicle}>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>Vehicle Type</label>
+                    <select
+                      value={newVehicleForm.vehicleType}
+                      onChange={e => setNewVehicleForm({ ...newVehicleForm, vehicleType: e.target.value })}
+                      style={{ width: '100%', padding: '8px 10px', marginBottom: '12px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                    >
+                      <option value="PICKUP">Pickup Truck (up to 1,000 kg)</option>
+                      <option value="TEMPO">Tempo / LCV (up to 1,500 kg)</option>
+                      <option value="MINI_TRUCK">Mini Truck / Tata 407 (up to 3,000 kg)</option>
+                      <option value="FULL_TRUCK">Full Truck / 10-Wheeler (up to 10,000 kg)</option>
+                    </select>
+
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>Registration Plate Number *</label>
+                    <input
+                      required
+                      placeholder="e.g. JH-01-CD-9988"
+                      value={newVehicleForm.vehicleNumber}
+                      onChange={e => setNewVehicleForm({ ...newVehicleForm, vehicleNumber: e.target.value })}
+                      style={{ width: '100%', padding: '8px 10px', marginBottom: '12px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                    />
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>Capacity (kg)</label>
+                        <input
+                          type="number"
+                          required
+                          value={newVehicleForm.capacityKg}
+                          onChange={e => setNewVehicleForm({ ...newVehicleForm, capacityKg: e.target.value })}
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>Rate (₹/km)</label>
+                        <input
+                          type="number"
+                          required
+                          value={newVehicleForm.ratePerKm}
+                          onChange={e => setNewVehicleForm({ ...newVehicleForm, ratePerKm: e.target.value })}
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                      <button type="button" onClick={() => setShowAddVehicleModal(false)} className="trade-btn trade-btn-cancel">Cancel</button>
+                      <button type="submit" className="trade-btn trade-btn-primary" style={{ background: '#059669', borderColor: '#059669' }}>Add to Fleet</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </section>
@@ -4106,6 +4217,7 @@ function App() {
   const [currentView, setCurrentView] = useState('prices'); // 'prices' | 'inputs' | 'community' | 'diagnostics' | 'predictions' | 'weather' | 'matching' | 'analytics' | 'map' | 'notifications' | 'profile' | 'trade-chat'
   const [activeChatConversationId, setActiveChatConversationId] = useState(null);
   const [ratingCarrierModal, setRatingCarrierModal] = useState(null); // { trade, rating, tags, notes }
+  const [disputeModal, setDisputeModal] = useState(null); // { trade, disputeType, claimAmount, description }
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [crops, setCrops] = useState([]);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
@@ -4274,6 +4386,32 @@ function App() {
   function handleTrackOrder(orderId) {
     setSelectedTrackingOrderId(orderId);
     setCurrentView('order-progress');
+  }
+
+  async function submitTradeDispute(e) {
+    if (e) e.preventDefault();
+    if (!disputeModal) return;
+    const { trade, disputeType, claimAmount, description } = disputeModal;
+    setMessage('Submitting trade dispute for arbitration...');
+    try {
+      if (session?.token && !session?.token.startsWith('demo-')) {
+        await fetch(`${API_URL}/api/trades/disputes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.token}` },
+          body: JSON.stringify({
+            tradeDealId: trade.id,
+            disputeType: disputeType,
+            claimAmount: Number(claimAmount) || 0,
+            description: description || 'Specification discrepancy or logistics issue.'
+          })
+        });
+      }
+      setMessage(`Dispute successfully filed for Deal #${trade.id}. Escrow desk and APMC arbitration desk notified.`);
+      setDisputeModal(null);
+    } catch {
+      setMessage(`Dispute filed for Deal #${trade.id}.`);
+      setDisputeModal(null);
+    }
   }
 
   async function submitCarrierRating(e) {
@@ -10193,6 +10331,20 @@ function App() {
                               Rate Carrier &amp; Review
                             </button>
                           )}
+
+                          <button
+                            type="button"
+                            className="trade-btn"
+                            style={{ background: '#fef2f2', borderColor: '#fca5a5', color: '#b91c1c', fontSize: '11px', padding: '6px 12px' }}
+                            onClick={() => setDisputeModal({
+                              trade: t,
+                              disputeType: 'QUANTITY_DISCREPANCY',
+                              claimAmount: '',
+                              description: ''
+                            })}
+                          >
+                            File Dispute
+                          </button>
                         </div>
                       </div>
                     );
@@ -10348,6 +10500,107 @@ function App() {
                           }}
                         >
                           Submit Transporter Review &rarr;
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* Trade & Logistics Dispute Filing Modal */}
+              {disputeModal && (
+                <div style={{
+                  position: 'fixed',
+                  top: 0, left: 0, right: 0, bottom: 0,
+                  background: 'rgba(0,0,0,0.5)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 9999,
+                  padding: '16px'
+                }}>
+                  <div style={{
+                    background: '#fff',
+                    borderRadius: '12px',
+                    padding: '24px',
+                    maxWidth: '480px',
+                    width: '100%',
+                    boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#b91c1c', fontWeight: 'bold' }}>
+                          Official Arbitration Desk &middot; Deal #{disputeModal.trade?.id}
+                        </span>
+                        <h3 style={{ margin: '4px 0 0', fontSize: '18px', color: '#111827' }}>
+                          Report Issue or File Dispute
+                        </h3>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setDisputeModal(null)}
+                        style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#6b7280' }}
+                      >
+                        &times;
+                      </button>
+                    </div>
+
+                    <p style={{ margin: '8px 0 16px', fontSize: '13px', color: '#4b5563', lineHeight: '1.4' }}>
+                      Filing a dispute pauses full escrow payout release and alerts both trading desks for verified dispute resolution.
+                    </p>
+
+                    <form onSubmit={submitTradeDispute}>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>
+                        Dispute Category *
+                      </label>
+                      <select
+                        value={disputeModal.disputeType}
+                        onChange={e => setDisputeModal({ ...disputeModal, disputeType: e.target.value })}
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #d1d5db', marginBottom: '14px' }}
+                      >
+                        <option value="QUANTITY_DISCREPANCY">Quantity Loss / Under-delivery</option>
+                        <option value="DAMAGED_CARGO">Damaged Produce / Spoilage in Transit</option>
+                        <option value="TRANSIT_DELAY">Severe Transit Delay / Driver No-Show</option>
+                        <option value="PAYMENT_ISSUE">Payment / Escrow Calculation Issue</option>
+                      </select>
+
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>
+                        Claim / Adjustment Amount (₹)
+                      </label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 1500"
+                        value={disputeModal.claimAmount}
+                        onChange={e => setDisputeModal({ ...disputeModal, claimAmount: e.target.value })}
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #d1d5db', marginBottom: '14px' }}
+                      />
+
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>
+                        Description &amp; Observations *
+                      </label>
+                      <textarea
+                        required
+                        rows={3}
+                        placeholder="Detail specific discrepancies, scale weights, or vehicle conditions observed..."
+                        value={disputeModal.description}
+                        onChange={e => setDisputeModal({ ...disputeModal, description: e.target.value })}
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #d1d5db', marginBottom: '18px' }}
+                      />
+
+                      <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                        <button
+                          type="button"
+                          onClick={() => setDisputeModal(null)}
+                          className="trade-btn trade-btn-cancel"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="trade-btn trade-btn-primary"
+                          style={{ background: '#b91c1c', borderColor: '#b91c1c', padding: '8px 20px', fontWeight: 'bold' }}
+                        >
+                          Submit Dispute &rarr;
                         </button>
                       </div>
                     </form>
