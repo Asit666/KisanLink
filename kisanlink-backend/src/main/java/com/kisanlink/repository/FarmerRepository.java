@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface FarmerRepository extends JpaRepository<Farmer, Long> {
     Optional<Farmer> findByUserId(Long userId);
+    Optional<Farmer> findByUserEmail(String email);
 }

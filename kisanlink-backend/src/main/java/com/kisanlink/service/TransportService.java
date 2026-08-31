@@ -17,6 +17,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class TransportService {
@@ -28,6 +30,8 @@ public class TransportService {
     private final TransportBookingRepository bookingRepo;
     private final TradeDealRepository tradeDealRepo;
     private final UserRepository userRepository;
+    private final FarmerFavoriteTransporterRepository favoriteRepo;
+    private final FarmerRepository farmerRepo;
     private final NotificationWebSocketService wsService;
     private final SmsWhatsAppService smsService;
 
@@ -35,12 +39,16 @@ public class TransportService {
                             TransportBookingRepository bookingRepo,
                             TradeDealRepository tradeDealRepo,
                             UserRepository userRepository,
+                            FarmerFavoriteTransporterRepository favoriteRepo,
+                            FarmerRepository farmerRepo,
                             NotificationWebSocketService wsService,
                             SmsWhatsAppService smsService) {
         this.transporterRepo = transporterRepo;
         this.bookingRepo = bookingRepo;
         this.tradeDealRepo = tradeDealRepo;
         this.userRepository = userRepository;
+        this.favoriteRepo = favoriteRepo;
+        this.farmerRepo = farmerRepo;
         this.wsService = wsService;
         this.smsService = smsService;
     }
@@ -49,7 +57,7 @@ public class TransportService {
 
     /**
      * Returns up to 5 ranked transporter suggestions for an ACCEPTED deal.
-     * Scoring weights: price=40%, proximity=35%, verified=15%, capacity=10%
+     * Incorporates crop perishability priority, driver reliability, and favorite carrier boosts.
      */
     @Transactional(readOnly = true)
     public List<TransportSuggestionResponse> getSuggestions(Long dealId, String userEmail) {
@@ -64,11 +72,23 @@ public class TransportService {
         BigDecimal routeKm = DistanceCalculator.between(farmLat, farmLon, buyerLat, buyerLon);
         if (routeKm == null) routeKm = BigDecimal.valueOf(50); // fallback 50 km
 
+        // Determine crop perishability priority
+        CropCategory cat = deal.getCrop() != null ? deal.getCrop().getCategory() : null;
+        String cropName = deal.getCrop() != null && deal.getCrop().getName() != null ? deal.getCrop().getName().toLowerCase() : "";
+        boolean isHighPerish = cat == CropCategory.VEGETABLE || cat == CropCategory.FRUIT || cat == CropCategory.FLOWER
+                || cropName.contains("tomato") || cropName.contains("spinach") || cropName.contains("milk") || cropName.contains("berry");
+        boolean isLowPerish = cat == CropCategory.GRAIN || cat == CropCategory.PULSE || cat == CropCategory.OIL_SEED || cat == CropCategory.SEED;
+        String perishTier = isHighPerish ? "HIGH" : (isLowPerish ? "LOW" : "MEDIUM");
+
+        // Fetch farmer's saved favorite carrier IDs
+        Set<Long> favTransporterIds = favoriteRepo.findByFarmerIdOrderByCreatedAtDesc(deal.getFarmer().getId())
+                .stream().map(f -> f.getTransporter().getId()).collect(Collectors.toSet());
+
         // Load all available transporters that can carry the quantity
         List<Transporter> candidates = transporterRepo.findAvailableWithMinCapacity(deal.getQuantity());
 
         // Score each candidate
-        record ScoredTransporter(Transporter t, double proximityKm, BigDecimal cost, double score) {}
+        record ScoredTransporter(Transporter t, double proximityKm, BigDecimal cost, double score, boolean favorite) {}
         List<ScoredTransporter> scored = new ArrayList<>();
 
         // Determine bounds for normalizing price and proximity
@@ -104,15 +124,32 @@ public class TransportService {
             // Capacity headroom (larger relative to quantity = better)
             double capacityScore = Math.min(t.getCapacityKg().doubleValue() / deal.getQuantity().doubleValue() / 3.0, 1.0);
 
-            double composite = (priceScore * 0.30) + (proxScore * 0.30) + (relScore * 0.25) + (verifiedScore * 0.10) + (capacityScore * 0.05);
-            scored.add(new ScoredTransporter(t, proximity, cost, composite));
+            // Dynamic perishability weighting
+            double composite;
+            if (isHighPerish) {
+                // High perishability: fast pickup proximity, carrier reliability, and prompt ETA dominate
+                composite = (proxScore * 0.35) + (relScore * 0.35) + (priceScore * 0.20) + (capacityScore * 0.10);
+            } else if (isLowPerish) {
+                // Low perishability: economic freight cost and payload capacity dominate
+                composite = (priceScore * 0.45) + (capacityScore * 0.20) + (proxScore * 0.20) + (relScore * 0.15);
+            } else {
+                composite = (priceScore * 0.30) + (proxScore * 0.30) + (relScore * 0.25) + (verifiedScore * 0.10) + (capacityScore * 0.05);
+            }
+
+            boolean isFav = favTransporterIds.contains(t.getId());
+            if (isFav) {
+                composite += 0.15; // 15% bonus for preferred saved carriers
+            }
+
+            scored.add(new ScoredTransporter(t, proximity, cost, composite, isFav));
         }
 
         final BigDecimal finalRouteKm = routeKm;
+        final String finalPerishTier = perishTier;
         return scored.stream()
                 .sorted(Comparator.comparingDouble(ScoredTransporter::score).reversed())
                 .limit(MAX_SUGGESTIONS)
-                .map(s -> toSuggestion(s.t(), s.proximityKm(), finalRouteKm, s.cost(), s.score()))
+                .map(s -> toSuggestion(s.t(), s.proximityKm(), finalRouteKm, s.cost(), s.score(), finalPerishTier, s.favorite()))
                 .toList();
     }
 
@@ -426,7 +463,37 @@ public class TransportService {
         log.info("Transporter {} rated {} stars by {}. New score: {}", transporterId, req.rating(), userEmail, t.getReliabilityScore());
     }
 
-    private TransportSuggestionResponse toSuggestion(Transporter t, double proximityKm, BigDecimal routeKm, BigDecimal cost, double score) {
+    @Transactional
+    public boolean toggleFavoriteTransporter(Long transporterId, String farmerEmail) {
+        Farmer farmer = farmerRepo.findByUserEmail(farmerEmail)
+                .orElseThrow(() -> new IllegalArgumentException("Farmer profile not found for email: " + farmerEmail));
+        Transporter transporter = transporterRepo.findById(transporterId)
+                .orElseThrow(() -> new IllegalArgumentException("Transporter not found: " + transporterId));
+
+        if (favoriteRepo.existsByFarmerIdAndTransporterId(farmer.getId(), transporterId)) {
+            favoriteRepo.deleteByFarmerIdAndTransporterId(farmer.getId(), transporterId);
+            return false; // Removed from favorites
+        } else {
+            favoriteRepo.save(new FarmerFavoriteTransporter(farmer, transporter));
+            return true; // Added to favorites
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<TransportSuggestionResponse> getFavoriteTransporters(String farmerEmail) {
+        Farmer farmer = farmerRepo.findByUserEmail(farmerEmail)
+                .orElseThrow(() -> new IllegalArgumentException("Farmer profile not found for email: " + farmerEmail));
+
+        return favoriteRepo.findByFarmerIdOrderByCreatedAtDesc(farmer.getId())
+                .stream()
+                .map(fav -> toSuggestion(fav.getTransporter(), 4.5, BigDecimal.valueOf(35),
+                        fav.getTransporter().getBaseCharge().add(fav.getTransporter().getRatePerKm().multiply(BigDecimal.valueOf(35))),
+                        98.0, "HIGH", true))
+                .toList();
+    }
+
+    private TransportSuggestionResponse toSuggestion(Transporter t, double proximityKm, BigDecimal routeKm, BigDecimal cost, double score, String perishTier, boolean isFav) {
+        int etaMinutes = Math.max(15, (int) Math.round((proximityKm + routeKm.doubleValue()) / 40.0 * 60.0));
         return new TransportSuggestionResponse(
                 t.getId(),
                 t.getUser().getName(),
@@ -448,7 +515,10 @@ public class TransportService {
                 t.getRating().doubleValue(),
                 t.getOnTimeRate().doubleValue(),
                 t.getReliabilityScore().doubleValue(),
-                t.getTierBadge()
+                t.getTierBadge(),
+                etaMinutes,
+                perishTier,
+                isFav
         );
     }
 

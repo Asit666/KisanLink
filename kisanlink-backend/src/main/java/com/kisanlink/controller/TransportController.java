@@ -137,4 +137,25 @@ public class TransportController {
             @AuthenticationPrincipal UserDetails principal) {
         transportService.rateTransporter(id, request, principal.getUsername());
     }
+
+    /**
+     * GET /api/transport/favorites
+     * Farmer retrieves their saved favorite carriers.
+     */
+    @GetMapping("/favorites")
+    public List<TransportSuggestionResponse> getFavorites(@AuthenticationPrincipal UserDetails principal) {
+        return transportService.getFavoriteTransporters(principal.getUsername());
+    }
+
+    /**
+     * POST /api/transport/favorites/{transporterId}
+     * Farmer toggles bookmarking a transporter as favorite.
+     */
+    @PostMapping("/favorites/{transporterId}")
+    public java.util.Map<String, Object> toggleFavorite(
+            @PathVariable Long transporterId,
+            @AuthenticationPrincipal UserDetails principal) {
+        boolean isFav = transportService.toggleFavoriteTransporter(transporterId, principal.getUsername());
+        return java.util.Map.of("transporterId", transporterId, "favorite", isFav);
+    }
 }

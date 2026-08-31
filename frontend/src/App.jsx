@@ -2088,7 +2088,30 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
     }
   }
 
+  async function toggleFavoriteCarrier(transporterId) {
+    try {
+      if (session?.token && !session?.token.startsWith('demo-')) {
+        const res = await fetch(`${apiUrl}/api/transport/favorites/${transporterId}`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setSuggestions(prev => prev.map(s => s.transporterId === transporterId ? { ...s, favorite: data.favorite } : s));
+          setMsg(data.favorite ? 'Transporter saved to your favorite carriers.' : 'Removed from favorite carriers.');
+          return;
+        }
+      }
+      setSuggestions(prev => prev.map(s => s.transporterId === transporterId ? { ...s, favorite: !s.favorite } : s));
+      setMsg('Carrier bookmark updated.');
+    } catch {
+      setSuggestions(prev => prev.map(s => s.transporterId === transporterId ? { ...s, favorite: !s.favorite } : s));
+      setMsg('Carrier bookmark updated.');
+    }
+  }
+
   const sortedSuggestions = [...suggestions].sort((a, b) => {
+    if (sortBy === 'favorites') return (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0);
     if (sortBy === 'reliability') return (b.reliabilityScore || 90) - (a.reliabilityScore || 90);
     if (sortBy === 'distance') return a.distanceFromFarmKm - b.distanceFromFarmKm;
     if (sortBy === 'price') return a.estimatedCost - b.estimatedCost;
@@ -2117,6 +2140,8 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
     );
   }
 
+  const hasHighPerish = suggestions.some(s => s.perishabilityTier === 'HIGH');
+
   return (
     <div style={{ marginTop: '10px' }}>
       {!open ? (
@@ -2129,11 +2154,18 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
             <div>
               <span style={{ fontWeight: 700, fontSize: '14px', color: '#e07b39' }}>Select a Transporter for This Deal</span>
               <p style={{ margin: '2px 0 0', fontSize: '11px', color: '#667269' }}>
-                Compare carriers by location proximity (near/far), freight fee, and payload capacity.
+                Compare carriers by location proximity (near/far), freight fee, driver reliability, and ETA.
               </p>
             </div>
             <button type="button" onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#667269', fontSize: '18px', padding: '2px 6px' }}>×</button>
           </div>
+
+          {/* Perishability Priority Banner */}
+          {hasHighPerish && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', color: '#991b1b', margin: '8px 0 10px' }}>
+              <strong>Perishable Produce Priority Active:</strong> Ranking prioritizes shortest ETA, near pickup proximity, and top carrier reliability to protect crop freshness.
+            </div>
+          )}
 
           {/* Sort controls */}
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center', margin: '10px 0', flexWrap: 'wrap' }}>
@@ -2145,6 +2177,14 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
               onClick={() => setSortBy('match')}
             >
               Best Match
+            </button>
+            <button
+              type="button"
+              className={`filter-chip ${sortBy === 'favorites' ? 'active' : ''}`}
+              style={{ fontSize: '11px', padding: '3px 8px' }}
+              onClick={() => setSortBy('favorites')}
+            >
+              Saved Favorites
             </button>
             <button
               type="button"
@@ -2190,7 +2230,7 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
                 key={s.transporterId}
                 style={{
                   background: '#fafafa',
-                  border: isNear ? '1.5px solid #3b7444' : '1px solid #e5e7eb',
+                  border: s.favorite ? '1.5px solid #ec4899' : (isNear ? '1.5px solid #3b7444' : '1px solid #e5e7eb'),
                   borderRadius: '10px',
                   padding: '12px 14px',
                   marginBottom: '10px',
@@ -2204,6 +2244,11 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
                 <div style={{ flex: '1 1 280px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <strong style={{ fontSize: '14px', color: '#111827' }}>{s.transporterName}</strong>
+                    {s.favorite && (
+                      <span style={{ fontSize: '10px', background: '#fdf2f8', color: '#be185d', padding: '2px 6px', borderRadius: '6px', fontWeight: 700 }}>
+                        FAVORITE CARRIER
+                      </span>
+                    )}
                     {s.verified && (
                       <span style={{ fontSize: '10px', background: '#3b744422', color: '#3b7444', padding: '2px 6px', borderRadius: '6px', fontWeight: 600 }}>
                         Verified Operator
@@ -2214,6 +2259,9 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
                     </span>
                     <span style={{ fontSize: '10px', background: proximityBg, color: proximityColor, padding: '2px 6px', borderRadius: '6px', fontWeight: 700 }}>
                       {proximityLabel}
+                    </span>
+                    <span style={{ fontSize: '10px', background: '#f0fdf4', color: '#166534', padding: '2px 6px', borderRadius: '6px', fontWeight: 600 }}>
+                      ETA: ~{s.etaMinutes || 35} mins
                     </span>
                   </div>
 
@@ -2239,14 +2287,32 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
                     <div style={{ fontSize: '9px', color: '#9ca3af' }}>Added to buyer escrow</div>
                   </div>
 
-                  <button
-                    type="button"
-                    className="trade-btn trade-btn-primary"
-                    style={{ background: '#e07b39', borderColor: '#e07b39', fontSize: '11px', padding: '6px 14px' }}
-                    onClick={() => book(s.transporterId)}
-                  >
-                    Select This Carrier
-                  </button>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      onClick={() => toggleFavoriteCarrier(s.transporterId)}
+                      style={{
+                        background: s.favorite ? '#fdf2f8' : '#f9fafb',
+                        border: s.favorite ? '1px solid #fbcfe8' : '1px solid #d1d5db',
+                        color: s.favorite ? '#be185d' : '#4b5563',
+                        fontSize: '11px',
+                        padding: '6px 10px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontWeight: 600
+                      }}
+                    >
+                      {s.favorite ? 'Saved Favorite' : '+ Save Favorite'}
+                    </button>
+                    <button
+                      type="button"
+                      className="trade-btn trade-btn-primary"
+                      style={{ background: '#e07b39', borderColor: '#e07b39', fontSize: '11px', padding: '6px 14px' }}
+                      onClick={() => book(s.transporterId)}
+                    >
+                      Select This Carrier
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -2291,6 +2357,24 @@ function TransportBookingStatus({ dealId, apiUrl, session, role }) {
 
   const statusColor = { PENDING: '#f59e0b', CONFIRMED: '#3b7444', IN_TRANSIT: '#059669', REJECTED: '#dc664a', DELIVERED: '#6366f1', CANCELLED: '#9ca3af' };
 
+  // Milestone Progress Index
+  const milestones = [
+    { key: 'REQUESTED', label: '1. Booked' },
+    { key: 'DISPATCHED', label: '2. Dispatched' },
+    { key: 'PICKUP', label: '3. Farm Pickup (POP)' },
+    { key: 'IN_TRANSIT', label: '4. In Transit' },
+    { key: 'DELIVERED', label: '5. Delivered (POD)' }
+  ];
+
+  let activeMilestoneIdx = 0;
+  if (booking.status === 'PENDING') activeMilestoneIdx = 0;
+  else if (booking.status === 'CONFIRMED') activeMilestoneIdx = 1;
+  else if (booking.status === 'IN_TRANSIT') activeMilestoneIdx = 3;
+  else if (booking.status === 'DELIVERED' || booking.status === 'COMPLETED') activeMilestoneIdx = 4;
+
+  const progressPercent = ((activeMilestoneIdx + 1) / milestones.length) * 100;
+  const etaMinutes = Math.max(15, Math.round((Number(booking.distanceKm) || 45) / 40 * 60));
+
   return (
     <div style={{ background: 'rgba(224,123,57,0.07)', border: '1.5px solid #e07b39', borderRadius: '10px', padding: '14px', marginTop: '8px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -2309,6 +2393,54 @@ function TransportBookingStatus({ dealId, apiUrl, session, role }) {
         <span style={{ background: (statusColor[booking.status] || '#3b7444') + '22', color: statusColor[booking.status] || '#3b7444', padding: '4px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>
           {booking.status?.replace('_', ' ')}
         </span>
+      </div>
+
+      {/* Live Waypoint Journey Milestones Tracker */}
+      <div style={{ marginTop: '14px', background: '#fff', border: '1px solid #fed7aa', borderRadius: '8px', padding: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+          <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#9a3412', textTransform: 'uppercase' }}>
+            Live Journey Waypoint Tracker
+          </span>
+          <span style={{ fontSize: '11px', color: '#4b5563', fontFamily: "'DM Mono', monospace" }}>
+            {booking.status === 'IN_TRANSIT' ? `ETA: ~${etaMinutes} mins remaining` : (booking.status === 'DELIVERED' ? 'Arrived at Destination' : 'Scheduled')}
+          </span>
+        </div>
+
+        {/* Progress bar line */}
+        <div style={{ height: '6px', background: '#e5e7eb', borderRadius: '3px', overflow: 'hidden', marginBottom: '10px' }}>
+          <div style={{ width: `${progressPercent}%`, height: '100%', background: '#ea580c', transition: 'width 0.4s ease' }} />
+        </div>
+
+        {/* 5 Milestone indicators */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '4px', textAlign: 'center' }}>
+          {milestones.map((m, idx) => {
+            const isDone = idx <= activeMilestoneIdx;
+            const isCurrent = idx === activeMilestoneIdx;
+            return (
+              <div key={m.key} style={{ fontSize: '10px' }}>
+                <div style={{
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  margin: '0 auto 4px',
+                  background: isDone ? '#ea580c' : '#d1d5db',
+                  color: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '9px',
+                  fontWeight: 'bold',
+                  boxShadow: isCurrent ? '0 0 0 3px #fed7aa' : 'none'
+                }}>
+                  {idx + 1}
+                </div>
+                <span style={{ color: isDone ? '#111827' : '#9ca3af', fontWeight: isDone ? 700 : 400 }}>
+                  {m.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Proof of Pickup (POP) Security Card for Farmer */}

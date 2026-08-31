@@ -3,7 +3,8 @@ package com.kisanlink.dto;
 import java.math.BigDecimal;
 
 /**
- * One ranked transporter suggestion returned by the matching engine with reliability metrics.
+ * Ranked transporter suggestion returned by the matching engine with reliability metrics,
+ * perishability-aware scoring, ETA, and farmer bookmark status.
  */
 public record TransportSuggestionResponse(
         Long transporterId,
@@ -20,7 +21,7 @@ public record TransportSuggestionResponse(
         /** Km from this transporter's base to the farmer pickup point */
         double distanceFromFarmKm,
 
-        /** Km from farmer pickup → buyer delivery (route length) */
+        /** Km from farmer pickup -> buyer delivery (route length) */
         double routeKm,
 
         BigDecimal ratePerKm,
@@ -37,5 +38,10 @@ public record TransportSuggestionResponse(
         double rating,
         double onTimeRate,
         double reliabilityScore,
-        String tierBadge
+        String tierBadge,
+
+        // Smart logistics additions
+        int etaMinutes,
+        String perishabilityTier,
+        boolean favorite
 ) {}
