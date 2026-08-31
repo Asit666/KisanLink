@@ -81,9 +81,49 @@ public class ScoringService {
                     opt.grossRevenue(),
                     opt.netReturn(),
                     newScore,
-                    opt.buyerVerified()
+                    opt.buyerVerified(),
+                    opt.transporterId(),
+                    opt.transporterName(),
+                    opt.vehicleType(),
+                    opt.transporterRatePerKm(),
+                    opt.transporterBaseCharge(),
+                    opt.platformFee(),
+                    opt.profitComparisonNote()
             );
         }).sorted((a, b) -> b.score().compareTo(a.score())).toList();
+
+        if (scored.size() > 1) {
+            RecommendationOption top = scored.getFirst();
+            RecommendationOption second = scored.get(1);
+            BigDecimal delta = top.netReturn().subtract(second.netReturn());
+
+            String topNote = delta.compareTo(BigDecimal.ZERO) > 0
+                    ? String.format("Yields INR %s higher net return than 2nd option via optimal transporter freight pairing.", delta.toPlainString())
+                    : "Optimal multi-factor deal combination.";
+
+            java.util.List<RecommendationOption> annotated = new java.util.ArrayList<>();
+            annotated.add(new RecommendationOption(
+                    top.buyerId(), top.buyerName(), top.pricePerKg(), top.distanceKm(),
+                    top.transportCost(), top.grossRevenue(), top.netReturn(), top.score(),
+                    top.buyerVerified(), top.transporterId(), top.transporterName(),
+                    top.vehicleType(), top.transporterRatePerKm(), top.transporterBaseCharge(),
+                    top.platformFee(), topNote
+            ));
+
+            for (int i = 1; i < scored.size(); i++) {
+                RecommendationOption current = scored.get(i);
+                BigDecimal diff = top.netReturn().subtract(current.netReturn());
+                String note = String.format("INR %s less take-home profit than Best Deal.", diff.toPlainString());
+                annotated.add(new RecommendationOption(
+                        current.buyerId(), current.buyerName(), current.pricePerKg(), current.distanceKm(),
+                        current.transportCost(), current.grossRevenue(), current.netReturn(), current.score(),
+                        current.buyerVerified(), current.transporterId(), current.transporterName(),
+                        current.vehicleType(), current.transporterRatePerKm(), current.transporterBaseCharge(),
+                        current.platformFee(), note
+                ));
+            }
+            return annotated;
+        }
 
         return scored;
     }

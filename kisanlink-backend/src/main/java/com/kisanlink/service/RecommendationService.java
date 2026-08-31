@@ -22,6 +22,7 @@ public class RecommendationService {
     private final FarmerProduceRepository produceRepository;
     private final BuyerRequirementRepository requirementRepository;
     private final RecommendationRepository recommendationRepository;
+    private final TransporterRepository transporterRepository;
     private final RecommendationConfig config;
     private final ScoringService scoringService;
     private final com.kisanlink.security.OwnershipService ownershipService;
@@ -30,6 +31,7 @@ public class RecommendationService {
                                  FarmerProduceRepository produceRepository,
                                  BuyerRequirementRepository requirementRepository,
                                  RecommendationRepository recommendationRepository,
+                                 TransporterRepository transporterRepository,
                                  RecommendationConfig config,
                                  ScoringService scoringService,
                                  com.kisanlink.security.OwnershipService ownershipService) {
@@ -37,6 +39,7 @@ public class RecommendationService {
         this.produceRepository = produceRepository;
         this.requirementRepository = requirementRepository;
         this.recommendationRepository = recommendationRepository;
+        this.transporterRepository = transporterRepository;
         this.config = config;
         this.scoringService = scoringService;
         this.ownershipService = ownershipService;
@@ -124,38 +127,70 @@ public class RecommendationService {
     // ── Private helpers ───────────────────────────────────────────────────────
 
     /**
-     * Builds a single option with financial data using the configured transport rates.
-     * The weighted {@code score} is set to a preliminary value of ZERO here;
-     * it will be replaced by {@link ScoringService#score(List)} in the next step.
+     * Builds a single option pairing the buyer requirement with the optimal available transporter.
      */
     private RecommendationOption rawOption(Farmer farmer, FarmerProduce produce, BuyerRequirement requirement) {
-        BigDecimal distance = DistanceCalculator.between(
+        BigDecimal routeDistance = DistanceCalculator.between(
                 farmer.getLatitude(), farmer.getLongitude(),
                 requirement.getBuyer().getLatitude(), requirement.getBuyer().getLongitude());
 
-        if (distance == null) {
-            distance = BigDecimal.valueOf(config.getTransport().getMaxDistanceKm()).setScale(2, RoundingMode.HALF_UP);
+        if (routeDistance == null) {
+            routeDistance = BigDecimal.valueOf(config.getTransport().getMaxDistanceKm()).setScale(2, RoundingMode.HALF_UP);
         }
 
-        // Use configured transport rates
-        BigDecimal transport = ProfitCalculator.transport(
-                distance,
-                config.getTransport().getBaseCharge(),
-                config.getTransport().getRatePerKm());
+        // Query available fleet carriers matching capacity
+        List<Transporter> availableTransporters = transporterRepository.findAvailableWithMinCapacity(produce.getQuantity());
+        if (availableTransporters.isEmpty()) {
+            availableTransporters = transporterRepository.findByAvailableTrue();
+        }
+
+        Transporter bestCarrier = null;
+        BigDecimal bestFreightCost = null;
+
+        if (!availableTransporters.isEmpty()) {
+            for (Transporter t : availableTransporters) {
+                BigDecimal freight = t.getBaseCharge().add(routeDistance.multiply(t.getRatePerKm())).setScale(2, RoundingMode.HALF_UP);
+                if (bestFreightCost == null || freight.compareTo(bestFreightCost) < 0) {
+                    bestFreightCost = freight;
+                    bestCarrier = t;
+                }
+            }
+        }
+
+        if (bestFreightCost == null) {
+            bestFreightCost = ProfitCalculator.transport(
+                    routeDistance,
+                    config.getTransport().getBaseCharge(),
+                    config.getTransport().getRatePerKm());
+        }
 
         BigDecimal gross = ProfitCalculator.revenue(requirement.getOfferedPrice(), produce.getQuantity());
-        BigDecimal net = gross.subtract(transport).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal platformFee = BigDecimal.valueOf(100.00).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal net = gross.subtract(bestFreightCost).subtract(platformFee).setScale(2, RoundingMode.HALF_UP);
+
+        Long carrierId = bestCarrier != null ? bestCarrier.getId() : null;
+        String carrierName = bestCarrier != null && bestCarrier.getUser() != null ? bestCarrier.getUser().getName() : "Regional Agro-Fleet";
+        String carrierVehicle = bestCarrier != null ? bestCarrier.getVehicleType().name() : "MINI_TRUCK";
+        BigDecimal carrierRate = bestCarrier != null ? bestCarrier.getRatePerKm() : config.getTransport().getRatePerKm();
+        BigDecimal carrierBase = bestCarrier != null ? bestCarrier.getBaseCharge() : config.getTransport().getBaseCharge();
 
         return new RecommendationOption(
                 requirement.getBuyer().getId(),
                 requirement.getBuyer().getBusinessName(),
                 requirement.getOfferedPrice(),
-                distance,
-                transport,
+                routeDistance,
+                bestFreightCost,
                 gross,
                 net,
                 BigDecimal.ZERO,          // placeholder — overwritten by ScoringService
-                requirement.getBuyer().isVerified()
+                requirement.getBuyer().isVerified(),
+                carrierId,
+                carrierName,
+                carrierVehicle,
+                carrierRate,
+                carrierBase,
+                platformFee,
+                null
         );
     }
 
