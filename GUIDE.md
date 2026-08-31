@@ -198,9 +198,9 @@ Navigation is controlled by the `currentView` state variable:
 ### 1-Click Quick Demo Login
 
 The login modal contains instant demo accounts:
-- **🌾 Farmer (Ramesh)**: `farmer@kisanlink.in`
-- **🏪 Buyer (Priya)**: `buyer@kisanlink.in`
-- **🚛 Transporter (Suresh)**: `transporter@kisanlink.in`
+- **Farmer (Ramesh)**: `farmer@kisanlink.in`
+- **Buyer (Priya)**: `buyer@kisanlink.in`
+- **Transporter (Suresh)**: `transporter@kisanlink.in`
 
 ---
 

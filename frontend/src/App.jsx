@@ -2024,7 +2024,7 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
         if (res.ok) {
           const data = await res.json();
           setBooking(data);
-          setMsg(`✅ Booking sent to ${data.transporterName}! Awaiting confirmation.`);
+          setMsg(`Booking sent to ${data.transporterName}! Awaiting confirmation.`);
           setSuggestions([]);
           return;
         }
@@ -2038,7 +2038,7 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
         distanceKm: selected.routeKm,
         status: 'PENDING'
       });
-      setMsg(`✅ Booking dispatched to ${selected.transporterName}! Transporter will review.`);
+      setMsg(`Booking dispatched to ${selected.transporterName}! Transporter will review.`);
       setSuggestions([]);
     } catch {
       setBooking({
@@ -2050,7 +2050,7 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
         distanceKm: selected.routeKm,
         status: 'PENDING'
       });
-      setMsg(`✅ Booking dispatched to ${selected.transporterName}! Transporter will review.`);
+      setMsg(`Booking dispatched to ${selected.transporterName}! Transporter will review.`);
       setSuggestions([]);
     }
   }
@@ -2060,7 +2060,7 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
       <div style={{ background: 'rgba(59,116,68,0.08)', border: '1.5px solid #3b7444', borderRadius: '10px', padding: '14px', marginTop: '10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <div style={{ fontWeight: 700, color: '#3b7444', fontSize: '13px' }}>🚛 Transport Booked</div>
+            <div style={{ fontWeight: 700, color: '#3b7444', fontSize: '13px' }}>Transport Booked</div>
             <div style={{ fontSize: '12px', marginTop: '4px' }}>{booking.transporterName} · {booking.vehicleType?.replace('_',' ')}</div>
             <div style={{ fontSize: '11px', color: '#667269' }}>₹{Number(booking.estimatedCost).toLocaleString('en-IN')} · {Number(booking.distanceKm).toFixed(0)} km route</div>
           </div>
@@ -2076,12 +2076,12 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
     <div style={{ marginTop: '10px' }}>
       {!open ? (
         <button type="button" className="trade-btn trade-btn-primary" onClick={loadSuggestions} style={{ background: '#e07b39', borderColor: '#e07b39' }}>
-          🚛 Find Transporter
+          Find Transporter
         </button>
       ) : (
         <div style={{ border: '1.5px solid #e07b39', borderRadius: '12px', padding: '14px', marginTop: '6px', background: '#fff' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-            <span style={{ fontWeight: 700, fontSize: '13px', color: '#e07b39' }}>🚛 Transporter Suggestions</span>
+            <span style={{ fontWeight: 700, fontSize: '13px', color: '#e07b39' }}>Transporter Suggestions</span>
             <button type="button" onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#667269', fontSize: '18px' }}>×</button>
           </div>
           {loading && <div style={{ color: '#667269', fontSize: '12px' }}>Loading ranked transporters…</div>}
@@ -2154,7 +2154,7 @@ function TransportBookingStatus({ dealId, apiUrl, session, role }) {
     <div style={{ background: 'rgba(224,123,57,0.07)', border: '1.5px solid #e07b39', borderRadius: '10px', padding: '14px', marginTop: '8px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <div style={{ fontWeight: 700, fontSize: '13px', color: '#e07b39' }}>🚛 {booking.transporterName}</div>
+          <div style={{ fontWeight: 700, fontSize: '13px', color: '#e07b39' }}>{booking.transporterName}</div>
           <div style={{ fontSize: '11px', color: '#667269', marginTop: '3px' }}>
             {booking.vehicleType?.replace('_',' ')} · {booking.vehicleNumber} · {Number(booking.capacityKg).toLocaleString('en-IN')} kg
           </div>
@@ -2170,7 +2170,7 @@ function TransportBookingStatus({ dealId, apiUrl, session, role }) {
         </span>
       </div>
       {booking.status === 'PENDING' && role === 'BUYER' && (
-        <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '8px' }}>⏳ Transporter hasn't confirmed yet. You'll be notified automatically.</div>
+        <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '8px' }}>Transporter has not confirmed yet. You will be notified automatically.</div>
       )}
     </div>
   );
@@ -2208,15 +2208,15 @@ function TransporterDashboard({ session, apiUrl }) {
         if (res.ok) {
           const updated = await res.json();
           setRequests(prev => prev.map(r => r.bookingId === bookingId ? updated : r));
-          setMsg('✅ Trip confirmed! Trade deal status moved to IN_TRANSIT.');
+          setMsg('Trip confirmed. Trade deal status moved to IN_TRANSIT.');
           return;
         }
       }
       setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'CONFIRMED', confirmedAt: new Date().toISOString() } : r));
-      setMsg('✅ Trip confirmed! Trade deal status moved to IN_TRANSIT.');
+      setMsg('Trip confirmed. Trade deal status moved to IN_TRANSIT.');
     } catch {
       setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'CONFIRMED', confirmedAt: new Date().toISOString() } : r));
-      setMsg('✅ Trip confirmed! Trade deal status moved to IN_TRANSIT.');
+      setMsg('Trip confirmed. Trade deal status moved to IN_TRANSIT.');
     }
   }
 
@@ -2254,15 +2254,15 @@ function TransporterDashboard({ session, apiUrl }) {
         if (res.ok) {
           const updated = await res.json();
           setRequests(prev => prev.map(r => r.bookingId === bookingId ? updated : r));
-          setMsg('🎉 Delivery logged! Trade deal marked DELIVERED. Buyer can now release escrow payout.');
+          setMsg('Delivery logged. Trade deal marked DELIVERED. Buyer can now release escrow payout.');
           return;
         }
       }
       setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'DELIVERED', deliveredAt: new Date().toISOString() } : r));
-      setMsg('🎉 Delivery logged! Trade deal marked DELIVERED. Buyer can now release escrow payout.');
+      setMsg('Delivery logged. Trade deal marked DELIVERED. Buyer can now release escrow payout.');
     } catch {
       setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'DELIVERED', deliveredAt: new Date().toISOString() } : r));
-      setMsg('🎉 Delivery logged!');
+      setMsg('Delivery logged.');
     }
   }
 
@@ -2282,9 +2282,9 @@ function TransporterDashboard({ session, apiUrl }) {
           <div>
             <p className="eyebrow">Agri-Logistics &amp; Freight Exchange</p>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              🚛 {session?.name || 'Suresh Logistics'}
+              {session?.name || 'Suresh Logistics'}
               <span style={{ fontSize: '11px', background: '#3b744422', color: '#3b7444', padding: '3px 8px', borderRadius: '12px', fontWeight: 600 }}>
-                ✓ Verified Fleet Operator
+                Verified Fleet Operator
               </span>
             </h2>
             <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
@@ -2305,7 +2305,7 @@ function TransporterDashboard({ session, apiUrl }) {
               }}
               onClick={() => setIsAvailable(!isAvailable)}
             >
-              {isAvailable ? '🟢 Online (Accepting Hauls)' : '⚪ Busy / Offline'}
+              {isAvailable ? 'Online (Accepting Hauls)' : 'Busy / Offline'}
             </button>
           </div>
         </div>
@@ -2370,7 +2370,6 @@ function TransporterDashboard({ session, apiUrl }) {
           <div style={{ marginTop: '16px' }}>
             {pendingRequests.length === 0 ? (
               <div style={{ padding: '36px 0', textAlign: 'center', color: '#6b7280' }}>
-                <div style={{ fontSize: '32px', marginBottom: '8px' }}>📭</div>
                 <div>No pending booking requests right now.</div>
                 <div style={{ fontSize: '12px', marginTop: '4px', color: '#9ca3af' }}>When a farmer books your vehicle after an accepted deal, it will show up here.</div>
               </div>
@@ -2386,14 +2385,14 @@ function TransporterDashboard({ session, apiUrl }) {
                         <strong style={{ fontSize: '15px' }}>Haul for Trade Deal #{r.dealId}</strong>
                       </div>
                       <div style={{ fontSize: '13px', color: '#374151', marginTop: '6px' }}>
-                        📍 <strong>Pickup:</strong> {r.pickupAddress}
+                        <strong>Pickup:</strong> {r.pickupAddress}
                       </div>
                       <div style={{ fontSize: '13px', color: '#374151', marginTop: '4px' }}>
-                        🎯 <strong>Delivery:</strong> {r.deliveryAddress}
+                        <strong>Delivery:</strong> {r.deliveryAddress}
                       </div>
                       {r.notes && (
                         <div style={{ fontSize: '12px', color: '#4b5563', background: '#f9fafb', padding: '6px 10px', borderRadius: '6px', marginTop: '8px', borderLeft: '3px solid #e07b39' }}>
-                          📦 {r.notes}
+                          Notes: {r.notes}
                         </div>
                       )}
                     </div>
@@ -2411,7 +2410,7 @@ function TransporterDashboard({ session, apiUrl }) {
                       style={{ background: '#3b7444', borderColor: '#3b7444', padding: '8px 16px', fontSize: '12px' }}
                       onClick={() => handleConfirm(r.bookingId)}
                     >
-                      ✅ Accept &amp; Dispatch Haul
+                      Accept &amp; Dispatch Haul
                     </button>
                     <button
                       type="button"
@@ -2419,7 +2418,7 @@ function TransporterDashboard({ session, apiUrl }) {
                       style={{ padding: '8px 16px', fontSize: '12px' }}
                       onClick={() => handleReject(r.bookingId)}
                     >
-                      ❌ Decline
+                      Decline
                     </button>
                   </div>
                 </div>
@@ -2433,7 +2432,6 @@ function TransporterDashboard({ session, apiUrl }) {
           <div style={{ marginTop: '16px' }}>
             {activeTrips.length === 0 ? (
               <div style={{ padding: '36px 0', textAlign: 'center', color: '#6b7280' }}>
-                <div style={{ fontSize: '32px', marginBottom: '8px' }}>🚛</div>
                 <div>No active hauls in transit.</div>
                 <div style={{ fontSize: '12px', marginTop: '4px', color: '#9ca3af' }}>Accept a pending request to move it to active transit.</div>
               </div>
@@ -2444,19 +2442,19 @@ function TransporterDashboard({ session, apiUrl }) {
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{ fontSize: '11px', background: '#ecfdf5', color: '#059669', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
-                          🟢 IN TRANSIT
+                          IN TRANSIT
                         </span>
                         <strong style={{ fontSize: '15px' }}>Haul for Trade Deal #{r.dealId}</strong>
                       </div>
                       <div style={{ fontSize: '13px', color: '#374151', marginTop: '6px' }}>
-                        📍 <strong>Origin:</strong> {r.pickupAddress}
+                        <strong>Origin:</strong> {r.pickupAddress}
                       </div>
                       <div style={{ fontSize: '13px', color: '#374151', marginTop: '4px' }}>
-                        🎯 <strong>Destination:</strong> {r.deliveryAddress}
+                        <strong>Destination:</strong> {r.deliveryAddress}
                       </div>
                       {r.notes && (
                         <div style={{ fontSize: '12px', color: '#4b5563', marginTop: '6px' }}>
-                          📦 {r.notes}
+                          Notes: {r.notes}
                         </div>
                       )}
                     </div>
@@ -2473,7 +2471,7 @@ function TransporterDashboard({ session, apiUrl }) {
                       style={{ background: '#1e40af', borderColor: '#1e40af', padding: '8px 18px', fontSize: '12px' }}
                       onClick={() => handleDelivered(r.bookingId)}
                     >
-                      📦 Confirm Delivery &amp; Log Proof of Delivery ↗
+                      Confirm Delivery &amp; Log Proof of Delivery →
                     </button>
                   </div>
                 </div>
@@ -4722,7 +4720,7 @@ function App() {
               className={`auth-role-btn ${role === 'TRANSPORTER' ? 'active' : ''}`}
               onClick={() => setRole('TRANSPORTER')}
             >
-              🚛 Transporter
+              Transporter
             </button>
           </div>
         )}
@@ -4791,7 +4789,7 @@ function App() {
               style={{ fontSize: '11px', padding: '5px 10px' }}
               onClick={() => handleQuickLogin('FARMER')}
             >
-              🌾 Farmer (Ramesh)
+              Farmer (Ramesh)
             </button>
             <button
               type="button"
@@ -4799,7 +4797,7 @@ function App() {
               style={{ fontSize: '11px', padding: '5px 10px' }}
               onClick={() => handleQuickLogin('BUYER')}
             >
-              🏪 Buyer (Priya)
+              Buyer (Priya)
             </button>
             <button
               type="button"
@@ -4807,7 +4805,7 @@ function App() {
               style={{ fontSize: '11px', padding: '5px 10px', borderColor: '#e07b39', color: '#e07b39' }}
               onClick={() => handleQuickLogin('TRANSPORTER')}
             >
-              🚛 Transporter (Suresh)
+              Transporter (Suresh)
             </button>
           </div>
 
@@ -4891,7 +4889,7 @@ function App() {
                 className={`auth-role-btn ${role === 'TRANSPORTER' ? 'active' : ''}`}
                 onClick={() => setRole('TRANSPORTER')}
               >
-                🚛 Transporter
+                Transporter
               </button>
             </div>
           )}
@@ -4956,7 +4954,7 @@ function App() {
             <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
               {text.authQuickDemo}
             </span>
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '8px', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 className="trade-btn trade-btn-secondary"
@@ -4972,6 +4970,14 @@ function App() {
                 onClick={() => handleQuickLogin('BUYER')}
               >
                 Buyer (Priya)
+              </button>
+              <button
+                type="button"
+                className="trade-btn trade-btn-secondary"
+                style={{ fontSize: '11px', padding: '5px 10px', borderColor: '#e07b39', color: '#e07b39' }}
+                onClick={() => handleQuickLogin('TRANSPORTER')}
+              >
+                Transporter (Suresh)
               </button>
             </div>
           </div>
@@ -5320,7 +5326,7 @@ function App() {
               className={`left-nav-item ${(currentView === 'transporter-dashboard') ? 'active' : ''}`}
               onClick={() => setCurrentView('transporter-dashboard')}
             >
-              <span className="left-nav-icon">🚛</span>
+              <span className="left-nav-icon">TR</span>
               <span className="left-nav-label">
                 <strong>Transport Hub</strong>
                 <small>Freight &amp; Hauls</small>
