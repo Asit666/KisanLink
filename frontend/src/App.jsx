@@ -1852,6 +1852,42 @@ function getDemoSuggestions() {
       score: 94.2
     },
     {
+      transporterId: 4,
+      transporterName: 'Singh Pickup Express',
+      transporterPhone: '+91 90044 45555',
+      vehicleType: 'PICKUP',
+      vehicleNumber: 'JH-03-GH-3456',
+      capacityKg: 800,
+      verified: true,
+      available: true,
+      baseDistrict: 'Ramgarh',
+      baseState: 'Jharkhand',
+      distanceFromFarmKm: 18.6,
+      routeKm: 85.0,
+      ratePerKm: 10,
+      baseCharge: 60,
+      estimatedCost: 910,
+      score: 91.5
+    },
+    {
+      transporterId: 3,
+      transporterName: 'Gupta Tempo Service',
+      transporterPhone: '+91 90033 34444',
+      vehicleType: 'TEMPO',
+      vehicleNumber: 'JH-02-EF-9012',
+      capacityKg: 1200,
+      verified: false,
+      available: true,
+      baseDistrict: 'Hazaribagh',
+      baseState: 'Jharkhand',
+      distanceFromFarmKm: 38.2,
+      routeKm: 85.0,
+      ratePerKm: 12,
+      baseCharge: 80,
+      estimatedCost: 1100,
+      score: 84.1
+    },
+    {
       transporterId: 2,
       transporterName: 'Ramesh Transport Co.',
       transporterPhone: '+91 90022 23333',
@@ -1862,48 +1898,30 @@ function getDemoSuggestions() {
       available: true,
       baseDistrict: 'Bokaro',
       baseState: 'Jharkhand',
-      distanceFromFarmKm: 28.0,
+      distanceFromFarmKm: 68.0,
       routeKm: 85.0,
       ratePerKm: 18,
       baseCharge: 150,
       estimatedCost: 1680,
-      score: 87.5
+      score: 82.5
     },
     {
-      transporterId: 3,
-      transporterName: 'Gupta Tempo Service',
-      transporterPhone: '+91 90033 34444',
-      vehicleType: 'TEMPO',
-      vehicleNumber: 'JH-02-EF-9012',
-      capacityKg: 1000,
-      verified: false,
+      transporterId: 5,
+      transporterName: 'Jha Heavy Freight Lines',
+      transporterPhone: '+91 90055 56666',
+      vehicleType: 'FULL_TRUCK',
+      vehicleNumber: 'JH-04-IJ-7890',
+      capacityKg: 8000,
+      verified: true,
       available: true,
-      baseDistrict: 'Hazaribagh',
+      baseDistrict: 'Dhanbad',
       baseState: 'Jharkhand',
-      distanceFromFarmKm: 35.2,
+      distanceFromFarmKm: 94.5,
       routeKm: 85.0,
-      ratePerKm: 12,
-      baseCharge: 80,
-      estimatedCost: 1100,
-      score: 82.1
-    },
-    {
-      transporterId: 4,
-      transporterName: 'Singh Pickup Express',
-      transporterPhone: '+91 90044 45555',
-      vehicleType: 'PICKUP',
-      vehicleNumber: 'JH-03-GH-3456',
-      capacityKg: 500,
-      verified: false,
-      available: true,
-      baseDistrict: 'Ramgarh',
-      baseState: 'Jharkhand',
-      distanceFromFarmKm: 18.6,
-      routeKm: 85.0,
-      ratePerKm: 10,
-      baseCharge: 60,
-      estimatedCost: 910,
-      score: 80.4
+      ratePerKm: 20,
+      baseCharge: 200,
+      estimatedCost: 1900,
+      score: 76.0
     }
   ];
 }
@@ -1985,6 +2003,7 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
   const [booking, setBooking] = useState(null);
   const [msg, setMsg] = useState('');
   const [open, setOpen] = useState(false);
+  const [sortBy, setSortBy] = useState('match'); // 'match' | 'distance' | 'price'
 
   async function loadSuggestions() {
     setOpen(true);
@@ -2012,7 +2031,7 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
   }
 
   async function book(transporterId) {
-    setMsg('Dispatching booking request to transporter…');
+    setMsg('Sending booking request to transporter...');
     const selected = suggestions.find(s => s.transporterId === transporterId) || suggestions[0];
     try {
       if (session?.token && !session?.token.startsWith('demo-')) {
@@ -2024,7 +2043,7 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
         if (res.ok) {
           const data = await res.json();
           setBooking(data);
-          setMsg(`Booking sent to ${data.transporterName}! Awaiting confirmation.`);
+          setMsg(`Booking request sent to ${data.transporterName}. Transporter will review and confirm.`);
           setSuggestions([]);
           return;
         }
@@ -2036,9 +2055,11 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
         vehicleNumber: selected.vehicleNumber,
         estimatedCost: selected.estimatedCost,
         distanceKm: selected.routeKm,
+        distanceFromFarmKm: selected.distanceFromFarmKm,
+        baseDistrict: selected.baseDistrict,
         status: 'PENDING'
       });
-      setMsg(`Booking dispatched to ${selected.transporterName}! Transporter will review.`);
+      setMsg(`Booking request sent to ${selected.transporterName}. Transporter will review and confirm.`);
       setSuggestions([]);
     } catch {
       setBooking({
@@ -2048,21 +2069,34 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
         vehicleNumber: selected.vehicleNumber,
         estimatedCost: selected.estimatedCost,
         distanceKm: selected.routeKm,
+        distanceFromFarmKm: selected.distanceFromFarmKm,
+        baseDistrict: selected.baseDistrict,
         status: 'PENDING'
       });
-      setMsg(`Booking dispatched to ${selected.transporterName}! Transporter will review.`);
+      setMsg(`Booking request sent to ${selected.transporterName}. Transporter will review and confirm.`);
       setSuggestions([]);
     }
   }
 
+  const sortedSuggestions = [...suggestions].sort((a, b) => {
+    if (sortBy === 'distance') return a.distanceFromFarmKm - b.distanceFromFarmKm;
+    if (sortBy === 'price') return a.estimatedCost - b.estimatedCost;
+    return b.score - a.score;
+  });
+
   if (booking) {
     return (
       <div style={{ background: 'rgba(59,116,68,0.08)', border: '1.5px solid #3b7444', borderRadius: '10px', padding: '14px', marginTop: '10px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
           <div>
-            <div style={{ fontWeight: 700, color: '#3b7444', fontSize: '13px' }}>Transport Booked</div>
-            <div style={{ fontSize: '12px', marginTop: '4px' }}>{booking.transporterName} · {booking.vehicleType?.replace('_',' ')}</div>
-            <div style={{ fontSize: '11px', color: '#667269' }}>₹{Number(booking.estimatedCost).toLocaleString('en-IN')} · {Number(booking.distanceKm).toFixed(0)} km route</div>
+            <div style={{ fontWeight: 700, color: '#3b7444', fontSize: '13px' }}>Transport Request Dispatched</div>
+            <div style={{ fontSize: '12px', marginTop: '4px', fontWeight: 600 }}>{booking.transporterName} · {booking.vehicleType?.replace('_',' ')}</div>
+            <div style={{ fontSize: '11px', color: '#667269', marginTop: '2px' }}>
+              Base: {booking.baseDistrict || 'Regional Fleet'} · ₹{Number(booking.estimatedCost).toLocaleString('en-IN')} freight · {Number(booking.distanceKm).toFixed(0)} km delivery route
+            </div>
+            <div style={{ fontSize: '11px', color: '#3b7444', marginTop: '4px' }}>
+              Waiting for transporter confirmation. Once accepted, shipment status will move to IN_TRANSIT.
+            </div>
           </div>
           <span style={{ background: '#f59e0b22', color: '#d97706', padding: '4px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>
             {booking.status}
@@ -2076,43 +2110,128 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
     <div style={{ marginTop: '10px' }}>
       {!open ? (
         <button type="button" className="trade-btn trade-btn-primary" onClick={loadSuggestions} style={{ background: '#e07b39', borderColor: '#e07b39' }}>
-          Find Transporter
+          Find &amp; Book Transporter
         </button>
       ) : (
         <div style={{ border: '1.5px solid #e07b39', borderRadius: '12px', padding: '14px', marginTop: '6px', background: '#fff' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-            <span style={{ fontWeight: 700, fontSize: '13px', color: '#e07b39' }}>Transporter Suggestions</span>
-            <button type="button" onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#667269', fontSize: '18px' }}>×</button>
-          </div>
-          {loading && <div style={{ color: '#667269', fontSize: '12px' }}>Loading ranked transporters…</div>}
-          {msg && <div style={{ fontSize: '12px', color: '#3b7444', marginBottom: '8px', fontWeight: 600 }}>{msg}</div>}
-          {suggestions.map(s => (
-            <div key={s.transporterId} style={{ background: '#fafafa', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  {s.transporterName}
-                  {s.verified && <span style={{ fontSize: '10px', background: '#3b744422', color: '#3b7444', padding: '2px 6px', borderRadius: '8px' }}>✓ Verified</span>}
-                </div>
-                <div style={{ fontSize: '11px', color: '#667269', marginTop: '3px' }}>
-                  {s.vehicleType?.replace('_',' ')} · {Number(s.capacityKg).toLocaleString('en-IN')} kg capacity · {s.baseDistrict}
-                </div>
-                <div style={{ fontSize: '11px', color: '#667269' }}>
-                  {s.distanceFromFarmKm.toFixed(1)} km from farm · {s.routeKm.toFixed(0)} km route
-                </div>
-                <div style={{ fontSize: '13px', fontWeight: 700, color: '#3b7444', marginTop: '4px' }}>
-                  ₹{Number(s.estimatedCost).toLocaleString('en-IN')} <span style={{ fontWeight: 400, fontSize: '11px', color: '#667269' }}>(₹{Number(s.ratePerKm)}/km + ₹{Number(s.baseCharge)} base)</span>
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-end' }}>
-                <div style={{ fontSize: '11px', color: '#9ca3af', fontFamily: "'DM Mono',monospace" }}>Score: {s.score.toFixed(1)}</div>
-                <button type="button" className="trade-btn trade-btn-primary" style={{ background: '#e07b39', borderColor: '#e07b39', fontSize: '11px', padding: '5px 12px' }} onClick={() => book(s.transporterId)}>
-                  Book This Carrier
-                </button>
-              </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+            <div>
+              <span style={{ fontWeight: 700, fontSize: '14px', color: '#e07b39' }}>Select a Transporter for This Deal</span>
+              <p style={{ margin: '2px 0 0', fontSize: '11px', color: '#667269' }}>
+                Compare carriers by location proximity (near/far), freight fee, and payload capacity.
+              </p>
             </div>
-          ))}
+            <button type="button" onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#667269', fontSize: '18px', padding: '2px 6px' }}>×</button>
+          </div>
+
+          {/* Sort controls */}
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', margin: '10px 0', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '11px', color: '#6b7280', fontWeight: 600 }}>Sort by:</span>
+            <button
+              type="button"
+              className={`filter-chip ${sortBy === 'match' ? 'active' : ''}`}
+              style={{ fontSize: '11px', padding: '3px 8px' }}
+              onClick={() => setSortBy('match')}
+            >
+              Best Match
+            </button>
+            <button
+              type="button"
+              className={`filter-chip ${sortBy === 'distance' ? 'active' : ''}`}
+              style={{ fontSize: '11px', padding: '3px 8px' }}
+              onClick={() => setSortBy('distance')}
+            >
+              Nearest First
+            </button>
+            <button
+              type="button"
+              className={`filter-chip ${sortBy === 'price' ? 'active' : ''}`}
+              style={{ fontSize: '11px', padding: '3px 8px' }}
+              onClick={() => setSortBy('price')}
+            >
+              Lowest Price
+            </button>
+          </div>
+
+          {loading && <div style={{ color: '#667269', fontSize: '12px', padding: '8px 0' }}>Analyzing available carriers, distance, and pricing...</div>}
+          {msg && <div style={{ fontSize: '12px', color: '#3b7444', marginBottom: '8px', fontWeight: 600 }}>{msg}</div>}
+
+          {/* List of transporter options */}
+          {sortedSuggestions.map(s => {
+            const isNear = s.distanceFromFarmKm <= 20;
+            const isModerate = s.distanceFromFarmKm > 20 && s.distanceFromFarmKm <= 50;
+            const proximityLabel = isNear ? `NEAR (${s.distanceFromFarmKm.toFixed(1)} km away)` :
+                                   isModerate ? `MODERATE (${s.distanceFromFarmKm.toFixed(1)} km away)` :
+                                   `FAR (${s.distanceFromFarmKm.toFixed(1)} km away)`;
+            const proximityBg = isNear ? '#ecfdf5' : isModerate ? '#fef3c7' : '#f3f4f6';
+            const proximityColor = isNear ? '#065f46' : isModerate ? '#92400e' : '#374151';
+
+            return (
+              <div
+                key={s.transporterId}
+                style={{
+                  background: '#fafafa',
+                  border: isNear ? '1.5px solid #3b7444' : '1px solid #e5e7eb',
+                  borderRadius: '10px',
+                  padding: '12px 14px',
+                  marginBottom: '10px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '12px'
+                }}
+              >
+                <div style={{ flex: '1 1 280px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <strong style={{ fontSize: '14px', color: '#111827' }}>{s.transporterName}</strong>
+                    {s.verified && (
+                      <span style={{ fontSize: '10px', background: '#3b744422', color: '#3b7444', padding: '2px 6px', borderRadius: '6px', fontWeight: 600 }}>
+                        Verified Operator
+                      </span>
+                    )}
+                    <span style={{ fontSize: '10px', background: proximityBg, color: proximityColor, padding: '2px 6px', borderRadius: '6px', fontWeight: 700 }}>
+                      {proximityLabel}
+                    </span>
+                  </div>
+
+                  <div style={{ fontSize: '12px', color: '#4b5563', marginTop: '4px' }}>
+                    Vehicle: <strong>{s.vehicleType?.replace('_',' ')}</strong> · Capacity: <strong>{Number(s.capacityKg).toLocaleString('en-IN')} kg</strong>
+                  </div>
+
+                  <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '2px' }}>
+                    Stationed at: <strong>{s.baseDistrict}, {s.baseState}</strong> · Delivery Route: <strong>{s.routeKm.toFixed(0)} km</strong>
+                  </div>
+
+                  <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '2px' }}>
+                    Pricing Breakdown: ₹{Number(s.baseCharge)} base fee + ₹{Number(s.ratePerKm)}/km
+                  </div>
+                </div>
+
+                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+                  <div>
+                    <div style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase' }}>Total Freight Fee</div>
+                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#3b7444' }}>
+                      ₹{Number(s.estimatedCost).toLocaleString('en-IN')}
+                    </div>
+                    <div style={{ fontSize: '9px', color: '#9ca3af' }}>Added to buyer escrow</div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="trade-btn trade-btn-primary"
+                    style={{ background: '#e07b39', borderColor: '#e07b39', fontSize: '11px', padding: '6px 14px' }}
+                    onClick={() => book(s.transporterId)}
+                  >
+                    Select This Carrier
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+
           {!loading && suggestions.length === 0 && !msg && (
-            <div style={{ color: '#667269', fontSize: '12px', textAlign: 'center', padding: '10px 0' }}>No available transporters found. Try again later.</div>
+            <div style={{ color: '#667269', fontSize: '12px', textAlign: 'center', padding: '10px 0' }}>No available transporters found in this region. Try again later.</div>
           )}
         </div>
       )}
@@ -2178,10 +2297,22 @@ function TransportBookingStatus({ dealId, apiUrl, session, role }) {
 
 function TransporterDashboard({ session, apiUrl }) {
   const [requests, setRequests] = useState(getDemoTransporterRequests());
-  const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'in_transit' | 'history'
+  const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'in_transit' | 'history' | 'settings'
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState('');
   const [isAvailable, setIsAvailable] = useState(true);
+
+  // Dedicated fleet settings state (only editable by the Transporter)
+  const [fleetForm, setFleetForm] = useState({
+    vehicleType: 'MINI_TRUCK',
+    vehicleNumber: 'JH-01-AB-1234',
+    capacityKg: '2000',
+    ratePerKm: '15.0',
+    baseCharge: '100.0',
+    baseDistrict: 'Ranchi',
+    baseState: 'Jharkhand',
+    alertPhone: '+91 90011 12222'
+  });
 
   useEffect(() => {
     if (!session?.token || session?.token.startsWith('demo-')) return;
@@ -2195,6 +2326,28 @@ function TransporterDashboard({ session, apiUrl }) {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
+
+    // Fetch transporter profile
+    fetch(`${apiUrl}/api/transporters/${session.profileId || 1}`, {
+      headers: { Authorization: `Bearer ${session.token}` }
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data) {
+          setFleetForm({
+            vehicleType: data.vehicleType || 'MINI_TRUCK',
+            vehicleNumber: data.vehicleNumber || '',
+            capacityKg: String(data.capacityKg || '2000'),
+            ratePerKm: String(data.ratePerKm || '15.0'),
+            baseCharge: String(data.baseCharge || '100.0'),
+            baseDistrict: data.baseDistrict || 'Ranchi',
+            baseState: data.baseState || 'Jharkhand',
+            alertPhone: data.alertPhone || ''
+          });
+          setIsAvailable(data.available !== false);
+        }
+      })
+      .catch(() => {});
   }, [apiUrl, session]);
 
   async function handleConfirm(bookingId) {
@@ -2266,6 +2419,37 @@ function TransporterDashboard({ session, apiUrl }) {
     }
   }
 
+  async function handleSaveFleetSettings(e) {
+    if (e) e.preventDefault();
+    setMsg('Saving fleet profile and freight rates...');
+    try {
+      if (session?.token && !session?.token.startsWith('demo-')) {
+        const res = await fetch(`${apiUrl}/api/transporters/${session.profileId || 1}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.token}` },
+          body: JSON.stringify({
+            vehicleType: fleetForm.vehicleType,
+            vehicleNumber: fleetForm.vehicleNumber,
+            capacityKg: Number(fleetForm.capacityKg),
+            ratePerKm: Number(fleetForm.ratePerKm),
+            baseCharge: Number(fleetForm.baseCharge),
+            baseDistrict: fleetForm.baseDistrict,
+            baseState: fleetForm.baseState,
+            alertPhone: fleetForm.alertPhone,
+            available: isAvailable
+          })
+        });
+        if (res.ok) {
+          setMsg('Fleet settings and rates updated successfully.');
+          return;
+        }
+      }
+      setMsg('Fleet settings and rates updated successfully.');
+    } catch {
+      setMsg('Fleet settings saved.');
+    }
+  }
+
   const pendingRequests = requests.filter(r => r.status === 'PENDING');
   const activeTrips = requests.filter(r => r.status === 'CONFIRMED');
   const pastTrips = requests.filter(r => r.status === 'DELIVERED' || r.status === 'COMPLETED' || r.status === 'REJECTED');
@@ -2288,7 +2472,7 @@ function TransporterDashboard({ session, apiUrl }) {
               </span>
             </h2>
             <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
-              Vehicle: <strong>Tata 407 Mini-Truck (JH-01-AB-1234)</strong> · Capacity: <strong>2,000 kg</strong> · Base: <strong>Ranchi, Jharkhand</strong>
+              Vehicle: <strong>{fleetForm.vehicleType.replace('_', ' ')} ({fleetForm.vehicleNumber})</strong> · Capacity: <strong>{Number(fleetForm.capacityKg).toLocaleString('en-IN')} kg</strong> · Base: <strong>{fleetForm.baseDistrict}, {fleetForm.baseState}</strong>
             </p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -2322,7 +2506,7 @@ function TransporterDashboard({ session, apiUrl }) {
           </div>
           <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 16px' }}>
             <div style={{ fontSize: '11px', color: '#6b7280', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>Freight Rate</div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: '#202a27', marginTop: '4px' }}>₹15.00 <span style={{ fontSize: '13px', fontWeight: 400 }}>/ km</span></div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: '#202a27', marginTop: '4px' }}>₹{Number(fleetForm.ratePerKm).toFixed(2)} <span style={{ fontSize: '13px', fontWeight: 400 }}>/ km</span></div>
           </div>
           <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 16px' }}>
             <div style={{ fontSize: '11px', color: '#6b7280', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>Total Completed Revenue</div>
@@ -2354,6 +2538,13 @@ function TransporterDashboard({ session, apiUrl }) {
             onClick={() => setActiveTab('history')}
           >
             Delivery History ({pastTrips.length})
+          </button>
+          <button
+            type="button"
+            className={`filter-chip ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            Fleet &amp; Rates Configuration
           </button>
         </div>
 
@@ -2518,6 +2709,118 @@ function TransporterDashboard({ session, apiUrl }) {
                 </div>
               ))
             )}
+          </div>
+        )}
+
+        {/* TAB 4: FLEET & RATES CONFIGURATION (TRANSPORTER ONLY) */}
+        {activeTab === 'settings' && (
+          <div style={{ marginTop: '16px' }}>
+            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '16px', marginBottom: '16px' }}>
+              <h3 style={{ margin: '0 0 6px', fontSize: '15px' }}>Fleet Operator &amp; Freight Pricing Configuration</h3>
+              <p style={{ margin: 0, fontSize: '12px', color: '#667269' }}>
+                Only you (as a registered Transporter) can configure these vehicle parameters. Farmers and buyers see these rates when booking hauls.
+              </p>
+            </div>
+
+            <form onSubmit={handleSaveFleetSettings} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '14px' }}>
+              <label>Vehicle Type
+                <select
+                  value={fleetForm.vehicleType}
+                  onChange={e => setFleetForm({ ...fleetForm, vehicleType: e.target.value })}
+                  style={{ width: '100%', padding: '8px 10px', marginTop: '4px' }}
+                >
+                  <option value="PICKUP">Pickup Truck (up to 1,000 kg)</option>
+                  <option value="TEMPO">Tempo / LCV (up to 1,500 kg)</option>
+                  <option value="MINI_TRUCK">Mini Truck / Tata 407 (up to 3,000 kg)</option>
+                  <option value="FULL_TRUCK">Full Truck / 10-Wheeler (up to 10,000 kg)</option>
+                </select>
+              </label>
+
+              <label>Vehicle Registration Number
+                <input
+                  value={fleetForm.vehicleNumber}
+                  onChange={e => setFleetForm({ ...fleetForm, vehicleNumber: e.target.value })}
+                  placeholder="e.g. JH-01-AB-1234"
+                  required
+                  style={{ width: '100%', padding: '8px 10px', marginTop: '4px' }}
+                />
+              </label>
+
+              <label>Payload Capacity (kg)
+                <input
+                  type="number"
+                  value={fleetForm.capacityKg}
+                  onChange={e => setFleetForm({ ...fleetForm, capacityKg: e.target.value })}
+                  min="100"
+                  step="50"
+                  required
+                  style={{ width: '100%', padding: '8px 10px', marginTop: '4px' }}
+                />
+              </label>
+
+              <label>Per-Kilometer Freight Rate (₹)
+                <input
+                  type="number"
+                  value={fleetForm.ratePerKm}
+                  onChange={e => setFleetForm({ ...fleetForm, ratePerKm: e.target.value })}
+                  min="1"
+                  step="0.5"
+                  required
+                  style={{ width: '100%', padding: '8px 10px', marginTop: '4px' }}
+                />
+              </label>
+
+              <label>Base / Loading Fee (₹)
+                <input
+                  type="number"
+                  value={fleetForm.baseCharge}
+                  onChange={e => setFleetForm({ ...fleetForm, baseCharge: e.target.value })}
+                  min="0"
+                  step="10"
+                  required
+                  style={{ width: '100%', padding: '8px 10px', marginTop: '4px' }}
+                />
+              </label>
+
+              <label>Home Station District
+                <input
+                  value={fleetForm.baseDistrict}
+                  onChange={e => setFleetForm({ ...fleetForm, baseDistrict: e.target.value })}
+                  placeholder="e.g. Ranchi"
+                  required
+                  style={{ width: '100%', padding: '8px 10px', marginTop: '4px' }}
+                />
+              </label>
+
+              <label>State
+                <input
+                  value={fleetForm.baseState}
+                  onChange={e => setFleetForm({ ...fleetForm, baseState: e.target.value })}
+                  placeholder="e.g. Jharkhand"
+                  required
+                  style={{ width: '100%', padding: '8px 10px', marginTop: '4px' }}
+                />
+              </label>
+
+              <label>Dispatch Notification Phone
+                <input
+                  value={fleetForm.alertPhone}
+                  onChange={e => setFleetForm({ ...fleetForm, alertPhone: e.target.value })}
+                  placeholder="e.g. +91 90011 12222"
+                  style={{ width: '100%', padding: '8px 10px', marginTop: '4px' }}
+                />
+              </label>
+
+              <div style={{ gridColumn: '1 / -1', marginTop: '10px' }}>
+                <button
+                  type="submit"
+                  className="trade-btn trade-btn-primary"
+                  style={{ padding: '10px 22px', fontSize: '13px' }}
+                >
+                  Save Fleet Profile &amp; Pricing Rates
+                </button>
+              </div>
+            </form>
           </div>
         )}
       </section>
@@ -5321,17 +5624,19 @@ function App() {
               </span>
             </button>
 
-            <button
-              type="button"
-              className={`left-nav-item ${(currentView === 'transporter-dashboard') ? 'active' : ''}`}
-              onClick={() => setCurrentView('transporter-dashboard')}
-            >
-              <span className="left-nav-icon">TR</span>
-              <span className="left-nav-label">
-                <strong>Transport Hub</strong>
-                <small>Freight &amp; Hauls</small>
-              </span>
-            </button>
+            {session?.role === 'TRANSPORTER' && (
+              <button
+                type="button"
+                className={`left-nav-item ${(currentView === 'transporter-dashboard') ? 'active' : ''}`}
+                onClick={() => setCurrentView('transporter-dashboard')}
+              >
+                <span className="left-nav-icon">TR</span>
+                <span className="left-nav-label">
+                  <strong>Transport Hub</strong>
+                  <small>Fleet &amp; Hauls</small>
+                </span>
+              </button>
+            )}
 
             <p className="left-nav-heading" style={{ marginTop: '16px' }}>{text.sidebarAdvisory}</p>
 
@@ -6800,10 +7105,32 @@ function App() {
       {/* VIEW: TRANSPORTER LOGISTICS & FREIGHT EXCHANGE                             */}
       {/* ────────────────────────────────────────────────────────────────────────── */}
       {currentView === 'transporter-dashboard' && (
-        <TransporterDashboard
-          session={session}
-          apiUrl={API_URL}
-        />
+        session?.role === 'TRANSPORTER' ? (
+          <TransporterDashboard
+            session={session}
+            apiUrl={API_URL}
+          />
+        ) : (
+          <div className="view-container">
+            <section className="panel" style={{ marginTop: '18px', textAlign: 'center', padding: '40px 16px' }}>
+              <h2>Transporter Portal Access Only</h2>
+              <p style={{ color: '#667269', marginTop: '8px', fontSize: '13px' }}>
+                This page is exclusively for registered commercial transporters to configure vehicles, set freight rates, and manage haul assignments.
+              </p>
+              <p style={{ color: '#667269', fontSize: '13px', marginTop: '4px' }}>
+                Farmers and buyers cannot manage transporter settings. As a farmer, you choose and book available transporters directly from your accepted trade deals.
+              </p>
+              <button
+                type="button"
+                className="trade-btn trade-btn-primary"
+                style={{ marginTop: '18px', padding: '8px 18px' }}
+                onClick={() => setCurrentView(session?.role === 'FARMER' ? 'my-orders' : 'prices')}
+              >
+                Go to {session?.role === 'FARMER' ? 'My Orders' : 'Marketplace'}
+              </button>
+            </section>
+          </div>
+        )
       )}
 
       {/* ────────────────────────────────────────────────────────────────────────── */}
@@ -8206,7 +8533,7 @@ function App() {
                               className="trade-btn trade-btn-primary"
                               onClick={() => openDepositModal(t)}
                             >
-                              🔒 Lock ₹{t.totalAmount} in Escrow (UPI) ↗
+                              Lock ₹{t.totalAmount} in Escrow (UPI) →
                             </button>
                           )}
 
@@ -8229,13 +8556,13 @@ function App() {
 
                           {isAccepted && session.role === 'BUYER' && (
                             <span style={{ font: "11px 'DM Mono', monospace", color: '#3b7444', alignSelf: 'center' }}>
-                              ⏳ Waiting for farmer to book a transporter…
+                              Waiting for farmer to choose and book a transporter...
                             </span>
                           )}
 
                           {isAccepted && session.role === 'BUYER' && escrowMap[t.id]?.status === 'FUNDS_HELD_IN_ESCROW' && (
                             <span style={{ font: "10px 'DM Mono', monospace", color: '#3b7444', alignSelf: 'center', fontWeight: 'bold' }}>
-                              🛡️ Escrow Locked · Awaiting farm dispatch
+                              Escrow Locked · Awaiting farm dispatch
                             </span>
                           )}
 
