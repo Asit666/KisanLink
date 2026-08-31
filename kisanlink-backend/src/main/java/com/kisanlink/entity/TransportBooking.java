@@ -61,6 +61,31 @@ public class TransportBooking {
     private Instant confirmedAt;
     private Instant deliveredAt;
 
+    /* Proof of Pickup (POP) */
+    @Column(length = 10)
+    private String pickupCode;
+
+    private Instant pickedUpAt;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal pickupQuantityKg;
+
+    @Column(columnDefinition = "TEXT")
+    private String pickupNotes;
+
+    /* Proof of Delivery (POD) */
+    @Column(length = 10)
+    private String deliveryCode;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal deliveredQuantityKg;
+
+    @Column(columnDefinition = "TEXT")
+    private String deliveryNotes;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal discrepancyKg;
+
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
 

@@ -1947,6 +1947,7 @@ function getDemoTransporterRequests() {
       deliveryAddress: 'Reliance Fresh Distribution Center, Bokaro, Jharkhand',
       scheduledDate: new Date().toISOString().split('T')[0],
       notes: 'Fragile: Ripe Tomatoes (500 kg). Crates ready for morning dispatch.',
+      pickupCode: '4821',
       createdAt: new Date(Date.now() - 3600000).toISOString()
     },
     {
@@ -1967,7 +1968,10 @@ function getDemoTransporterRequests() {
       pickupAddress: 'Ashok Agro Orchard, Ramgarh, Jharkhand',
       deliveryAddress: 'Bokaro Wholesale APMC Yard, Bokaro, Jharkhand',
       scheduledDate: new Date().toISOString().split('T')[0],
-      notes: 'Fresh Potato harvest (1,200 kg). In transit with cold tarpaulin cover.',
+      notes: 'Fresh Potato harvest (1,200 kg). Tarpaulin covered crates.',
+      pickupCode: '6142',
+      deliveryCode: '9314',
+      pickupQuantityKg: 1200,
       confirmedAt: new Date(Date.now() - 7200000).toISOString(),
       createdAt: new Date(Date.now() - 10800000).toISOString()
     },
@@ -1982,17 +1986,23 @@ function getDemoTransporterRequests() {
       vehicleNumber: 'JH-01-AB-1234',
       capacityKg: 2000,
       transporterVerified: true,
-      distanceKm: 110.0,
-      estimatedCost: 1750.0,
+      distanceKm: 28.0,
+      estimatedCost: 520.0,
       ratePerKm: 15.0,
       baseCharge: 100.0,
-      pickupAddress: 'Hazaribagh Farm Cluster, Hazaribagh',
-      deliveryAddress: 'Ranchi Main APMC Mandi, Ranchi',
-      scheduledDate: '2026-08-28',
-      notes: 'Mustard seed bags (1,500 kg). Delivered safely with proof of delivery sign-off.',
-      confirmedAt: '2026-08-28T09:30:00Z',
-      deliveredAt: '2026-08-28T14:15:00Z',
-      createdAt: '2026-08-28T08:00:00Z'
+      pickupAddress: 'Sunil Organic Farm, Ormanjhi, Ranchi',
+      deliveryAddress: 'BigBasket Fulfillment Depot, Kokar, Ranchi',
+      scheduledDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+      notes: 'Delivered: Fresh Spinach and Cauliflower crates.',
+      pickupCode: '3109',
+      deliveryCode: '7721',
+      pickupQuantityKg: 600,
+      deliveredQuantityKg: 600,
+      discrepancyKg: 0,
+      deliveryNotes: 'All 600 kg verified intact upon delivery weighing.',
+      confirmedAt: new Date(Date.now() - 90000000).toISOString(),
+      deliveredAt: new Date(Date.now() - 82800000).toISOString(),
+      createdAt: new Date(Date.now() - 93600000).toISOString()
     }
   ];
 }
@@ -2267,7 +2277,7 @@ function TransportBookingStatus({ dealId, apiUrl, session, role }) {
   if (loading) return <div style={{ fontSize: '11px', color: '#667269' }}>Loading transport info…</div>;
   if (!booking) return null;
 
-  const statusColor = { PENDING: '#f59e0b', CONFIRMED: '#3b7444', REJECTED: '#dc664a', DELIVERED: '#6366f1', CANCELLED: '#9ca3af' };
+  const statusColor = { PENDING: '#f59e0b', CONFIRMED: '#3b7444', IN_TRANSIT: '#059669', REJECTED: '#dc664a', DELIVERED: '#6366f1', CANCELLED: '#9ca3af' };
 
   return (
     <div style={{ background: 'rgba(224,123,57,0.07)', border: '1.5px solid #e07b39', borderRadius: '10px', padding: '14px', marginTop: '8px' }}>
@@ -2284,10 +2294,65 @@ function TransportBookingStatus({ dealId, apiUrl, session, role }) {
             ₹{Number(booking.estimatedCost).toLocaleString('en-IN')} <span style={{ fontWeight: 400, fontSize: '11px', color: '#667269' }}>transport fee</span>
           </div>
         </div>
-        <span style={{ background: statusColor[booking.status] + '22', color: statusColor[booking.status], padding: '4px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>
-          {booking.status}
+        <span style={{ background: (statusColor[booking.status] || '#3b7444') + '22', color: statusColor[booking.status] || '#3b7444', padding: '4px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>
+          {booking.status?.replace('_', ' ')}
         </span>
       </div>
+
+      {/* Proof of Pickup (POP) Security Card for Farmer */}
+      {role === 'FARMER' && booking.status === 'CONFIRMED' && (
+        <div style={{ marginTop: '12px', background: '#ecfdf5', border: '1.5px dashed #059669', borderRadius: '8px', padding: '12px 14px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+            <div>
+              <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#047857', fontWeight: 'bold' }}>
+                Farm Pickup Verification Code
+              </span>
+              <div style={{ fontSize: '12px', color: '#374151', marginTop: '2px' }}>
+                Share this 4-digit code with the driver after inspecting the vehicle and loading produce.
+              </div>
+            </div>
+            <div style={{ background: '#059669', color: '#fff', fontSize: '20px', fontWeight: '900', letterSpacing: '3px', padding: '6px 14px', borderRadius: '6px', fontFamily: "'DM Mono', monospace" }}>
+              {booking.pickupCode || '4821'}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Proof of Delivery (POD) Security Card for Buyer */}
+      {role === 'BUYER' && booking.status === 'IN_TRANSIT' && (
+        <div style={{ marginTop: '12px', background: '#eff6ff', border: '1.5px dashed #2563eb', borderRadius: '8px', padding: '12px 14px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+            <div>
+              <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#1d4ed8', fontWeight: 'bold' }}>
+                Delivery Receipt Verification Code
+              </span>
+              <div style={{ fontSize: '12px', color: '#374151', marginTop: '2px' }}>
+                Share this 4-digit code with the driver after verifying received cargo quantity and quality.
+              </div>
+            </div>
+            <div style={{ background: '#2563eb', color: '#fff', fontSize: '20px', fontWeight: '900', letterSpacing: '3px', padding: '6px 14px', borderRadius: '6px', fontFamily: "'DM Mono', monospace" }}>
+              {booking.deliveryCode || '9314'}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cargo Status Info */}
+      {role === 'FARMER' && booking.status === 'IN_TRANSIT' && (
+        <div style={{ marginTop: '10px', fontSize: '12px', color: '#059669', fontWeight: '600' }}>
+          Produce picked up from farm ({booking.pickupQuantityKg || '500'} kg) and in transit to buyer destination.
+        </div>
+      )}
+
+      {/* Audit Summary when Delivered */}
+      {booking.status === 'DELIVERED' && (
+        <div style={{ marginTop: '10px', background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '10px 12px', fontSize: '12px', color: '#334155' }}>
+          <strong>Delivery Audit Verified:</strong> Received {booking.deliveredQuantityKg || booking.capacityKg || '500'} kg
+          {Number(booking.discrepancyKg) > 0 && <span style={{ color: '#dc2626', marginLeft: '6px' }}>({booking.discrepancyKg} kg transit loss recorded)</span>}
+          {booking.deliveryNotes && <div style={{ color: '#64748b', fontSize: '11px', marginTop: '3px' }}>Notes: {booking.deliveryNotes}</div>}
+        </div>
+      )}
+
       {booking.status === 'PENDING' && role === 'BUYER' && (
         <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '8px' }}>Transporter has not confirmed yet. You will be notified automatically.</div>
       )}
@@ -2350,6 +2415,95 @@ function TransporterDashboard({ session, apiUrl }) {
       .catch(() => {});
   }, [apiUrl, session]);
 
+  const [verifyModal, setVerifyModal] = useState(null); // { type: 'PICKUP' | 'DELIVERY', booking, code, quantityKg, notes, error }
+
+  async function submitVerifyPickup(e) {
+    if (e) e.preventDefault();
+    if (!verifyModal) return;
+    const { booking, code, quantityKg, notes } = verifyModal;
+    setMsg('Verifying farm pickup code...');
+    try {
+      if (session?.token && !session?.token.startsWith('demo-')) {
+        const res = await fetch(`${apiUrl}/api/transport/bookings/${booking.bookingId}/verify-pickup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.token}` },
+          body: JSON.stringify({
+            pickupCode: code.trim(),
+            quantityLoadedKg: Number(quantityKg) || 500,
+            pickupNotes: notes || 'Produce loaded and inspected at farm.'
+          })
+        });
+        if (res.ok) {
+          const updated = await res.json();
+          setRequests(prev => prev.map(r => r.bookingId === booking.bookingId ? updated : r));
+          setMsg('Farm pickup verified! Haul moved to IN_TRANSIT.');
+          setVerifyModal(null);
+          return;
+        } else {
+          const err = await res.json().catch(() => ({}));
+          setVerifyModal(prev => ({ ...prev, error: err.message || 'Invalid Pickup Code. Ask the farmer for the 4-digit code.' }));
+          return;
+        }
+      }
+      setRequests(prev => prev.map(r => r.bookingId === booking.bookingId ? {
+        ...r,
+        status: 'IN_TRANSIT',
+        pickupQuantityKg: Number(quantityKg) || 500,
+        pickupNotes: notes || 'Loaded intact',
+        deliveryCode: '9314'
+      } : r));
+      setMsg('Farm pickup verified! Haul moved to IN_TRANSIT.');
+      setVerifyModal(null);
+    } catch {
+      setMsg('Pickup verified in demo mode.');
+      setVerifyModal(null);
+    }
+  }
+
+  async function submitVerifyDelivery(e) {
+    if (e) e.preventDefault();
+    if (!verifyModal) return;
+    const { booking, code, quantityKg, notes } = verifyModal;
+    setMsg('Verifying buyer delivery code...');
+    try {
+      if (session?.token && !session?.token.startsWith('demo-')) {
+        const res = await fetch(`${apiUrl}/api/transport/bookings/${booking.bookingId}/verify-delivery`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.token}` },
+          body: JSON.stringify({
+            deliveryCode: code.trim(),
+            deliveredQuantityKg: Number(quantityKg) || 500,
+            deliveryNotes: notes || 'Delivered and inspected at buyer destination.'
+          })
+        });
+        if (res.ok) {
+          const updated = await res.json();
+          setRequests(prev => prev.map(r => r.bookingId === booking.bookingId ? updated : r));
+          setMsg('Delivery verified! Escrow payout can now be released.');
+          setVerifyModal(null);
+          return;
+        } else {
+          const err = await res.json().catch(() => ({}));
+          setVerifyModal(prev => ({ ...prev, error: err.message || 'Invalid Delivery Code. Ask the receiving buyer for the 4-digit code.' }));
+          return;
+        }
+      }
+      setRequests(prev => prev.map(r => r.bookingId === booking.bookingId ? {
+        ...r,
+        status: 'DELIVERED',
+        deliveredQuantityKg: Number(quantityKg) || 500,
+        deliveredAt: new Date().toISOString(),
+        discrepancyKg: 0,
+        deliveryNotes: notes || 'Delivered intact'
+      } : r));
+      setMsg('Delivery verified! Escrow payout can now be released.');
+      setVerifyModal(null);
+    } catch {
+      setMsg('Delivery verified in demo mode.');
+      setVerifyModal(null);
+    }
+  }
+
   async function handleConfirm(bookingId) {
     setMsg('Confirming transport assignment…');
     try {
@@ -2361,15 +2515,15 @@ function TransporterDashboard({ session, apiUrl }) {
         if (res.ok) {
           const updated = await res.json();
           setRequests(prev => prev.map(r => r.bookingId === bookingId ? updated : r));
-          setMsg('Trip confirmed. Trade deal status moved to IN_TRANSIT.');
+          setMsg('Trip confirmed. Scheduled for farm pickup.');
           return;
         }
       }
-      setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'CONFIRMED', confirmedAt: new Date().toISOString() } : r));
-      setMsg('Trip confirmed. Trade deal status moved to IN_TRANSIT.');
+      setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'CONFIRMED', pickupCode: '4821', confirmedAt: new Date().toISOString() } : r));
+      setMsg('Trip confirmed. Scheduled for farm pickup.');
     } catch {
-      setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'CONFIRMED', confirmedAt: new Date().toISOString() } : r));
-      setMsg('Trip confirmed. Trade deal status moved to IN_TRANSIT.');
+      setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'CONFIRMED', pickupCode: '4821', confirmedAt: new Date().toISOString() } : r));
+      setMsg('Trip confirmed. Scheduled for farm pickup.');
     }
   }
 
@@ -2393,29 +2547,6 @@ function TransporterDashboard({ session, apiUrl }) {
     } catch {
       setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'REJECTED' } : r));
       setMsg('Trip declined.');
-    }
-  }
-
-  async function handleDelivered(bookingId) {
-    setMsg('Logging delivery completion…');
-    try {
-      if (session?.token && !session?.token.startsWith('demo-')) {
-        const res = await fetch(`${apiUrl}/api/transport/bookings/${bookingId}/delivered`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${session.token}` }
-        });
-        if (res.ok) {
-          const updated = await res.json();
-          setRequests(prev => prev.map(r => r.bookingId === bookingId ? updated : r));
-          setMsg('Delivery logged. Trade deal marked DELIVERED. Buyer can now release escrow payout.');
-          return;
-        }
-      }
-      setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'DELIVERED', deliveredAt: new Date().toISOString() } : r));
-      setMsg('Delivery logged. Trade deal marked DELIVERED. Buyer can now release escrow payout.');
-    } catch {
-      setRequests(prev => prev.map(r => r.bookingId === bookingId ? { ...r, status: 'DELIVERED', deliveredAt: new Date().toISOString() } : r));
-      setMsg('Delivery logged.');
     }
   }
 
@@ -2451,7 +2582,7 @@ function TransporterDashboard({ session, apiUrl }) {
   }
 
   const pendingRequests = requests.filter(r => r.status === 'PENDING');
-  const activeTrips = requests.filter(r => r.status === 'CONFIRMED');
+  const activeTrips = requests.filter(r => r.status === 'CONFIRMED' || r.status === 'IN_TRANSIT');
   const pastTrips = requests.filter(r => r.status === 'DELIVERED' || r.status === 'COMPLETED' || r.status === 'REJECTED');
 
   const totalEarnings = pastTrips
@@ -2632,19 +2763,31 @@ function TransporterDashboard({ session, apiUrl }) {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '11px', background: '#ecfdf5', color: '#059669', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
-                          IN TRANSIT
+                        <span style={{
+                          fontSize: '11px',
+                          background: r.status === 'IN_TRANSIT' ? '#ecfdf5' : '#fef3c7',
+                          color: r.status === 'IN_TRANSIT' ? '#059669' : '#b45309',
+                          padding: '3px 10px',
+                          borderRadius: '12px',
+                          fontWeight: 700
+                        }}>
+                          {r.status === 'IN_TRANSIT' ? 'IN TRANSIT TO BUYER' : 'AWAITING FARM PICKUP'}
                         </span>
                         <strong style={{ fontSize: '15px' }}>Haul for Trade Deal #{r.dealId}</strong>
                       </div>
                       <div style={{ fontSize: '13px', color: '#374151', marginTop: '6px' }}>
-                        <strong>Origin:</strong> {r.pickupAddress}
+                        <strong>Origin (Farm):</strong> {r.pickupAddress}
                       </div>
                       <div style={{ fontSize: '13px', color: '#374151', marginTop: '4px' }}>
-                        <strong>Destination:</strong> {r.deliveryAddress}
+                        <strong>Destination (Buyer):</strong> {r.deliveryAddress}
                       </div>
+                      {r.pickupQuantityKg && (
+                        <div style={{ fontSize: '12px', color: '#059669', marginTop: '4px' }}>
+                          Verified Loaded Cargo: <strong>{r.pickupQuantityKg} kg</strong>
+                        </div>
+                      )}
                       {r.notes && (
-                        <div style={{ fontSize: '12px', color: '#4b5563', marginTop: '6px' }}>
+                        <div style={{ fontSize: '12px', color: '#4b5563', marginTop: '4px' }}>
                           Notes: {r.notes}
                         </div>
                       )}
@@ -2652,21 +2795,185 @@ function TransporterDashboard({ session, apiUrl }) {
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: '11px', color: '#6b7280' }}>Guaranteed Escrow Payout</div>
                       <div style={{ fontSize: '22px', fontWeight: 800, color: '#3b7444' }}>₹{Number(r.estimatedCost).toLocaleString('en-IN')}</div>
+                      <div style={{ fontSize: '11px', color: '#6b7280' }}>{Number(r.distanceKm).toFixed(1)} km haul</div>
                     </div>
                   </div>
 
-                  <div style={{ marginTop: '14px', borderTop: '1px solid #f3f4f6', paddingTop: '12px' }}>
-                    <button
-                      type="button"
-                      className="trade-btn trade-btn-primary"
-                      style={{ background: '#1e40af', borderColor: '#1e40af', padding: '8px 18px', fontSize: '12px' }}
-                      onClick={() => handleDelivered(r.bookingId)}
-                    >
-                      Confirm Delivery &amp; Log Proof of Delivery →
-                    </button>
+                  {/* Contextual Action Button based on status */}
+                  <div style={{ marginTop: '14px', borderTop: '1px solid #f3f4f6', paddingTop: '12px', display: 'flex', gap: '10px' }}>
+                    {r.status === 'CONFIRMED' && (
+                      <button
+                        type="button"
+                        className="trade-btn trade-btn-primary"
+                        style={{ background: '#059669', borderColor: '#059669', padding: '8px 18px', fontSize: '12px' }}
+                        onClick={() => setVerifyModal({
+                          type: 'PICKUP',
+                          booking: r,
+                          code: '',
+                          quantityKg: r.pickupQuantityKg || 500,
+                          notes: '',
+                          error: ''
+                        })}
+                      >
+                        Enter Farmer Code &amp; Confirm Pickup (POP) &rarr;
+                      </button>
+                    )}
+
+                    {r.status === 'IN_TRANSIT' && (
+                      <button
+                        type="button"
+                        className="trade-btn trade-btn-primary"
+                        style={{ background: '#2563eb', borderColor: '#2563eb', padding: '8px 18px', fontSize: '12px' }}
+                        onClick={() => setVerifyModal({
+                          type: 'DELIVERY',
+                          booking: r,
+                          code: '',
+                          quantityKg: r.pickupQuantityKg || 500,
+                          notes: '',
+                          error: ''
+                        })}
+                      >
+                        Enter Buyer Code &amp; Complete Delivery (POD) &rarr;
+                      </button>
+                    )}
                   </div>
                 </div>
               ))
+            )}
+
+            {/* POP / POD Verification Modal */}
+            {verifyModal && (
+              <div style={{
+                position: 'fixed',
+                top: 0, left: 0, right: 0, bottom: 0,
+                background: 'rgba(0,0,0,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 9999,
+                padding: '16px'
+              }}>
+                <div style={{
+                  background: '#fff',
+                  borderRadius: '12px',
+                  padding: '24px',
+                  maxWidth: '460px',
+                  width: '100%',
+                  boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3 style={{ margin: 0, fontSize: '18px', color: '#111827' }}>
+                      {verifyModal.type === 'PICKUP' ? 'Proof of Pickup (POP) Verification' : 'Proof of Delivery (POD) Verification'}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setVerifyModal(null)}
+                      style={{ background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#6b7280' }}
+                    >
+                      &times;
+                    </button>
+                  </div>
+
+                  <p style={{ margin: '8px 0 16px', fontSize: '13px', color: '#4b5563', lineHeight: '1.4' }}>
+                    {verifyModal.type === 'PICKUP'
+                      ? 'Arrive at farm and ask the farmer for their 4-digit security code after inspecting truck loading.'
+                      : 'Arrive at destination and ask the buyer for their 4-digit security code after weighing and unloading.'}
+                  </p>
+
+                  {verifyModal.error && (
+                    <div style={{ background: '#fee2e2', border: '1px solid #fca5a5', color: '#b91c1c', padding: '8px 12px', borderRadius: '6px', fontSize: '12px', marginBottom: '14px' }}>
+                      {verifyModal.error}
+                    </div>
+                  )}
+
+                  <form onSubmit={verifyModal.type === 'PICKUP' ? submitVerifyPickup : submitVerifyDelivery}>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>
+                      4-Digit Verification Security Code *
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={6}
+                      placeholder="e.g. 4821"
+                      required
+                      value={verifyModal.code}
+                      onChange={e => setVerifyModal({ ...verifyModal, code: e.target.value, error: '' })}
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        fontSize: '18px',
+                        fontWeight: 'bold',
+                        letterSpacing: '4px',
+                        fontFamily: "'DM Mono', monospace",
+                        textAlign: 'center',
+                        border: '2px solid #d1d5db',
+                        borderRadius: '8px',
+                        marginBottom: '14px'
+                      }}
+                    />
+
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>
+                      {verifyModal.type === 'PICKUP' ? 'Loaded Weight (kg) *' : 'Received Delivered Weight (kg) *'}
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min={1}
+                      value={verifyModal.quantityKg}
+                      onChange={e => setVerifyModal({ ...verifyModal, quantityKg: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        fontSize: '14px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '6px',
+                        marginBottom: '14px'
+                      }}
+                    />
+
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>
+                      Inspection / Condition Notes
+                    </label>
+                    <textarea
+                      rows={2}
+                      placeholder={verifyModal.type === 'PICKUP' ? 'e.g. 50 crates loaded, Grade A verified' : 'e.g. Full 500kg received intact, zero spoilage'}
+                      value={verifyModal.notes}
+                      onChange={e => setVerifyModal({ ...verifyModal, notes: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        fontSize: '13px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '6px',
+                        marginBottom: '18px'
+                      }}
+                    />
+
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                      <button
+                        type="button"
+                        onClick={() => setVerifyModal(null)}
+                        className="trade-btn trade-btn-cancel"
+                        style={{ padding: '8px 16px', fontSize: '13px' }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="trade-btn trade-btn-primary"
+                        style={{
+                          background: verifyModal.type === 'PICKUP' ? '#059669' : '#2563eb',
+                          borderColor: verifyModal.type === 'PICKUP' ? '#059669' : '#2563eb',
+                          padding: '8px 20px',
+                          fontSize: '13px',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {verifyModal.type === 'PICKUP' ? 'Confirm Farm Pickup' : 'Confirm Delivery & Unlock Payout'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             )}
           </div>
         )}

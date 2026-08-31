@@ -194,21 +194,102 @@ public class TransportService {
 
         booking.setStatus(BookingStatus.CONFIRMED);
         booking.setConfirmedAt(Instant.now());
+
+        // Generate secure 4-digit pickup code for Farmer to hold
+        int pickupCode = 1000 + new java.security.SecureRandom().nextInt(9000);
+        booking.setPickupCode(String.valueOf(pickupCode));
+        bookingRepo.save(booking);
+
+        TradeDeal deal = booking.getTradeDeal();
+        tradeDealRepo.save(deal);
+
+        // Notify farmer and buyer (zero emojis)
+        String farmerMsg = String.format("Transporter %s (%s) confirmed your booking. Farm Pickup Security Code: %s. Share this code with the driver upon cargo inspection.",
+                booking.getTransporter().getUser().getName(), booking.getTransporter().getVehicleNumber(), booking.getPickupCode());
+        String buyerMsg = String.format("Transporter %s (%s) confirmed the haul. Pickup from farm is scheduled.",
+                booking.getTransporter().getUser().getName(), booking.getTransporter().getVehicleNumber());
+
+        wsService.sendUserNotification(deal.getFarmer().getUser(), "TRANSPORT_CONFIRMED", "Transporter Confirmed Haul", farmerMsg, booking.getId(), null);
+        wsService.sendUserNotification(deal.getBuyer().getUser(), "TRANSPORT_CONFIRMED", "Transporter Confirmed Haul", buyerMsg, booking.getId(), null);
+        wsService.sendTradeUpdate(deal.getFarmer().getUser(), deal, farmerMsg);
+        wsService.sendTradeUpdate(deal.getBuyer().getUser(), deal, buyerMsg);
+
+        log.info("Booking {} confirmed with pickup code {} — deal {}", bookingId, booking.getPickupCode(), deal.getId());
+        return toResponse(booking);
+    }
+
+    @Transactional
+    public TransportBookingResponse verifyPickup(Long bookingId, com.kisanlink.dto.VerifyPickupRequest request, String transporterEmail) {
+        TransportBooking booking = findBookingAndVerifyTransporter(bookingId, transporterEmail);
+        if (booking.getStatus() != BookingStatus.CONFIRMED) {
+            throw new IllegalStateException("Only CONFIRMED bookings awaiting pickup can be verified");
+        }
+
+        if (booking.getPickupCode() != null && !booking.getPickupCode().trim().equals(request.pickupCode().trim())) {
+            throw new IllegalArgumentException("Invalid Pickup Security Code. Please ask the farmer for the 4-digit security code.");
+        }
+
+        booking.setStatus(BookingStatus.IN_TRANSIT);
+        booking.setPickedUpAt(Instant.now());
+        booking.setPickupQuantityKg(request.quantityLoadedKg());
+        booking.setPickupNotes(request.pickupNotes());
+
+        // Generate secure 4-digit delivery code for Buyer to hold
+        int deliveryCode = 1000 + new java.security.SecureRandom().nextInt(9000);
+        booking.setDeliveryCode(String.valueOf(deliveryCode));
         bookingRepo.save(booking);
 
         TradeDeal deal = booking.getTradeDeal();
         deal.setStatus(TradeStatus.IN_TRANSIT);
         tradeDealRepo.save(deal);
 
-        // Notify farmer and buyer
-        String msg = String.format("Transporter %s (%s) has confirmed your booking. Your goods are now IN TRANSIT.",
-                booking.getTransporter().getUser().getName(), booking.getTransporter().getVehicleNumber());
-        wsService.sendUserNotification(deal.getFarmer().getUser(), "TRANSPORT_CONFIRMED", "Transporter Confirmed!", msg, booking.getId(), null);
-        wsService.sendUserNotification(deal.getBuyer().getUser(), "TRANSPORT_CONFIRMED", "Transporter Confirmed!", msg, booking.getId(), null);
+        String buyerMsg = String.format("Shipment loaded from farm (%s kg) and IN TRANSIT. Delivery Security Code: %s. Share this code with the driver after unloading.",
+                request.quantityLoadedKg(), booking.getDeliveryCode());
+        String farmerMsg = String.format("Farm pickup verified (%s kg). Transporter %s is en route to the destination.",
+                request.quantityLoadedKg(), booking.getTransporter().getUser().getName());
+
+        wsService.sendUserNotification(deal.getBuyer().getUser(), "CARGO_IN_TRANSIT", "Cargo In Transit", buyerMsg, booking.getId(), null);
+        wsService.sendUserNotification(deal.getFarmer().getUser(), "CARGO_IN_TRANSIT", "Cargo In Transit", farmerMsg, booking.getId(), null);
+        wsService.sendTradeUpdate(deal.getFarmer().getUser(), deal, farmerMsg);
+        wsService.sendTradeUpdate(deal.getBuyer().getUser(), deal, buyerMsg);
+
+        log.info("Booking {} pickup verified — deal {} now IN_TRANSIT with delivery code {}", bookingId, deal.getId(), booking.getDeliveryCode());
+        return toResponse(booking);
+    }
+
+    @Transactional
+    public TransportBookingResponse verifyDelivery(Long bookingId, com.kisanlink.dto.VerifyDeliveryRequest request, String transporterEmail) {
+        TransportBooking booking = findBookingAndVerifyTransporter(bookingId, transporterEmail);
+        if (booking.getStatus() != BookingStatus.IN_TRANSIT && booking.getStatus() != BookingStatus.CONFIRMED) {
+            throw new IllegalStateException("Only IN_TRANSIT bookings can be verified for delivery");
+        }
+
+        if (booking.getDeliveryCode() != null && !booking.getDeliveryCode().trim().equals(request.deliveryCode().trim())) {
+            throw new IllegalArgumentException("Invalid Delivery Security Code. Please ask the receiving buyer for the 4-digit security code.");
+        }
+
+        booking.setStatus(BookingStatus.DELIVERED);
+        booking.setDeliveredAt(Instant.now());
+        booking.setDeliveredQuantityKg(request.deliveredQuantityKg());
+        booking.setDeliveryNotes(request.deliveryNotes());
+
+        BigDecimal dispatched = booking.getPickupQuantityKg() != null ? booking.getPickupQuantityKg() : booking.getTradeDeal().getQuantity();
+        BigDecimal discrepancy = dispatched.subtract(request.deliveredQuantityKg());
+        booking.setDiscrepancyKg(discrepancy);
+        bookingRepo.save(booking);
+
+        TradeDeal deal = booking.getTradeDeal();
+        deal.setStatus(TradeStatus.DELIVERED);
+        tradeDealRepo.save(deal);
+
+        String msg = String.format("Delivery complete! Received: %s kg. Weight discrepancy: %s kg. Escrow payout can now be released.",
+                request.deliveredQuantityKg(), discrepancy);
+        wsService.sendUserNotification(deal.getFarmer().getUser(), "GOODS_DELIVERED", "Delivery Complete", msg, booking.getId(), null);
+        wsService.sendUserNotification(deal.getBuyer().getUser(), "GOODS_DELIVERED", "Delivery Complete", msg, booking.getId(), null);
         wsService.sendTradeUpdate(deal.getFarmer().getUser(), deal, msg);
         wsService.sendTradeUpdate(deal.getBuyer().getUser(), deal, msg);
 
-        log.info("Booking {} confirmed — deal {} now IN_TRANSIT", bookingId, deal.getId());
+        log.info("Booking {} delivery verified — deal {} now DELIVERED", bookingId, deal.getId());
         return toResponse(booking);
     }
 
@@ -237,26 +318,8 @@ public class TransportService {
     @Transactional
     public TransportBookingResponse markDelivered(Long bookingId, String transporterEmail) {
         TransportBooking booking = findBookingAndVerifyTransporter(bookingId, transporterEmail);
-        if (booking.getStatus() != BookingStatus.CONFIRMED) {
-            throw new IllegalStateException("Only CONFIRMED bookings can be marked as delivered");
-        }
-
-        booking.setStatus(BookingStatus.DELIVERED);
-        booking.setDeliveredAt(Instant.now());
-        bookingRepo.save(booking);
-
-        TradeDeal deal = booking.getTradeDeal();
-        deal.setStatus(TradeStatus.DELIVERED);
-        tradeDealRepo.save(deal);
-
-        String msg = "Your goods have been delivered! Please release the escrow payment to complete the trade.";
-        wsService.sendUserNotification(deal.getFarmer().getUser(), "GOODS_DELIVERED", "Delivery Complete! 🎉", msg, booking.getId(), null);
-        wsService.sendUserNotification(deal.getBuyer().getUser(), "GOODS_DELIVERED", "Delivery Complete! 🎉", msg, booking.getId(), null);
-        wsService.sendTradeUpdate(deal.getFarmer().getUser(), deal, msg);
-        wsService.sendTradeUpdate(deal.getBuyer().getUser(), deal, msg);
-
-        log.info("Booking {} delivered — deal {} now DELIVERED", bookingId, deal.getId());
-        return toResponse(booking);
+        BigDecimal qty = booking.getPickupQuantityKg() != null ? booking.getPickupQuantityKg() : booking.getTradeDeal().getQuantity();
+        return verifyDelivery(bookingId, new com.kisanlink.dto.VerifyDeliveryRequest(booking.getDeliveryCode() != null ? booking.getDeliveryCode() : "0000", qty, "Direct completion"), transporterEmail);
     }
 
     // ─── Query ─────────────────────────────────────────────────────────────────
@@ -367,8 +430,16 @@ public class TransportService {
                 b.getDeliveryAddress(),
                 b.getScheduledDate(),
                 b.getNotes(),
-                b.getConfirmedAt(),
+                b.getPickupCode(),
+                b.getPickedUpAt(),
+                b.getPickupQuantityKg(),
+                b.getPickupNotes(),
+                b.getDeliveryCode(),
                 b.getDeliveredAt(),
+                b.getDeliveredQuantityKg(),
+                b.getDeliveryNotes(),
+                b.getDiscrepancyKg(),
+                b.getConfirmedAt(),
                 b.getCreatedAt()
         );
     }

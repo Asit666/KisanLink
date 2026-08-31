@@ -91,8 +91,32 @@ public class TransportController {
     }
 
     /**
+     * POST /api/transport/bookings/{id}/verify-pickup
+     * Transporter enters Farmer's 4-digit Pickup Verification Code & loaded kg.
+     */
+    @PostMapping("/bookings/{id}/verify-pickup")
+    public TransportBookingResponse verifyPickup(
+            @PathVariable Long id,
+            @Valid @RequestBody com.kisanlink.dto.VerifyPickupRequest request,
+            @AuthenticationPrincipal UserDetails principal) {
+        return transportService.verifyPickup(id, request, principal.getUsername());
+    }
+
+    /**
+     * POST /api/transport/bookings/{id}/verify-delivery
+     * Transporter enters Buyer's 4-digit Delivery Verification Code, received kg, and condition notes.
+     */
+    @PostMapping("/bookings/{id}/verify-delivery")
+    public TransportBookingResponse verifyDelivery(
+            @PathVariable Long id,
+            @Valid @RequestBody com.kisanlink.dto.VerifyDeliveryRequest request,
+            @AuthenticationPrincipal UserDetails principal) {
+        return transportService.verifyDelivery(id, request, principal.getUsername());
+    }
+
+    /**
      * POST /api/transport/bookings/{id}/delivered
-     * Transporter marks goods as delivered; trade advances to DELIVERED.
+     * Transporter marks goods as delivered (direct completion fallback).
      */
     @PostMapping("/bookings/{id}/delivered")
     public TransportBookingResponse markDelivered(

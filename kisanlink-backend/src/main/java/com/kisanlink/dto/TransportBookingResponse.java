@@ -30,8 +30,18 @@ public record TransportBookingResponse(
         LocalDate scheduledDate,
         String notes,
 
+        // Proof of Pickup & Proof of Delivery
+        String pickupCode,
+        Instant pickedUpAt,
+        BigDecimal pickupQuantityKg,
+        String pickupNotes,
+        String deliveryCode,
+        Instant deliveredAt,
+        BigDecimal deliveredQuantityKg,
+        String deliveryNotes,
+        BigDecimal discrepancyKg,
+
         // Timestamps
         Instant confirmedAt,
-        Instant deliveredAt,
         Instant createdAt
 ) {}
