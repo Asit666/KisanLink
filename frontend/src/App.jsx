@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { KisanLinkWebSocketClient } from './websocket';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -1980,11 +1980,11 @@ function getDemoTransporterRequests() {
 }
 
 function FindTransporterPanel({ dealId, apiUrl, session }) {
-  const [suggestions, setSuggestions] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
-  const [booking, setBooking] = React.useState(null);
-  const [msg, setMsg] = React.useState('');
-  const [open, setOpen] = React.useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [booking, setBooking] = useState(null);
+  const [msg, setMsg] = useState('');
+  const [open, setOpen] = useState(false);
 
   async function loadSuggestions() {
     setOpen(true);
@@ -2121,10 +2121,10 @@ function FindTransporterPanel({ dealId, apiUrl, session }) {
 }
 
 function TransportBookingStatus({ dealId, apiUrl, session, role }) {
-  const [booking, setBooking] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
+  const [booking, setBooking] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (session?.token && !session?.token.startsWith('demo-')) {
       fetch(`${apiUrl}/api/transport/bookings/deal/${dealId}`, {
         headers: { Authorization: `Bearer ${session.token}` }
@@ -2177,13 +2177,13 @@ function TransportBookingStatus({ dealId, apiUrl, session, role }) {
 }
 
 function TransporterDashboard({ session, apiUrl }) {
-  const [requests, setRequests] = React.useState(getDemoTransporterRequests());
-  const [activeTab, setActiveTab] = React.useState('pending'); // 'pending' | 'in_transit' | 'history'
-  const [loading, setLoading] = React.useState(false);
-  const [msg, setMsg] = React.useState('');
-  const [isAvailable, setIsAvailable] = React.useState(true);
+  const [requests, setRequests] = useState(getDemoTransporterRequests());
+  const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'in_transit' | 'history'
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState('');
+  const [isAvailable, setIsAvailable] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!session?.token || session?.token.startsWith('demo-')) return;
     setLoading(true);
     fetch(`${apiUrl}/api/transport/transporter/${session.profileId || 1}/requests`, {
