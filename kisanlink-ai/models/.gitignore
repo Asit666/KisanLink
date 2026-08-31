@@ -1,0 +1,15 @@
+# Model weight files are NOT committed to git (too large for GitHub)
+# They are stored separately and downloaded before running the service.
+#
+# To get the model:
+#   Option 1: Train it yourself:
+#     python train_optimized.py
+#
+#   Option 2: Download from project release / shared storage:
+#     (place crop_doctor_v1.pt in this folder)
+
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors

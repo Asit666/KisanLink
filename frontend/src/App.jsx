@@ -3,6 +3,974 @@ import { KisanLinkWebSocketClient } from './websocket';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
+const LANGUAGE_TEXT = {
+  en: {
+    navPrices: 'Market Prices',
+    navForecast: 'Price Forecast',
+    navWeather: 'Agro-Weather',
+    navMatching: 'Buyer Matching',
+    navAnalytics: 'Farmer Analytics',
+    navMap: 'Market Map',
+    navNotifications: 'Notifications',
+    navProfile: 'Profile',
+    tutorialTitle: 'Welcome to KisanLink',
+    tutorialSubtitle: 'Quick tour for your first login',
+    tutorialStep1Title: 'Explore the market',
+    tutorialStep1Text: 'Track mandi prices, crop trends, and live trade signals in one place.',
+    tutorialStep2Title: 'Connect with buyers',
+    tutorialStep2Text: 'Use buyer matching and trade negotiation tools to get better prices for your produce.',
+    tutorialStep3Title: 'Use crop diagnostics',
+    tutorialStep3Text: 'Upload a leaf photo or image URL to diagnose diseases and receive treatment guidance.',
+    tutorialStep4Title: 'Switch language anytime',
+    tutorialStep4Text: 'Use the language selector in the top bar to switch between English, Hindi, and Marathi.',
+    tutorialStep5Title: 'Track notifications',
+    tutorialStep5Text: 'Check price alerts, trade updates, and field notices from the notifications center.',
+    tutorialStep6Title: 'Open your profile',
+    tutorialStep6Text: 'Review your account details, location, and saved farm profile from the session card.',
+    tutorialNext: 'Next',
+    tutorialBack: 'Back',
+    tutorialFinish: 'Start using KisanLink',
+    languageLabel: 'Language',
+    languageEnglish: 'English',
+    languageHindi: 'हिन्दी',
+    languageMarathi: 'मराठी',
+    sidebarMarketplace: 'Marketplace',
+    sidebarTradeShop: 'My Trade & Shop',
+    sidebarAdvisory: 'Advisory & Support',
+    sidebarCrops: 'Crops & Produce',
+    sidebarCropsSmall: 'Fresh farm markets',
+    sidebarInputs: 'Farm Inputs',
+    sidebarInputsSmall: 'Fertilizers & bio-inputs',
+    sidebarOrders: 'My Orders',
+    sidebarOrdersSmall: 'Procurement & Escrow',
+    sidebarMyShop: 'My Shop',
+    sidebarMyShopSmall: 'Produce & Inventory',
+    sidebarProgress: 'Order Progress',
+    sidebarProgressSmall: 'Live Milestone Tracker',
+    sidebarCommunity: 'Farmers Community',
+    sidebarCommunitySmall: 'Q&A & Knowledge',
+    sidebarDiagnostics: 'Crop Doctor AI',
+    sidebarDiagnosticsSmall: 'Leaf disease diagnosis',
+    sidebarNetwork: 'Advisors & Govt Network',
+    sidebarNetworkSmall: 'KVK, experts & field map',
+    allInputs: 'All Inputs',
+    inputsSectionTitle: 'Agro-Supply & Bio-Inputs Linkage',
+    inputsSectionSubtitle: 'Procure certified fertilizers, bio-stimulants, and crop protection chemicals directly from authorized distributors with transparent pricing and escrow safety.',
+    inputsAvailable: 'Formulations Available',
+    inputsCategoryAll: 'All Inputs',
+    inputsCategoryFertilizers: 'Fertilizers & Nutrients',
+    inputsCategoryPesticides: 'Pesticides & Protection',
+    inputsCategoryBioInputs: 'Bio-Inputs & Stimulants',
+    inputsGovtSubsidized: 'Govt. Subsidized',
+    inputsStandardUnit: 'Standard Unit:',
+    inputsIndicativeRate: 'Indicative Rate',
+    inputsComposition: 'Composition:',
+    inputsDosage: 'Application / Dosage:',
+    inputsDistributorHubs: 'Distributor Hubs:',
+    inputsProcure: 'Procure / Buy →',
+    inputsListStock: 'List Stock / Sell →',
+    inputsConnectingCatalog: 'Connecting to input catalog...',
+    inputProcurementTitle: 'Direct Input Procurement',
+    inputProcureItem: 'Procure {item}',
+    inputUnitRate: 'UNIT RATE:',
+    inputDistributors: 'Distributors:',
+    inputOrderQuantity: 'Order Quantity (Units) *',
+    inputCalculatedTotal: 'Calculated Total (₹)',
+    inputDeliveryDistrict: 'Delivery District / FPO Depot',
+    inputCancel: 'Cancel',
+    inputConfirmProcurement: 'Confirm Procurement Order →',
+    diagSourceSample: 'Sample',
+    diagSourceUpload: 'Upload',
+    diagSourceUrl: 'Image URL',
+    diagChooseLeaf: 'Choose a leaf photo',
+    diagUploadFormats: 'JPEG, PNG, or WebP',
+    diagNoImage: 'No image selected',
+    diagSpecimenReady: 'Specimen ready',
+    diagCropHint: 'Crop hint',
+    diagAutoDetect: 'Auto-detect crop',
+    diagFieldNotes: 'Field notes',
+    diagOptionalSymptoms: 'Optional symptoms',
+    diagLoad: 'Load',
+    diagSampleTomatoLeaf: 'Use the sample tomato leaf',
+    diagQuickCheck: 'A quick service connection check',
+    diagAnalyze: 'Diagnose with Crop Doctor AI',
+    diagAnalyzing: 'Analyzing specimen...',
+    diagDiagnosisTitle: 'Trained model diagnosis',
+    diagConfidence: 'confidence',
+    diagTreatmentProtocol: 'Treatment protocol',
+    diagRecommendedInputs: 'Recommended inputs',
+    diagTopCandidates: 'Top model candidates',
+    diagEmptyStateTitle: 'Your diagnosis will appear here',
+    diagEmptyStateText: 'Select a leaf image, then run the trained vision model.',
+    communityNewDiscussion: '+ New Discussion',
+    communitySearchPlaceholder: 'Search topics, crops, or remedies...',
+    communityCommodity: 'COMMODITY:',
+    communityAllCommodities: 'All Commodities',
+    communityAllTopics: 'All Topics',
+    communityFarmerQueries: 'Farmer Queries',
+    communityBuyerNotices: 'Buyer Notices',
+    communityAgronomistProtocols: 'Agronomist Protocols',
+    communityClear: 'Clear',
+    communityReply: 'Reply',
+    communityAddReply: 'Add your reply or remedy...',
+    communityNoDiscussions: 'No discussions found',
+    communityNoDiscussionsSub: 'Publish a new inquiry or procurement requirement to start a thread.',
+    communityReplyCount: 'reply',
+    communityReplyCountPlural: 'replies',
+    communityAssistanceMap: 'Regional Support Mapping',
+    communityVendorList: 'Regional Extension Stations',
+    supportSectionTitle: 'Advisors, Govt KVKs & Support Map',
+    supportSectionSubtitle: 'Verified agricultural extension officers, certified crop pathologists, district KVK research stations, NABL soil testing centers, and 24x7 farmer emergency helplines.',
+    supportCenters: 'KVK Centers',
+    supportAgronomists: 'Agronomists',
+    supportSoilLabs: 'Soil Labs',
+    supportSearchPlaceholder: 'Search advisors, KVKs, soil labs, or services...',
+    supportRadarViewLabel: 'Regional Support Mapping',
+    supportRadarSubtitle: 'Active Assistance Nodes within 25 km Cluster Radius',
+    supportMapSubtitle: 'Live Google Map',
+    supportRadarViewBtn: 'Radar View',
+    supportGoogleMapBtn: 'Google Maps Live',
+    supportYourFarm: 'Your Farm',
+    supportOpenMap: 'Open in Google Maps App →',
+    supportLead: 'Lead:',
+    supportHours: 'Hours:',
+    supportCallDesk: 'Call Desk:',
+    supportGoogleMapAction: 'Google Map →',
+    ordersTradeDeals: 'Trade Deals & Escrow Settlement Desk',
+    ordersStatusAll: 'All Orders',
+    ordersStatusInTransit: 'In Transit',
+    ordersStatusEscrowProtected: 'Escrow Protected',
+    ordersStatusCompleted: 'Completed & Delivered',
+    ordersStatusDisputed: 'Disputed',
+    ordersPlacedOn: 'Placed on',
+    ordersContracts: 'Trade Contracts',
+    ordersCounterpart: 'Counterpart:',
+    ordersDestination: 'Destination:',
+    ordersTrack: 'Track Order Progress →',
+    ordersReleaseEscrow: 'Release Escrow',
+    ordersRaiseDispute: 'Raise Dispute / Mismatch',
+    ordersNoOrders: 'No active orders found.',
+    shopSectionTitle: 'My Shop & Produce Listings',
+    shopSectionSubtitle: 'Manage your harvest catalog, available stock volumes, unit prices, and direct buyer offers.',
+    shopAddProduce: '+ Add Produce to Shop',
+    shopActiveListings: 'Active Listings',
+    shopOnlineBuyers: 'Online for buyers',
+    shopTotalHarvestStock: 'Total Harvest Stock',
+    shopReadyStorage: 'Ready in Silos / Cold Storage',
+    shopSalesRevenue: 'Sales Revenue',
+    shopCompletedEscrow: 'Completed via Escrow',
+    shopPendingEscrow: 'Pending Escrow',
+    shopUnderInspection: 'Under quality inspection',
+    shopInventoryTitle: 'Storefront Produce Inventory',
+    shopCommodity: 'Commodity',
+    shopQualityGrade: 'Quality Grade',
+    shopStockSilo: 'Stock in Silo',
+    shopUnitPrice: 'Shop Unit Price',
+    shopStorageHub: 'Storage Hub',
+    shopInquiries: 'Inquiries',
+    shopStatus: 'Status',
+    shopActions: 'Actions',
+    shopPauseListing: 'Pause Listing',
+    shopActivate: 'Activate',
+    shopBuyerOffersTitle: 'Direct Buyer Purchase Offers & Bids',
+    shopBuyerOffersSubtitle: 'Institutional buyers requesting bulk procurement with guaranteed escrow deposits.',
+    shopPending: 'Pending',
+    authSignInTitle: 'Sign In to Your Account',
+    authCreateTitle: 'Create an Account',
+    authSignIn: 'Sign In',
+    authCreate: 'Create Account',
+    authFullName: 'Full Name',
+    authMobile: 'Mobile Number',
+    authEmail: 'Email Address',
+    authPassword: 'Password',
+    authQuickDemo: 'Quick 1-Click Demo Login:',
+    authGuest: 'Continue Browsing as Guest',
+    authFarmer: 'Farmer / Producer',
+    authBuyer: 'Buyer / Trader',
+    authBackMarketplace: 'Back to Marketplace',
+    signOut: 'Sign Out',
+    heroEyebrow: 'Commodity Spot & Contract Exchange',
+    heroTitle: 'KisanLink Marketplace',
+    heroCopy: 'Live market arrival rates, direct farmer harvest listings, and farm inputs with transparent trade escrow.',
+    panelPriceDiscovery: 'Price Discovery',
+    panelMarketPulse: 'Market Pulse & 7-Day Movement',
+    panelAnalytics: 'Market Analytics',
+    panelQuickTrading: 'Quick Trading',
+    panelInstantLinkage: 'Instant Produce Linkage',
+    panelActiveBoard: 'Active Commodity Board',
+    panelCommodities: 'Commodities & Live Market Rates',
+    panelSearchPlaceholder: 'Search commodities by name or category...',
+    sortLabel: 'SORT:',
+    mostActive: 'Most Active',
+    priceLowHigh: 'Price: Low to High',
+    priceHighLow: 'Price: High to Low',
+    nameAToZ: 'Name: A to Z',
+    viewPredictions: 'View ML Predictions →',
+    sellProduceLot: '+ Sell Produce Lot →',
+    postBuyRequirement: '+ Post Buy Requirement →',
+    sellProduce: '+ Sell Produce',
+    postBuyOrder: '+ Post Buy Order',
+    loadingMarket: 'Loading market price movement...',
+    selectedCrop: 'Selected Crop',
+    produceUnit: 'PRODUCE',
+    marketRange: 'Market Range',
+    labelNotifications: 'Notifications & Field Dispatch',
+    labelProfile: 'Account & Location Profile',
+    guestAccess: 'Guest Access',
+    notificationsStatus: 'Syncing',
+    sectionProfileHeader: 'Account & Location Profile',
+    profileEmail: 'Email',
+    profileRole: 'Role',
+    profileId: 'Profile ID',
+    profileBusinessName: 'Business Name',
+    profileBusinessType: 'Business Type',
+    profileAddress: 'Address / Village',
+    profileDistrict: 'District',
+    profileState: 'State',
+    profileLatitude: 'Latitude',
+    profileLongitude: 'Longitude',
+    profileAlertContacts: 'Alert & Notification Contacts',
+    profileMobileWhatsApp: 'Mobile / WhatsApp Number',
+    profileAlertEmail: 'Alert Email',
+    profileSave: 'Save Profile & Sync GPS',
+    profileRouting: 'Notification Routing',
+    profileWhatsApp: 'WhatsApp',
+    profileSms: 'SMS',
+    profileEmailLabel: 'Email',
+    profileInApp: 'In-App',
+    profileOpenDispatch: 'Open Field Dispatch Center',
+    ordersHeader: 'My Orders & Procurement',
+    myShopHeader: 'My Shop & Produce Listings',
+    orderProgressHeader: 'Order Progress',
+    notificationsEyebrow: 'Market activity & signals',
+    markAllRead: 'Mark all read',
+    unreadLabel: 'unread',
+    fieldAlerts: 'field alerts',
+    inAppFeed: 'In-App Desk Feed',
+    smsDispatch: 'SMS & WhatsApp Field Dispatch',
+    noNotifications: 'No notifications received yet.',
+    noFieldAlerts: 'No field alerts dispatched yet. Use the form above to send a test.',
+    communitySection: 'Farmers Community',
+    communityEyebrow: 'Marketplace Exchange & Advisory',
+    cropDoctorSection: 'Crop Doctor AI',
+    diagnosisIntro: 'Upload a clear leaf photo for a trained disease diagnosis and treatment prescription.',
+    catAllItems: 'All Items',
+    catVegetables: 'Vegetables',
+    catFruits: 'Fruits',
+    catGrains: 'Grains',
+    catPulses: 'Pulses',
+    catSeeds: 'Seeds',
+    catSpices: 'Spices',
+    catOilSeeds: 'Oil Seeds',
+    catFertilizers: 'Fertilizers',
+    catPesticides: 'Pesticides',
+    catBioInputs: 'Bio-Inputs',
+    catEquipment: 'Equipment & Tools',
+    catOther: 'Other',
+    prodSubsidized: 'Subsidized Chemical Fertilizer',
+    prodRootDev: 'Root Development & Early Growth',
+    prodAllStage: 'All-Stage Vegetative Growth',
+    prodOrganic: 'Organic Soil Rejuvenation',
+    prodPestResist: 'Pest Resistance & Tuber/Fruit Quality',
+    prodPhosSulph: 'Phosphorus + Sulphur Supplement',
+    prodBioPesticide: 'Organic Bio-Pesticide (Zero Chemical Residue)',
+    prodContactInsect: 'Contact & Ingestion Insecticide',
+    prodFungicide: 'Broad-Spectrum Protective Fungicide',
+    prodBioControl: 'Eco-Friendly Bio-Control of Root Rot & Wilt',
+    prodSystemic: 'Systemic Sucking Pest Controller',
+    prodStimulant: 'Stress Tolerance & Plant Vigor Enhancer',
+    prodNitrogenFixer: 'Biological Nitrogen Fixer (Saves 25% Urea)',
+    prodPhosUnlock: 'Unlocks Insoluble Soil Phosphorus',
+    prodSpraying: 'Precision Spraying & Labor Saving Equipment',
+    prodMicroIrrigation: 'Micro-Irrigation Water Conservation',
+    prodIPM: 'Integrated Pest Management (IPM)',
+    prodPostHarvest: 'Post-Harvest Protection Cover',
+    diseaseEarlyBlight: 'Tomato Early Blight',
+    diseaseLateBlight: 'Potato Late Blight',
+    diseaseBlast: 'Rice / Paddy Blast',
+    diseaseRust: 'Wheat Rust (Orange Pustules)',
+    diseaseLeafCurl: 'Chilli Leaf Curl Virus',
+    diseaseWhiteRust: 'Mustard White Rust & Aphids',
+    diseaseMildew: 'Powdery Mildew',
+    diseaseChlorosis: 'Nitrogen Yellowing (Chlorosis)',
+    diseaseBorer: 'Caterpillar / Armyworm Borer',
+    supportGovtKVK: 'Government KVK Research Station',
+    supportAgronomist: 'Certified Agronomist',
+    supportSoilLab: 'Soil Testing Laboratory',
+    supportHelpline: 'National 24x7 Helpline',
+    supportFPO: 'Farmer Producer Organization',
+    supportDesignKVK: 'District Agricultural Extension & Research Hub',
+    supportDesignAgro: 'Horticulture & Pathology Specialist',
+    supportDesignLab: 'Certified Nutrient & Micro-Nutrient Laboratory',
+    supportDesignHelp: 'Free Agronomic Advice in Local Languages',
+    supportDesignFPO: 'Bulk Aggregation & Cold Storage Hub',
+    supportDesignIPM: 'Integrated Pest Management (IPM) Specialist',
+    supportServiceSoil: 'Soil Health Testing',
+    supportServiceSeed: 'Certified Seed Distribution',
+    supportServicePathology: 'Free Crop Pathology Diagnosis',
+    supportServiceKisan: 'PM-Kisan Desk',
+    supportServiceBlight: 'Tomato & Chilli Blight Remediation',
+    supportServiceSpray: 'Spray Calibration & PHI',
+    supportServiceBioInput: 'Organic Bio-Input Regimes',
+    supportServiceNPK: 'NPK & Micronutrient Profiling',
+    supportServiceSalinity: 'EC & pH Salinity Testing',
+    supportServiceCards: 'Subsidized Soil Health Cards (₹20/sample)',
+    supportServiceEmergency: 'Emergency Pest Attack Advisory',
+    supportServiceMSP: 'MSP & Market Scheme Info',
+    supportServiceWeather: 'Weather Disaster Warnings',
+    supportServiceDialects: 'Hindi & Regional Dialects',
+    supportServiceBuyer: 'Direct Buyer Aggregation',
+    supportServiceCooling: 'Pre-Cooling & Cold Chain',
+    supportServiceGrading: 'Export Quality Grading',
+    supportServiceInputs: 'Collective Input Buying',
+    supportServicePheromone: 'Pheromone Traps & Bio-Control',
+    supportServiceThrips: 'Thrips & Whitefly Remediation',
+    supportServiceCertif: 'Residue-Free Certification',
+  },
+  hi: {
+    navPrices: 'बाज़ार कीमतें',
+    navForecast: 'मूल्य पूर्वानुमान',
+    navWeather: 'कृषि मौसम',
+    navMatching: 'खरीदार मिलान',
+    navAnalytics: 'किसान विश्लेषण',
+    navMap: 'बाज़ार नक्शा',
+    navNotifications: 'सूचनाएँ',
+    navProfile: 'प्रोफ़ाइल',
+    tutorialTitle: 'KisanLink में आपका स्वागत है',
+    tutorialSubtitle: 'पहली बार प्रवेश के लिए छोटी यात्रा',
+    tutorialStep1Title: 'बाज़ार देखें',
+    tutorialStep1Text: 'एक ही जगह पर मंडी कीमतें, फसल रुझान और लाइव ट्रेड संकेत देखें।',
+    tutorialStep2Title: 'खरीदारों से जुड़ें',
+    tutorialStep2Text: 'खरीदार मिलान और ट्रेड वार्ता से अपने उत्पाद के लिए बेहतर कीमत पाएं।',
+    tutorialStep3Title: 'फसल निदान का उपयोग करें',
+    tutorialStep3Text: 'पत्ती का फोटो अपलोड करें और बीमारी का निदान व उपचार सुझाव पाएं।',
+    tutorialStep4Title: 'कभी भी भाषा बदलें',
+    tutorialStep4Text: 'शीर्ष बार में भाषा चुनकर अंग्रेज़ी, हिन्दी और मराठी के बीच बदलें।',
+    tutorialStep5Title: 'सूचनाएँ देखें',
+    tutorialStep5Text: 'अपडेट, व्यापार सूचना और खेत से जुड़ी चेतनाएँ नोटिफिकेशन सेंटर से देखें।',
+    tutorialStep6Title: 'अपनी प्रोफ़ाइल खोलें',
+    tutorialStep6Text: 'सत्र कार्ड से अपनी प्रोफ़ाइल, स्थान और कृषि जानकारी जाँचें।',
+    tutorialNext: 'अगला',
+    tutorialBack: 'पीछे',
+    tutorialFinish: 'KisanLink का उपयोग शुरू करें',
+    languageLabel: 'भाषा',
+    languageEnglish: 'English',
+    languageHindi: 'हिन्दी',
+    languageMarathi: 'मराठी',
+    sidebarMarketplace: 'बाज़ार',
+    sidebarTradeShop: 'मेरी ट्रेड और दुकान',
+    sidebarAdvisory: 'सलाह और सहायता',
+    sidebarCrops: 'फसलें और उत्पाद',
+    sidebarCropsSmall: 'ताज़ा खेत बाजार',
+    sidebarInputs: 'खेती की सामग्री',
+    sidebarInputsSmall: 'उर्वरक और जैव-इनपुट',
+    sidebarOrders: 'मेरी ऑर्डर',
+    sidebarOrdersSmall: 'खरीद और एस्क्रो',
+    sidebarMyShop: 'मेरी दुकान',
+    sidebarMyShopSmall: 'उत्पादन और इन्वेंटरी',
+    sidebarProgress: 'ऑर्डर प्रगति',
+    sidebarProgressSmall: 'लाइव माइलस्टोन ट्रैकर',
+    sidebarCommunity: 'किसान समुदाय',
+    sidebarCommunitySmall: 'प्रश्न उत्तर और ज्ञान',
+    sidebarDiagnostics: 'क्रॉप डॉक्टर एआई',
+    sidebarDiagnosticsSmall: 'पत्ती रोग निदान',
+    sidebarNetwork: 'सलाहकार और सरकारी नेटवर्क',
+    sidebarNetworkSmall: 'केवीके, विशेषज्ञ और फील्ड मानचित्र',
+    allInputs: 'सभी इनपुट',
+    inputsSectionTitle: 'कृषि आपूर्ति और बायो-इन्पुट्स लिंकेज',
+    inputsSectionSubtitle: 'प्रमाणित उर्वरक, बायो-स्टिमुलेंट और फसल संरक्षण रसायनों को अधिकृत वितरकों से सीधे खरीदें, साथ में पारदर्शी मूल्य और एस्क्रो सुरक्षा।',
+    inputsAvailable: 'उपलब्ध फॉर्मुलेशन',
+    inputsCategoryAll: 'सभी इनपुट',
+    inputsCategoryFertilizers: 'उर्वरक और पोषक तत्व',
+    inputsCategoryPesticides: 'कीटनाशक और संरक्षण',
+    inputsCategoryBioInputs: 'बायो-इन्पुट्स और स्टिमुलेंट्स',
+    inputsGovtSubsidized: 'सरकारी सब्सिडी',
+    inputsStandardUnit: 'मानक इकाई:',
+    inputsIndicativeRate: 'संकेतात्मक दर',
+    inputsComposition: 'संघटन:',
+    inputsDosage: 'प्रयोग / खुराक:',
+    inputsDistributorHubs: 'वितरक हब:',
+    inputsProcure: 'खरीदें / खरीदें →',
+    inputsListStock: 'स्टॉक सूचीबद्ध करें / बेचें →',
+    inputsConnectingCatalog: 'इनपुट कैटलॉग से जुड़ रहा है...',
+    inputProcurementTitle: 'प्रत्यक्ष इनपुट खरीद',
+    inputProcureItem: '{item} खरीदें',
+    inputUnitRate: 'इकाई दर:',
+    inputDistributors: 'वितरक:',
+    inputOrderQuantity: 'ऑर्डर मात्रा (इकाइयाँ) *',
+    inputCalculatedTotal: 'गणना की गई कुल राशि (₹)',
+    inputDeliveryDistrict: 'डिलीवरी जिल्हा / एफपीओ डिपो',
+    inputCancel: 'रद्द करें',
+    inputConfirmProcurement: 'खरीद ऑर्डर की पुष्टि करें →',
+    diagSourceSample: 'नमूना',
+    diagSourceUpload: 'अपलोड',
+    diagSourceUrl: 'इमेज URL',
+    diagChooseLeaf: 'पत्ती की फोटो चुनें',
+    diagUploadFormats: 'JPEG, PNG, या WebP',
+    diagNoImage: 'कोई इमेज नहीं चुनी गई',
+    diagSpecimenReady: 'सैंपल तैयार',
+    diagCropHint: 'फसल संकेत',
+    diagAutoDetect: 'फसल अपने-आप पहचानें',
+    diagFieldNotes: 'फील्ड नोट्स',
+    diagOptionalSymptoms: 'वैकल्पिक लक्षण',
+    diagLoad: 'लोड',
+    diagSampleTomatoLeaf: 'सैंपल टमाटर की पत्ती उपयोग करें',
+    diagQuickCheck: 'त्वरित सेवा कनेक्शन परीक्षण',
+    diagAnalyze: 'क्रॉप डॉक्टर एआई से निदान करें',
+    diagAnalyzing: 'सैंपल का विश्लेषण हो रहा है...',
+    diagDiagnosisTitle: 'प्रशिक्षित मॉडल निदान',
+    diagConfidence: 'विश्वास',
+    diagTreatmentProtocol: 'उपचार प्रोटोकॉल',
+    diagRecommendedInputs: 'अनुशंसित इनपुट',
+    diagTopCandidates: 'सबसे प्रभावी मॉडल उम्मीदवार',
+    diagEmptyStateTitle: 'आपका निदान यहाँ दिखाई देगा',
+    diagEmptyStateText: 'पत्ती की इमेज चुनें, फिर प्रशिक्षित विज़न मॉडल चलाएं।',
+    communityNewDiscussion: '+ नई चर्चा',
+    communitySearchPlaceholder: 'विषय, फसल या उपचार खोजें...',
+    communityCommodity: 'कमोडिटी:',
+    communityAllCommodities: 'सभी कमोडिटीज़',
+    communityAllTopics: 'सभी विषय',
+    communityFarmerQueries: 'किसान प्रश्न',
+    communityBuyerNotices: 'खरीदार नोटिस',
+    communityAgronomistProtocols: 'कृषि सलाहकार प्रोटोकॉल',
+    communityClear: 'हटाएं',
+    communityReply: 'जवाब दें',
+    communityAddReply: 'अपना जवाब या उपचार जोड़ें...',
+    communityNoDiscussions: 'कोई चर्चा नहीं मिली',
+    communityNoDiscussionsSub: 'नई पूछताछ या खरीद आवश्यकताएँ पोस्ट करके चर्चा शुरू करें।',
+    communityReplyCount: 'जवाब',
+    communityReplyCountPlural: 'जवाब',
+    supportSectionTitle: 'सलाहकार, सरकारी केवीके और सहायता मानचित्र',
+    supportSectionSubtitle: 'प्रमाणित कृषि विस्तार अधिकारी, प्रमाणित फसल रोग विशेषज्ञ, जिला केवीके अनुसंधान केंद्र, NABL मृदा परीक्षण केंद्र और 24x7 किसान आपातकालीन हेल्पलाइन।',
+    supportCenters: 'केवीके केंद्र',
+    supportAgronomists: 'कृषि सलाहकार',
+    supportSoilLabs: 'मृदा लैब',
+    supportSearchPlaceholder: 'सलाहकार, केवीके, मृदा लैब या सेवा ढूंढें...',
+    supportRadarViewLabel: 'क्षेत्रीय सहायता मानचित्रण',
+    supportRadarSubtitle: '25 किमी क्लस्टर त्रिज्या के भीतर सक्रिय सहायता नोड्स',
+    supportMapSubtitle: 'लाइव Google मानचित्र',
+    supportRadarViewBtn: 'रेडर दृश्य',
+    supportGoogleMapBtn: 'Google Maps लाइव',
+    supportYourFarm: 'आपका खेत',
+    supportOpenMap: 'Google Maps ऐप में खोलें →',
+    supportLead: 'नेतृत्व:',
+    supportHours: 'समय:',
+    supportCallDesk: 'कॉल डेस्क:',
+    supportGoogleMapAction: 'Google मानचित्र →',
+    ordersTradeDeals: 'ट्रेड डील्स और एस्क्रो सेटलमेंट डेस्क',
+    ordersStatusAll: 'सभी ऑर्डर',
+    ordersStatusInTransit: 'इन ट्रांजिट',
+    ordersStatusEscrowProtected: 'एस्क्रो सुरक्षित',
+    ordersStatusCompleted: 'पूर्ण और पहुँचाए गए',
+    ordersStatusDisputed: 'विवादित',
+    ordersPlacedOn: 'रखें',
+    ordersContracts: 'ट्रेड कॉन्ट्रैक्ट',
+    ordersCounterpart: 'साथी:',
+    ordersDestination: 'गंतव्य:',
+    ordersTrack: 'ऑर्डर प्रगति देखें →',
+    ordersReleaseEscrow: 'एस्क्रो जारी करें',
+    ordersRaiseDispute: 'विवाद / असंगति उठाएँ',
+    ordersNoOrders: 'कोई सक्रिय ऑर्डर नहीं मिला।',
+    shopSectionTitle: 'मेरी दुकान और उत्पाद सूची',
+    shopSectionSubtitle: 'अपनी फसल सूची, उपलब्ध स्टॉक, इकाई कीमत और सीधे खरीदारों की ofertas प्रबंधित करें।',
+    shopAddProduce: '+ दुकान में उत्पाद जोड़ें',
+    shopActiveListings: 'सक्रिय लिस्टिंग',
+    shopOnlineBuyers: 'खरीदारों के लिए ऑनलाइन',
+    shopTotalHarvestStock: 'कुल फसल स्टॉक',
+    shopReadyStorage: 'सिलो / कोल्ड स्टोरेज में तैयार',
+    shopSalesRevenue: 'बिक्री आय',
+    shopCompletedEscrow: 'एस्क्रो द्वारा पूर्ण',
+    shopPendingEscrow: 'लंबित एस्क्रो',
+    shopUnderInspection: 'गुणवत्ता निरीक्षण में',
+    shopInventoryTitle: 'स्टोरफ्रंट उत्पाद इन्वेंटरी',
+    shopCommodity: 'कमोडिटी',
+    shopQualityGrade: 'गुणवत्ता ग्रेड',
+    shopStockSilo: 'सिलो में स्टॉक',
+    shopUnitPrice: 'दुकान इकाई मूल्य',
+    shopStorageHub: 'स्टोरेज हब',
+    shopInquiries: 'जाँचें',
+    shopStatus: 'स्थिति',
+    shopActions: 'कार्रवाई',
+    shopPauseListing: 'लिस्टिंग रोकें',
+    shopActivate: 'सक्रिय करें',
+    shopBuyerOffersTitle: 'प्रत्यक्ष खरीदार खरीद ऑफर और बोलियाँ',
+    shopBuyerOffersSubtitle: 'संस्थागत खरीदार बड़े पैमाने पर खरीद के लिए गारंटीकृत एस्क्रो जमा के साथ अनुरोध कर रहे हैं।',
+    shopPending: 'लंबित',
+    authSignInTitle: 'अपने खाते में साइन इन करें',
+    authCreateTitle: 'खाता बनाएं',
+    authSignIn: 'साइन इन',
+    authCreate: 'खाता बनाएं',
+    authFullName: 'पूरा नाम',
+    authMobile: 'मोबाइल नंबर',
+    authEmail: 'ईमेल पता',
+    authPassword: 'पासवर्ड',
+    authQuickDemo: 'त्वरित डेमो लॉगिन:',
+    authGuest: 'अतिथि के रूप में ब्राउज़ जारी रखें',
+    authFarmer: 'किसान / उत्पादक',
+    authBuyer: 'खरीदार / व्यापारी',
+    authBackMarketplace: 'बाज़ार पर वापस',
+    signOut: 'साइन आउट',
+    heroEyebrow: 'कमोडिटी स्पॉट और कॉन्ट्रैक्ट एक्सचेंज',
+    heroTitle: 'KisanLink बाज़ार',
+    heroCopy: 'लाइव बाजार आगमन दर, सीधे किसान फसल सूची और पारदर्शी ट्रेड एस्क्रो के साथ कृषि इनपुट।',
+    panelPriceDiscovery: 'मूल्य खोज',
+    panelMarketPulse: 'बाज़ार पल्स और 7-दिवसीय गति',
+    panelAnalytics: 'बाज़ार विश्लेषण',
+    panelQuickTrading: 'त्वरित ट्रेडिंग',
+    panelInstantLinkage: 'तुरंत उत्पाद लिंकिंग',
+    panelActiveBoard: 'सक्रिय कमोडिटी बोर्ड',
+    panelCommodities: 'कमोडिटीज़ और लाइव मार्केट रेट',
+    panelSearchPlaceholder: 'नाम या श्रेणी से कमोडिटी खोजें...',
+    sortLabel: 'क्रमबद्ध करें:',
+    mostActive: 'सबसे सक्रिय',
+    priceLowHigh: 'मूल्य: कम से उच्च',
+    priceHighLow: 'मूल्य: उच्च से कम',
+    nameAToZ: 'नाम: ए से जेड',
+    viewPredictions: 'एमएल भविष्यवाणी देखें →',
+    sellProduceLot: '+ उत्पाद lot बेचें →',
+    postBuyRequirement: '+ खरीद आवश्यकता पोस्ट करें →',
+    sellProduce: '+ उत्पाद बेचें',
+    postBuyOrder: '+ खरीद ऑर्डर पोस्ट करें',
+    loadingMarket: 'बाज़ार मूल्य गति लोड हो रही है...',
+    selectedCrop: 'चयनित फसल',
+    produceUnit: 'उत्पाद',
+    marketRange: 'बाज़ार रेंज',
+    labelNotifications: 'सूचनाएँ और फील्ड डिस्पैच',
+    labelProfile: 'अकाउंट और लोकेशन प्रोफाइल',
+    guestAccess: 'अतिथि एक्सेस',
+    notificationsStatus: 'सिंक हो रहा है',
+    sectionProfileHeader: 'अकाउंट और लोकेशन प्रोफाइल',
+    profileEmail: 'ईमेल',
+    profileRole: 'भूमिका',
+    profileId: 'प्रोफ़ाइल आईडी',
+    profileBusinessName: 'व्यवसाय का नाम',
+    profileBusinessType: 'व्यवसाय प्रकार',
+    profileAddress: 'पता / गाँव',
+    profileDistrict: 'जिला',
+    profileState: 'राज्य',
+    profileLatitude: 'अक्षांश',
+    profileLongitude: 'देशांतर',
+    profileAlertContacts: 'अलर्ट और सूचना संपर्क',
+    profileMobileWhatsApp: 'मोबाइल / व्हाट्सऐप नंबर',
+    profileAlertEmail: 'अलर्ट ईमेल',
+    profileSave: 'प्रोफ़ाइल सेव करें और GPS सिंक करें',
+    profileRouting: 'सूचना रूटिंग',
+    profileWhatsApp: 'व्हाट्सऐप',
+    profileSms: 'एसएमएस',
+    profileEmailLabel: 'ईमेल',
+    profileInApp: 'इन-ऐप',
+    profileOpenDispatch: 'फील्ड डिस्पैच सेंटर खोलें',
+    ordersHeader: 'मेरी ऑर्डर और खरीद',
+    myShopHeader: 'मेरी दुकान और उत्पाद सूची',
+    orderProgressHeader: 'ऑर्डर प्रगति',
+    notificationsEyebrow: 'बाजार गतिविधि और संकेत',
+    markAllRead: 'सभी पढ़े गए',
+    unreadLabel: 'अपठित',
+    fieldAlerts: 'फील्ड अलर्ट',
+    inAppFeed: 'इन-ऐप डेस्क फीड',
+    smsDispatch: 'एसएमएस और व्हाट्सऐप फील्ड डिस्पैच',
+    noNotifications: 'अभी कोई सूचना नहीं मिली है।',
+    noFieldAlerts: 'अभी कोई फील्ड अलर्ट नहीं भेजा गया है। परीक्षण भेजने के लिए ऊपर फॉर्म का उपयोग करें।',
+    communitySection: 'किसान समुदाय',
+    communityEyebrow: 'बाज़ार एक्सचेंज और सलाह',
+    cropDoctorSection: 'क्रॉप डॉक्टर एआई',
+    diagnosisIntro: 'उपचार सुझाने के लिए साफ पत्ती की फोटो अपलोड करें।',
+    catAllItems: 'सभी आइटम',
+    catVegetables: 'सब्जियां',
+    catFruits: 'फल',
+    catGrains: 'अनाज',
+    catPulses: 'दालें',
+    catSeeds: 'बीज',
+    catSpices: 'मसाले',
+    catOilSeeds: 'तिलहन',
+    catFertilizers: 'खाद और पोषक तत्व',
+    catPesticides: 'कीटनाशक और सुरक्षा',
+    catBioInputs: 'बायो-इनपुट्स और स्टिमुलेंट्स',
+    catEquipment: 'उपकरण और उपकरण',
+    catOther: 'अन्य',
+    prodSubsidized: 'अनुदानित रासायनिक खाद',
+    prodRootDev: 'रूट विकास और प्रारंभिक विकास',
+    prodAllStage: 'सभी-चरण वनस्पति विकास',
+    prodOrganic: 'जैव मिट्टी कायाकल्प',
+    prodPestResist: 'कीट प्रतिरोध और कंद/फल गुणवत्ता',
+    prodPhosSulph: 'फास्फोरस + सल्फर पूरक',
+    prodBioPesticide: 'जैव कीटनाशक (शून्य रासायनिक अवशेष)',
+    prodContactInsect: 'संपर्क और अंतर्ग्रहण कीटनाशक',
+    prodFungicide: 'व्यापक स्पेक्ट्रम सुरक्षात्मक कवकनाशी',
+    prodBioControl: 'पर्यावरण के अनुकूल जैव-नियंत्रण',
+    prodSystemic: 'प्रणालीगत चूसने वाले कीट नियंत्रक',
+    prodStimulant: 'तनाव सहिष्णुता और पौधे की जीवंतता बढ़ाने वाला',
+    prodNitrogenFixer: 'जैविक नाइट्रोजन फिक्सर (25% यूरिया बचाता है)',
+    prodPhosUnlock: 'अघुलनशील मिट्टी फास्फोरस अनलॉक करता है',
+    prodSpraying: 'सटीक छिड़काव और श्रम बचत उपकरण',
+    prodMicroIrrigation: 'सूक्ष्म-सिंचाई जल संरक्षण',
+    prodIPM: 'एकीकृत कीट प्रबंधन (IPM)',
+    prodPostHarvest: 'कटाई के बाद सुरक्षा कवर',
+    diseaseEarlyBlight: 'टमाटर अर्ली ब्लाइट',
+    diseaseLateBlight: 'आलू लेट ब्लाइट',
+    diseaseBlast: 'चावल / धान ब्लास्ट',
+    diseaseRust: 'गेहूं रस्ट (नारंगी पुस्टुल)',
+    diseaseLeafCurl: 'मिर्च लीफ कर्ल वायरस',
+    diseaseWhiteRust: 'सरसों व्हाइट रस्ट और एफिड्स',
+    diseaseMildew: 'पाउडरी मिल्ड्यू',
+    diseaseChlorosis: 'नाइट्रोजन पीलापन (क्लोरोसिस)',
+    diseaseBorer: 'कैटरपिलर / आर्मीवर्म बोरर',
+    supportGovtKVK: 'सरकारी KVK अनुसंधान स्टेशन',
+    supportAgronomist: 'प्रमाणित कृषि विज्ञानी',
+    supportSoilLab: 'मिट्टी परीक्षण प्रयोगशाला',
+    supportHelpline: 'राष्ट्रीय 24x7 हेल्पलाइन',
+    supportFPO: 'किसान उत्पादक संगठन',
+    supportDesignKVK: 'जिला कृषि विस्तार और अनुसंधान केंद्र',
+    supportDesignAgro: 'बागवानी और पैथोलॉजी विशेषज्ञ',
+    supportDesignLab: 'प्रमाणित पोषक तत्व और सूक्ष्म पोषक तत्व प्रयोगशाला',
+    supportDesignHelp: 'स्थानीय भाषाओं में मुफ्त कृषि सलाह',
+    supportDesignFPO: 'थोक एकत्रीकरण और कोल्ड स्टोरेज हब',
+    supportDesignIPM: 'एकीकृत कीट प्रबंधन (IPM) विशेषज्ञ',
+    supportServiceSoil: 'मिट्टी स्वास्थ्य परीक्षण',
+    supportServiceSeed: 'प्रमाणित बीज वितरण',
+    supportServicePathology: 'मुफ्त फसल पैथोलॉजी निदान',
+    supportServiceKisan: 'PM-किसान डेस्क',
+    supportServiceBlight: 'टमाटर और मिर्च ब्लाइट उपचार',
+    supportServiceSpray: 'स्प्रे कैलिब्रेशन और PHI',
+    supportServiceBioInput: 'जैव इनपुट्स शासन',
+    supportServiceNPK: 'NPK और सूक्ष्म पोषक तत्व प्रोफाइलिंग',
+    supportServiceSalinity: 'EC और pH लवणता परीक्षण',
+    supportServiceCards: 'अनुदानित मिट्टी स्वास्थ्य कार्ड (₹20/नमूना)',
+    supportServiceEmergency: 'आपातकालीन कीट हमले की सलाह',
+    supportServiceMSP: 'MSP और बाजार योजना जानकारी',
+    supportServiceWeather: 'मौसम आपदा चेतावनी',
+    supportServiceDialects: 'हिंदी और क्षेत्रीय बोलियां',
+    supportServiceBuyer: 'सीधे खरीदार एकत्रीकरण',
+    supportServiceCooling: 'प्री-कूलिंग और कोल्ड चेन',
+    supportServiceGrading: 'निर्यात गुणवत्ता ग्रेडिंग',
+    supportServiceInputs: 'सामूहिक इनपुट खरीद',
+    supportServicePheromone: 'फेरोमोन जाल और जैव-नियंत्रण',
+    supportServiceThrips: 'थ्रिप्स और व्हाइटफ्लाई उपचार',
+    supportServiceCertif: 'अवशेष-मुक्त प्रमाणन',
+  },
+  mr: {
+    navPrices: 'बाजार भाव',
+    navForecast: 'भाव अंदाज',
+    navWeather: 'शेती हवामान',
+    navMatching: 'खरेदीदार जुळणी',
+    navAnalytics: 'शेतकरी विश्लेषण',
+    navMap: 'बाजार नकाशा',
+    navNotifications: 'सूचना',
+    navProfile: 'प्रोफाइल',
+    tutorialTitle: 'KisanLink मध्ये आपले स्वागत आहे',
+    tutorialSubtitle: 'पहिल्यांदा लॉगिन केल्यावर जलद मार्गदर्शन',
+    tutorialStep1Title: 'बाजार पहा',
+    tutorialStep1Text: 'एका ठिकाणी मंडई भाव, पिकांची ट्रेंड आणि लाईव्ह ट्रेड संकेत पहा.',
+    tutorialStep2Title: 'खरेदीदारांशी संपर्क साधा',
+    tutorialStep2Text: 'खरेदीदार जुळणी आणि ट्रेड वाटाघाटीद्वारे आपल्या उत्पादनासाठी चांगला भाव मिळवा.',
+    tutorialStep3Title: 'पीक निदान वापरा',
+    tutorialStep3Text: 'पानाचे फोटो अपलोड करून रोग ओळखा आणि उपचार सूचना मिळवा.',
+    tutorialStep4Title: 'कधीही भाषा बदला',
+    tutorialStep4Text: 'वरच्या बारमधील भाषा निवडक वापरून इंग्रजी, हिंदी आणि मराठी दरम्यान बदला.',
+    tutorialStep5Title: 'सूचनांची पडताळणी करा',
+    tutorialStep5Text: 'भावाची सूचना, ट्रेड अपडेट आणि शेताशी संबंधित सूचना नोटिफिकेशन केंद्रातून पहा.',
+    tutorialStep6Title: 'प्रोफाइल उघडा',
+    tutorialStep6Text: 'सेशन कार्डमधून आपली प्रोफाइल, स्थान आणि शेत माहिती तपासा.',
+    tutorialNext: 'पुढे',
+    tutorialBack: 'मागे',
+    tutorialFinish: 'KisanLink वापरण्यास सुरुवात करा',
+    languageLabel: 'भाषा',
+    languageEnglish: 'English',
+    languageHindi: 'हिन्दी',
+    languageMarathi: 'मराठी',
+    sidebarMarketplace: 'बाजार',
+    sidebarTradeShop: 'माझी ट्रेड आणि दुकान',
+    sidebarAdvisory: 'सल्ला आणि मदत',
+    sidebarCrops: 'पीक आणि उत्पादने',
+    sidebarCropsSmall: 'ताज्या शेत बाजार',
+    sidebarInputs: 'शेतीची इन्पुट्स',
+    sidebarInputsSmall: 'खत आणि बायो-इन्पुट्स',
+    sidebarOrders: 'माझ्या ऑर्डर्स',
+    sidebarOrdersSmall: 'खरेदी आणि एस्क्रॉ',
+    sidebarMyShop: 'माझी दुकान',
+    sidebarMyShopSmall: 'उत्पादन आणि इन्व्हेंटरी',
+    sidebarProgress: 'ऑर्डर प्रगती',
+    sidebarProgressSmall: 'लाइव माइलस्टोन ट्रॅकर',
+    sidebarCommunity: 'शेतकरी समुदाय',
+    sidebarCommunitySmall: 'प्रश्न आणि ज्ञान',
+    sidebarDiagnostics: 'क्रॉप डॉक्टर एआई',
+    sidebarDiagnosticsSmall: 'पान रोग निदान',
+    sidebarNetwork: 'सल्लागार आणि सरकारी नेटवर्क',
+    sidebarNetworkSmall: 'केव्हीके, तज्ञ आणि फील्ड नकाशा',
+    allInputs: 'सर्व इनपुट्स',
+    inputsSectionTitle: 'शेती पुरवठा आणि बायो-इन्पुट्स लिंकेज',
+    inputsSectionSubtitle: 'प्रमाणित खत, बायो-स्टिमुलंट्स आणि पीक प्रोटेक्शन केमिकल्स अधिकृत वितरकांकडून थेट खरेदी करा, पारदर्शक किंमत आणि एस्क्रॉ सुरक्षितता देऊन.',
+    inputsAvailable: 'उपलब्ध फॉर्म्युलेशन',
+    inputsCategoryAll: 'सर्व इनपुट्स',
+    inputsCategoryFertilizers: 'खत आणि पोषक घटक',
+    inputsCategoryPesticides: 'किटकनाशक आणि संरक्षण',
+    inputsCategoryBioInputs: 'बायो-इन्पुट्स आणि स्टिमुलंट्स',
+    inputsGovtSubsidized: 'सरकारी अनुदान',
+    inputsStandardUnit: 'मानक युनिट:',
+    inputsIndicativeRate: 'संकेतिक दर',
+    inputsComposition: 'संरचना:',
+    inputsDosage: 'प्रयोग / डोस:',
+    inputsDistributorHubs: 'वितरक हब:',
+    inputsProcure: 'खरेदी / विक्री →',
+    inputsListStock: 'स्टॉक सूची करा / विक्री →',
+    inputsConnectingCatalog: 'इनपुट कॅटलॉगशी जोडले जात आहे...',
+    inputProcurementTitle: 'प्रत्यक्ष इनपुट खरेदी',
+    inputProcureItem: '{item} खरेदी करा',
+    inputUnitRate: 'युनिट दर:',
+    inputDistributors: 'वितरक:',
+    inputOrderQuantity: 'ऑर्डर मात्रा (युनिट्स) *',
+    inputCalculatedTotal: 'गणना केलेली एकूण रक्कम (₹)',
+    inputDeliveryDistrict: 'डिलिव्हरी जिल्हा / एफपीओ डिपो',
+    inputCancel: 'रद्द करा',
+    inputConfirmProcurement: 'खरेदी ऑर्डरची पुष्टी करा →',
+    diagSourceSample: 'नमुना',
+    diagSourceUpload: 'अपलोड',
+    diagSourceUrl: 'इमेज URL',
+    diagChooseLeaf: 'पानाची फोटो निवडा',
+    diagUploadFormats: 'JPEG, PNG, किंवा WebP',
+    diagNoImage: 'कोणतीही इमेज निवडलेली नाही',
+    diagSpecimenReady: 'सॅम्पल तयार',
+    diagCropHint: 'पीक संकेत',
+    diagAutoDetect: 'पीक आपोआप ओळखा',
+    diagFieldNotes: 'फील्ड नोट्स',
+    diagOptionalSymptoms: 'पर्यायी लक्षणे',
+    diagLoad: 'लोड',
+    diagSampleTomatoLeaf: 'सॅम्पल टमाटर पान वापरा',
+    diagQuickCheck: 'त्वरित सेवा कनेक्शन तपासणी',
+    diagAnalyze: 'क्रॉप डॉक्टर एआयद्वारे निदान करा',
+    diagAnalyzing: 'सॅम्पलचे विश्लेषण होत आहे...',
+    diagDiagnosisTitle: 'प्रशिक्षित मॉडेल निदान',
+    diagConfidence: 'विश्वास',
+    diagTreatmentProtocol: 'उपचार प्रोटोकॉल',
+    diagRecommendedInputs: 'शिफारस केलेले इनपुट',
+    diagTopCandidates: 'सर्वात मजबूत मॉडेल उमेदवार',
+    diagEmptyStateTitle: 'तुमचे निदान येथे दिसेल',
+    diagEmptyStateText: 'पानाची इमेज निवडा, नंतर प्रशिक्षित व्हिजन मॉडेल चालवा.',
+    communityNewDiscussion: '+ नवीन चर्चा',
+    communitySearchPlaceholder: 'विषय, पीक किंवा उपाय शोधा...',
+    communityCommodity: 'कमोडिटी:',
+    communityAllCommodities: 'सर्व कमोडिटीज',
+    communityAllTopics: 'सर्व विषय',
+    communityFarmerQueries: 'शेतकरी प्रश्न',
+    communityBuyerNotices: 'खरेदीदार नोटिस',
+    communityAgronomistProtocols: 'कृषी तज्ञ प्रोटोकॉल',
+    communityClear: 'क्लियर',
+    communityReply: 'प्रतिक्रिया',
+    communityAddReply: 'तुमची प्रतिक्रिया किंवा उपाय जोडा...',
+    communityNoDiscussions: 'कोणतीही चर्चा सापडली नाही',
+    communityNoDiscussionsSub: 'नवीन चौकशी किंवा खरेदी आवश्यकता पोस्ट करून चर्चा सुरू करा.',
+    communityReplyCount: 'प्रतिक्रिया',
+    communityReplyCountPlural: 'प्रतिक्रिया',
+    supportSectionTitle: 'सलाहकार, सरकारी केव्हीके आणि मदत नकाशा',
+    supportSectionSubtitle: 'प्रमाणित कृषि विस्तार अधिकारी, प्रमाणित पीक रोगतज्ञ, जिल्हा केव्हीके संशोधन केंद्र, NABL माती तपासणी केंद्र आणि 24x7 शेतकरी आपत्कालीन हेल्पलाइन.',
+    supportCenters: 'केव्हीके केंद्रे',
+    supportAgronomists: 'प्रमाणित कृषिशास्त्रज्ञ',
+    supportSoilLabs: 'माती व तपासणी प्रयोगशाळा',
+    supportSearchPlaceholder: 'सलाहकार, केव्हीके, माती प्रयोगशाळा किंवा सेवा शोधा...',
+    supportRadarViewLabel: 'प्रादेशिक सहाय्य मानचित्रण',
+    supportRadarSubtitle: '25 किमी क्लस्टर त्रिज्येतील सक्रिय सहाय्य नोड्स',
+    supportMapSubtitle: 'लाइव Google नकाशा',
+    supportRadarViewBtn: 'रेडर दृश्य',
+    supportGoogleMapBtn: 'Google Maps लाइव्ह',
+    supportYourFarm: 'तुमचे शेत',
+    supportOpenMap: 'Google Maps अॅपमध्ये उघडा →',
+    supportLead: 'प्रमुख:',
+    supportHours: 'वेळ:',
+    supportCallDesk: 'कॉल डेस्क:',
+    supportGoogleMapAction: 'Google नकाशा →',
+    ordersTradeDeals: 'ट्रेड डील्स आणि एस्क्रो सेटलमेंट डेस्क',
+    ordersStatusAll: 'सर्व ऑर्डर',
+    ordersStatusInTransit: 'इन ट्रान्झिट',
+    ordersStatusEscrowProtected: 'एस्क्रो सुरक्षित',
+    ordersStatusCompleted: 'पूर्ण आणि वितरित',
+    ordersStatusDisputed: 'विवादित',
+    ordersPlacedOn: 'राखले',
+    ordersContracts: 'ट्रेड कॉन्ट्रॅक्ट्स',
+    ordersCounterpart: 'सहभागी:',
+    ordersDestination: 'गंतव्य:',
+    ordersTrack: 'ऑर्डर प्रगती पहा →',
+    ordersReleaseEscrow: 'एस्क्रो रिलीझ करा',
+    ordersRaiseDispute: 'विवाद / विसंगती उठवा',
+    ordersNoOrders: 'कोणतेही सक्रिय ऑर्डर नाहीत.',
+    shopSectionTitle: 'माझी दुकान आणि उत्पादन सूची',
+    shopSectionSubtitle: 'तुमची Harvest सूची, उपलब्ध स्टॉक, युनिट किंमत आणि थेट खरेदीदार ऑफर्स व्यवस्थापित करा.',
+    shopAddProduce: '+ दुकानमध्ये उत्पादन जोडा',
+    shopActiveListings: 'सक्रिय लिस्टिंग',
+    shopOnlineBuyers: 'खरेदीदारांसाठी ऑनलाइन',
+    shopTotalHarvestStock: 'एकूण फसल स्टॉक',
+    shopReadyStorage: 'सिलो / कोल्ड स्टोरेजमध्ये तयार',
+    shopSalesRevenue: 'विक्री उत्पन्न',
+    shopCompletedEscrow: 'एस्क्रोद्वारे पूर्ण',
+    shopPendingEscrow: 'प्रलंबित एस्क्रो',
+    shopUnderInspection: 'गुणवत्ता तपासणीमध्ये',
+    shopInventoryTitle: 'स्टोरफ्रंट उत्पादन इन्व्हेंटरी',
+    shopCommodity: 'कमोडिटी',
+    shopQualityGrade: 'गुणवत्ता ग्रेड',
+    shopStockSilo: 'सिलोमध्ये स्टॉक',
+    shopUnitPrice: 'दुकान युनिट किंमत',
+    shopStorageHub: 'स्टोरेज हब',
+    shopInquiries: 'पडताळणी',
+    shopStatus: 'स्थिती',
+    shopActions: 'क्रिया',
+    shopPauseListing: 'लिस्टिंग थांबवा',
+    shopActivate: 'सक्रिय करा',
+    shopBuyerOffersTitle: 'प्रत्यक्ष खरेदीदार खरेदी ऑफर आणि बोली',
+    shopBuyerOffersSubtitle: 'संस्थात्मक खरेदीदार मोठ्या प्रमाणात खरेदीसाठी हमीबद्ध एस्क्रॉ ठेवणूकसह विनंती करत आहेत.',
+    shopPending: 'प्रलंबित',
+    authSignInTitle: 'आपल्या खात्यात साइन इन करा',
+    authCreateTitle: 'खाते तयार करा',
+    authSignIn: 'साइन इन',
+    authCreate: 'खाते तयार करा',
+    authFullName: 'पूर्ण नाव',
+    authMobile: 'मोबाइल नंबर',
+    authEmail: 'ईमेल पत्ता',
+    authPassword: 'पासवर्ड',
+    authQuickDemo: 'त्वरित डेमो लॉगिन:',
+    authGuest: 'अतिथी म्हणून ब्राउझिंग सुरू ठेवा',
+    authFarmer: 'शेतकरी / उत्पादक',
+    authBuyer: 'खरेदीदार / व्यापारी',
+    authBackMarketplace: 'बाजारावर परत',
+    signOut: 'साइन आउट',
+    heroEyebrow: 'कमोडिटी स्पॉट आणि कॉन्ट्रॅक्ट एक्सचेंज',
+    heroTitle: 'KisanLink बाजार',
+    heroCopy: 'लाइव बाजार आगमन दर, थेट शेतकरी कापणी यादी आणि पारदर्शक ट्रेड एस्क्रोसह शेती इन्पुट्स.',
+    panelPriceDiscovery: 'भाव शोध',
+    panelMarketPulse: 'बाजार पल्स आणि 7-दिवसीय हालचाल',
+    panelAnalytics: 'बाजार विश्लेषण',
+    panelQuickTrading: 'त्वरित ट्रेडिंग',
+    panelInstantLinkage: 'तुरळक उत्पादन जोडणी',
+    panelActiveBoard: 'सक्रिय कमोडिटी बोर्ड',
+    panelCommodities: 'कमोडिटी आणि लाइव मार्केट रेट',
+    panelSearchPlaceholder: 'नाव किंवा श्रेणीने कमोडिटी शोधा...',
+    sortLabel: 'क्रमवारी:',
+    mostActive: 'सर्वात सक्रिय',
+    priceLowHigh: 'भाव: कमी ते जास्त',
+    priceHighLow: 'भाव: जास्त ते कमी',
+    nameAToZ: 'नाव: अ ते झ',
+    viewPredictions: 'एमएल अंदाज पाहा →',
+    sellProduceLot: '+ उत्पादन lot विका →',
+    postBuyRequirement: '+ खरेदी आवश्यकता पोस्ट करा →',
+    sellProduce: '+ उत्पादन विका',
+    postBuyOrder: '+ खरेदी ऑर्डर पोस्ट करा',
+    loadingMarket: 'बाजार भाव लोड होत आहे...',
+    selectedCrop: 'निवडलेले पीक',
+    produceUnit: 'उत्पादन',
+    marketRange: 'बाजार श्रेणी',
+    labelNotifications: 'सूचना आणि फील्ड डिस्पॅच',
+    labelProfile: 'अकाउंट आणि लोकेशन प्रोफाइल',
+    guestAccess: 'अतिथी प्रवेश',
+    notificationsStatus: 'सिंक होत आहे',
+    sectionProfileHeader: 'अकाउंट आणि लोकेशन प्रोफाइल',
+    profileEmail: 'ईमेल',
+    profileRole: 'भूमिका',
+    profileId: 'प्रोफाइल आयडी',
+    profileBusinessName: 'व्यवसायाचे नाव',
+    profileBusinessType: 'व्यवसाय प्रकार',
+    profileAddress: 'पत्ता / गाव',
+    profileDistrict: 'जिल्हा',
+    profileState: 'राज्य',
+    profileLatitude: 'अक्षांश',
+    profileLongitude: 'रेखांश',
+    profileAlertContacts: 'अलर्ट आणि सूचना संपर्क',
+    profileMobileWhatsApp: 'मोबाइल / व्हॉट्सअॅप नंबर',
+    profileAlertEmail: 'अलर्ट ईमेल',
+    profileSave: 'प्रोफाइल सेव करा आणि GPS सिंक करा',
+    profileRouting: 'सूचना रूटिंग',
+    profileWhatsApp: 'व्हॉट्सअॅप',
+    profileSms: 'एसएमएस',
+    profileEmailLabel: 'ईमेल',
+    profileInApp: 'इन-ऐप',
+    profileOpenDispatch: 'फील्ड डिस्पॅच सेंटर उघडा',
+    ordersHeader: 'माझ्या ऑर्डर्स आणि खरेदी',
+    myShopHeader: 'माझी दुकान आणि उत्पादन सूची',
+    orderProgressHeader: 'ऑर्डर प्रगती',
+    notificationsEyebrow: 'बाजार गतिविधी आणि सिग्नल',
+    markAllRead: 'सर्व वाचले',
+    unreadLabel: 'न वाचलेले',
+    fieldAlerts: 'फील्ड अलर्ट',
+    inAppFeed: 'इन-ऐप डेस्क फीड',
+    smsDispatch: 'एसएमएस आणि व्हॉट्सअॅप फील्ड डिस्पॅच',
+    noNotifications: 'अजून कोणतीही सूचना नाही.',
+    noFieldAlerts: 'अजून कोणतेही फील्ड अलर्ट पाठविले गेले नाही. चाचणी पाठवण्यासाठी वरील फॉर्म वापरा.',
+    communitySection: 'शेतकरी समुदाय',
+    communityEyebrow: 'बाजार एक्सचेंज आणि सल्ला',
+    cropDoctorSection: 'क्रॉप डॉक्टर एआई',
+    diagnosisIntro: 'उपचार सूचना मिळवण्यासाठी साफ पानाच्या फोटो अपलोड करा.',
+    catAllItems: 'सर्व वस्तू',
+    catVegetables: 'भाज्या',
+    catFruits: 'फळे',
+    catGrains: 'धान्य',
+    catPulses: 'डाळी',
+    catSeeds: 'बिया',
+    catSpices: 'मसाले',
+    catOilSeeds: 'तेलबिया',
+    catFertilizers: 'खत आणि पोषक घटक',
+    catPesticides: 'किटकनाशक आणि संरक्षण',
+    catBioInputs: 'बायो-इन्पुट्स आणि स्टिमुलंट्स',
+    catEquipment: 'उपकरण आणि साधने',
+    catOther: 'इतर',
+    prodSubsidized: 'अनुदानित रासायनिक खत',
+    prodRootDev: 'मुळ विकास आणि सुरुवातीचा विकास',
+    prodAllStage: 'सर्व-स्तरीय वनस्पती विकास',
+    prodOrganic: 'जैविक मातीचे पुनरुज्जीवन',
+    prodPestResist: 'कीट प्रतिरोध आणि कंद/फळांची गुणवत्ता',
+    prodPhosSulph: 'फॉस्फोरस + सल्फर पूरक',
+    prodBioPesticide: 'जैविक किटकनाशक (शून्य रासायनिक अवशेष)',
+    prodContactInsect: 'संपर्क आणि अंतर्ग्रहण किटकनाशक',
+    prodFungicide: 'व्यापक स्पेक्ट्रम सुरक्षात्मक बुरशीनाशी',
+    prodBioControl: 'पर्यावरण अनुकूल जैव-नियंत्रण',
+    prodSystemic: 'प्रणालीगत चूषक कीट नियंत्रक',
+    prodStimulant: 'तणाव सहनशीलता आणि पौधे जीवनीयता वर्धक',
+    prodNitrogenFixer: 'जैविक नायट्रोजन फिक्सर (25% यूरिया बचवते)',
+    prodPhosUnlock: 'अविद्रव्य मातीचा फॉस्फोरस अनलॉक करते',
+    prodSpraying: 'अचूक फवारणी आणि श्रम बचत उपकरण',
+    prodMicroIrrigation: 'सूक्ष्म-सिंचन जल संरक्षण',
+    prodIPM: 'एकीकृत कीट व्यवस्थापन (IPM)',
+    prodPostHarvest: 'कापणीनंतर संरक्षण कव्हर',
+    diseaseEarlyBlight: 'टोमॅटो Early Blight',
+    diseaseLateBlight: 'बटाटा Late Blight',
+    diseaseBlast: 'तांदूळ / भात Blast',
+    diseaseRust: 'गहू Rust (नारंगी Pustules)',
+    diseaseLeafCurl: 'मिरची Leaf Curl Virus',
+    diseaseWhiteRust: 'सरसाप White Rust & Aphids',
+    diseaseMildew: 'Powdery Mildew',
+    diseaseChlorosis: 'नायट्रोजन पिलुपणा (Chlorosis)',
+    diseaseBorer: 'Caterpillar / Armyworm Borer',
+    supportGovtKVK: 'सरकारी KVK संशोधन स्टेशन',
+    supportAgronomist: 'प्रमाणित कृषिशास्त्रज्ञ',
+    supportSoilLab: 'मातीची तपासणी प्रयोगशाळा',
+    supportHelpline: 'राष्ट्रीय 24x7 हेल्पलाइन',
+    supportFPO: 'शेतकरी निर्माता संस्था',
+    supportDesignKVK: 'जिल्ह्याचे कृषी विस्तार आणि संशोधन केंद्र',
+    supportDesignAgro: 'बागेतील आणि रोग विशेषज्ञ',
+    supportDesignLab: 'प्रमाणित पोषक आणि सूक्ष्मपोषक प्रयोगशाळा',
+    supportDesignHelp: 'स्थानिक भाषांमध्ये मुक्त कृषी सल्ला',
+    supportDesignFPO: 'मोठ्या प्रमाणात एकत्रीकरण आणि कोल्ड स्टोरेज हब',
+    supportDesignIPM: 'एकीकृत कीट व्यवस्थापन (IPM) विशेषज्ञ',
+    supportServiceSoil: 'मातीचे आरोग्य तपासणी',
+    supportServiceSeed: 'प्रमाणित बीज वितरण',
+    supportServicePathology: 'मुक्त पीक रोग निदान',
+    supportServiceKisan: 'PM-किसान डेस्क',
+    supportServiceBlight: 'टोमॅटो आणि मिरची Blight उपचार',
+    supportServiceSpray: 'फवारणी कॅलिब्रेशन आणि PHI',
+    supportServiceBioInput: 'जैविक इन्पुट शासन',
+    supportServiceNPK: 'NPK आणि सूक्ष्मपोषक प्रोफाइलिंग',
+    supportServiceSalinity: 'EC आणि pH लवणता तपासणी',
+    supportServiceCards: 'अनुदानित मातीचे आरोग्य कार्ड (₹20/नमुना)',
+    supportServiceEmergency: 'आपातकालीन कीट हल्ल्याचा सल्ला',
+    supportServiceMSP: 'MSP आणि बाजार योजना माहिती',
+    supportServiceWeather: 'हवामान आपत्ती चेतावणी',
+    supportServiceDialects: 'हिंदी आणि क्षेत्रीय बोली',
+    supportServiceBuyer: 'थेट खरेदीदार एकत्रीकरण',
+    supportServiceCooling: 'प्री-कूलिंग आणि कोल्ड चेन',
+    supportServiceGrading: 'निर्यात गुणवत्ता ग्रेडिंग',
+    supportServiceInputs: 'सामूहिक इन्पुट खरेदी',
+    supportServicePheromone: 'फेरोमोन जाल आणि जैव-नियंत्रण',
+    supportServiceThrips: 'थ्रिप्स आणि व्हाइटफ्लाई उपचार',
+    supportServiceCertif: 'अवशेष-मुक्त प्रमाणन',
+  },
+};
+
 const CATEGORIES = [
   { value: 'ALL', label: 'All Items' },
   { value: 'VEGETABLE', label: 'Vegetables' },
@@ -19,7 +987,84 @@ const CATEGORIES = [
   { value: 'OTHER', label: 'Other' },
 ];
 
+// Translation helper for category, product type, disease, and support text
+const getLocalizedText = (textKey, language = 'en') => {
+  const textMap = {
+    // Categories
+    'All Items': { en: 'All Items', hi: 'सभी आइटम', mr: 'सर्व वस्तू' },
+    'Vegetables': { en: 'Vegetables', hi: 'सब्जियां', mr: 'भाज्या' },
+    'Fruits': { en: 'Fruits', hi: 'फल', mr: 'फळे' },
+    'Grains': { en: 'Grains', hi: 'अनाज', mr: 'धान्य' },
+    'Pulses': { en: 'Pulses', hi: 'दालें', mr: 'डाळी' },
+    'Seeds': { en: 'Seeds', hi: 'बीज', mr: 'बिया' },
+    'Spices': { en: 'Spices', hi: 'मसाले', mr: 'मसाले' },
+    'Oil Seeds': { en: 'Oil Seeds', hi: 'तिलहन', mr: 'तेलबिया' },
+    'Fertilizers': { en: 'Fertilizers', hi: 'खाद और पोषक तत्व', mr: 'खत आणि पोषक घटक' },
+    'Pesticides': { en: 'Pesticides', hi: 'कीटनाशक और सुरक्षा', mr: 'किटकनाशक आणि संरक्षण' },
+    'Bio-Inputs': { en: 'Bio-Inputs', hi: 'बायो-इनपुट्स और स्टिमुलेंट्स', mr: 'बायो-इन्पुट्स आणि स्टिमुलंट्स' },
+    'Equipment & Tools': { en: 'Equipment & Tools', hi: 'उपकरण और उपकरण', mr: 'उपकरण आणि साधने' },
+    'Other': { en: 'Other', hi: 'अन्य', mr: 'इतर' },
+    
+    // Product Types
+    'Subsidized Chemical Fertilizer': { en: 'Subsidized Chemical Fertilizer', hi: 'अनुदानित रासायनिक खाद', mr: 'अनुदानित रासायनिक खत' },
+    'Root Development & Early Growth': { en: 'Root Development & Early Growth', hi: 'रूट विकास और प्रारंभिक विकास', mr: 'मुळ विकास आणि सुरुवातीचा विकास' },
+    'All-Stage Vegetative Growth': { en: 'All-Stage Vegetative Growth', hi: 'सभी-चरण वनस्पति विकास', mr: 'सर्व-स्तरीय वनस्पती विकास' },
+    'Organic Soil Rejuvenation': { en: 'Organic Soil Rejuvenation', hi: 'जैव मिट्टी कायाकल्प', mr: 'जैविक मातीचे पुनरुज्जीवन' },
+    'Pest Resistance & Tuber/Fruit Quality': { en: 'Pest Resistance & Tuber/Fruit Quality', hi: 'कीट प्रतिरोध और कंद/फल गुणवत्ता', mr: 'कीट प्रतिरोध आणि कंद/फळांची गुणवत्ता' },
+    'Phosphorus + Sulphur Supplement': { en: 'Phosphorus + Sulphur Supplement', hi: 'फास्फोरस + सल्फर पूरक', mr: 'फॉस्फोरस + सल्फर पूरक' },
+    'Organic Bio-Pesticide (Zero Chemical Residue)': { en: 'Organic Bio-Pesticide (Zero Chemical Residue)', hi: 'जैव कीटनाशक (शून्य रासायनिक अवशेष)', mr: 'जैविक किटकनाशक (शून्य रासायनिक अवशेष)' },
+    'Contact & Ingestion Insecticide': { en: 'Contact & Ingestion Insecticide', hi: 'संपर्क और अंतर्ग्रहण कीटनाशक', mr: 'संपर्क आणि अंतर्ग्रहण किटकनाशक' },
+    'Broad-Spectrum Protective Fungicide': { en: 'Broad-Spectrum Protective Fungicide', hi: 'व्यापक स्पेक्ट्रम सुरक्षात्मक कवकनाशी', mr: 'व्यापक स्पेक्ट्रम सुरक्षात्मक बुरशीनाशी' },
+    'Eco-Friendly Bio-Control of Root Rot & Wilt': { en: 'Eco-Friendly Bio-Control of Root Rot & Wilt', hi: 'पर्यावरण के अनुकूल जैव-नियंत्रण', mr: 'पर्यावरण अनुकूल जैव-नियंत्रण' },
+    'Systemic Sucking Pest Controller': { en: 'Systemic Sucking Pest Controller', hi: 'प्रणालीगत चूसने वाले कीट नियंत्रक', mr: 'प्रणालीगत चूषक कीट नियंत्रक' },
+    'Stress Tolerance & Plant Vigor Enhancer': { en: 'Stress Tolerance & Plant Vigor Enhancer', hi: 'तनाव सहिष्णुता और पौधे की जीवंतता बढ़ाने वाला', mr: 'तणाव सहनशीलता आणि पौधे जीवनीयता वर्धक' },
+    'Biological Nitrogen Fixer (Saves 25% Urea)': { en: 'Biological Nitrogen Fixer (Saves 25% Urea)', hi: 'जैविक नाइट्रोजन फिक्सर (25% यूरिया बचाता है)', mr: 'जैविक नायट्रोजन फिक्सर (25% यूरिया बचवते)' },
+    'Unlocks Insoluble Soil Phosphorus': { en: 'Unlocks Insoluble Soil Phosphorus', hi: 'अघुलनशील मिट्टी फास्फोरस अनलॉक करता है', mr: 'अविद्रव्य मातीचा फॉस्फोरस अनलॉक करते' },
+    'Precision Spraying & Labor Saving Equipment': { en: 'Precision Spraying & Labor Saving Equipment', hi: 'सटीक छिड़काव और श्रम बचत उपकरण', mr: 'अचूक फवारणी आणि श्रम बचत उपकरण' },
+    'Micro-Irrigation Water Conservation': { en: 'Micro-Irrigation Water Conservation', hi: 'सूक्ष्म-सिंचाई जल संरक्षण', mr: 'सूक्ष्म-सिंचन जल संरक्षण' },
+    'Integrated Pest Management (IPM)': { en: 'Integrated Pest Management (IPM)', hi: 'एकीकृत कीट प्रबंधन (IPM)', mr: 'एकीकृत कीट व्यवस्थापन (IPM)' },
+    'Post-Harvest Protection Cover': { en: 'Post-Harvest Protection Cover', hi: 'कटाई के बाद सुरक्षा कवर', mr: 'कापणीनंतर संरक्षण कव्हर' },
+    
+    // Disease Labels  
+    'Tomato Early Blight': { en: 'Tomato Early Blight', hi: 'टमाटर अर्ली ब्लाइट', mr: 'टोमॅटो Early Blight' },
+    'Potato Late Blight': { en: 'Potato Late Blight', hi: 'आलू लेट ब्लाइट', mr: 'बटाटा Late Blight' },
+    'Rice / Paddy Blast': { en: 'Rice / Paddy Blast', hi: 'चावल / धान ब्लास्ट', mr: 'तांदूळ / भात Blast' },
+    'Wheat Rust (Orange Pustules)': { en: 'Wheat Rust (Orange Pustules)', hi: 'गेहूं रस्ट (नारंगी पुस्टुल)', mr: 'गहू Rust (नारंगी Pustules)' },
+    'Chilli Leaf Curl Virus': { en: 'Chilli Leaf Curl Virus', hi: 'मिर्च लीफ कर्ल वायरस', mr: 'मिरची Leaf Curl Virus' },
+    'Mustard White Rust & Aphids': { en: 'Mustard White Rust & Aphids', hi: 'सरसों व्हाइट रस्ट और एफिड्स', mr: 'सरसाप White Rust & Aphids' },
+    'Powdery Mildew': { en: 'Powdery Mildew', hi: 'पाउडरी मिल्ड्यू', mr: 'Powdery Mildew' },
+    'Nitrogen Yellowing (Chlorosis)': { en: 'Nitrogen Yellowing (Chlorosis)', hi: 'नाइट्रोजन पीलापन (क्लोरोसिस)', mr: 'नायट्रोजन पिलुपणा (Chlorosis)' },
+    'Caterpillar / Armyworm Borer': { en: 'Caterpillar / Armyworm Borer', hi: 'कैटरपिलर / आर्मीवर्म बोरर', mr: 'Caterpillar / Armyworm Borer' },
+    
+    // Severity Levels
+    'MILD': { en: 'Mild', hi: 'हल्का', mr: 'हल्का' },
+    'MODERATE': { en: 'Moderate', hi: 'मध्यम', mr: 'मध्यम' },
+    'SEVERE': { en: 'Severe', hi: 'गंभीर', mr: 'गंभीर' },
+    
+    // Support Services
+    'Soil Health Testing': { en: 'Soil Health Testing', hi: 'मिट्टी स्वास्थ्य परीक्षण', mr: 'मातीचे आरोग्य परीक्षण' },
+    'Certified Seed Distribution': { en: 'Certified Seed Distribution', hi: 'प्रमाणित बीज वितरण', mr: 'प्रमाणित बीज वितरण' },
+    'Free Crop Pathology Diagnosis': { en: 'Free Crop Pathology Diagnosis', hi: 'फसल रोग निदान सेवा', mr: 'फसल रोग निदान सेवा' },
+    'PM-Kisan Desk': { en: 'PM-Kisan Desk', hi: 'PM-किसान डेस्क', mr: 'PM-किसान डेस्क' },
+    'Tomato & Chilli Blight Remediation': { en: 'Tomato & Chilli Blight Remediation', hi: 'टमाटर और मिर्च ब्लाइट उपचार', mr: 'टोमॅटो आणि मिरची Blight उपचार' },
+    'Spray Calibration & PHI': { en: 'Spray Calibration & PHI', hi: 'स्प्रे कैलिब्रेशन और PHI', mr: 'स्प्रे कॅलिब्रेशन आणि PHI' },
+    'Organic Bio-Input Regimes': { en: 'Organic Bio-Input Regimes', hi: 'जैविक इनपुट योजना', mr: 'जैविक इनपुट योजना' },
+    'NPK & Micronutrient Profiling': { en: 'NPK & Micronutrient Profiling', hi: 'NPK और सूक्ष्म पोषक प्रोफाइलिंग', mr: 'NPK आणि मायक्रोन्यूट्रिएंट प्रोफाइलिंग' },
+    'EC & pH Salinity Testing': { en: 'EC & pH Salinity Testing', hi: 'EC और pH लवणता परीक्षण', mr: 'EC आणि pH खारटपणा परीक्षण' },
+    'Subsidized Soil Health Cards (₹20/sample)': { en: 'Subsidized Soil Health Cards (₹20/sample)', hi: 'अनुदानित मिट्टी स्वास्थ्य कार्ड (₹20/नमूना)', mr: 'अनुदानित मातीचे आरोग्य कार्ड (₹20/नमूना)' },
+    '24x7 Farmer Distress Hotline': { en: '24x7 Farmer Distress Hotline', hi: '24x7 किसान परेशानी हेल्पलाइन', mr: '24x7 शेतकरी संकट हेल्पलाइन' },
+    'Emergency Pest/Disease Advisory': { en: 'Emergency Pest/Disease Advisory', hi: 'आपातकालीन कीट/रोग सलाह', mr: 'आपातकालीन कीट/रोग सूचना' },
+    'Subsidized Pesticide-Fertilizer Info': { en: 'Subsidized Pesticide-Fertilizer Info', hi: 'अनुदानित कीटनाशक-खाद जानकारी', mr: 'अनुदानित किटकनाशक-खत माहिती' },
+  };
+
+  if (textMap[textKey] && textMap[textKey][language]) {
+    return textMap[textKey][language];
+  }
+  return textKey; // Fallback to original text if no translation found
+};
+
 const AGRI_INPUT_SPECS = {
+
   'Urea (Neem Coated 46% N)': {
     category: 'FERTILIZER',
     composition: '46% Nitrogen (Neem Coated for slow release)',
@@ -967,14 +2012,16 @@ function App() {
   // Crop Doctor AI Diagnostics State
   const [imageInputMode, setImageInputMode] = useState('sample'); // 'sample' | 'upload' | 'url'
   const [diagnosticForm, setDiagnosticForm] = useState({
-    cropName: 'Tomato',
+    cropName: '',
     cropId: null,
     imageUrl: 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=600&auto=format&fit=crop',
     notes: 'Concentric dark target rings with yellow chlorotic halos on bottom leaves.'
   });
+  const [previewImageUrl, setPreviewImageUrl] = useState('https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=900&auto=format&fit=crop');
   const [diagnosticResult, setDiagnosticResult] = useState(null);
   const [diagnosticHistory, setDiagnosticHistory] = useState([]);
   const [diagnosticLoading, setDiagnosticLoading] = useState(false);
+  const [diagnosticFile, setDiagnosticFile] = useState(null);
   const [diagnosticImageFeatures, setDiagnosticImageFeatures] = useState(null);
   const [escalateModalReport, setEscalateModalReport] = useState(null);
   const [escalationNotes, setEscalationNotes] = useState('');
@@ -1059,7 +2106,146 @@ function App() {
   const [role, setRole] = useState('FARMER');
   const [account, setAccount] = useState({ name: '', email: '', password: '', phone: '' });
   const [authLoading, setAuthLoading] = useState(false);
-  const [session, setSession] = useState(() => JSON.parse(localStorage.getItem('kisanlinkSession') || 'null'));
+  const [session, setSession] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('kisanlinkSession') || 'null');
+      if (stored && stored.name) {
+        stored.name = stored.name.replace(/\s*\((farmer|buyer|agrotech)[^)]*\)/gi, '').trim();
+      }
+      return stored;
+    } catch {
+      return null;
+    }
+  });
+  const [language, setLanguage] = useState(() => {
+    try {
+      return localStorage.getItem('kisanlinkLanguage') || 'en';
+    } catch {
+      return 'en';
+    }
+  });
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [tutorialFocusRect, setTutorialFocusRect] = useState(null);
+  const tutorialRefs = useRef({ language: null, market: null, sidebarMarket: null, notifications: null, profile: null, diagnostics: null });
+  const tutorialScrollLockRef = useRef(false);
+  const tutorialLastRectRef = useRef(null);
+
+  const text = LANGUAGE_TEXT[language] || LANGUAGE_TEXT.en;
+  const tutorialTargets = [
+    { key: 'market', title: text.tutorialStep1Title, description: text.tutorialStep1Text },
+    { key: 'sidebarMarket', title: text.tutorialStep2Title, description: text.tutorialStep2Text },
+    { key: 'diagnostics', title: text.tutorialStep3Title, description: text.tutorialStep3Text },
+    { key: 'language', title: text.tutorialStep4Title, description: text.tutorialStep4Text },
+    { key: 'notifications', title: text.tutorialStep5Title, description: text.tutorialStep5Text },
+    { key: 'profile', title: text.tutorialStep6Title, description: text.tutorialStep6Text },
+  ];
+
+  useEffect(() => {
+    if (!showTutorial) return;
+
+    const targetKey = tutorialTargets[tutorialStep]?.key;
+    if (!targetKey) {
+      setTutorialFocusRect(null);
+      tutorialScrollLockRef.current = false;
+      tutorialLastRectRef.current = null;
+      return;
+    }
+
+    if (targetKey === 'market' || targetKey === 'sidebarMarket') {
+      setCurrentView('prices');
+    }
+    if (targetKey === 'diagnostics') {
+      setCurrentView('diagnostics');
+    }
+    if (targetKey === 'notifications') {
+      setCurrentView('notifications');
+    }
+    if (targetKey === 'profile') {
+      setCurrentView('profile');
+    }
+
+    let rafId = null;
+    let resizeObserver = null;
+
+    const updateFocusRect = () => {
+      const node = tutorialRefs.current[targetKey];
+      if (!node) {
+        setTutorialFocusRect(null);
+        return;
+      }
+
+      const rect = node.getBoundingClientRect();
+      const nextRect = {
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height
+      };
+
+      const prevRect = tutorialLastRectRef.current;
+      const changed = !prevRect ||
+        Math.abs(prevRect.left - nextRect.left) > 1 ||
+        Math.abs(prevRect.top - nextRect.top) > 1 ||
+        Math.abs(prevRect.width - nextRect.width) > 1 ||
+        Math.abs(prevRect.height - nextRect.height) > 1;
+
+      if (changed) {
+        setTutorialFocusRect(nextRect);
+        tutorialLastRectRef.current = nextRect;
+      }
+
+      const shouldScroll = rect.top < 40 || rect.bottom > window.innerHeight - 40;
+      if (shouldScroll) {
+        if (!tutorialScrollLockRef.current) {
+          node.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+          tutorialScrollLockRef.current = true;
+        }
+      } else {
+        tutorialScrollLockRef.current = false;
+      }
+    };
+
+    const scheduleUpdate = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = window.requestAnimationFrame(() => {
+        updateFocusRect();
+        rafId = null;
+      });
+    };
+
+    updateFocusRect();
+    scheduleUpdate();
+
+    const onResize = () => scheduleUpdate();
+    const onScroll = () => scheduleUpdate();
+
+    window.addEventListener('resize', onResize);
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    const node = tutorialRefs.current[targetKey];
+    if (node && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => scheduleUpdate());
+      resizeObserver.observe(node);
+    }
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      if (resizeObserver) resizeObserver.disconnect();
+      tutorialScrollLockRef.current = false;
+      tutorialLastRectRef.current = null;
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('scroll', onScroll, { passive: true });
+    };
+  }, [showTutorial, tutorialStep, language]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('kisanlinkLanguage', language);
+    } catch {
+      // ignore storage errors
+    }
+  }, [language]);
 
 
   // Farmer produce state
@@ -1677,6 +2863,7 @@ function App() {
       localStorage.setItem('kisanlinkToken', data.token);
       localStorage.setItem('kisanlinkSession', JSON.stringify(data));
       setSession(data);
+      triggerFirstTimeTutorial();
       setMessage(`Welcome, ${data.name}! Signed in as ${data.role}.`);
       loadProfileData(data);
     } catch (err) {
@@ -1719,12 +2906,13 @@ function App() {
   function handleQuickLogin(targetRole) {
     setMessage('');
     const demoUser = targetRole === 'FARMER'
-      ? { token: 'demo-farmer-jwt', userId: 1, profileId: 1, name: 'Ramesh Kumar (Farmer)', email: 'farmer@kisanlink.in', role: 'FARMER' }
-      : { token: 'demo-buyer-jwt', userId: 2, profileId: 1, name: 'Priya Sharma (AgroTech)', email: 'buyer@kisanlink.in', role: 'BUYER' };
+      ? { token: 'demo-farmer-jwt', userId: 1, profileId: 1, name: 'Ramesh Kumar', email: 'farmer@kisanlink.in', role: 'FARMER' }
+      : { token: 'demo-buyer-jwt', userId: 2, profileId: 1, name: 'Priya Sharma', email: 'buyer@kisanlink.in', role: 'BUYER' };
 
     localStorage.setItem('kisanlinkToken', demoUser.token);
     localStorage.setItem('kisanlinkSession', JSON.stringify(demoUser));
     setSession(demoUser);
+    triggerFirstTimeTutorial();
     setMessage(`Signed in as ${demoUser.name} (${demoUser.role})`);
   }
 
@@ -1734,6 +2922,20 @@ function App() {
     setSession(null);
     setCurrentView('prices');
     setMessage('You have signed out of your trade desk.');
+  }
+
+  function triggerFirstTimeTutorial() {
+    const seen = localStorage.getItem('kisanlinkTutorialSeen') === 'true';
+    if (!seen || true) {
+      setTutorialStep(0);
+      setShowTutorial(true);
+    }
+  }
+
+  function completeTutorial() {
+    localStorage.setItem('kisanlinkTutorialSeen', 'true');
+    setShowTutorial(false);
+    setTutorialStep(0);
   }
 
   async function saveProduce(event) {
@@ -2232,6 +3434,11 @@ function App() {
   function handleImageFileUpload(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    setDiagnosticFile(file);
+
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewImageUrl(objectUrl);
+    setDiagnosticForm(prev => ({ ...prev, imageUrl: objectUrl }));
 
     const origMb = (file.size / (1024 * 1024)).toFixed(1);
     const reader = new FileReader();
@@ -2274,6 +3481,7 @@ function App() {
           imageUrl: webpDataUrl,
           notes: features?.detectedNote || prev.notes
         }));
+        setPreviewImageUrl(webpDataUrl);
 
         setMessage(`Leaf photo captured & analyzed (${origMb > 0 ? origMb : 4.2}MB -> ${approxKb}KB). Click Diagnose Disease to view report.`);
       };
@@ -2282,12 +3490,62 @@ function App() {
     reader.readAsDataURL(file);
   }
 
+  function resolveDirectImageUrl(inputUrl) {
+    const trimmedUrl = (inputUrl || '').trim();
+    if (!trimmedUrl || !trimmedUrl.startsWith('http')) return null;
+
+    try {
+      const parsed = new URL(trimmedUrl);
+      const candidates = [
+        parsed.searchParams.get('mediaurl'),
+        parsed.searchParams.get('imgurl'),
+        parsed.searchParams.get('imageurl'),
+        parsed.searchParams.get('imgsrc'),
+        parsed.searchParams.get('source'),
+      ];
+
+      for (const candidate of candidates) {
+        if (candidate && candidate.startsWith('http')) return candidate.trim();
+      }
+
+      return trimmedUrl;
+    } catch {
+      return null;
+    }
+  }
+
   function handleLoadImageUrl(url) {
-    if (!url || !url.startsWith('http')) {
+    const resolvedUrl = resolveDirectImageUrl(url);
+    const trimmedUrl = (resolvedUrl || '').trim();
+    if (!trimmedUrl || !trimmedUrl.startsWith('http')) {
       setMessage('Please enter a valid image web address starting with http:// or https://');
       return;
     }
+
+    let parsedUrl;
+    try {
+      parsedUrl = new URL(trimmedUrl);
+    } catch {
+      setMessage('That image URL is invalid. Please paste a direct image link.');
+      return;
+    }
+
+    const isDirectImagePath = /\.(jpe?g|png|webp|gif|bmp|avif)(\?.*)?$/i.test(parsedUrl.pathname);
+    const isCommonImageHost = /images\.unsplash\.com|images\.pexels\.com|cdn\.|cloudfront\.net|amazonaws\.com|githubusercontent\.com|imgur\.com|ibb\.co/i.test(parsedUrl.hostname) || parsedUrl.pathname.includes('/photo-');
+    const isSearchResultPage = /bing\.com\/images|google\..*\/search|search\?q=|imagesearch|imgur\.com\/gallery/i.test(trimmedUrl);
+
+    if (!isDirectImagePath && !isCommonImageHost && !parsedUrl.searchParams.has('mediaurl')) {
+      setMessage('Please use a direct image link, not a search result or webpage. Example: a JPG/PNG/WebP URL from a CDN or photo source.');
+      return;
+    }
+
+    if (isSearchResultPage && !parsedUrl.searchParams.has('mediaurl')) {
+      setMessage('This looks like a search result page, not an actual image file. Use the direct image URL instead.');
+      return;
+    }
+
     const img = new Image();
+    setDiagnosticFile(null);
     img.crossOrigin = 'anonymous';
     img.onload = () => {
       const canvas = document.createElement('canvas');
@@ -2299,16 +3557,18 @@ function App() {
       setDiagnosticImageFeatures(features);
       setDiagnosticForm(prev => ({
         ...prev,
-        imageUrl: url,
+        imageUrl: trimmedUrl,
         notes: features?.detectedNote || prev.notes
       }));
+      setPreviewImageUrl(trimmedUrl);
       setMessage('Image link loaded and visual features analyzed! Click Diagnose Disease.');
     };
     img.onerror = () => {
-      setDiagnosticForm(prev => ({ ...prev, imageUrl: url }));
-      setMessage('Image URL loaded. Ready for diagnosis.');
+      setDiagnosticForm(prev => ({ ...prev, imageUrl: '' }));
+      setPreviewImageUrl('');
+      setMessage('This image could not be loaded. Please use a direct image URL that points to the file itself.');
     };
-    img.src = url;
+    img.src = trimmedUrl;
   }
 
   function openGoogleLensSearch() {
@@ -2593,36 +3853,61 @@ function App() {
     if (e) e.preventDefault();
     setDiagnosticLoading(true);
     try {
-      const authHeaders = session?.token ? { Authorization: `Bearer ${session.token}` } : {};
-      const res = await fetch(`${API_URL}/api/diagnostics/scan`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authHeaders },
-        body: JSON.stringify({
-          farmerId: session?.profileId || null,
-          cropId: diagnosticForm.cropId || null,
-          cropName: diagnosticForm.cropName,
-          imageUrl: diagnosticForm.imageUrl,
-          notes: diagnosticForm.notes
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setDiagnosticResult(data);
-        setDiagnosticHistory(prev => [data, ...prev.filter(d => d.id !== data.id)]);
-        setMessage(`Crop Doctor AI: Diagnosis generated for ${data.cropName} (${data.confidenceScore}% confidence).`);
-      } else {
-        // Fallback to client-side neural inference
-        const fallback = inferClientSideDiagnosis(diagnosticForm.cropName, diagnosticForm.imageUrl, diagnosticForm.notes);
-        setDiagnosticResult(fallback);
-        setDiagnosticHistory(prev => [fallback, ...prev.filter(d => d.id !== fallback.id)]);
-        setMessage(`Crop Doctor (Edge Inference): ${fallback.detectedDisease} (${fallback.confidenceScore}% confidence).`);
-      }
-    } catch {
-      // Local client-side diagnostic fallback when backend is offline
-      const fallback = inferClientSideDiagnosis(diagnosticForm.cropName, diagnosticForm.imageUrl, diagnosticForm.notes);
-      setDiagnosticResult(fallback);
-      setDiagnosticHistory(prev => [fallback, ...prev.filter(d => d.id !== fallback.id)]);
-      setMessage(`Crop Doctor (Edge Inference): ${fallback.detectedDisease} (${fallback.confidenceScore}% match).`);
+      let file = diagnosticFile;
+      const request = file
+        ? (() => {
+            const formData = new FormData();
+            formData.append('file', file);
+            if (diagnosticForm.cropName && diagnosticForm.cropName !== 'Auto-detect crop') {
+              formData.append('crop_hint', diagnosticForm.cropName);
+            }
+            return fetch('http://localhost:8000/predict', { method: 'POST', body: formData });
+          })()
+        : fetch('http://localhost:8000/predict-url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              url: diagnosticForm.imageUrl,
+              crop_hint: diagnosticForm.cropName && diagnosticForm.cropName !== 'Auto-detect crop' ? diagnosticForm.cropName : ''
+            })
+          });
+      const res = await request;
+      if (!res.ok) throw new Error(`AI service returned ${res.status}`);
+
+      const data = await res.json();
+      const selectedCropName = diagnosticForm.cropName && diagnosticForm.cropName !== 'Auto-detect crop' ? diagnosticForm.cropName : null;
+      const normalizedCropName = selectedCropName || data.crop || 'General Crop';
+      const normalizedTopCandidates = (data.top_candidates || []).map(candidate => ({
+        ...candidate,
+        crop: selectedCropName || candidate.crop || data.crop || 'General Crop'
+      }));
+
+      const diagnosis = {
+        id: Date.now(),
+        farmerId: session?.profileId || null,
+        farmerName: session?.name || 'Independent Farmer',
+        cropId: diagnosticForm.cropId || null,
+        cropName: normalizedCropName,
+        imageUrl: diagnosticForm.imageUrl,
+        detectedDisease: data.condition,
+        pathogenType: data.pathogen_type,
+        confidenceScore: data.confidence_score,
+        severity: data.severity,
+        symptoms: data.top_candidates?.map(candidate => `${candidate.condition} (${candidate.confidence}%)`).join(' | '),
+        treatmentPlan: data.treatment_plan,
+        recommendedInputs: data.recommended_inputs?.split(',').map(input => input.trim()).filter(Boolean) || [],
+        topCandidates: normalizedTopCandidates,
+        status: 'COMPLETED',
+        createdAt: new Date().toISOString(),
+        isHealthy: data.is_healthy,
+        modelStatus: data.model_status,
+        device: data.device
+      };
+      setDiagnosticResult(diagnosis);
+      setDiagnosticHistory(prev => [diagnosis, ...prev]);
+      setMessage(`Crop Doctor AI: ${diagnosis.detectedDisease} (${diagnosis.confidenceScore}% confidence).`);
+    } catch (error) {
+      setMessage(`${error.message || 'External image could not be analyzed.'} Confirm the URL is a direct public image link.`);
     } finally {
       setDiagnosticLoading(false);
     }
@@ -2677,15 +3962,15 @@ function App() {
             style={{ padding: 0, fontSize: '11px', color: '#556058', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
             onClick={() => setCurrentView('prices')}
           >
-            ← Back to Marketplace
+            ← {text.authBackMarketplace}
           </button>
-          <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>Guest Access</span>
+          <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>{text.guestAccess}</span>
         </div>
 
         <div style={{ textAlign: 'center', marginBottom: '18px' }}>
           <p className="eyebrow" style={{ margin: '0 0 4px', color: '#778078' }}>{customEyebrow}</p>
           <h2 style={{ margin: 0, fontSize: '20px', color: '#202a27' }}>
-            {authMode === 'login' ? 'Sign In to Your Account' : 'Create an Account'}
+            {authMode === 'login' ? text.authSignInTitle : text.authCreateTitle}
           </h2>
         </div>
 
@@ -2696,14 +3981,14 @@ function App() {
             className={authMode === 'login' ? 'active' : ''}
             onClick={() => { setAuthMode('login'); setMessage(''); }}
           >
-            Sign In
+            {text.authSignIn}
           </button>
           <button
             type="button"
             className={authMode === 'register' ? 'active' : ''}
             onClick={() => { setAuthMode('register'); setMessage(''); }}
           >
-            Create Account
+            {text.authCreate}
           </button>
         </div>
 
@@ -2714,14 +3999,14 @@ function App() {
               className={`auth-role-btn ${role === 'FARMER' ? 'active' : ''}`}
               onClick={() => setRole('FARMER')}
             >
-              Farmer / Producer
+              {text.authFarmer}
             </button>
             <button
               type="button"
               className={`auth-role-btn ${role === 'BUYER' ? 'active' : ''}`}
               onClick={() => setRole('BUYER')}
             >
-              Buyer / Trader
+              {text.authBuyer}
             </button>
           </div>
         )}
@@ -2729,7 +4014,7 @@ function App() {
         <form onSubmit={handleAuth} style={{ marginTop: 0 }}>
           {authMode === 'register' && (
             <>
-              <label style={{ marginTop: 0 }}>Full Name
+              <label style={{ marginTop: 0 }}>{text.authFullName}
                 <input
                   value={account.name}
                   onChange={(e) => setAccount({ ...account, name: e.target.value })}
@@ -2737,7 +4022,7 @@ function App() {
                   required
                 />
               </label>
-              <label>Mobile Number
+              <label>{text.authMobile}
                 <input
                   type="tel"
                   value={account.phone}
@@ -2749,7 +4034,7 @@ function App() {
             </>
           )}
 
-          <label style={{ marginTop: authMode === 'login' ? 0 : '10px' }}>Email Address
+          <label style={{ marginTop: authMode === 'login' ? 0 : '10px' }}>{text.authEmail}
             <input
               type="email"
               value={account.email}
@@ -2759,7 +4044,7 @@ function App() {
             />
           </label>
 
-          <label>Password
+          <label>{text.authPassword}
             <input
               type="password"
               value={account.password}
@@ -2774,14 +4059,14 @@ function App() {
             className="trade-btn trade-btn-primary"
             style={{ width: '100% !important', marginTop: '16px', padding: '10px 16px', fontSize: '13px', textAlign: 'center', justifyContent: 'center' }}
           >
-            {authMode === 'login' ? 'Sign In →' : 'Create Account →'}
+            {authMode === 'login' ? `${text.authSignIn} →` : `${text.authCreate} →`}
           </button>
         </form>
 
         {/* Quick Demo 1-Click Login */}
         <div className="auth-demo-strip">
           <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
-            Quick 1-Click Demo Login:
+            {text.authQuickDemo}
           </span>
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '8px' }}>
             <button
@@ -2809,7 +4094,7 @@ function App() {
               style={{ fontSize: '12px', color: '#2f6838', fontWeight: 600, padding: 0 }}
               onClick={() => setCurrentView('prices')}
             >
-              Continue Browsing as Guest &rarr;
+              {text.authGuest} &rarr;
             </button>
           </div>
         </div>
@@ -2822,14 +4107,14 @@ function App() {
   const isAuthPage = (currentView === 'profile' && !session);
 
   const NAV_TABS = [
-    { id: 'prices', label: 'Market Prices' },
-    { id: 'predictions', label: 'Price Forecast' },
-    { id: 'weather', label: 'Agro-Weather' },
-    { id: 'matching', label: 'Buyer Matching' },
-    { id: 'analytics', label: 'Farmer Analytics' },
-    { id: 'map', label: 'Market Map' },
-    { id: 'notifications', label: 'Notifications', badge: unreadCount },
-    { id: 'profile', label: 'Profile' },
+    { id: 'prices', label: text.navPrices },
+    { id: 'predictions', label: text.navForecast },
+    { id: 'weather', label: text.navWeather },
+    { id: 'matching', label: text.navMatching },
+    { id: 'analytics', label: text.navAnalytics },
+    { id: 'map', label: text.navMap },
+    { id: 'notifications', label: text.navNotifications, badge: unreadCount },
+    { id: 'profile', label: text.navProfile },
   ];
 
   if (!session) {
@@ -2850,14 +4135,14 @@ function App() {
               className={authMode === 'login' ? 'active' : ''}
               onClick={() => { setAuthMode('login'); setMessage(''); }}
             >
-              Sign In
+              {text.authSignIn}
             </button>
             <button
               type="button"
               className={authMode === 'register' ? 'active' : ''}
               onClick={() => { setAuthMode('register'); setMessage(''); }}
             >
-              Create Account
+              {text.authCreate}
             </button>
           </div>
 
@@ -2868,14 +4153,14 @@ function App() {
                 className={`auth-role-btn ${role === 'FARMER' ? 'active' : ''}`}
                 onClick={() => setRole('FARMER')}
               >
-                Farmer / Producer
+                {text.authFarmer}
               </button>
               <button
                 type="button"
                 className={`auth-role-btn ${role === 'BUYER' ? 'active' : ''}`}
                 onClick={() => setRole('BUYER')}
               >
-                Buyer / Trader
+                {text.authBuyer}
               </button>
             </div>
           )}
@@ -2883,7 +4168,7 @@ function App() {
           <form onSubmit={handleAuth} style={{ marginTop: 0 }}>
             {authMode === 'register' && (
               <>
-                <label style={{ marginTop: 0 }}>Full Name
+                <label style={{ marginTop: 0 }}>{text.authFullName}
                   <input
                     value={account.name}
                     onChange={(e) => setAccount({ ...account, name: e.target.value })}
@@ -2891,7 +4176,7 @@ function App() {
                     required
                   />
                 </label>
-                <label>Mobile Number
+                <label>{text.authMobile}
                   <input
                     type="tel"
                     value={account.phone}
@@ -2903,7 +4188,7 @@ function App() {
               </>
             )}
 
-            <label style={{ marginTop: authMode === 'login' ? 0 : '10px' }}>Email Address
+            <label style={{ marginTop: authMode === 'login' ? 0 : '10px' }}>{text.authEmail}
               <input
                 type="email"
                 value={account.email}
@@ -2913,7 +4198,7 @@ function App() {
               />
             </label>
 
-            <label>Password
+            <label>{text.authPassword}
               <input
                 type="password"
                 value={account.password}
@@ -2930,7 +4215,7 @@ function App() {
             >
               {authLoading
                 ? (authMode === 'login' ? 'Signing in to Desk...' : 'Creating Account & Opening Desk...')
-                : (authMode === 'login' ? 'Sign In to Trade Desk →' : 'Create Account & Open Desk →')
+                : (authMode === 'login' ? `${text.authSignIn} to Trade Desk →` : `${text.authCreate} & Open Desk →`)
               }
             </button>
           </form>
@@ -2938,7 +4223,7 @@ function App() {
           {/* Quick Demo 1-Click Login */}
           <div className="auth-demo-strip">
             <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
-              Quick 1-Click Demo Login:
+              {text.authQuickDemo}
             </span>
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '8px' }}>
               <button
@@ -2976,6 +4261,141 @@ function App() {
 
   return (
     <main className="shell">
+      {showTutorial && session && (
+        <>
+          <style>{`
+            @keyframes tutorialPulse {
+              0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(126, 203, 143, 0.65); }
+              50% { transform: scale(1.02); box-shadow: 0 0 0 12px rgba(126, 203, 143, 0.08); }
+              100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(126, 203, 143, 0); }
+            }
+            @keyframes tutorialCardIn {
+              0% { opacity: 0; transform: translateY(8px) scale(0.98); }
+              100% { opacity: 1; transform: translateY(0) scale(1); }
+            }
+          `}</style>
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(8, 12, 10, 0.58)', zIndex: 1500 }} />
+          {tutorialFocusRect && (() => {
+            const calloutWidth = 290;
+            const calloutHeight = 170;
+            const targetRect = tutorialFocusRect;
+            const targetCenterX = targetRect.left + targetRect.width / 2;
+            const targetCenterY = targetRect.top + targetRect.height / 2;
+            const viewportCenterX = window.innerWidth / 2;
+            const viewportCenterY = window.innerHeight / 2;
+            const calloutLeft = Math.min(
+              Math.max(24, viewportCenterX - calloutWidth / 2),
+              window.innerWidth - calloutWidth - 24
+            );
+            const calloutTop = Math.min(
+              Math.max(24, viewportCenterY - calloutHeight / 2),
+              window.innerHeight - calloutHeight - 24
+            );
+            const placeOnRight = targetCenterX >= viewportCenterX;
+            const connectorStartX = placeOnRight ? calloutLeft + 12 : calloutLeft + calloutWidth - 12;
+            const connectorStartY = calloutTop + calloutHeight * 0.52;
+            const connectorEndX = placeOnRight ? targetRect.left + targetRect.width - 8 : targetRect.left + 8;
+            const connectorEndY = targetCenterY;
+            const controlOffset = Math.max(70, Math.abs(connectorEndX - connectorStartX) * 0.6);
+            const path = placeOnRight
+              ? `M ${connectorStartX} ${connectorStartY} C ${connectorStartX + controlOffset} ${connectorStartY}, ${connectorEndX - controlOffset} ${connectorEndY}, ${connectorEndX} ${connectorEndY}`
+              : `M ${connectorStartX} ${connectorStartY} C ${connectorStartX - controlOffset} ${connectorStartY}, ${connectorEndX + controlOffset} ${connectorEndY}, ${connectorEndX} ${connectorEndY}`;
+
+            return (
+              <>
+                <div
+                  style={{
+                    position: 'fixed',
+                    left: tutorialFocusRect.left - 10,
+                    top: tutorialFocusRect.top - 10,
+                    width: tutorialFocusRect.width + 20,
+                    height: tutorialFocusRect.height + 20,
+                    border: 'none',
+                    borderRadius: '12px',
+                    background: 'rgba(126, 203, 143, 0.08)',
+                    boxShadow: '0 0 0 2px rgba(126, 203, 143, 0.45), 0 0 0 9999px rgba(8, 12, 10, 0.58)',
+                    zIndex: 1600,
+                    pointerEvents: 'none',
+                    animation: 'tutorialPulse 1.6s ease-in-out infinite',
+                    transition: 'left 140ms ease-out, top 140ms ease-out, width 140ms ease-out, height 140ms ease-out',
+                    willChange: 'left, top, width, height'
+                  }}
+                />
+                <svg
+                  style={{
+                    position: 'fixed',
+                    inset: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    zIndex: 1705,
+                    pointerEvents: 'none'
+                  }}
+                  viewBox={`0 0 ${window.innerWidth} ${window.innerHeight}`}
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <marker id="tutorial-arrow-head" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                      <path d="M 0 0 L 12 6 L 0 12 z" fill="rgba(160, 214, 170, 0.95)" />
+                    </marker>
+                  </defs>
+                  <path
+                    d={path}
+                    fill="none"
+                    stroke="rgba(160, 214, 170, 0.95)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    markerEnd="url(#tutorial-arrow-head)"
+                  />
+                  <circle cx={connectorEndX} cy={connectorEndY} r="4.5" fill="#7ecb8f" />
+                </svg>
+                <div
+                  style={{
+                    position: 'fixed',
+                    left: calloutLeft,
+                    top: calloutTop,
+                    width: calloutWidth,
+                    background: 'rgba(15, 17, 16, 0.88)',
+                    border: 'none',
+                    borderRadius: '18px',
+                    boxShadow: '0 18px 40px rgba(0,0,0,0.22)',
+                    padding: '18px 18px 14px',
+                    backdropFilter: 'blur(8px)',
+                    zIndex: 1710,
+                    pointerEvents: 'auto',
+                    animation: 'tutorialCardIn 0.25s ease-out'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <span style={{ font: "11px 'DM Mono', monospace", letterSpacing: '0.12em', color: '#d7e7d6', textTransform: 'uppercase' }}>Onboarding</span>
+                    <button type="button" className="text-button" onClick={completeTutorial} style={{ fontSize: '12px', color: '#dfe9df' }}>Skip</button>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span style={{ background: '#7ecb8f', color: '#0e1a12', borderRadius: '999px', width: '28px', height: '28px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '12px' }}>{tutorialStep + 1}</span>
+                    <strong style={{ color: '#f3f8f2', fontSize: '15px' }}>{tutorialTargets[tutorialStep].title}</strong>
+                  </div>
+                  <p style={{ margin: 0, color: '#edf4ef', lineHeight: 1.6, fontSize: '14px' }}>{tutorialTargets[tutorialStep].description}</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '18px', gap: '10px' }}>
+                    <button type="button" className="trade-btn trade-btn-secondary" disabled={tutorialStep === 0} onClick={() => setTutorialStep((prev) => Math.max(prev - 1, 0))} style={{ opacity: tutorialStep === 0 ? 0.5 : 1 }}>
+                      {text.tutorialBack}
+                    </button>
+                    {tutorialStep < tutorialTargets.length - 1 ? (
+                      <button type="button" className="trade-btn trade-btn-primary" onClick={() => setTutorialStep((prev) => prev + 1)}>
+                        {text.tutorialNext}
+                      </button>
+                    ) : (
+                      <button type="button" className="trade-btn trade-btn-primary" onClick={completeTutorial}>
+                        {text.tutorialFinish}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+        </>
+      )}
+
       {/* Topbar — Row 1: Brand + Account, Row 2: Nav tabs */}
       <nav className="topbar">
         <div className="topbar-row">
@@ -2985,16 +4405,29 @@ function App() {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <label ref={(el) => { tutorialRefs.current.language = el; }} className="language-switcher">
+              <span>{text.languageLabel}</span>
+              <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+                <option value="en">{text.languageEnglish}</option>
+                <option value="hi">{text.languageHindi}</option>
+                <option value="mr">{text.languageMarathi}</option>
+              </select>
+            </label>
             <span className="ws-status-badge" title={wsConnected ? 'Real-time WebSocket connection active' : 'Connecting to live WebSocket stream'}>
               <i className={`ws-dot ${wsConnected ? 'connected' : 'connecting'}`} />
-              {wsConnected ? 'Live WS' : 'Syncing'}
+              {wsConnected ? 'Live WS' : text.notificationsStatus}
             </span>
 
             {session && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span className="session-tag" onClick={() => setCurrentView('profile')} style={{ cursor: 'pointer' }}>
+                <span
+                  ref={(el) => { tutorialRefs.current.profile = el; }}
+                  className="session-tag"
+                  onClick={() => setCurrentView('profile')}
+                  style={{ cursor: 'pointer' }}
+                >
                   <i className="connection" style={{ display: 'inline-block', width: 7, height: 7, background: '#6e9d68', borderRadius: '50%', marginRight: 7 }} />
-                  {session.name} ({session.role})
+                  {(session.name || '').replace(/\s*\((farmer|buyer|agrotech)[^)]*\)/gi, '').trim()} ({session.role})
                 </span>
                 <button
                   type="button"
@@ -3003,7 +4436,7 @@ function App() {
                   onClick={handleLogout}
                   title="Sign out of account"
                 >
-                  Sign Out
+                  {text.signOut}
                 </button>
               </div>
             )}
@@ -3014,6 +4447,10 @@ function App() {
           {NAV_TABS.map((tab) => (
             <button
               key={tab.id}
+              ref={(el) => {
+                if (tab.id === 'prices') tutorialRefs.current.market = el;
+                if (tab.id === 'notifications') tutorialRefs.current.notifications = el;
+              }}
               type="button"
               className={`nav-tab ${currentView === tab.id ? 'active' : ''}`}
               onClick={() => setCurrentView(tab.id)}
@@ -3061,17 +4498,18 @@ function App() {
         {/* Left Sidebar — Marketplace Quick Nav */}
         <aside className={`left-nav${sidebarOpen ? '' : ' left-nav-hidden'}`}>
 
-            <p className="left-nav-heading">Marketplace</p>
+            <p className="left-nav-heading">{text.sidebarMarketplace}</p>
 
             <button
+              ref={(el) => { tutorialRefs.current.sidebarMarket = el; }}
               type="button"
               className={`left-nav-item ${(currentView === 'prices') ? 'active' : ''}`}
               onClick={() => setCurrentView('prices')}
             >
               <span className="left-nav-icon">C</span>
               <span className="left-nav-label">
-                <strong>Crops &amp; Produce</strong>
-                <small>Fresh farm markets</small>
+                <strong>{text.sidebarCrops}</strong>
+                <small>{text.sidebarCropsSmall}</small>
               </span>
             </button>
 
@@ -3082,8 +4520,8 @@ function App() {
             >
               <span className="left-nav-icon">I</span>
               <span className="left-nav-label">
-                <strong>Farm Inputs</strong>
-                <small>Fertilizers &amp; bio-inputs</small>
+                <strong>{text.sidebarInputs}</strong>
+                <small>{text.sidebarInputsSmall}</small>
               </span>
             </button>
 
@@ -3091,7 +4529,7 @@ function App() {
             {currentView === 'inputs' && (
               <div className="left-nav-sub">
                 {[
-                  { value: 'ALL', label: 'All Inputs' },
+                  { value: 'ALL', label: text.allInputs },
                   { value: 'FERTILIZER', label: 'Fertilizers' },
                   { value: 'PESTICIDE', label: 'Pesticides' },
                   { value: 'BIO_INPUT', label: 'Bio-Inputs' },
@@ -3108,7 +4546,7 @@ function App() {
               </div>
             )}
 
-            <p className="left-nav-heading" style={{ marginTop: '16px' }}>My Trade &amp; Shop</p>
+            <p className="left-nav-heading" style={{ marginTop: '16px' }}>{text.sidebarTradeShop}</p>
 
             <button
               type="button"
@@ -3117,8 +4555,8 @@ function App() {
             >
               <span className="left-nav-icon">O</span>
               <span className="left-nav-label">
-                <strong>My Orders</strong>
-                <small>Procurement &amp; Escrow</small>
+                <strong>{text.sidebarOrders}</strong>
+                <small>{text.sidebarOrdersSmall}</small>
               </span>
             </button>
 
@@ -3129,8 +4567,8 @@ function App() {
             >
               <span className="left-nav-icon">M</span>
               <span className="left-nav-label">
-                <strong>My Shop</strong>
-                <small>Produce &amp; Inventory</small>
+                <strong>{text.sidebarMyShop}</strong>
+                <small>{text.sidebarMyShopSmall}</small>
               </span>
             </button>
 
@@ -3141,22 +4579,35 @@ function App() {
             >
               <span className="left-nav-icon">T</span>
               <span className="left-nav-label">
-                <strong>Order Progress</strong>
-                <small>Live Milestone Tracker</small>
+                <strong>{text.sidebarProgress}</strong>
+                <small>{text.sidebarProgressSmall}</small>
               </span>
             </button>
 
-            <p className="left-nav-heading" style={{ marginTop: '16px' }}>Advisory &amp; Support</p>
+            <p className="left-nav-heading" style={{ marginTop: '16px' }}>{text.sidebarAdvisory}</p>
 
             <button
               type="button"
-              className={`left-nav-item ${(currentView === 'community' || currentView === 'diagnostics') ? 'active' : ''}`}
+              className={`left-nav-item ${currentView === 'community' ? 'active' : ''}`}
               onClick={() => setCurrentView('community')}
             >
               <span className="left-nav-icon">Q</span>
               <span className="left-nav-label">
-                <strong>Farmers Community</strong>
-                <small>Q&amp;A &amp; Knowledge</small>
+                <strong>{text.sidebarCommunity}</strong>
+                <small>{text.sidebarCommunitySmall}</small>
+              </span>
+            </button>
+
+            <button
+              ref={(el) => { tutorialRefs.current.diagnostics = el; }}
+              type="button"
+              className={`left-nav-item ${currentView === 'diagnostics' ? 'active' : ''}`}
+              onClick={() => setCurrentView('diagnostics')}
+            >
+              <span className="left-nav-icon">AI</span>
+              <span className="left-nav-label">
+                <strong>{text.sidebarDiagnostics}</strong>
+                <small>{text.sidebarDiagnosticsSmall}</small>
               </span>
             </button>
 
@@ -3167,8 +4618,8 @@ function App() {
             >
               <span className="left-nav-icon">S</span>
               <span className="left-nav-label">
-                <strong>Advisors &amp; Govt Network</strong>
-                <small>KVK, experts &amp; field map</small>
+                <strong>{text.sidebarNetwork}</strong>
+                <small>{text.sidebarNetworkSmall}</small>
               </span>
             </button>
           </aside>
@@ -3188,9 +4639,9 @@ function App() {
         <div className="view-container">
           <section className="hero">
             <div>
-              <p className="eyebrow">Commodity Spot &amp; Contract Exchange</p>
-              <h1>KisanLink Marketplace</h1>
-              <p className="hero-copy">Live market arrival rates, direct farmer harvest listings, and farm inputs with transparent trade escrow.</p>
+              <p className="eyebrow">{text.heroEyebrow}</p>
+              <h1>{text.heroTitle}</h1>
+              <p className="hero-copy">{text.heroCopy}</p>
             </div>
             <div className="hero-stamp"><strong>01</strong><span>MARKET<br />DESK</span></div>
           </section>
@@ -3199,8 +4650,8 @@ function App() {
           <section className="dashboard-grid">
             <article className="panel market-panel">
               <div className="panel-heading">
-                <div><p className="eyebrow">Price Discovery</p><h2>Market Pulse &amp; 7-Day Movement</h2></div>
-                <span className="date-chip">Market Analytics</span>
+                <div><p className="eyebrow">{text.panelPriceDiscovery}</p><h2>{text.panelMarketPulse}</h2></div>
+                <span className="date-chip">{text.panelAnalytics}</span>
               </div>
 
               {/* Crop selector */}
@@ -3221,7 +4672,7 @@ function App() {
                 <div className="price-feature">
                   <div>
                     <span className="crop-label">
-                      {pulseCrop?.name || 'Selected Crop'} <span className="category-badge">{pulseCrop?.category || 'PRODUCE'}</span>
+                      {pulseCrop?.name || text.selectedCrop} <span className="category-badge">{pulseCrop?.category || text.produceUnit}</span>
                     </span>
                     <strong>₹{trend.latestPrice}<small> / {pulseCrop?.unit || 'kg'}</small></strong>
                   </div>
@@ -3230,7 +4681,7 @@ function App() {
                   </span>
                 </div>
               ) : (
-                <p className="muted">Loading market price movement...</p>
+                <p className="muted">{text.loadingMarket}</p>
               )}
 
               {/* 7-day interactive bar graph */}
@@ -3277,22 +4728,22 @@ function App() {
               </div>
 
               <div className="trend-caption">
-                <span>Market Range: ₹{minPrice} - ₹{maxPrice}</span>
+                <span>{text.marketRange}: ₹{minPrice} - ₹{maxPrice}</span>
                 <button
                   type="button"
                   className="text-button"
                   onClick={() => setCurrentView('predictions')}
                   style={{ cursor: 'pointer' }}
                 >
-                  View ML Predictions &rarr;
+                  {text.viewPredictions}
                 </button>
               </div>
             </article>
 
             {/* Quick Trading Action Card */}
             <aside className="note-panel">
-              <p className="eyebrow">Quick Trading</p>
-              <h2>Instant Produce Linkage</h2>
+              <p className="eyebrow">{text.panelQuickTrading}</p>
+              <h2>{text.panelInstantLinkage}</h2>
               <p>Post a harvest lot or publish a bulk procurement order in seconds with guaranteed escrow settlement.</p>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
@@ -3311,7 +4762,7 @@ function App() {
                   })}
                   style={{ width: '100%', padding: '10px 14px', fontSize: '12px' }}
                 >
-                  + Sell Produce Lot &rarr;
+                  {text.sellProduceLot}
                 </button>
                 <button
                   type="button"
@@ -3328,7 +4779,7 @@ function App() {
                   })}
                   style={{ width: '100%', padding: '10px 14px', fontSize: '12px' }}
                 >
-                  + Post Buy Requirement &rarr;
+                  {text.postBuyRequirement}
                 </button>
               </div>
             </aside>
@@ -3339,8 +4790,8 @@ function App() {
             <article className="panel crop-panel">
               <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
                 <div>
-                  <p className="eyebrow">Active Commodity Board</p>
-                  <h2>Commodities &amp; Live Market Rates</h2>
+                  <p className="eyebrow">{text.panelActiveBoard}</p>
+                  <h2>{text.panelCommodities}</h2>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                   <button
@@ -3357,7 +4808,7 @@ function App() {
                       description: ''
                     })}
                   >
-                    + Sell Produce
+                    {text.sellProduce}
                   </button>
                   <button
                     type="button"
@@ -3373,7 +4824,7 @@ function App() {
                       deliveryLocation: 'Main Market Hub'
                     })}
                   >
-                    + Post Buy Order
+                    {text.postBuyOrder}
                   </button>
                 </div>
               </div>
@@ -3385,7 +4836,7 @@ function App() {
                     <input
                       type="text"
                       className="field-input"
-                      placeholder="Search commodities by name or category..."
+                      placeholder={text.panelSearchPlaceholder}
                       value={marketplaceSearchQuery}
                       onChange={(e) => setMarketplaceSearchQuery(e.target.value)}
                       style={{ paddingRight: marketplaceSearchQuery ? '55px' : '12px' }}
@@ -3416,17 +4867,17 @@ function App() {
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                    <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>SORT:</span>
+                    <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>{text.sortLabel}</span>
                     <select
                       className="field-input"
                       value={marketplaceSortBy}
                       onChange={(e) => setMarketplaceSortBy(e.target.value)}
                       style={{ fontSize: '12px', padding: '7px 10px', width: 'auto', minWidth: '130px' }}
                     >
-                      <option value="POPULAR">Most Active</option>
-                      <option value="PRICE_ASC">Price: Low to High</option>
-                      <option value="PRICE_DESC">Price: High to Low</option>
-                      <option value="NAME_ASC">Name: A to Z</option>
+                      <option value="POPULAR">{text.mostActive}</option>
+                      <option value="PRICE_ASC">{text.priceLowHigh}</option>
+                      <option value="PRICE_DESC">{text.priceHighLow}</option>
+                      <option value="NAME_ASC">{text.nameAToZ}</option>
                     </select>
                   </div>
                 </div>
@@ -3440,7 +4891,7 @@ function App() {
                       className={`filter-chip ${selectedCategoryFilter === cat.value ? 'active' : ''}`}
                       onClick={() => setSelectedCategoryFilter(cat.value)}
                     >
-                      {cat.label}
+                      {getLocalizedText(cat.label, language)}
                     </button>
                   ))}
                 </div>
@@ -3550,25 +5001,25 @@ function App() {
           <section className="panel" style={{ marginTop: '18px' }}>
             <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <p className="eyebrow">Agro-Supply &amp; Bio-Inputs Linkage</p>
-                <h2>Fertilizers, Pesticides &amp; Bio-Inputs</h2>
+                <p className="eyebrow">{text.inputsSectionTitle}</p>
+                <h2>{text.inputsSectionTitle}</h2>
               </div>
               <span className="count">
-                {crops.filter(c => ['FERTILIZER', 'PESTICIDE', 'BIO_INPUT'].includes(c.category)).length} Formulations Available
+                {crops.filter(c => ['FERTILIZER', 'PESTICIDE', 'BIO_INPUT'].includes(c.category)).length} {text.inputsAvailable}
               </span>
             </div>
             <p className="muted" style={{ margin: '4px 0 14px', fontSize: '13px' }}>
-              Procure certified fertilizers, bio-stimulants, and crop protection chemicals directly from authorized distributors with transparent pricing and escrow safety.
+              {text.inputsSectionSubtitle}
             </p>
 
             {/* Filter chips & Search */}
             <div className="marketplace-toolbar" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div className="category-filter-bar" style={{ margin: 0 }}>
                 {[
-                  { value: 'ALL', label: 'All Inputs' },
-                  { value: 'FERTILIZER', label: 'Fertilizers & Nutrients' },
-                  { value: 'PESTICIDE', label: 'Pesticides & Protection' },
-                  { value: 'BIO_INPUT', label: 'Bio-Inputs & Stimulants' },
+                  { value: 'ALL', label: text.inputsCategoryAll },
+                  { value: 'FERTILIZER', label: text.inputsCategoryFertilizers },
+                  { value: 'PESTICIDE', label: text.inputsCategoryPesticides },
+                  { value: 'BIO_INPUT', label: text.inputsCategoryBioInputs },
                 ].map((cat) => (
                   <button
                     key={cat.value}
@@ -3612,31 +5063,31 @@ function App() {
                               {item.category}
                             </span>
                             {spec.subsidized && (
-                              <span className="subsidized-pill">Govt. Subsidized</span>
+                              <span className="subsidized-pill">{text.inputsGovtSubsidized}</span>
                             )}
                           </div>
                           <h3 style={{ margin: '4px 0 2px', fontSize: '15px' }}>{item.name}</h3>
                           <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
-                            Standard Unit: {item.unit}
+                            {text.inputsStandardUnit} {item.unit}
                           </span>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                          <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', textTransform: 'uppercase', display: 'block' }}>Indicative Rate</span>
+                          <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', textTransform: 'uppercase', display: 'block' }}>{text.inputsIndicativeRate}</span>
                           <strong style={{ fontSize: '15px', color: '#202a27' }}>{spec.indicativePrice}</strong>
                         </div>
                       </div>
 
                       <div className="agri-input-specs">
                         <div className="spec-row">
-                          <span className="spec-label">Composition:</span>
+                          <span className="spec-label">{text.inputsComposition}</span>
                           <span className="spec-value">{spec.composition}</span>
                         </div>
                         <div className="spec-row">
-                          <span className="spec-label">Application / Dosage:</span>
+                          <span className="spec-label">{text.inputsDosage}</span>
                           <span className="spec-value">{spec.dosage}</span>
                         </div>
                         <div className="spec-row">
-                          <span className="spec-label">Distributor Hubs:</span>
+                          <span className="spec-label">{text.inputsDistributorHubs}</span>
                           <span className="spec-value">{spec.dealers} ({spec.rating})</span>
                         </div>
                       </div>
@@ -3652,21 +5103,21 @@ function App() {
                             deliveryDistrict: 'Local Farm Depot'
                           })}
                         >
-                          Procure / Buy &rarr;
+                          {text.inputsProcure}
                         </button>
                         <button
                           type="button"
                           className="trade-btn trade-btn-secondary"
                           onClick={() => handleSellInput(item, spec)}
                         >
-                          List Stock / Sell &rarr;
+                          {text.inputsListStock}
                         </button>
                       </div>
                     </div>
                   );
                 })}
               {crops.filter(c => ['FERTILIZER', 'PESTICIDE', 'BIO_INPUT', 'FARM_EQUIPMENT'].includes(c.category)).length === 0 && (
-                <p className="muted" style={{ padding: '16px 0' }}>Connecting to input catalog...</p>
+                <p className="muted" style={{ padding: '16px 0' }}>{text.inputsConnectingCatalog}</p>
               )}
             </div>
           </section>
@@ -3677,24 +5128,24 @@ function App() {
               <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
                 <div className="modal-header">
                   <div>
-                    <p className="eyebrow">Direct Input Procurement</p>
-                    <h3 style={{ margin: '2px 0 0', fontSize: '16px' }}>Procure {quickProcureInputModal.item.name}</h3>
+                    <p className="eyebrow">{text.inputProcurementTitle}</p>
+                    <h3 style={{ margin: '2px 0 0', fontSize: '16px' }}>{text.inputProcureItem.replace('{item}', quickProcureInputModal.item.name)}</h3>
                   </div>
                   <button type="button" className="close-btn" onClick={() => setQuickProcureInputModal(null)}>&times;</button>
                 </div>
 
                 <form onSubmit={handleQuickProcureInputSubmit} style={{ padding: '14px 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div style={{ background: '#faf9f5', border: '1px solid #d9d6cc', borderRadius: '4px', padding: '10px 12px' }}>
-                    <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>UNIT RATE:</span>
+                    <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>{text.inputUnitRate}</span>
                     <strong style={{ marginLeft: '8px', fontSize: '13px' }}>{quickProcureInputModal.spec.indicativePrice}</strong>
                     <div style={{ fontSize: '11px', color: '#566057', marginTop: '4px' }}>
-                      Distributors: {quickProcureInputModal.spec.dealers}
+                      {text.inputDistributors} {quickProcureInputModal.spec.dealers}
                     </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                     <div className="field-group">
-                      <label className="field-label">Order Quantity (Units) *</label>
+                      <label className="field-label">{text.inputOrderQuantity}</label>
                       <input
                         type="number"
                         className="field-input"
@@ -3705,7 +5156,7 @@ function App() {
                       />
                     </div>
                     <div className="field-group">
-                      <label className="field-label">Calculated Total (₹)</label>
+                      <label className="field-label">{text.inputCalculatedTotal}</label>
                       <input
                         type="text"
                         className="field-input"
@@ -3716,7 +5167,7 @@ function App() {
                   </div>
 
                   <div className="field-group">
-                    <label className="field-label">Delivery District / FPO Depot</label>
+                    <label className="field-label">{text.inputDeliveryDistrict}</label>
                     <input
                       type="text"
                       className="field-input"
@@ -3728,10 +5179,10 @@ function App() {
 
                   <div className="modal-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '6px' }}>
                     <button type="button" className="trade-btn trade-btn-secondary" onClick={() => setQuickProcureInputModal(null)}>
-                      Cancel
+                      {text.inputCancel}
                     </button>
                     <button type="submit" className="trade-btn trade-btn-primary">
-                      Confirm Procurement Order &rarr;
+                      {text.inputConfirmProcurement}
                     </button>
                   </div>
                 </form>
@@ -3745,14 +5196,213 @@ function App() {
       {/* ────────────────────────────────────────────────────────────────────────── */}
       {/* VIEW: COMMUNITY EXCHANGE (FARMERS, BUYERS & AGRONOMISTS)                   */}
       {/* ────────────────────────────────────────────────────────────────────────── */}
-      {(currentView === 'community' || currentView === 'diagnostics') && (
+      {currentView === 'diagnostics' && (
+        <div className="view-container">
+          <section className="panel" style={{ marginTop: '18px' }}>
+            <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
+              <div>
+                <p className="eyebrow">MobileNetV3-Large · 38 Disease Classes · CUDA Inference</p>
+                <h2>{text.cropDoctorSection}</h2>
+                <p className="muted" style={{ margin: '4px 0 0', fontSize: '13px' }}>
+                  {text.diagnosisIntro}
+                </p>
+              </div>
+              <span className="count" style={{ background: '#e8f3ea', color: '#2f6838' }}>AI SERVICE · 8000</span>
+            </div>
+
+            <div className="diagnostic-studio-grid" style={{ marginTop: '18px' }}>
+              <div className="diagnostic-console-panel">
+                <div className="source-toggle-bar">
+                  {[
+                    { value: 'sample', label: text.diagSourceSample },
+                    { value: 'upload', label: text.diagSourceUpload },
+                    { value: 'url', label: text.diagSourceUrl }
+                  ].map(mode => (
+                    <button
+                      key={mode.value}
+                      type="button"
+                      className={`source-toggle-btn ${imageInputMode === mode.value ? 'active' : ''}`}
+                      onClick={() => {
+                        setImageInputMode(mode.value);
+                        if (mode.value !== 'sample') {
+                          setDiagnosticFile(null);
+                        }
+                      }}
+                    >
+                      {mode.label}
+                    </button>
+                  ))}
+                </div>
+
+                {imageInputMode === 'upload' ? (
+                  <>
+                    <input
+                      ref={diagnosticFileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleImageFileUpload}
+                      style={{ display: 'none' }}
+                    />
+                    <button type="button" className="upload-dropzone-box" onClick={() => diagnosticFileInputRef.current?.click()}>
+                      <strong>{diagnosticFile ? diagnosticFile.name : text.diagChooseLeaf}</strong>
+                      <span style={{ display: 'block', marginTop: '6px', fontSize: '11px', color: '#778078' }}>{text.diagUploadFormats}</span>
+                    </button>
+                  </>
+                ) : imageInputMode === 'url' ? (
+                  <div className="diagnostic-url-row">
+                    <input
+                      type="url"
+                      className="field-input"
+                      placeholder="https://example.com/leaf.jpg"
+                      value={diagnosticForm.imageUrl}
+                      onChange={(e) => {
+                        const nextValue = e.target.value;
+                        setDiagnosticForm(prev => ({ ...prev, imageUrl: nextValue }));
+                        setDiagnosticFile(null);
+                        setPreviewImageUrl(nextValue && /^(https?:\/\/|data:image\/)/i.test(nextValue.trim()) ? nextValue.trim() : '');
+                      }}
+                    />
+                    <button type="button" className="trade-btn trade-btn-secondary diagnostic-url-load-btn" onClick={() => handleLoadImageUrl(diagnosticForm.imageUrl)}>{text.diagLoad}</button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="upload-dropzone-box"
+                    onClick={() => {
+                      const sampleUrl = 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=900&auto=format&fit=crop';
+                      setDiagnosticFile(null);
+                      setDiagnosticForm(prev => ({ ...prev, imageUrl: sampleUrl }));
+                      setPreviewImageUrl(`${sampleUrl}?v=${Date.now()}`);
+                    }}
+                  >
+                    <strong>{text.diagSampleTomatoLeaf}</strong>
+                    <span style={{ display: 'block', marginTop: '6px', fontSize: '11px', color: '#778078' }}>{text.diagQuickCheck}</span>
+                  </button>
+                )}
+
+                <div className="leaf-preview-frame" style={{ marginTop: '12px' }}>
+                  {previewImageUrl ? (
+                    <img
+                      key={previewImageUrl}
+                      className="leaf-img"
+                      src={previewImageUrl}
+                      alt="Selected crop leaf"
+                      onError={() => setPreviewImageUrl('')}
+                    />
+                  ) : (
+                    <span className="muted">{text.diagNoImage}</span>
+                  )}
+                  {previewImageUrl && <span className="leaf-tag">{text.diagSpecimenReady}</span>}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '12px' }}>
+                  <div className="field-group">
+                    <label className="field-label" htmlFor="diagnostic-crop">{text.diagCropHint}</label>
+                    <select
+                      id="diagnostic-crop"
+                      className="field-input"
+                      value={diagnosticForm.cropId || ''}
+                      onChange={(e) => {
+                        const cropId = e.target.value ? Number(e.target.value) : null;
+                        const selected = crops.find(crop => crop.id === cropId);
+                        setDiagnosticForm(prev => ({ ...prev, cropId, cropName: selected?.name || '' }));
+                      }}
+                    >
+                      <option value="">{text.diagAutoDetect}</option>
+                      {crops.map(crop => <option key={crop.id} value={crop.id}>{crop.name}</option>)}
+                    </select>
+                  </div>
+                  <div className="field-group">
+                    <label className="field-label" htmlFor="diagnostic-notes">{text.diagFieldNotes}</label>
+                    <input
+                      id="diagnostic-notes"
+                      className="field-input"
+                      value={diagnosticForm.notes}
+                      onChange={(e) => setDiagnosticForm(prev => ({ ...prev, notes: e.target.value }))}
+                      placeholder={text.diagOptionalSymptoms}
+                    />
+                  </div>
+                </div>
+
+                <button type="button" className="trade-btn trade-btn-primary crop-doctor-submit-btn" onClick={runDiagnosticScan} disabled={diagnosticLoading}>
+                  {diagnosticLoading ? text.diagAnalyzing : text.diagAnalyze}
+                </button>
+              </div>
+
+              <div className="diagnostic-result-panel">
+                {diagnosticResult ? (
+                  <div className="diagnostic-card">
+                    <div className="diagnostic-header">
+                      <div>
+                        <span className="diag-section-title">{text.diagDiagnosisTitle}</span>
+                        <h3 style={{ margin: '4px 0 2px', fontSize: '21px', color: '#202a27' }}>{diagnosticResult.cropName}</h3>
+                        <p className="diag-text">
+                          {(() => {
+                            const diseaseFull = diagnosticResult.detectedDisease;
+                            const diseaseMatch = diseaseFull.match(/^([^(]+)/);
+                            const diseaseName = diseaseMatch ? diseaseMatch[1].trim() : diseaseFull;
+                            const scientificName = diseaseFull.match(/\(([^)]+)\)/);
+                            const translated = getLocalizedText(diseaseName, language);
+                            return scientificName ? `${translated} (${scientificName[1]})` : translated;
+                          })()}
+                        </p>
+                      </div>
+                      <div className="confidence-meter-box">
+                        <span className="confidence-num">{diagnosticResult.confidenceScore}%</span>
+                        <span className="confidence-label">{text.diagConfidence}</span>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <span className={`severity-badge severity-${String(diagnosticResult.severity).toLowerCase()}`}>{getLocalizedText(diagnosticResult.severity, language)}</span>
+                      <span className="severity-badge" style={{ background: '#eef2f8', color: '#204068' }}>{diagnosticResult.pathogenType}</span>
+                      <span className="severity-badge" style={{ background: '#eef3eb', color: '#2f6838' }}>{diagnosticResult.device}</span>
+                    </div>
+
+                    <div className="treatment-box">
+                      <span className="diag-section-title">{text.diagTreatmentProtocol}</span>
+                      <p className="diag-text" style={{ whiteSpace: 'pre-line' }}>{diagnosticResult.treatmentPlan}</p>
+                    </div>
+
+                    <div>
+                      <span className="diag-section-title">{text.diagRecommendedInputs}</span>
+                      <div className="prescription-input-list">
+                        {diagnosticResult.recommendedInputs.map(input => <div className="prescription-item" key={input}><span className="prescription-name">{input}</span></div>)}
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="diag-section-title">{text.diagTopCandidates}</span>
+                      {diagnosticResult.topCandidates.map(candidate => (
+                        <div key={candidate.raw_label} style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', padding: '6px 0', borderBottom: '1px solid #eeeae1', fontSize: '12px' }}>
+                          <span>{candidate.crop} · {candidate.condition}</span><strong>{candidate.confidence}%</strong>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ minHeight: '440px', display: 'grid', placeItems: 'center', textAlign: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: '34px', marginBottom: '10px' }}>+</div>
+                      <h3 style={{ margin: 0, color: '#202a27' }}>{text.diagEmptyStateTitle}</h3>
+                      <p className="muted" style={{ maxWidth: '280px', lineHeight: '1.5' }}>{text.diagEmptyStateText}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {currentView === 'community' && (
 
         <div className="view-container">
           <section className="panel" style={{ marginTop: '18px' }}>
             <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <p className="eyebrow">Marketplace Exchange &amp; Advisory</p>
-                <h2>Farmers Community</h2>
+                <p className="eyebrow">{text.communityEyebrow}</p>
+                <h2>{text.communitySection}</h2>
                 <p className="muted" style={{ margin: '4px 0 0', fontSize: '13px' }}>
                   Open bulletin for crop health discussions, procurement notices, and agronomic advisories.
                 </p>
@@ -3764,7 +5414,7 @@ function App() {
                   onClick={() => setNewPostModalOpen(true)}
                   style={{ padding: '8px 18px', fontSize: '12px' }}
                 >
-                  + New Discussion
+                  {text.communityNewDiscussion}
                 </button>
               </div>
             </div>
@@ -3776,7 +5426,7 @@ function App() {
                   <input
                     type="text"
                     className="field-input"
-                    placeholder="Search topics, crops, or remedies..."
+                    placeholder={text.communitySearchPlaceholder}
                     value={communitySearchQuery}
                     onChange={(e) => setCommunitySearchQuery(e.target.value)}
                     style={{ fontSize: '13px', padding: '8px 12px' }}
@@ -3787,20 +5437,20 @@ function App() {
                       onClick={() => setCommunitySearchQuery('')}
                       style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#778078', fontSize: '11px', fontFamily: "'DM Mono', monospace" }}
                     >
-                      Clear
+                      {text.communityClear}
                     </button>
                   )}
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                  <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>COMMODITY:</span>
+                  <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>{text.communityCommodity}</span>
                   <select
                     className="field-input"
                     value={communityFilterCrop}
                     onChange={(e) => setCommunityFilterCrop(e.target.value)}
                     style={{ fontSize: '12px', padding: '7px 10px', width: 'auto', minWidth: '130px' }}
                   >
-                    <option value="ALL">All Commodities</option>
+                    <option value="ALL">{text.communityAllCommodities}</option>
                     <option value="Tomato">Tomato</option>
                     <option value="Chilli">Chilli / Pepper</option>
                     <option value="Rice">Rice / Paddy</option>
@@ -3816,10 +5466,10 @@ function App() {
               {/* Participant Filter Chips */}
               <div className="category-filter-bar" style={{ margin: 0, paddingTop: '2px' }}>
                 {[
-                  { value: 'ALL', label: 'All Topics' },
-                  { value: 'FARMER', label: 'Farmer Queries' },
-                  { value: 'BUYER', label: 'Buyer Notices' },
-                  { value: 'AGRONOMIST', label: 'Agronomist Protocols' }
+                  { value: 'ALL', label: text.communityAllTopics },
+                  { value: 'FARMER', label: text.communityFarmerQueries },
+                  { value: 'BUYER', label: text.communityBuyerNotices },
+                  { value: 'AGRONOMIST', label: text.communityAgronomistProtocols }
                 ].map(tab => (
                   <button
                     key={tab.value}
@@ -3934,7 +5584,7 @@ function App() {
                           </button>
 
                           <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>
-                            {post.answers.length} {post.answers.length === 1 ? 'reply' : 'replies'}
+                            {post.answers.length} {post.answers.length === 1 ? text.communityReplyCount : text.communityReplyCountPlural}
                           </span>
                         </div>
 
@@ -4022,7 +5672,7 @@ function App() {
                         <input
                           type="text"
                           className="field-input"
-                          placeholder="Add your reply or remedy..."
+                          placeholder={text.communityAddReply}
                           value={replyInputByPostId[post.id] || ''}
                           onChange={(e) => setReplyInputByPostId(prev => ({ ...prev, [post.id]: e.target.value }))}
                           onKeyDown={(e) => { if (e.key === 'Enter') handleAddCommunityReply(post.id); }}
@@ -4034,7 +5684,7 @@ function App() {
                           onClick={() => handleAddCommunityReply(post.id)}
                           style={{ padding: '6px 12px', fontSize: '11px', whiteSpace: 'nowrap' }}
                         >
-                          Reply
+                          {text.communityReply}
                         </button>
                       </div>
 
@@ -4045,17 +5695,17 @@ function App() {
               {communityPosts.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '36px 20px', background: '#faf9f5', borderRadius: '4px', border: '1px dashed #d9d6cc' }}>
                   <p style={{ fontSize: '14px', fontWeight: 600, color: '#202a27', margin: '0 0 4px' }}>
-                    No discussions found
+                    {text.communityNoDiscussions}
                   </p>
                   <p style={{ fontSize: '12px', color: '#778078', margin: '0 0 12px' }}>
-                    Publish a new inquiry or procurement requirement to start a thread.
+                    {text.communityNoDiscussionsSub}
                   </p>
                   <button
                     type="button"
                     className="trade-btn trade-btn-primary"
                     onClick={() => setNewPostModalOpen(true)}
                   >
-                    + New Discussion
+                    {text.communityNewDiscussion}
                   </button>
                 </div>
               )}
@@ -4075,20 +5725,20 @@ function App() {
             <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
               <div>
                 <p className="eyebrow">Institutional &amp; Expert Field Directory</p>
-                <h2>Advisors, Govt KVKs &amp; Support Map</h2>
+                <h2>{text.supportSectionTitle}</h2>
                 <p className="muted" style={{ margin: '4px 0 0', fontSize: '13px' }}>
-                  Verified agricultural extension officers, certified crop pathologists, district KVK research stations, NABL soil testing centers, and 24x7 farmer emergency helplines.
+                  {text.supportSectionSubtitle}
                 </p>
               </div>
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <span className="count" style={{ background: '#202a27', color: '#f6f5f0', fontSize: '11px' }}>
-                  6 KVK Centers
+                  6 {text.supportCenters}
                 </span>
                 <span className="count" style={{ background: '#2f6838', color: '#f6f5f0', fontSize: '11px' }}>
-                  14 Agronomists
+                  14 {text.supportAgronomists}
                 </span>
                 <span className="count" style={{ background: '#35453e', color: '#f6f5f0', fontSize: '11px' }}>
-                  8 Soil Labs
+                  8 {text.supportSoilLabs}
                 </span>
               </div>
             </div>
@@ -4100,7 +5750,7 @@ function App() {
                   <input
                     type="text"
                     className="field-input"
-                    placeholder="Search advisors, KVKs, soil labs, or services..."
+                    placeholder={text.supportSearchPlaceholder}
                     value={supportSearchQuery}
                     onChange={(e) => setSupportSearchQuery(e.target.value)}
                     style={{ fontSize: '13px', padding: '8px 12px' }}
@@ -4144,12 +5794,12 @@ function App() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
                 <div>
                   <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#889e92', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    Regional Support Mapping
+                    {text.supportRadarViewLabel}
                   </span>
                   <p style={{ margin: '2px 0 0', fontSize: '13px', color: '#ffffff', fontWeight: 600 }}>
                     {supportMapViewMode === 'RADAR'
-                      ? 'Active Assistance Nodes within 25 km Cluster Radius'
-                      : `Live Google Map: ${SUPPORT_DIRECTORY.find(n => n.id === selectedSupportNode)?.name || 'Regional Extension Stations'}`}
+                      ? text.supportRadarSubtitle
+                      : `${text.supportMapSubtitle}: ${SUPPORT_DIRECTORY.find(n => n.id === selectedSupportNode)?.name || text.supportSectionTitle}`}
                   </p>
                 </div>
 
@@ -4171,7 +5821,7 @@ function App() {
                         lineHeight: 1.2
                       }}
                     >
-                      Radar View
+                      {text.supportRadarViewBtn}
                     </button>
                     <button
                       type="button"
@@ -4188,7 +5838,7 @@ function App() {
                         lineHeight: 1.2
                       }}
                     >
-                      Google Maps Live
+                      {text.supportGoogleMapBtn}
                     </button>
                   </div>
                 </div>
@@ -4213,7 +5863,7 @@ function App() {
                   <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 15, textAlign: 'center' }}>
                     <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ffffff', margin: '0 auto', boxShadow: '0 0 12px #6e9d68' }} />
                     <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#ffffff', background: 'rgba(0,0,0,0.7)', padding: '1px 4px', borderRadius: 2, display: 'inline-block', marginTop: 2 }}>
-                      Your Farm
+                      {text.supportYourFarm}
                     </span>
                   </div>
 
@@ -4269,7 +5919,7 @@ function App() {
                             className="trade-btn trade-btn-primary"
                             style={{ padding: '4px 10px', fontSize: '10px', textDecoration: 'none' }}
                           >
-                            Open in Google Maps App &rarr;
+                            {text.supportOpenMap}
                           </a>
                         </div>
                       </>
@@ -4335,10 +5985,10 @@ function App() {
                         {/* In Charge & Hours */}
                         <div style={{ background: '#f8f7f2', borderRadius: '4px', padding: '6px 10px', fontSize: '11px', color: '#4d5750', marginBottom: '8px', border: '1px solid #eceae2' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span>Lead: <strong>{node.inCharge}</strong></span>
+                            <span>{text.supportLead} <strong>{node.inCharge}</strong></span>
                           </div>
                           <div style={{ font: "10px 'DM Mono', monospace", color: '#778078', marginTop: '2px' }}>
-                            Hours: {node.hours}
+                            {text.supportHours} {node.hours}
                           </div>
                         </div>
 
@@ -4346,7 +5996,7 @@ function App() {
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '6px' }}>
                           {node.services.map((srv, idx) => (
                             <span key={idx} style={{ fontSize: '10px', background: '#f0eee8', color: '#333b35', padding: '2px 6px', borderRadius: '3px' }}>
-                              {srv}
+                              {getLocalizedText(srv, language)}
                             </span>
                           ))}
                         </div>
@@ -4366,7 +6016,7 @@ function App() {
                             }
                           }}
                         >
-                          Call Desk: {node.phone}
+                          {text.supportCallDesk} {node.phone}
                         </a>
 
                         <button
@@ -4379,7 +6029,7 @@ function App() {
                             setGoogleMapModalNode(node);
                           }}
                         >
-                          Google Map &rarr;
+                          {text.supportGoogleMapAction}
                         </button>
                       </div>
 
@@ -4405,23 +6055,23 @@ function App() {
           <section className="panel" style={{ marginTop: '18px' }}>
             <div className="panel-heading">
               <div>
-                <p className="eyebrow">Trade Deals &amp; Escrow Settlement Desk</p>
-                <h2>My Orders &amp; Procurement</h2>
+                <p className="eyebrow">{text.ordersTradeDeals}</p>
+                <h2>{text.ordersHeader}</h2>
                 <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
                   Track active purchase orders, farmer harvest procurements, and escrow-guaranteed payments.
                 </p>
               </div>
-              <span className="count">{userOrders.length} Trade Contracts</span>
+              <span className="count">{userOrders.length} {text.ordersContracts}</span>
             </div>
 
             {/* Status Filter Chips */}
             <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', padding: '14px 0 8px' }}>
               {[
-                { value: 'ALL', label: 'All Orders' },
-                { value: 'IN_TRANSIT', label: 'In Transit' },
-                { value: 'ESCROW_LOCKED', label: 'Escrow Protected' },
-                { value: 'DELIVERED', label: 'Completed & Delivered' },
-                { value: 'DISPUTED', label: 'Disputed' }
+                { value: 'ALL', label: text.ordersStatusAll },
+                { value: 'IN_TRANSIT', label: text.ordersStatusInTransit },
+                { value: 'ESCROW_LOCKED', label: text.ordersStatusEscrowProtected },
+                { value: 'DELIVERED', label: text.ordersStatusCompleted },
+                { value: 'DISPUTED', label: text.ordersStatusDisputed }
               ].map(f => (
                 <button
                   key={f.value}
@@ -4457,7 +6107,7 @@ function App() {
                               {order.id}
                             </span>
                             <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', display: 'block', marginTop: '1px' }}>
-                              Placed on {order.orderDate}
+                              {text.ordersPlacedOn} {order.orderDate}
                             </span>
                           </div>
                           <span className={`order-status-badge ${statusClass}`}>
@@ -4498,10 +6148,10 @@ function App() {
                         {/* Counterpart & Destination */}
                         <div style={{ fontSize: '11px', color: '#556058', marginBottom: '8px' }}>
                           <p style={{ margin: '0 0 2px' }}>
-                            <strong>Counterpart:</strong> {order.counterpart}
+                            <strong>{text.ordersCounterpart}</strong> {order.counterpart}
                           </p>
                           <p style={{ margin: '0' }}>
-                            <strong>Destination:</strong> {order.deliveryLocation}
+                            <strong>{text.ordersDestination}</strong> {order.deliveryLocation}
                           </p>
                         </div>
                       </div>
@@ -4515,7 +6165,7 @@ function App() {
                             style={{ flex: 1, minWidth: '140px', padding: '8px 12px' }}
                             onClick={() => handleTrackOrder(order.id)}
                           >
-                            Track Order Progress &rarr;
+                            {text.ordersTrack}
                           </button>
                           {order.escrowStatus !== 'DELIVERED' && order.escrowStatus !== 'DISPUTED' && (
                             <button
@@ -4525,7 +6175,7 @@ function App() {
                               onClick={() => handleReleaseEscrow(order.id)}
                               title="Confirm receipt and release payment to seller"
                             >
-                              Release Escrow
+                              {text.ordersReleaseEscrow}
                             </button>
                           )}
                         </div>
@@ -4537,7 +6187,7 @@ function App() {
                             style={{ fontSize: '10px', color: '#a82020', textAlign: 'center', padding: '2px 0' }}
                             onClick={() => handleRaiseDispute(order.id)}
                           >
-                            Raise Dispute / Mismatch
+                            {text.ordersRaiseDispute}
                           </button>
                         )}
                       </div>
@@ -4547,7 +6197,7 @@ function App() {
             </div>
 
             {userOrders.length === 0 && (
-              <p className="muted" style={{ padding: '30px 0', textAlign: 'center' }}>No active orders found.</p>
+              <p className="muted" style={{ padding: '30px 0', textAlign: 'center' }}>{text.ordersNoOrders}</p>
             )}
           </section>
         </div>
@@ -4562,9 +6212,9 @@ function App() {
             <div className="panel-heading">
               <div>
                 <p className="eyebrow">Farmer Direct Storefront &amp; Stock Inventory</p>
-                <h2>My Shop &amp; Produce Listings</h2>
+                <h2>{text.shopSectionTitle}</h2>
                 <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
-                  Manage your harvest catalog, available stock volumes, unit prices, and direct buyer offers.
+                  {text.shopSectionSubtitle}
                 </p>
               </div>
               <button
@@ -4580,33 +6230,33 @@ function App() {
                   location: 'Nashik Farm Gate'
                 })}
               >
-                + Add Produce to Shop
+                {text.shopAddProduce}
               </button>
             </div>
 
             {/* Shop Summary KPIs Strip */}
             <div className="shop-stats-grid">
               <div className="shop-stat-card">
-                <span>Active Listings</span>
+                <span>{text.shopActiveListings}</span>
                 <strong>{shopInventory.filter(i => i.status === 'ACTIVE').length}</strong>
-                <small>Online for buyers</small>
+                <small>{text.shopOnlineBuyers}</small>
               </div>
               <div className="shop-stat-card">
-                <span>Total Harvest Stock</span>
+                <span>{text.shopTotalHarvestStock}</span>
                 <strong>
                   {shopInventory.reduce((acc, curr) => acc + curr.stockQuantity, 0).toLocaleString()} <span style={{ fontSize: '13px', fontWeight: 600 }}>Qtl</span>
                 </strong>
-                <small>Ready in Silos / Cold Storage</small>
+                <small>{text.shopReadyStorage}</small>
               </div>
               <div className="shop-stat-card">
-                <span>Sales Revenue</span>
+                <span>{text.shopSalesRevenue}</span>
                 <strong>₹6,82,000</strong>
-                <small>Completed via Escrow</small>
+                <small>{text.shopCompletedEscrow}</small>
               </div>
               <div className="shop-stat-card">
-                <span>Pending Escrow</span>
+                <span>{text.shopPendingEscrow}</span>
                 <strong style={{ color: '#2f6838' }}>₹3,88,000</strong>
-                <small>Under quality inspection</small>
+                <small>{text.shopUnderInspection}</small>
               </div>
             </div>
 
@@ -4614,7 +6264,7 @@ function App() {
             <div style={{ marginTop: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
                 <h3 style={{ margin: 0, fontSize: '16px', color: '#202a27' }}>
-                  Storefront Produce Inventory
+                  {text.shopInventoryTitle}
                 </h3>
                 <div style={{ display: 'flex', gap: '6px' }}>
                   {['ALL', 'GRAIN', 'VEGETABLES', 'FRUITS', 'OILSEED'].map(cat => (
@@ -4635,14 +6285,14 @@ function App() {
                 <table className="market-table">
                   <thead>
                     <tr>
-                      <th>Commodity</th>
-                      <th>Quality Grade</th>
-                      <th>Stock in Silo</th>
-                      <th>Shop Unit Price</th>
-                      <th>Storage Hub</th>
-                      <th>Inquiries</th>
-                      <th>Status</th>
-                      <th style={{ textAlign: 'right' }}>Actions</th>
+                      <th>{text.shopCommodity}</th>
+                      <th>{text.shopQualityGrade}</th>
+                      <th>{text.shopStockSilo}</th>
+                      <th>{text.shopUnitPrice}</th>
+                      <th>{text.shopStorageHub}</th>
+                      <th>{text.shopInquiries}</th>
+                      <th>{text.shopStatus}</th>
+                      <th style={{ textAlign: 'right' }}>{text.shopActions}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -4693,7 +6343,7 @@ function App() {
                               style={{ padding: '4px 8px', fontSize: '10px' }}
                               onClick={() => handleToggleShopStatus(item.id)}
                             >
-                              {item.status === 'ACTIVE' ? 'Pause Listing' : 'Activate'}
+                              {item.status === 'ACTIVE' ? text.shopPauseListing : text.shopActivate}
                             </button>
                           </td>
                         </tr>
@@ -4708,14 +6358,14 @@ function App() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <div>
                   <h3 style={{ margin: 0, fontSize: '16px', color: '#202a27' }}>
-                    Direct Buyer Purchase Offers &amp; Bids
+                    {text.shopBuyerOffersTitle}
                   </h3>
                   <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#667269' }}>
-                    Institutional buyers requesting bulk procurement with guaranteed escrow deposits.
+                    {text.shopBuyerOffersSubtitle}
                   </p>
                 </div>
                 <span className="count" style={{ background: '#f5d9d0', color: '#b45a42' }}>
-                  {shopOffers.length} Pending
+                  {shopOffers.length} {text.shopPending}
                 </span>
               </div>
 
@@ -6259,7 +7909,7 @@ function App() {
             <div className="panel-heading">
               <div>
                 <p className="eyebrow">Market activity &amp; signals</p>
-                <h2>Notifications &amp; Field Dispatch</h2>
+                <h2>{text.labelNotifications}</h2>
               </div>
               <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
                 {unreadCount > 0 && notifSubTab === 'app' && (
@@ -6418,7 +8068,7 @@ function App() {
             <div className="panel-heading">
               <div>
                 <p className="eyebrow">Account &amp; Location Profile</p>
-                <h2>{session.name}</h2>
+                <h2>{(session.name || '').replace(/\s*\((farmer|buyer|agrotech)[^)]*\)/gi, '').trim()}</h2>
               </div>
               <button
                 type="button"

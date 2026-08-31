@@ -1,0 +1,70 @@
+# ─── Python / AI Backend ───────────────────────────────────────
+kisanlink-ai/.venv/
+kisanlink-ai/venv/
+kisanlink-ai/__pycache__/
+kisanlink-ai/**/__pycache__/
+kisanlink-ai/*.pyc
+kisanlink-ai/*.pyo
+kisanlink-ai/.pytest_cache/
+kisanlink-ai/dist/
+kisanlink-ai/build/
+kisanlink-ai/*.egg-info/
+
+# ─── ML Model weights (large binary files) ─────────────────────
+# Store these with Git LFS or a dedicated model registry
+kisanlink-ai/models/*.pt
+kisanlink-ai/models/*.pth
+kisanlink-ai/models/*.ckpt
+kisanlink-ai/models/*.bin
+
+# ─── Training datasets (never commit raw image datasets) ────────
+kisanlink-ai/dataset/
+kisanlink-ai/data/
+kisanlink-ai/train_data/
+kisanlink-ai/PlantVillage/
+kisanlink-ai/*.zip
+kisanlink-ai/*.tar.gz
+
+# ─── Java / Spring Boot Backend ─────────────────────────────────
+kisanlink-backend/target/
+kisanlink-backend/.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# ─── Frontend / Node.js ─────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.cache/
+
+# ─── Environment / Secrets (NEVER commit these) ─────────────────
+.env
+.env.local
+.env.production
+.env.*.local
+*.env
+
+# ─── IDE and editor files ───────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.DS_Store
+Thumbs.db
+
+# ─── Logs ───────────────────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── OS files ───────────────────────────────────────────────────
+.DS_Store
+desktop.ini

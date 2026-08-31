@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 🌿 KisanLink AI Crop Doctor — PyTorch RTX Training Engine
 MobileNetV3-Large Transfer Learning for Plant Disease Classification (38 Classes)
@@ -6,18 +8,37 @@ Optimized for NVIDIA RTX Laptops (CUDA 12.x / AMP FP16 / 5GB+ VRAM)
 
 import os
 import sys
+import io
+
+# Fix Windows console encoding for emoji support
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 import json
 import time
 import argparse
 import torch
 import torch.nn as nn
 import torch.optim as optim
-try:
-    from torch.amp import GradScaler, autocast
-except ImportError:
-    from torch.cuda.amp import GradScaler, autocast
+import shutil
+from pathlib import Path
 
 from torchvision import datasets, transforms, models
+
+try:
+    GradScaler = torch.amp.GradScaler
+except AttributeError:
+    from torch.cuda.amp import GradScaler
+
+
+def autocast_context(device):
+    if hasattr(torch, "autocast"):
+        return torch.autocast(
+            device_type=device.type,
+            dtype=torch.float16 if device.type == "cuda" else torch.bfloat16,
+            enabled=(device.type == "cuda"),
+        )
+    return torch.cuda.amp.autocast(enabled=(device.type == "cuda"))
 
 def get_device():
     if torch.cuda.is_available():
@@ -39,6 +60,25 @@ def build_model(num_classes):
         nn.Linear(in_features, num_classes)
     )
     return model
+
+def save_checkpoint_with_backup(model, accuracy, epoch, save_path, keep_best=3):
+    """Save checkpoint with backup versioning to prevent data loss"""
+    backup_dir = Path(save_path).parent / "backups"
+    backup_dir.mkdir(exist_ok=True)
+    
+    # Save versioned backup
+    backup_path = backup_dir / f"checkpoint_e{epoch:02d}_acc{accuracy:.2f}.pt"
+    torch.save(model.state_dict(), backup_path)
+    
+    # Keep only best N backups
+    backups = sorted(backup_dir.glob("checkpoint_*.pt"), key=lambda x: x.stat().st_mtime, reverse=True)
+    for old_backup in backups[keep_best:]:
+        old_backup.unlink()
+    
+    # Update main checkpoint
+    torch.save(model.state_dict(), save_path)
+    print(f"  Backed up: {backup_path.name}")
+    return backup_path
 
 def train(data_dir="./data", num_epochs=10, batch_size=64, learning_rate=0.001, save_path="./models/crop_doctor_v1.pt"):
     device = get_device()
@@ -91,10 +131,11 @@ def train(data_dir="./data", num_epochs=10, batch_size=64, learning_rate=0.001, 
     criterion = nn.CrossEntropyLoss(label_smoothing=0.05)
     optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1e-4)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-6)
-    scaler = GradScaler(enabled=(device.type == "cuda"))
+    scaler = GradScaler(device=device.type, enabled=(device.type == "cuda")) if hasattr(torch.amp, "GradScaler") else GradScaler(enabled=(device.type == "cuda"))
 
     best_acc = 0.0
     start_time = time.time()
+    history = []  # Track training history
 
     print("\n" + "=" * 75)
     print(f"🚀 Starting RTX Training ({num_epochs} Epochs | Batch Size: {batch_size} | Mixed Precision: FP16)")
@@ -112,11 +153,15 @@ def train(data_dir="./data", num_epochs=10, batch_size=64, learning_rate=0.001, 
             labels = labels.to(device, non_blocking=True)
             optimizer.zero_grad()
 
-            with autocast(enabled=(device.type == "cuda")):
+            with autocast_context(device):
                 outputs = model(images)
                 loss = criterion(outputs, labels)
 
             scaler.scale(loss).backward()
+            
+            # Gradient clipping (prevent unstable gradients)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            
             scaler.step(optimizer)
             scaler.update()
 
@@ -139,7 +184,7 @@ def train(data_dir="./data", num_epochs=10, batch_size=64, learning_rate=0.001, 
                 images = images.to(device, non_blocking=True)
                 labels = labels.to(device, non_blocking=True)
 
-                with autocast(enabled=(device.type == "cuda")):
+                with autocast_context(device):
                     outputs = model(images)
                     loss = criterion(outputs, labels)
 
@@ -159,13 +204,28 @@ def train(data_dir="./data", num_epochs=10, batch_size=64, learning_rate=0.001, 
 
         if val_acc > best_acc:
             best_acc = val_acc
-            torch.save(model.state_dict(), save_path)
-            print(f"  ⭐ Saved Best Model Checkpoint -> {save_path} (Accuracy: {val_acc:.2f}%)")
+            save_checkpoint_with_backup(model, val_acc, epoch + 1, save_path)
+            print(f"  ⭐ Saved Best Model Checkpoint (Accuracy: {val_acc:.2f}%)")
+        
+        # Track metrics
+        history.append({
+            "epoch": epoch + 1,
+            "train_loss": float(train_loss),
+            "train_acc": float(train_acc),
+            "val_loss": float(val_loss),
+            "val_acc": float(val_acc)
+        })
 
     total_min = (time.time() - start_time) / 60
     print("\n" + "=" * 75)
     print(f"🎉 Training Finished in {total_min:.2f} minutes | Top Validation Accuracy: {best_acc:.2f}%")
     print(f"📦 Model Saved: {save_path}")
+    
+    # Save training history
+    history_file = os.path.join(os.path.dirname(save_path), "training_history.json")
+    with open(history_file, "w") as f:
+        json.dump(history, f, indent=2)
+    print(f"📊 Training history saved: {history_file}")
     print("=" * 75)
 
 if __name__ == "__main__":
