@@ -97,12 +97,14 @@ public class TransportService {
             double priceScore = 1.0 - (cost.doubleValue() / maxCost);
             // Closer → higher proximity score
             double proxScore = 1.0 - (proximity / maxProx);
+            // Reliability performance score
+            double relScore = t.getReliabilityScore().doubleValue() / 100.0;
             // Verified bonus
             double verifiedScore = t.isVerified() ? 1.0 : 0.0;
             // Capacity headroom (larger relative to quantity = better)
             double capacityScore = Math.min(t.getCapacityKg().doubleValue() / deal.getQuantity().doubleValue() / 3.0, 1.0);
 
-            double composite = (priceScore * 0.40) + (proxScore * 0.35) + (verifiedScore * 0.15) + (capacityScore * 0.10);
+            double composite = (priceScore * 0.30) + (proxScore * 0.30) + (relScore * 0.25) + (verifiedScore * 0.10) + (capacityScore * 0.05);
             scored.add(new ScoredTransporter(t, proximity, cost, composite));
         }
 
@@ -388,6 +390,42 @@ public class TransportService {
         }
     }
 
+    @Transactional
+    public void rateTransporter(Long transporterId, com.kisanlink.dto.TransporterRatingRequest req, String userEmail) {
+        Transporter t = transporterRepo.findById(transporterId)
+                .orElseThrow(() -> new IllegalArgumentException("Transporter not found: " + transporterId));
+
+        int currentCount = t.getRatingCount();
+        BigDecimal currentRating = t.getRating();
+        BigDecimal newRating = BigDecimal.valueOf(req.rating());
+
+        // Rolling weighted average
+        BigDecimal updatedAvg = currentRating.multiply(BigDecimal.valueOf(currentCount))
+                .add(newRating)
+                .divide(BigDecimal.valueOf(currentCount + 1), 2, RoundingMode.HALF_UP);
+
+        t.setRating(updatedAvg);
+        t.setRatingCount(currentCount + 1);
+        t.setCompletedTrips(t.getCompletedTrips() + 1);
+
+        double onTime = t.getOnTimeRate().doubleValue();
+        double ratingScore = (updatedAvg.doubleValue() / 5.0) * 30.0;
+        double reliability = (onTime * 0.40) + ratingScore + 28.5;
+        reliability = Math.min(100.0, Math.max(50.0, reliability));
+
+        t.setReliabilityScore(BigDecimal.valueOf(reliability).setScale(2, RoundingMode.HALF_UP));
+        if (reliability >= 90.0) {
+            t.setTierBadge("TOP_CARRIER");
+        } else if (reliability >= 80.0) {
+            t.setTierBadge("VERIFIED_EXPRESS");
+        } else {
+            t.setTierBadge("STANDARD");
+        }
+
+        transporterRepo.save(t);
+        log.info("Transporter {} rated {} stars by {}. New score: {}", transporterId, req.rating(), userEmail, t.getReliabilityScore());
+    }
+
     private TransportSuggestionResponse toSuggestion(Transporter t, double proximityKm, BigDecimal routeKm, BigDecimal cost, double score) {
         return new TransportSuggestionResponse(
                 t.getId(),
@@ -405,7 +443,12 @@ public class TransportService {
                 t.getRatePerKm(),
                 t.getBaseCharge(),
                 cost,
-                Math.round(score * 1000.0) / 10.0
+                Math.round(score * 1000.0) / 10.0,
+                t.getCompletedTrips(),
+                t.getRating().doubleValue(),
+                t.getOnTimeRate().doubleValue(),
+                t.getReliabilityScore().doubleValue(),
+                t.getTierBadge()
         );
     }
 

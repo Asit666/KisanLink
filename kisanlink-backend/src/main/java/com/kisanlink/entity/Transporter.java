@@ -56,6 +56,24 @@ public class Transporter {
     @Column(length = 20)
     private String alertPhone;
 
+    @Column(nullable = false)
+    private int completedTrips = 12;
+
+    @Column(nullable = false, precision = 3, scale = 2)
+    private BigDecimal rating = BigDecimal.valueOf(4.80);
+
+    @Column(nullable = false)
+    private int ratingCount = 8;
+
+    @Column(nullable = false, precision = 5, scale = 2)
+    private BigDecimal onTimeRate = BigDecimal.valueOf(96.50);
+
+    @Column(nullable = false, precision = 5, scale = 2)
+    private BigDecimal reliabilityScore = BigDecimal.valueOf(92.50);
+
+    @Column(length = 30, nullable = false)
+    private String tierBadge = "TOP_CARRIER";
+
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
 

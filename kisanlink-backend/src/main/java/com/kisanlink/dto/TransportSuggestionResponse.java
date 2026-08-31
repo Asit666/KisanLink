@@ -3,7 +3,7 @@ package com.kisanlink.dto;
 import java.math.BigDecimal;
 
 /**
- * One ranked transporter suggestion returned by the matching engine.
+ * One ranked transporter suggestion returned by the matching engine with reliability metrics.
  */
 public record TransportSuggestionResponse(
         Long transporterId,
@@ -30,5 +30,12 @@ public record TransportSuggestionResponse(
         BigDecimal estimatedCost,
 
         /** 0-100 composite score (higher = better match) */
-        double score
+        double score,
+
+        // Reliability metrics
+        int completedTrips,
+        double rating,
+        double onTimeRate,
+        double reliabilityScore,
+        String tierBadge
 ) {}

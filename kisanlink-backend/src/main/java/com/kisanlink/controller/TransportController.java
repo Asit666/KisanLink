@@ -124,4 +124,17 @@ public class TransportController {
             @AuthenticationPrincipal UserDetails principal) {
         return transportService.markDelivered(id, principal.getUsername());
     }
+
+    /**
+     * POST /api/transport/transporters/{id}/rate
+     * Farmer or Buyer rates the Transporter and provides feedback after delivery.
+     */
+    @PostMapping("/transporters/{id}/rate")
+    @ResponseStatus(HttpStatus.OK)
+    public void rateTransporter(
+            @PathVariable Long id,
+            @Valid @RequestBody com.kisanlink.dto.TransporterRatingRequest request,
+            @AuthenticationPrincipal UserDetails principal) {
+        transportService.rateTransporter(id, request, principal.getUsername());
+    }
 }
