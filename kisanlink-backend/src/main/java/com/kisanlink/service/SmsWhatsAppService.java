@@ -33,14 +33,31 @@ public class SmsWhatsAppService {
         this.notificationWebSocketService = notificationWebSocketService;
     }
 
+    public interface NotificationGatewayProvider {
+        GatewayResult dispatch(String recipientPhone, MessageChannel channel, String text);
+    }
+
+    public record GatewayResult(String providerMessageId, MessageStatus status, boolean isSimulated) {}
+
+    private NotificationGatewayProvider gatewayProvider = (recipientPhone, channel, text) -> {
+        String prefix = channel == MessageChannel.WHATSAPP ? "WA-SIM-" : "SM-SIM-";
+        String providerId = prefix + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
+        return new GatewayResult(providerId, MessageStatus.DELIVERED, true);
+    };
+
+    public void setGatewayProvider(NotificationGatewayProvider provider) {
+        if (provider != null) {
+            this.gatewayProvider = provider;
+        }
+    }
+
     public SmsAlertResponse dispatchAlert(User user, String recipientPhone, MessageChannel channel, String messageType, String text) {
         String phone = (recipientPhone != null && !recipientPhone.isBlank())
                 ? recipientPhone
                 : (user != null && user.getPhone() != null ? user.getPhone() : "+91-9876543210");
 
         MessageChannel targetChannel = channel != null ? channel : MessageChannel.SMS;
-        String prefix = targetChannel == MessageChannel.WHATSAPP ? "WA-" : "SM-";
-        String providerId = prefix + UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase();
+        GatewayResult gatewayResult = gatewayProvider.dispatch(phone, targetChannel, text);
 
         SmsWhatsAppLog log = new SmsWhatsAppLog();
         log.setUser(user);
@@ -48,8 +65,8 @@ public class SmsWhatsAppService {
         log.setChannel(targetChannel);
         log.setMessageType(messageType != null ? messageType : "FIELD_ALERT");
         log.setBody(text);
-        log.setProviderMessageId(providerId);
-        log.setStatus(MessageStatus.DELIVERED);
+        log.setProviderMessageId(gatewayResult.providerMessageId());
+        log.setStatus(gatewayResult.status());
         log.setSentAt(Instant.now());
 
         SmsWhatsAppLog saved = logRepository.save(log);

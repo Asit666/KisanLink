@@ -19,7 +19,12 @@ public class JwtService {
     private final long expiration;
 
     public JwtService(@Value("${jwt.secret}") String secret,
-                      @Value("${jwt.expiration}") long expiration) {
+                      @Value("${jwt.expiration}") long expiration,
+                      @Value("${spring.profiles.active:}") String activeProfile) {
+        if (("prod".equalsIgnoreCase(activeProfile) || "production".equalsIgnoreCase(activeProfile))
+                && (secret.contains("change-this-development-secret") || secret.length() < 32)) {
+            throw new IllegalStateException("FATAL: Insecure default JWT secret configured in production environment. A strong, random 256-bit secret is required.");
+        }
         this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expiration = expiration;
     }

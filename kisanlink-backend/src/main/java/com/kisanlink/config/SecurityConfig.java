@@ -32,8 +32,8 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/api/auth/**", "/error", "/ws/**", "/api/notifications/sms-whatsapp/webhook").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/crops/**", "/api/markets/**", "/api/prices/**", "/api/predictions/**", "/api/weather/**").permitAll()
+                        .requestMatchers("/", "/api/auth/**", "/error", "/ws/**", "/api/notifications/sms-whatsapp/webhook", "/api/webhooks/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/crops/**", "/api/markets/**", "/api/prices/**", "/api/predictions/**", "/api/weather/**", "/api/support/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/crops", "/api/markets", "/api/prices").hasRole("ADMIN")
                         .requestMatchers("/api/farmers/**").hasRole("FARMER")
                         .requestMatchers("/api/buyers/**").hasRole("BUYER")

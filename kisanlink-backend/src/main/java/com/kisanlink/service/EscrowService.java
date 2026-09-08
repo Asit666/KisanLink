@@ -199,6 +199,36 @@ public class EscrowService {
         return mapToResponse(saved);
     }
 
+    @Transactional
+    public EscrowResponse processVerifiedPaymentWebhook(Long escrowId, BigDecimal amount, String gatewayPaymentId, String gatewayName) {
+        EscrowPayment escrow = escrowRepository.findById(escrowId)
+                .orElseThrow(() -> new IllegalArgumentException("Escrow account not found: " + escrowId));
+
+        if (escrow.getStatus() != EscrowStatus.PENDING_DEPOSIT) {
+            return mapToResponse(escrow);
+        }
+
+        TradeDeal deal = escrow.getTradeDeal();
+        escrow.setDepositAmount(amount != null ? amount : escrow.getTotalAmount());
+        escrow.setPaymentMethod(PaymentMethod.UPI_INSTANT);
+        escrow.setBuyerUpiId("gateway-" + (gatewayName != null ? gatewayName.toLowerCase() : "provider") + "@verified");
+        escrow.setUpiRef(gatewayPaymentId != null ? gatewayPaymentId : "GW-" + System.currentTimeMillis());
+        escrow.setStatus(EscrowStatus.FUNDS_HELD_IN_ESCROW);
+        escrow.setDepositedAt(Instant.now());
+
+        EscrowPayment saved = escrowRepository.save(escrow);
+
+        String farmerTitle = "Payment Guaranteed in Escrow: ₹" + saved.getDepositAmount();
+        String farmerMsg = String.format("Buyer paid via verified gateway for Trade #%d. Funds held in Escrow Vault.", deal.getId());
+        notificationWebSocketService.sendUserNotification(deal.getFarmer().getUser(), "ESCROW_LOCKED", farmerTitle, farmerMsg, deal.getId(), EscrowStatus.FUNDS_HELD_IN_ESCROW.name());
+
+        String buyerTitle = "Payment Confirmed: ₹" + saved.getDepositAmount();
+        String buyerMsg = String.format("Gateway payment confirmed for Trade #%d. Ref: %s.", deal.getId(), saved.getUpiRef());
+        notificationWebSocketService.sendUserNotification(deal.getBuyer().getUser(), "ESCROW_LOCKED", buyerTitle, buyerMsg, deal.getId(), EscrowStatus.FUNDS_HELD_IN_ESCROW.name());
+
+        return mapToResponse(saved);
+    }
+
     @Transactional(readOnly = true)
     public EscrowResponse getEscrowByTradeId(Long dealId, String userEmail) {
         TradeDeal deal = tradeDealRepository.findById(dealId)

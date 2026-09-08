@@ -61,6 +61,9 @@ public class KisanLinkIntegrationTests {
     @Autowired
     private MarketPriceRepository marketPriceRepository;
 
+    @Autowired
+    private SupportCenterRepository supportCenterRepository;
+
     private Crop tomato;
 
     @BeforeEach
@@ -1248,6 +1251,82 @@ public class KisanLinkIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("ESCALATED"))
                 .andExpect(jsonPath("$.expertNotes").value(org.hamcrest.Matchers.containsString("Copper Oxychloride")));
+    }
+
+    @Test
+    void testSupportCentersEndpoint() throws Exception {
+        SupportCenter sc = new SupportCenter();
+        sc.setName("ICAR Krishi Vigyan Kendra Test");
+        sc.setCenterType("GOVT_KVK");
+        sc.setBadge("ICAR Verified");
+        sc.setDesignation("District Station");
+        sc.setDepartment("ICAR");
+        sc.setDistrict("Nashik");
+        sc.setState("Maharashtra");
+        sc.setAddress("Panchavati, Nashik");
+        sc.setLatitude(20.0384);
+        sc.setLongitude(73.8052);
+        sc.setPhone("+91 253 2530182");
+        sc.setServices("Soil testing, seeds");
+        sc.setVerified(true);
+        supportCenterRepository.save(sc);
+
+        mockMvc.perform(get("/api/support/nearby")
+                        .param("latitude", "20.0384")
+                        .param("longitude", "73.8052")
+                        .param("radiusKm", "500"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].name").value("ICAR Krishi Vigyan Kendra Test"))
+                .andExpect(jsonPath("$[0].distanceKm").isNumber());
+
+        mockMvc.perform(get("/api/support/nearby")
+                        .param("type", "GOVT_KVK"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    void testPaymentWebhookEndpoint() throws Exception {
+        // 1. Informational or unhandled event is acknowledged cleanly
+        String infoPayload = """
+                {
+                    "event": "payment.authorized",
+                    "escrowId": 12345,
+                    "paymentId": "PAY_INFO_999"
+                }
+                """;
+        mockMvc.perform(post("/api/webhooks/payment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(infoPayload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.paymentId").value("PAY_INFO_999"));
+
+        // 2. Invalid escrow id returns 400 bad request with error description
+        String invalidPayload = """
+                {
+                    "event": "PAYMENT_SUCCESS",
+                    "escrowId": 99999,
+                    "amount": 15000.00,
+                    "paymentId": "PAY_TEST_WEBHOOK_001",
+                    "gateway": "RAZORPAY",
+                    "status": "CAPTURED"
+                }
+                """;
+        mockMvc.perform(post("/api/webhooks/payment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidPayload))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.paymentId").value("PAY_TEST_WEBHOOK_001"));
+
+        // 3. Duplicate delivery is recognized and idempotently acknowledged
+        mockMvc.perform(post("/api/webhooks/payment")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(infoPayload))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Duplicate webhook acknowledged")));
     }
 }
 
