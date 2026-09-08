@@ -1328,6 +1328,52 @@ public class KisanLinkIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Duplicate webhook acknowledged")));
     }
+
+    @Test
+    void testSecurityAuthorizationAndInputValidationBoundaries() throws Exception {
+        // 1. Register two farmers and one buyer
+        AuthResponse farmer1 = registerUser("Farmer Alice", "alice.sec@test.com", "Password@123", Role.FARMER);
+        AuthResponse farmer2 = registerUser("Farmer Bob", "bob.sec@test.com", "Password@123", Role.FARMER);
+        AuthResponse buyer = registerUser("Buyer Charlie", "charlie.sec@test.com", "Password@123", Role.BUYER);
+
+        // 2. Negative Input Validation: produce creation with blank quality and null quantity is rejected with 400 Bad Request
+        String invalidProduceJson = """
+                {
+                    "cropId": 1,
+                    "cropName": "Tomato",
+                    "quantity": null,
+                    "quality": "",
+                    "expectedPrice": -50.0
+                }
+                """;
+        mockMvc.perform(post("/api/farmers/" + farmer1.profileId() + "/produce")
+                        .header("Authorization", "Bearer " + farmer1.token())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidProduceJson))
+                .andExpect(status().isBadRequest());
+
+        // 3. Authorization Boundary: Farmer Bob cannot create produce under Farmer Alice's profile (403 Forbidden)
+        ProduceRequest validProduce = new ProduceRequest(
+                tomato.getId(),
+                java.math.BigDecimal.valueOf(1000),
+                "GRADE_A",
+                java.time.LocalDate.now().plusDays(2),
+                java.time.LocalDate.now().plusDays(10),
+                java.math.BigDecimal.valueOf(25.0)
+        );
+        mockMvc.perform(post("/api/farmers/" + farmer1.profileId() + "/produce")
+                        .header("Authorization", "Bearer " + farmer2.token())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validProduce)))
+                .andExpect(status().isForbidden());
+
+        // 4. Authorization Boundary: Buyer cannot add produce to Farmer profile (403 Forbidden)
+        mockMvc.perform(post("/api/farmers/" + farmer1.profileId() + "/produce")
+                        .header("Authorization", "Bearer " + buyer.token())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validProduce)))
+                .andExpect(status().isForbidden());
+    }
 }
 
 

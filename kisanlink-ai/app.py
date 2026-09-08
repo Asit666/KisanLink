@@ -11,6 +11,7 @@ falling back to deterministic image heuristics when the trained checkpoint is mi
 import io
 import ipaddress
 import json
+import logging
 import os
 import socket
 from urllib.parse import parse_qs, urlparse
@@ -26,6 +27,15 @@ from pydantic import BaseModel
 from starlette.datastructures import Headers
 from torchvision import models, transforms
 
+# Configure structured logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("kisanlink.ai")
+
+# Enforce PIL decompression limits (16 Megapixels) to prevent memory exhaustion
+Image.MAX_IMAGE_PIXELS = 16_000_000
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10 MB
+MAX_IMAGE_DIMENSION = 4096
+
 app = FastAPI(
     title="KisanLink AI Crop Doctor Microservice",
     description="Real-time Computer Vision Disease Diagnosis powered by PyTorch and MobileNetV3-Large",
@@ -34,15 +44,15 @@ app = FastAPI(
 
 raw_cors = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://localhost:3000")
 allowed_origins = [origin.strip() for origin in raw_cors.split(",") if origin.strip()]
-if "*" in allowed_origins or os.getenv("CORS_ALLOW_ALL", "").lower() in ("true", "1"):
+if os.getenv("ENV") != "production" and ("*" in allowed_origins or os.getenv("CORS_ALLOW_ALL", "").lower() in ("true", "1")):
     allowed_origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
 )
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -361,7 +371,16 @@ async def predict_leaf_disease(file: UploadFile = File(...), crop_hint: str = ""
 
     try:
         contents = await file.read()
-        image = Image.open(io.BytesIO(contents)).convert("RGB")
+        if len(contents) > MAX_UPLOAD_SIZE:
+            raise HTTPException(status_code=400, detail="Uploaded file exceeds maximum allowable limit of 10 MB.")
+
+        raw_image = Image.open(io.BytesIO(contents))
+        if raw_image.width > MAX_IMAGE_DIMENSION or raw_image.height > MAX_IMAGE_DIMENSION:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Image dimensions ({raw_image.width}x{raw_image.height}) exceed maximum allowed limit of {MAX_IMAGE_DIMENSION}x{MAX_IMAGE_DIMENSION}."
+            )
+        image = raw_image.convert("RGB")
 
         if model is not None and os.path.exists(MODEL_PATH):
             tensor = INFERENCE_TRANSFORMS(image).unsqueeze(0).to(DEVICE)
@@ -440,8 +459,14 @@ async def predict_leaf_disease(file: UploadFile = File(...), crop_hint: str = ""
             requires_expert_review=requires_expert_review,
         )
 
+    except HTTPException:
+        raise
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Inference error: {str(exc)}") from exc
+        logger.exception("Inference processing error in predict_leaf_disease")
+        raise HTTPException(
+            status_code=500,
+            detail="Inference failed. Unable to process diagnostic image at this time."
+        ) from exc
 
 
 def resolve_direct_image_url(raw_url: str) -> str:
@@ -508,28 +533,49 @@ async def predict_leaf_from_url(payload: dict):
     validate_public_ip(hostname)
 
     try:
-        # Stream response with strict 10MB limit and 15s timeout
+        # Stream response with strict 10MB limit, 15s timeout, and per-hop SSRF redirect validation
         max_bytes = 10 * 1024 * 1024
         downloaded = io.BytesIO()
+        current_url = direct_image_url
 
-        with requests.get(
-            direct_image_url,
-            timeout=15,
-            stream=True,
-            headers={"User-Agent": "KisanLink-Crop-Doctor/1.0"}
-        ) as response:
-            response.raise_for_status()
-            content_type = response.headers.get("content-type", "image/jpeg").split(";", 1)[0].strip().lower()
-            if not content_type.startswith("image/"):
-                raise HTTPException(status_code=400, detail=f"The URL returned non-image content-type: '{content_type}'.")
+        for hop in range(3):
+            parsed_current = urlparse(current_url)
+            if not parsed_current.hostname:
+                raise HTTPException(status_code=400, detail="Invalid host in image URL.")
+            validate_public_ip(parsed_current.hostname)
 
-            total_size = 0
-            for chunk in response.iter_content(chunk_size=65536):
-                if chunk:
-                    total_size += len(chunk)
-                    if total_size > max_bytes:
-                        raise HTTPException(status_code=400, detail="Image file exceeds maximum allowable limit of 10 MB.")
-                    downloaded.write(chunk)
+            with requests.get(
+                current_url,
+                timeout=15,
+                stream=True,
+                allow_redirects=False,
+                headers={"User-Agent": "KisanLink-Crop-Doctor/1.0"}
+            ) as response:
+                if response.is_redirect or response.status_code in (301, 302, 303, 307, 308):
+                    location = response.headers.get("Location", "")
+                    if not location:
+                        raise HTTPException(status_code=400, detail="Redirect response missing Location header.")
+                    if location.startswith("/"):
+                        current_url = f"{parsed_current.scheme}://{parsed_current.netloc}{location}"
+                    else:
+                        current_url = location
+                    continue
+
+                response.raise_for_status()
+                content_type = response.headers.get("content-type", "image/jpeg").split(";", 1)[0].strip().lower()
+                if not content_type.startswith("image/"):
+                    raise HTTPException(status_code=400, detail=f"The URL returned non-image content-type: '{content_type}'.")
+
+                total_size = 0
+                for chunk in response.iter_content(chunk_size=65536):
+                    if chunk:
+                        total_size += len(chunk)
+                        if total_size > max_bytes:
+                            raise HTTPException(status_code=400, detail="Image file exceeds maximum allowable limit of 10 MB.")
+                        downloaded.write(chunk)
+                break
+        else:
+            raise HTTPException(status_code=400, detail="Too many redirects encountered while fetching image.")
 
         downloaded.seek(0)
         upload = UploadFile(

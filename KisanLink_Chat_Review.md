@@ -3420,3 +3420,556 @@ If you're preparing this for **SIH**, I'd prioritize that over adding more featu
 [3]: https://github.com/Asit666/KisanLink/blob/main/frontend/src/App.jsx "KisanLink/frontend/src/App.jsx at main · Asit666/KisanLink · GitHub"
 [4]: https://github.com/Asit666/KisanLink/blob/main/README.md "KisanLink/README.md at main · Asit666/KisanLink · GitHub"
 [5]: https://github.com/Asit666/KisanLink/blob/main/frontend/package.json "KisanLink/frontend/package.json at main · Asit666/KisanLink · GitHub"
+----------------------------------------------------------------------------------
+
+new review 4 
+
+3. Your frontend is still one enormous file
+
+This remains a major software problem.
+
+App.jsx is currently 12,255 lines.
+
+That's far too large for a React application.
+
+You have essentially created a monolithic frontend.
+
+Fix
+
+Break it into:
+
+src/
+├── App.jsx
+├── pages/
+│   ├── FarmerDashboard.jsx
+│   ├── BuyerDashboard.jsx
+│   ├── TransporterDashboard.jsx
+│   ├── Marketplace.jsx
+│   ├── PriceDiscovery.jsx
+│   └── CropDoctor.jsx
+│
+├── components/
+├── services/
+├── hooks/
+├── utils/
+├── constants/
+└── i18n/
+
+Don't rewrite everything at once.
+
+Extract one logical section at a time.
+
+🔴 4. Business logic is duplicated between UI and tests
+
+This is an important architectural problem.
+
+Your frontend test file contains its own implementations of things such as:
+
+calculateFarmerNetRealization()
+calculateFarmerEconomicProfit()
+
+rather than importing the production implementation.
+
+That creates a dangerous situation:
+
+Production calculation
+        ≠
+Test calculation
+
+The test can pass even if the actual application calculation is broken.
+
+Fix
+
+Move calculations into:
+
+src/utils/economics.js
+
+Then:
+
+// application
+import { calculateFarmerNetRealization } from './utils/economics';
+
+and:
+
+// tests
+import { calculateFarmerNetRealization } from '../utils/economics';
+
+The tests must test the real code.
+
+This applies to:
+
+farmer net realization
+buyer landed cost
+transporter profit
+escrow state machine
+price normalization
+recommendation engine
+🔴 5. Frontend tests are not really UI tests
+
+The repository claims 19 frontend tests across nine suites.
+
+But the test file uses:
+
+node:test
+node:assert
+
+rather than a browser/React testing framework.
+
+So these tests primarily verify JavaScript calculations and modules, not whether the actual UI works.
+
+They don't adequately catch:
+
+Button doesn't work
+Form doesn't submit
+Modal doesn't open
+Page crashes
+API response isn't rendered
+Role dashboard is broken
+React state doesn't update
+Fix
+
+Keep the current unit tests, but add:
+
+React Testing Library
++
+Playwright
+
+Then test the actual interface.
+
+🔴 6. No real end-to-end browser test
+
+The backend E2E test is useful, and the README says the full backend workflow is tested.
+
+But:
+
+Backend E2E ≠ Full Application E2E
+
+You need:
+
+Browser
+ ↓
+React
+ ↓
+API
+ ↓
+Database
+ ↓
+AI service
+ ↓
+WebSocket
+
+tested together.
+
+The most important test should be:
+Login
+ ↓
+Farmer dashboard
+ ↓
+Create listing
+ ↓
+Buyer sees listing
+ ↓
+Buyer makes offer
+ ↓
+Farmer accepts
+ ↓
+Escrow created
+ ↓
+Transport assigned
+ ↓
+Delivery
+ ↓
+Payment
+
+If this works through the actual browser, you've eliminated a huge class of integration bugs.
+
+🔴 7. API configuration uses localhost fallbacks
+
+Your frontend contains:
+
+const API_URL =
+    import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+const AI_API_URL =
+    import.meta.env.VITE_AI_API_URL || 'http://localhost:8000';
+
+This is convenient during development, but dangerous for deployment.
+
+A missing environment variable silently causes the production frontend to call localhost.
+
+Fix
+
+Development:
+
+localhost
+
+Production:
+
+https://api.yourdomain.com
+https://ai.yourdomain.com
+
+And ideally fail clearly if a production URL isn't configured.
+
+🔴 8. There is too much hardcoded application data in App.jsx
+
+The file begins with large hardcoded structures for agricultural inputs, products, prices, dealers, dosages, etc.
+
+That's a problem because application data is mixed with application logic.
+
+Current:
+
+App.jsx
+ ├── UI
+ ├── API logic
+ ├── business logic
+ ├── agricultural products
+ ├── prices
+ ├── recommendations
+ └── demo data
+Fix
+
+Move static configuration into:
+
+src/data/
+src/constants/
+
+And dynamic data should come from APIs.
+
+🟠 9. The frontend has external image URLs directly embedded
+
+For example, diagnostic presets contain direct Unsplash URLs.
+
+That's okay for demo images, but creates external dependencies.
+
+If the external service changes/removes the image, your UI breaks visually.
+
+Fix
+
+Either:
+
+public/images/
+
+or a controlled image/CDN service.
+
+🟠 10. AI CORS configuration is overly permissive
+
+The AI service allows:
+
+allow_methods=["*"]
+allow_headers=["*"]
+
+and has a configuration path that allows all origins.
+
+For development that's convenient.
+
+For production:
+
+allow_origins = your actual frontend domain
+allow_methods = required methods only
+allow_headers = required headers only
+
+Do not leave wildcard CORS enabled in production.
+
+🟠 11. AI URL image fetching needs more SSRF hardening
+
+The project deserves credit here: the AI service does have SSRF protection and checks for private/loopback/link-local/reserved addresses. It also limits downloads to 10 MB and has a 15-second timeout.
+
+That's good.
+
+However, DNS-based SSRF protection can still be tricky because DNS resolution and the actual connection can race/rebind.
+
+For production:
+
+resolve and connect safely
+restrict redirects
+validate every redirect destination
+preferably use an allowlist for image domains if practical
+enforce response size
+enforce image dimensions
+
+The current implementation is better than an unprotected URL fetch, but I wouldn't call it completely hardened.
+
+🟠 12. Uploaded images don't have an explicit pixel-dimension limit
+
+The URL endpoint has a 10 MB download limit.
+
+But the uploaded-file endpoint reads the image and passes it to PIL without an explicit file-size/dimension limit.
+
+A malicious or extremely large image can consume significant memory/CPU.
+
+Fix
+
+Limit:
+
+file size
+image width
+image height
+pixel count
+
+before processing.
+
+🟠 13. AI exceptions expose internal error messages
+
+The endpoint does:
+
+except Exception as exc:
+    raise HTTPException(
+        status_code=500,
+        detail=f"Inference error: {str(exc)}"
+    )
+
+This can expose internal implementation information to clients.
+
+Fix
+
+Log the actual exception server-side:
+
+logger.exception(...)
+
+Return:
+
+{
+  "error": "INFERENCE_FAILED",
+  "message": "Unable to process image"
+}
+
+Don't expose stack/internal details.
+
+🟠 14. Backend technology versions should be stabilized
+
+The current backend pom.xml uses:
+
+Spring Boot 4.1.1
+Java 25
+
+This is a relatively aggressive stack choice.
+
+For a student/hackathon project that's not automatically wrong, but it increases compatibility/deployment risk.
+
+You need to ensure your:
+
+JDK
+Maven
+IDE
+Docker image
+CI environment
+
+all use the exact same Java version.
+
+🟠 15. Database testing configuration needs separation
+
+The backend has H2 as a runtime test dependency while PostgreSQL is the actual runtime database.
+
+That's potentially problematic because:
+
+Production = PostgreSQL
+Tests = H2
+
+can allow database-specific bugs to escape testing.
+
+For example:
+
+PostgreSQL SQL behavior
+PostgreSQL constraints
+PostgreSQL types
+PostgreSQL transaction behavior
+
+may differ from H2.
+
+Better
+
+Use:
+
+Testcontainers
++
+PostgreSQL
+
+for integration tests.
+
+Then your tests run against the same database engine you actually deploy.
+
+🟠 16. WebSocket failure handling needs testing
+
+The frontend imports:
+
+KisanLinkWebSocketClient
+
+directly into the giant App.jsx.
+
+The important cases to test are:
+
+server unavailable
+connection dropped
+reconnect
+duplicate messages
+stale messages
+logout while connected
+role changes
+multiple browser tabs
+
+A WebSocket feature that works only when the connection is perfect isn't production-ready.
+
+🟡 17. Environment/configuration needs one central system
+
+Right now configuration is spread across:
+
+VITE_API_URL
+VITE_AI_API_URL
+CORS_ORIGINS
+CORS_ALLOW_ALL
+database configuration
+JWT configuration
+Docker configuration
+
+Create a clear configuration strategy:
+
+.env.development
+.env.test
+.env.production
+
+and document required variables.
+
+Never silently use insecure production defaults.
+
+🟡 18. Error handling needs a consistent format
+
+Every backend endpoint should return errors consistently.
+
+Instead of one endpoint returning:
+
+{"message":"Something failed"}
+
+and another:
+
+{"error":"..."}
+
+standardize:
+
+{
+  "success": false,
+  "code": "INVALID_REQUEST",
+  "message": "Quantity must be greater than zero",
+  "timestamp": "...",
+  "requestId": "..."
+}
+
+This makes frontend error handling much easier.
+
+🟡 19. Validation needs to be tested for bad inputs
+
+Don't only test:
+
+valid farmer
+valid crop
+valid price
+valid quantity
+
+Test:
+
+quantity = 0
+quantity = -1
+price = 0
+price = -100
+empty crop
+invalid crop
+huge quantity
+huge price
+missing buyer
+expired offer
+duplicate offer
+already completed escrow
+invalid delivery
+unauthorized user
+
+This is where many real application bugs appear.
+
+🟡 20. Your tests should include authorization attacks
+
+Because KisanLink has different roles:
+
+Farmer
+Buyer
+Transporter
+Admin
+
+you need tests such as:
+
+Farmer cannot modify another farmer's listing
+Buyer cannot approve delivery
+Transporter cannot release escrow
+Farmer cannot access admin endpoint
+Buyer cannot manipulate another buyer's offer
+
+The presence of Spring Security in the backend is good.
+
+But having security configured isn't the same as proving authorization is correct.
+
+Priority list
+
+If you want to fix this systematically, I recommend this exact order:
+
+🔴 P0
+1. Verify real AI model / fallback behavior
+2. Extract business logic from App.jsx
+3. Make tests import production business logic
+4. Add real browser E2E testing
+5. Verify all frontend ↔ backend API flows
+6. Fix production environment configuration
+7. Test role-based authorization
+🟠 P1
+8. Add PostgreSQL Testcontainers
+9. Harden AI upload limits
+10. Harden AI URL fetching
+11. Standardize API errors
+12. Improve WebSocket reconnect/error handling
+13. Remove application data from App.jsx
+14. Add invalid-input tests
+🟡 P2
+15. Split App.jsx into pages/components
+16. Clean configuration
+17. Clean external image dependencies
+18. Improve logging/monitoring
+19. Remove duplicate code
+20. Improve documentation
+One especially important finding
+
+The repository's README now says 23/23 backend tests, 19/19 frontend tests, and a clean Vite production build.
+
+So I would not say:
+
+"KisanLink has no tests."
+
+It does.
+
+The actual problem is more specific:
+
+The existing tests prove a lot of business logic, but they don't yet prove that the complete browser application works correctly when all services interact.
+
+That's the software problem I'd attack next.
+
+Recommended fixing target
+
+Don't add anything new.
+
+Get this to 100% working first:
+
+                    KisanLink
+                        │
+             ┌──────────┴──────────┐
+             │                     │
+          Frontend              Backend
+             │                     │
+             │              ┌──────┴──────┐
+             │              │             │
+             │           Database       AI
+             │              │             │
+             └──────────────┴─────────────┘
+                            │
+                     Complete E2E test
+                            │
+                     PASS = software ready
+
+This is now the software-fix checklist I'd use for KisanLink. The next step should be fixing P0 items one by one, starting with the frontend/backend integration and the duplicated business logic, rather than adding more features.
+
+
+
