@@ -45,6 +45,58 @@ describe('Farmer Net Realization & Selling Decision Engine', () => {
     };
   }
 
+  function calculateFarmerEconomicProfit({
+    acres = 2.5,
+    quantityKg = 5000,
+    pricePerKg = 27.0,
+    distanceKm = 38,
+    ratePerKm = 15,
+    baseFee = 100,
+    handlingPct = 0.015,
+    seedCostPerAcre = 3500,
+    fertCostPerAcre = 6500,
+    labourCostPerAcre = 8500,
+    tillageCostPerAcre = 3500,
+    irrigationCostPerAcre = 3000
+  }) {
+    const totalCostPerAcre = seedCostPerAcre + fertCostPerAcre + labourCostPerAcre + tillageCostPerAcre + irrigationCostPerAcre;
+    const totalCultivationCost = Math.round(acres * totalCostPerAcre);
+    const productionCostPerKg = Number((totalCultivationCost / quantityKg).toFixed(2));
+
+    const grossRevenue = Math.round(quantityKg * pricePerKg);
+    const freight = 100 + Math.round(ratePerKm * distanceKm * (1 + (quantityKg > 1000 ? (quantityKg - 1000) / 3000 : 0)));
+    const handlingFee = Math.round(grossRevenue * handlingPct);
+    const postHarvestCosts = freight + handlingFee;
+
+    // Escrow Net Bank Payout (Direct Cash Wired to Bank)
+    const escrowNetBankPayout = grossRevenue - postHarvestCosts;
+    const payoutPerKg = Number((escrowNetBankPayout / quantityKg).toFixed(2));
+
+    // Economic Net Farm Profit (Gross - Cultivation - Post-Harvest)
+    const economicNetFarmProfit = escrowNetBankPayout - totalCultivationCost;
+    const profitPerAcre = Math.round(economicNetFarmProfit / acres);
+    const profitMarginPercent = Number(((economicNetFarmProfit / grossRevenue) * 100).toFixed(1));
+    const benefitCostRatio = Number((grossRevenue / (totalCultivationCost + postHarvestCosts)).toFixed(2));
+    const breakEvenPricePerKg = Number(((totalCultivationCost + postHarvestCosts) / quantityKg).toFixed(2));
+
+    return {
+      totalCostPerAcre,
+      totalCultivationCost,
+      productionCostPerKg,
+      grossRevenue,
+      freight,
+      handlingFee,
+      postHarvestCosts,
+      escrowNetBankPayout,
+      payoutPerKg,
+      economicNetFarmProfit,
+      profitPerAcre,
+      profitMarginPercent,
+      benefitCostRatio,
+      breakEvenPricePerKg
+    };
+  }
+
   it('should compute farmer net return after deducting freight and handling', () => {
     // 500 kg Tomato at Rs 27/kg over 38 km
     const res = calculateFarmerNetRealization(500, 27.0, 38, 15, 100, 0.015);
@@ -68,6 +120,50 @@ describe('Farmer Net Realization & Selling Decision Engine', () => {
     assert.strictEqual(mandiA.netReturn, 21475);
     assert.strictEqual(mandiB.netReturn, 22160);
     assert.ok(mandiB.netReturn > mandiA.netReturn);
+  });
+
+  it('should compute full-cycle economic net farm profit, B:C ratio, profit per acre, and break-even price vs escrow bank payout', () => {
+    // 2.5 acres Tomato, 5000 kg yield, Rs 27/kg, 38 km haul to institutional buyer
+    const res = calculateFarmerEconomicProfit({
+      acres: 2.5,
+      quantityKg: 5000,
+      pricePerKg: 27.0,
+      distanceKm: 38,
+      seedCostPerAcre: 3500,
+      fertCostPerAcre: 6500,
+      labourCostPerAcre: 8500,
+      tillageCostPerAcre: 3500,
+      irrigationCostPerAcre: 3000
+    });
+
+    // Cultivation: 3500 + 6500 + 8500 + 3500 + 3000 = 25000/acre * 2.5 = 62500
+    assert.strictEqual(res.totalCostPerAcre, 25000);
+    assert.strictEqual(res.totalCultivationCost, 62500);
+    assert.strictEqual(res.productionCostPerKg, 12.50);
+
+    // Gross: 5000 * 27 = 135000
+    assert.strictEqual(res.grossRevenue, 135000);
+
+    // Freight: 100 + 15 * 38 * (1 + 4000/3000 = 2.333) = 100 + 1330 = 1430
+    assert.strictEqual(res.freight, 1430);
+    // Handling: 1.5% of 135000 = 2025
+    assert.strictEqual(res.handlingFee, 2025);
+    assert.strictEqual(res.postHarvestCosts, 3455);
+
+    // Escrow Net Bank Payout: 135000 - 3455 = 131545
+    assert.strictEqual(res.escrowNetBankPayout, 131545);
+    assert.strictEqual(res.payoutPerKg, 26.31);
+
+    // Economic Net Farm Profit: 131545 - 62500 = 69045
+    assert.strictEqual(res.economicNetFarmProfit, 69045);
+    assert.strictEqual(res.profitPerAcre, 27618); // 69045 / 2.5
+    assert.ok(res.profitMarginPercent > 50);
+
+    // Benefit-Cost Ratio: 135000 / (62500 + 3455 = 65955) = 2.05 : 1
+    assert.strictEqual(res.benefitCostRatio, 2.05);
+
+    // Break-Even Price: 65955 / 5000 = 13.19/kg
+    assert.strictEqual(res.breakEvenPricePerKg, 13.19);
   });
 });
 
@@ -149,6 +245,58 @@ describe('Transporter Trip Operating Profit & Freight Margin Engine', () => {
     };
   }
 
+  function calculateTransporterFullFleetEconomics({
+    distanceKm = 85,
+    payloadKg = 2500,
+    ratePerKm = 17.5,
+    baseCharge = 220,
+    mileageKmPerLitre = 8.5,
+    dieselPrice = 92.0,
+    tolls = 240,
+    deadheadRisk = 0.20,
+    wearPerKm = 2.8,
+    driverWages = 450,
+    permitInsurance = 100,
+    escrowFeePercent = 0.02
+  }) {
+    const dist = Math.max(1, distanceKm);
+    const payloadTons = payloadKg / 1000;
+    const tonKm = Number((payloadTons * dist).toFixed(1));
+
+    const grossFreightRevenue = Math.round(baseCharge + (dist * ratePerKm));
+    const escrowFee = Math.round(grossFreightRevenue * escrowFeePercent);
+    const escrowNetBankPayout = grossFreightRevenue - escrowFee;
+
+    const fuelLitres = dist / mileageKmPerLitre;
+    const outwardFuelCost = Math.round(fuelLitres * dieselPrice);
+    const deadheadContingency = Math.round(outwardFuelCost * deadheadRisk);
+    const maintenanceAndWear = Math.round(dist * wearPerKm);
+
+    const totalOperatingCost = outwardFuelCost + deadheadContingency + tolls + maintenanceAndWear + driverWages + permitInsurance + escrowFee;
+    const netTripProfit = grossFreightRevenue - totalOperatingCost;
+    const profitMarginPercent = Number(((netTripProfit / grossFreightRevenue) * 100).toFixed(1));
+    const netReturnPerKm = Number((netTripProfit / dist).toFixed(2));
+    const netReturnPerKg = Number((netTripProfit / payloadKg).toFixed(2));
+    const breakEvenFreightRatePerKm = Number((totalOperatingCost / dist).toFixed(2));
+    const revenuePerTonKm = Number((grossFreightRevenue / tonKm).toFixed(2));
+
+    return {
+      grossFreightRevenue,
+      escrowFee,
+      escrowNetBankPayout,
+      outwardFuelCost,
+      deadheadContingency,
+      totalOperatingCost,
+      netTripProfit,
+      profitMarginPercent,
+      netReturnPerKm,
+      netReturnPerKg,
+      breakEvenFreightRatePerKm,
+      revenuePerTonKm,
+      tonKm
+    };
+  }
+
   it('should compute transporter net profit deducting diesel, tolls, wear, and deadhead buffer', () => {
     // 85 km trip in Pickup (rate: 17.5/km, base: 220, mileage: 8.5 km/L, wear: 2.8/km, driver: 450, tolls: 240, diesel: 92)
     const res = calculateTransporterTripProfit(85, 17.5, 220, 8.5, 92.0, 240, 0.20, 450, 2.8);
@@ -179,6 +327,50 @@ describe('Transporter Trip Operating Profit & Freight Margin Engine', () => {
     assert.strictEqual(res.totalOperatingCost, 3925);
     assert.strictEqual(res.netTripProfit, 425);
     assert.ok(res.profitMarginPercent > 9.0);
+  });
+
+  it('should compute escrow bank payout, break-even freight rate, revenue per ton-km, and profit per kg', () => {
+    // 120 km trip in Medium LCV (5T): base 450, 26.0/km, 6.0 km/L, 3500 kg payload, tolls 320, deadhead 20%, driver 650, permit 180
+    const res = calculateTransporterFullFleetEconomics({
+      distanceKm: 120,
+      payloadKg: 3500,
+      ratePerKm: 26.0,
+      baseCharge: 450,
+      mileageKmPerLitre: 6.0,
+      dieselPrice: 92.0,
+      tolls: 320,
+      deadheadRisk: 0.20,
+      wearPerKm: 4.5,
+      driverWages: 650,
+      permitInsurance: 180,
+      escrowFeePercent: 0.02
+    });
+
+    // Gross freight: 450 + (120 * 26) = 3570
+    assert.strictEqual(res.grossFreightRevenue, 3570);
+    // Escrow fee (2%): 71
+    assert.strictEqual(res.escrowFee, 71);
+    // Escrow Net Bank Payout: 3570 - 71 = 3499
+    assert.strictEqual(res.escrowNetBankPayout, 3499);
+
+    // Fuel: (120 / 6) * 92 = 20 * 92 = 1840
+    assert.strictEqual(res.outwardFuelCost, 1840);
+    // Deadhead (20%): 368
+    assert.strictEqual(res.deadheadContingency, 368);
+    // Wear: 120 * 4.5 = 540
+    // Operating total: 1840 + 368 + 320 + 540 + 650 + 180 + 71 = 3969
+    assert.strictEqual(res.totalOperatingCost, 3969);
+
+    // Net trip profit: 3570 - 3969 = -399
+    assert.strictEqual(res.netTripProfit, -399);
+
+    // Break-even rate per km: 3969 / 120 = 33.08/km (minimum rate to charge to cover all expenses)
+    assert.strictEqual(res.breakEvenFreightRatePerKm, 33.08);
+
+    // Ton-km: 3.5 tons * 120 km = 420 ton-km
+    assert.strictEqual(res.tonKm, 420);
+    // Revenue per ton-km: 3570 / 420 = 8.50
+    assert.strictEqual(res.revenuePerTonKm, 8.50);
   });
 });
 

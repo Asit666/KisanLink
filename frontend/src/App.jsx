@@ -3360,68 +3360,117 @@ function App() {
     };
   })();
 
-  // Transporter Trip Operating Profit & Margin Decision Engine State
+  // ──────────────────────────────────────────────────────────────────────────
+  // TRANSPORTER FLEET & ROUTE DECISION ENGINE STATE & SPECIFICATIONS
+  // ──────────────────────────────────────────────────────────────────────────
+  const TRANSPORTER_VEHICLE_SPECS = {
+    'MINI_TRUCK': { baseCharge: 150, ratePerKm: 14.0, mileage: 10.5, wearPerKm: 2.2, driverPerTrip: 350, permitInsurancePerTrip: 80, name: 'Mini-Truck (Tata Ace / 2T)' },
+    'PICKUP': { baseCharge: 220, ratePerKm: 17.5, mileage: 8.5, wearPerKm: 2.8, driverPerTrip: 450, permitInsurancePerTrip: 100, name: 'Pickup (Bolero Maxi / 1.5T)' },
+    'MEDIUM_5T': { baseCharge: 450, ratePerKm: 26.0, mileage: 6.0, wearPerKm: 4.5, driverPerTrip: 650, permitInsurancePerTrip: 180, name: 'Medium LCV (Eicher 5T)' },
+    'HEAVY_10T': { baseCharge: 800, ratePerKm: 42.0, mileage: 4.2, wearPerKm: 7.0, driverPerTrip: 950, permitInsurancePerTrip: 250, name: 'Multi-Axle Heavy (10T)' },
+    'REEFER': { baseCharge: 950, ratePerKm: 48.0, mileage: 3.8, wearPerKm: 8.5, driverPerTrip: 1100, permitInsurancePerTrip: 320, name: 'Cold-Chain Reefer (Temp Controlled)' }
+  };
+
   const [transCalcDistanceKm, setTransCalcDistanceKm] = useState(85);
   const [transCalcPayloadKg, setTransCalcPayloadKg] = useState(2500);
   const [transCalcVehicleType, setTransCalcVehicleType] = useState('PICKUP');
   const [transCalcDieselPrice, setTransCalcDieselPrice] = useState(92.0); // Rs/L
   const [transCalcTollCost, setTransCalcTollCost] = useState(240); // Rs
   const [transCalcDeadheadRisk, setTransCalcDeadheadRisk] = useState(0.20); // 20% empty return risk
+  const [transCalcDriverWage, setTransCalcDriverWage] = useState(null); // optional override
+  const [transCalcPermitCost, setTransCalcPermitCost] = useState(null); // optional override
+  const [showTransCostDetails, setShowTransCostDetails] = useState(false);
 
   const transporterTripDecision = (() => {
-    const vehicleSpecs = {
-      'MINI_TRUCK': { baseCharge: 150, ratePerKm: 14.0, mileage: 10.5, wearPerKm: 2.2, driverPerTrip: 350, name: 'Mini-Truck (2T)' },
-      'PICKUP': { baseCharge: 220, ratePerKm: 17.5, mileage: 8.5, wearPerKm: 2.8, driverPerTrip: 450, name: 'Pickup (1.5T)' },
-      'MEDIUM_5T': { baseCharge: 450, ratePerKm: 26.0, mileage: 6.0, wearPerKm: 4.5, driverPerTrip: 650, name: 'Medium LCV (5T)' },
-      'HEAVY_10T': { baseCharge: 800, ratePerKm: 42.0, mileage: 4.2, wearPerKm: 7.0, driverPerTrip: 950, name: 'Multi-Axle Heavy (10T)' },
-      'REEFER': { baseCharge: 950, ratePerKm: 48.0, mileage: 3.8, wearPerKm: 8.5, driverPerTrip: 1100, name: 'Cold-Chain Reefer' }
-    };
-    const spec = vehicleSpecs[transCalcVehicleType] || vehicleSpecs['PICKUP'];
-
+    const spec = TRANSPORTER_VEHICLE_SPECS[transCalcVehicleType] || TRANSPORTER_VEHICLE_SPECS['PICKUP'];
     const dist = Math.max(1, Number(transCalcDistanceKm) || 10);
+    const payloadKg = Math.max(10, Number(transCalcPayloadKg) || 1000);
+    const payloadTons = payloadKg / 1000;
+    const tonKm = Number((payloadTons * dist).toFixed(1));
+
     const grossFreightRevenue = Math.round(spec.baseCharge + (dist * spec.ratePerKm));
+    const escrowFee = Math.round(grossFreightRevenue * 0.02); // 2% KisanLink escrow matching fee
+    const escrowNetBankPayout = grossFreightRevenue - escrowFee; // Direct bank credit via KisanLink Escrow
+
     const fuelPrice = Math.max(50, Number(transCalcDieselPrice) || 92);
     const fuelLitres = dist / spec.mileage;
     const outwardFuelCost = Math.round(fuelLitres * fuelPrice);
     const deadheadContingency = Math.round(outwardFuelCost * Number(transCalcDeadheadRisk));
     const tolls = Number(transCalcTollCost) || 0;
     const maintenanceAndWear = Math.round(dist * spec.wearPerKm);
-    const driverWages = spec.driverPerTrip;
+    const driverWages = transCalcDriverWage !== null && transCalcDriverWage !== undefined && transCalcDriverWage !== '' ? Number(transCalcDriverWage) : spec.driverPerTrip;
+    const permitInsurance = transCalcPermitCost !== null && transCalcPermitCost !== undefined && transCalcPermitCost !== '' ? Number(transCalcPermitCost) : spec.permitInsurancePerTrip;
 
-    const totalOperatingCost = outwardFuelCost + deadheadContingency + tolls + maintenanceAndWear + driverWages;
+    const totalOperatingCost = outwardFuelCost + deadheadContingency + tolls + maintenanceAndWear + driverWages + permitInsurance + escrowFee;
     const netTripProfit = grossFreightRevenue - totalOperatingCost;
     const profitMarginPercent = Number(((netTripProfit / Math.max(1, grossFreightRevenue)) * 100).toFixed(1));
     const netReturnPerKm = Number((netTripProfit / dist).toFixed(2));
+    const netReturnPerKg = Number((netTripProfit / payloadKg).toFixed(2));
+    const breakEvenFreightRatePerKm = Number((totalOperatingCost / dist).toFixed(2));
+    const revenuePerTonKm = Number((grossFreightRevenue / Math.max(0.1, tonKm)).toFixed(2));
 
     return {
       specName: spec.name,
       grossFreightRevenue,
+      escrowFee,
+      escrowNetBankPayout,
       outwardFuelCost,
       deadheadContingency,
       tolls,
       maintenanceAndWear,
       driverWages,
+      permitInsurance,
       totalOperatingCost,
       netTripProfit,
       profitMarginPercent,
-      netReturnPerKm
+      netReturnPerKm,
+      netReturnPerKg,
+      breakEvenFreightRatePerKm,
+      revenuePerTonKm,
+      tonKm,
+      payloadTons
     };
   })();
 
-  // Where Should This Farmer Sell? Net Profit Decision Engine State
+  // ──────────────────────────────────────────────────────────────────────────
+  // FARMER AGRONOMIC & NET PROFIT DECISION ENGINE STATE & BENCHMARKS
+  // ──────────────────────────────────────────────────────────────────────────
+  const CROP_PRODUCTION_BENCHMARKS = {
+    'Tomato': { defaultAcres: 2.5, yieldPerAcreKg: 2000, seedCostPerAcre: 3500, fertCostPerAcre: 6500, labourCostPerAcre: 8500, tillageCostPerAcre: 3500, irrigationCostPerAcre: 3000 },
+    'Onion': { defaultAcres: 2.0, yieldPerAcreKg: 2400, seedCostPerAcre: 4000, fertCostPerAcre: 5500, labourCostPerAcre: 7000, tillageCostPerAcre: 3200, irrigationCostPerAcre: 2800 },
+    'Wheat': { defaultAcres: 4.0, yieldPerAcreKg: 1600, seedCostPerAcre: 2200, fertCostPerAcre: 4200, labourCostPerAcre: 4500, tillageCostPerAcre: 2800, irrigationCostPerAcre: 1800 },
+    'Soybean': { defaultAcres: 3.5, yieldPerAcreKg: 1000, seedCostPerAcre: 2600, fertCostPerAcre: 3800, labourCostPerAcre: 4200, tillageCostPerAcre: 2200, irrigationCostPerAcre: 1300 },
+    'Potato': { defaultAcres: 2.0, yieldPerAcreKg: 3500, seedCostPerAcre: 8500, fertCostPerAcre: 7500, labourCostPerAcre: 8000, tillageCostPerAcre: 4000, irrigationCostPerAcre: 3500 },
+    'Green Grapes': { defaultAcres: 1.5, yieldPerAcreKg: 2200, seedCostPerAcre: 9000, fertCostPerAcre: 12000, labourCostPerAcre: 14000, tillageCostPerAcre: 5000, irrigationCostPerAcre: 6000 }
+  };
+
   const [sellCalcCrop, setSellCalcCrop] = useState('Tomato');
-  const [sellCalcQty, setSellCalcQty] = useState(500); // kg
+  const [sellCalcAcres, setSellCalcAcres] = useState(2.5);
+  const [sellCalcQty, setSellCalcQty] = useState(5000); // 2.5 acres * 2000 kg/acre
   const [sellCalcQuality, setSellCalcQuality] = useState('GRADE_A');
   const [sellCalcCluster, setSellCalcCluster] = useState('Nashik Aggregation Yard');
+  const [showCultivationCosts, setShowCultivationCosts] = useState(false);
+  const [customCostOverrides, setCustomCostOverrides] = useState({});
 
-  // Dynamic Net Realization Computation for "Where Should This Farmer Sell?"
+  // Dynamic Full-Cycle Economic Profit & Escrow Payout Computation
   const netSellDecision = (() => {
-    const qty = Math.max(1, Number(sellCalcQty) || 100);
     const crop = sellCalcCrop;
+    const benchmark = CROP_PRODUCTION_BENCHMARKS[crop] || CROP_PRODUCTION_BENCHMARKS['Tomato'];
+    const acres = Math.max(0.1, Number(sellCalcAcres) || 1);
+    const qty = Math.max(1, Number(sellCalcQty) || Math.round(acres * benchmark.yieldPerAcreKg));
     const quality = sellCalcQuality;
 
-    const qMultiplier = quality === 'GRADE_APLUS' ? 1.15 : (quality === 'GRADE_A' ? 1.0 : 0.88);
+    const seedCostPerAcre = customCostOverrides.seedCost !== undefined ? Number(customCostOverrides.seedCost) : benchmark.seedCostPerAcre;
+    const fertCostPerAcre = customCostOverrides.fertCost !== undefined ? Number(customCostOverrides.fertCost) : benchmark.fertCostPerAcre;
+    const labourCostPerAcre = customCostOverrides.labourCost !== undefined ? Number(customCostOverrides.labourCost) : benchmark.labourCostPerAcre;
+    const tillageCostPerAcre = customCostOverrides.tillageCost !== undefined ? Number(customCostOverrides.tillageCost) : benchmark.tillageCostPerAcre;
+    const irrigationCostPerAcre = customCostOverrides.irrigationCost !== undefined ? Number(customCostOverrides.irrigationCost) : benchmark.irrigationCostPerAcre;
 
+    const totalCostPerAcre = seedCostPerAcre + fertCostPerAcre + labourCostPerAcre + tillageCostPerAcre + irrigationCostPerAcre;
+    const totalCultivationCost = Math.round(acres * totalCostPerAcre);
+    const productionCostPerKg = Number((totalCultivationCost / qty).toFixed(2));
+
+    const qMultiplier = quality === 'GRADE_APLUS' ? 1.15 : (quality === 'GRADE_A' ? 1.0 : 0.88);
     const baseRates = {
       'Tomato': 27.0,
       'Onion': 22.5,
@@ -3432,38 +3481,62 @@ function App() {
     };
     const nominalRate = (baseRates[crop] || 25.0) * qMultiplier;
 
-    // Option 1: Verified Institutional Buyer
+    // Channel 1: Verified Institutional Buyer via KisanLink Escrow
     const buyerDistKm = 38;
     const buyerRatePerKg = Math.round(nominalRate * 10) / 10;
     const buyerGross = Math.round(qty * buyerRatePerKg);
     const buyerFreight = 100 + Math.round(15 * buyerDistKm * (1 + (qty > 1000 ? (qty - 1000) / 3000 : 0)));
     const buyerHandling = Math.round(buyerGross * 0.015);
-    const buyerTotalCosts = buyerFreight + buyerHandling;
-    const buyerNetReturn = buyerGross - buyerTotalCosts;
-    const buyerNetPerKg = Math.round((buyerNetReturn / qty) * 100) / 100;
+    const buyerPostHarvestCosts = buyerFreight + buyerHandling;
+    const buyerBankPayout = buyerGross - buyerPostHarvestCosts; // Cash wired to farmer bank account
+    const buyerNetPerKg = Math.round((buyerBankPayout / qty) * 100) / 100;
+    const buyerEconomicProfit = buyerBankPayout - totalCultivationCost; // True Economic Farm Net Profit
+    const buyerProfitPerAcre = Math.round(buyerEconomicProfit / acres);
+    const buyerMarginPercent = Number(((buyerEconomicProfit / Math.max(1, buyerGross)) * 100).toFixed(1));
+    const buyerBenefitCostRatio = Number((buyerGross / Math.max(1, totalCultivationCost + buyerPostHarvestCosts)).toFixed(2));
+    const buyerBreakEvenPricePerKg = Number(((totalCultivationCost + buyerPostHarvestCosts) / qty).toFixed(2));
 
-    // Option 2: Local Mandi APMC
+    // Channel 2: Local Mandi APMC
     const mandiDistKm = 12;
     const mandiRatePerKg = Math.round((nominalRate * 0.94) * 10) / 10;
     const mandiGross = Math.round(qty * mandiRatePerKg);
     const mandiFreight = 100 + Math.round(15 * mandiDistKm);
     const mandiCommission = Math.round(mandiGross * 0.065);
-    const mandiTotalCosts = mandiFreight + mandiCommission;
-    const mandiNetReturn = mandiGross - mandiTotalCosts;
-    const mandiNetPerKg = Math.round((mandiNetReturn / qty) * 100) / 100;
+    const mandiPostHarvestCosts = mandiFreight + mandiCommission;
+    const mandiBankPayout = mandiGross - mandiPostHarvestCosts;
+    const mandiNetPerKg = Math.round((mandiBankPayout / qty) * 100) / 100;
+    const mandiEconomicProfit = mandiBankPayout - totalCultivationCost;
+    const mandiProfitPerAcre = Math.round(mandiEconomicProfit / acres);
+    const mandiMarginPercent = Number(((mandiEconomicProfit / Math.max(1, mandiGross)) * 100).toFixed(1));
+    const mandiBenefitCostRatio = Number((mandiGross / Math.max(1, totalCultivationCost + mandiPostHarvestCosts)).toFixed(2));
+    const mandiBreakEvenPricePerKg = Number(((totalCultivationCost + mandiPostHarvestCosts) / qty).toFixed(2));
 
-    // Option 3: Village Gate Middleman
+    // Channel 3: Village Gate Middleman
     const traderRatePerKg = Math.round((nominalRate * 0.82) * 10) / 10;
     const traderGross = Math.round(qty * traderRatePerKg);
-    const traderNetReturn = traderGross;
+    const traderBankPayout = traderGross;
     const traderNetPerKg = traderRatePerKg;
+    const traderEconomicProfit = traderGross - totalCultivationCost;
+    const traderProfitPerAcre = Math.round(traderEconomicProfit / acres);
+    const traderMarginPercent = Number(((traderEconomicProfit / Math.max(1, traderGross)) * 100).toFixed(1));
+    const traderBenefitCostRatio = Number((traderGross / Math.max(1, totalCultivationCost)).toFixed(2));
+    const traderBreakEvenPricePerKg = Number((totalCultivationCost / qty).toFixed(2));
 
-    const netAdvantage = buyerNetReturn - Math.max(mandiNetReturn, traderNetReturn);
+    const netAdvantage = buyerEconomicProfit - Math.max(mandiEconomicProfit, traderEconomicProfit);
 
     return {
       qty,
       crop,
+      acres,
       quality,
+      seedCostPerAcre,
+      fertCostPerAcre,
+      labourCostPerAcre,
+      tillageCostPerAcre,
+      irrigationCostPerAcre,
+      totalCostPerAcre,
+      totalCultivationCost,
+      productionCostPerKg,
       buyer: {
         destinationName: 'Azadpur Terminal Hub / Reliance Agro Link',
         buyerName: 'FreshBasket Agri Procurement Ltd',
@@ -3471,10 +3544,16 @@ function App() {
         distanceKm: buyerDistKm,
         freight: buyerFreight,
         handlingFee: buyerHandling,
-        totalCosts: buyerTotalCosts,
+        totalCosts: buyerPostHarvestCosts,
         grossRevenue: buyerGross,
-        netReturn: buyerNetReturn,
+        bankPayout: buyerBankPayout,
+        netReturn: buyerBankPayout, // maintain backwards compatibility
         netPerKg: buyerNetPerKg,
+        economicProfit: buyerEconomicProfit,
+        profitPerAcre: buyerProfitPerAcre,
+        marginPercent: buyerMarginPercent,
+        benefitCostRatio: buyerBenefitCostRatio,
+        breakEvenPricePerKg: buyerBreakEvenPricePerKg,
         trustScore: 97,
         matchScore: 94,
         paymentTerms: '24-Hour Verified Escrow Settlement'
@@ -3486,19 +3565,31 @@ function App() {
         freight: mandiFreight,
         commissionFee: mandiCommission,
         grossRevenue: mandiGross,
-        netReturn: mandiNetReturn,
-        netPerKg: mandiNetPerKg
+        bankPayout: mandiBankPayout,
+        netReturn: mandiBankPayout,
+        netPerKg: mandiNetPerKg,
+        economicProfit: mandiEconomicProfit,
+        profitPerAcre: mandiProfitPerAcre,
+        marginPercent: mandiMarginPercent,
+        benefitCostRatio: mandiBenefitCostRatio,
+        breakEvenPricePerKg: mandiBreakEvenPricePerKg
       },
       villageTrader: {
         destinationName: 'Village Gate Aggregator',
         pricePerKg: traderRatePerKg,
-        netReturn: traderNetReturn,
-        netPerKg: traderNetPerKg
+        grossRevenue: traderGross,
+        bankPayout: traderBankPayout,
+        netReturn: traderBankPayout,
+        netPerKg: traderNetPerKg,
+        economicProfit: traderEconomicProfit,
+        profitPerAcre: traderProfitPerAcre,
+        marginPercent: traderMarginPercent,
+        benefitCostRatio: traderBenefitCostRatio,
+        breakEvenPricePerKg: traderBreakEvenPricePerKg
       },
       netAdvantage: Math.max(0, netAdvantage)
     };
   })();
-
   // My Orders, My Shop & Order Progress State
   const [userOrders, setUserOrders] = useState(INITIAL_USER_ORDERS);
   const [shopInventory, setShopInventory] = useState(INITIAL_SHOP_INVENTORY);
@@ -3712,7 +3803,7 @@ function App() {
     {
       id: 1,
       type: 'PRICE_ALERT',
-      icon: '🍅',
+      icon: '[Crop]',
       title: 'Tomato Market Price Jump',
       message: 'Tomato modal price reached ₹24/kg (+14.3%) in Ranchi Main Market.',
       time: '10m ago',
@@ -3722,7 +3813,7 @@ function App() {
     {
       id: 2,
       type: 'BUYER_MATCH',
-      icon: '🤝',
+      icon: '[Deal]',
       title: 'New Matching Requirement',
       message: 'ABC Processors published a requirement for 2,000 kg Grade A Tomato at ₹30/kg.',
       time: '25m ago',
@@ -3732,7 +3823,7 @@ function App() {
     {
       id: 3,
       type: 'FORECAST',
-      icon: '📈',
+      icon: '[Trend]',
       title: 'Bullish AI Price Forecast',
       message: 'Mustard Seeds projected +7.2% upward trajectory over the next 7 days.',
       time: '1h ago',
@@ -3742,7 +3833,7 @@ function App() {
     {
       id: 4,
       type: 'ROUTE',
-      icon: '🧭',
+      icon: '[Radar]',
       title: 'Freight Rate Update',
       message: 'Ramgarh Market route active (38.4 km, ₹675.40 freight).',
       time: '2h ago',
@@ -4008,7 +4099,7 @@ function App() {
       const newNotif = {
         id: Date.now(),
         type: event.eventType || 'NOTIFICATION',
-        icon: event.eventType?.includes('BUYER') ? '🤝' : event.eventType?.includes('TRADE') ? '📜' : '🔔',
+        icon: event.eventType?.includes('BUYER') ? '[Trade]' : event.eventType?.includes('TRADE') ? '[Order]' : '[Notice]',
         title: event.title || 'Live Update',
         message: event.message || '',
         time: 'Just now',
@@ -8756,7 +8847,7 @@ function App() {
                   </div>
 
                   <p style={{ font: "10px 'DM Mono', monospace", color: '#77837a', marginTop: '12px' }}>
-                    🔬 <strong>Methodology:</strong> {forecast.methodology}
+                    <strong>Methodology:</strong> {forecast.methodology}
                   </p>
                 </div>
 
@@ -10419,21 +10510,21 @@ function App() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px', borderBottom: '1px solid #edebe4', paddingBottom: '12px' }}>
                   <div>
                     <span className="eyebrow" style={{ color: '#8a6218', fontWeight: 700 }}>
-                      Logistics Decision Engine &middot; Route Margins &amp; Fuel Optimization
+                      Logistics Decision Engine &middot; Escrow Payout &amp; Operating Margins
                     </span>
                     <h2 style={{ margin: '2px 0 0', fontSize: '20px', color: '#202a27' }}>
                       Transporter Trip Operating Profit &amp; Freight Margin Calculator
                     </h2>
                     <p className="muted" style={{ margin: '3px 0 0', fontSize: '13px' }}>
-                      Computes real net trip earnings after deducting diesel fuel, deadhead return risk, highway tolls, and vehicle maintenance.
+                      Computes both Escrow Net Bank Payout and real Economic Trip Profit after deducting diesel fuel, deadhead return risk, tolls, wear, driver wages, and permits.
                     </p>
                   </div>
                   <span className="count" style={{ background: '#8a6218', color: '#ffffff', fontSize: '11px', padding: '4px 10px', borderRadius: '4px' }}>
-                    Fleet Profitability
+                    Fleet Profitability &amp; Risk Guard
                   </span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '18px', background: '#fdfbf7', padding: '14px', borderRadius: '6px', border: '1px solid #f0e9dd' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px', marginBottom: '14px', background: '#fdfbf7', padding: '14px', borderRadius: '6px', border: '1px solid #f0e9dd' }}>
                   <div>
                     <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
                       HAUL DISTANCE (KM)
@@ -10472,7 +10563,11 @@ function App() {
                       className="field-input"
                       style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
                       value={transCalcVehicleType}
-                      onChange={(e) => setTransCalcVehicleType(e.target.value)}
+                      onChange={(e) => {
+                        setTransCalcVehicleType(e.target.value);
+                        setTransCalcDriverWage(null);
+                        setTransCalcPermitCost(null);
+                      }}
                     >
                       <option value="MINI_TRUCK">Mini-Truck (Tata Ace / 2T)</option>
                       <option value="PICKUP">Pickup (Bolero Maxi / 1.5T)</option>
@@ -10499,7 +10594,7 @@ function App() {
 
                   <div>
                     <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      TOLLS &amp; CHARGES (₹)
+                      TOLLS &amp; WEIGHBRIDGE (₹)
                     </label>
                     <input
                       type="number"
@@ -10529,11 +10624,55 @@ function App() {
                   </div>
                 </div>
 
+                {/* Optional Expandable Driver Wage & RTO Permit Override */}
+                <div style={{ marginBottom: '16px' }}>
+                  <button
+                    type="button"
+                    style={{ background: 'none', border: 'none', color: '#8a6218', fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
+                    onClick={() => setShowTransCostDetails(!showTransCostDetails)}
+                  >
+                    {showTransCostDetails ? '[-] Hide Driver Wage & RTO Permit Overrides' : '[+] Customize Driver Wages & RTO Permit Fees (Optional)'}
+                  </button>
+
+                  {showTransCostDetails && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginTop: '10px', background: '#faf6ee', padding: '12px', borderRadius: '6px', border: '1px solid #ebdcc5' }}>
+                      <div>
+                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                          DRIVER TRIP WAGE (₹)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="50"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                          value={transCalcDriverWage !== null ? transCalcDriverWage : transporterTripDecision.driverWages}
+                          onChange={(e) => setTransCalcDriverWage(e.target.value === '' ? '' : Number(e.target.value))}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                          PERMIT &amp; TRANSIT INSURANCE (₹)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="20"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                          value={transCalcPermitCost !== null ? transCalcPermitCost : transporterTripDecision.permitInsurance}
+                          onChange={(e) => setTransCalcPermitCost(e.target.value === '' ? '' : Number(e.target.value))}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                   <div style={{ border: '2px solid #8a6218', borderRadius: '6px', padding: '16px', background: '#fdfbf7', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     <div>
                       <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#8a6218', color: '#ffffff', padding: '3px 8px', borderRadius: '3px' }}>
-                        TRIP COST ACCOUNTING
+                        TRIP COST ACCOUNTING &amp; ESCROW DISBURSEMENT
                       </span>
                       <h3 style={{ margin: '8px 0 4px', fontSize: '16px', color: '#202a27' }}>
                         Operational Expense Breakdown
@@ -10544,26 +10683,40 @@ function App() {
                           <strong style={{ fontSize: '15px', color: '#202a27' }}>₹{transporterTripDecision.grossFreightRevenue.toLocaleString()}</strong>
                         </div>
                         <div>
-                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>DIESEL FUEL</span>
+                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>DIESEL OUTLAY</span>
                           <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{transporterTripDecision.outwardFuelCost.toLocaleString()}</span>
                         </div>
                         <div>
-                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>DEADHEAD BUFFER</span>
+                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>DEADHEAD CONTINGENCY</span>
                           <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{transporterTripDecision.deadheadContingency.toLocaleString()}</span>
                         </div>
                         <div>
-                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>TOLLS &amp; DRIVER</span>
-                          <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{(transporterTripDecision.tolls + transporterTripDecision.driverWages + transporterTripDecision.maintenanceAndWear).toLocaleString()}</span>
+                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>DRIVER, TOLLS &amp; WEAR</span>
+                          <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{(transporterTripDecision.tolls + transporterTripDecision.maintenanceAndWear + transporterTripDecision.driverWages + transporterTripDecision.permitInsurance).toLocaleString()}</span>
                         </div>
                       </div>
 
-                      <div style={{ background: '#202a27', color: '#ffffff', padding: '10px 14px', borderRadius: '4px', marginBottom: '10px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#c4ad83' }}>NET TRIP PROFIT</span>
-                          <strong style={{ fontSize: '18px', color: '#d4a34b' }}>₹{transporterTripDecision.netTripProfit.toLocaleString()}</strong>
+                      {/* Dual Highlight: Escrow Payout vs Real Economic Profit */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
+                        <div style={{ background: '#253529', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
+                          <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#8fb899', display: 'block', textTransform: 'uppercase' }}>
+                            ESCROW BANK PAYOUT
+                          </span>
+                          <strong style={{ fontSize: '17px', color: '#6e9d68' }}>₹{transporterTripDecision.escrowNetBankPayout.toLocaleString()}</strong>
+                          <small style={{ fontSize: '9px', color: '#b2c0b7', display: 'block', marginTop: '2px' }}>
+                            Direct bank credit (-2% fee: ₹{transporterTripDecision.escrowFee})
+                          </small>
                         </div>
-                        <div style={{ fontSize: '11px', color: '#b2c0b7', marginTop: '2px' }}>
-                          Operating Margin: <strong>{transporterTripDecision.profitMarginPercent}%</strong> &middot; Net Return: <strong>₹{transporterTripDecision.netReturnPerKm}/km</strong>
+                        <div style={{ background: '#202a27', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
+                          <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#c4ad83', display: 'block', textTransform: 'uppercase' }}>
+                            ECONOMIC NET PROFIT
+                          </span>
+                          <strong style={{ fontSize: '17px', color: transporterTripDecision.netTripProfit >= 0 ? '#d4a34b' : '#e66b6b' }}>
+                            ₹{transporterTripDecision.netTripProfit.toLocaleString()}
+                          </strong>
+                          <small style={{ fontSize: '9px', color: '#b2c0b7', display: 'block', marginTop: '2px' }}>
+                            Margin: {transporterTripDecision.profitMarginPercent}% after all expenses
+                          </small>
                         </div>
                       </div>
                     </div>
@@ -10584,13 +10737,33 @@ function App() {
                   <div style={{ border: '1px solid #e0ddd5', borderRadius: '6px', padding: '16px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     <div>
                       <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', fontWeight: 600, textTransform: 'uppercase' }}>
-                        FLEET BENCHMARK
+                        FLEET BENCHMARK &amp; PERFORMANCE METRICS
                       </span>
                       <h3 style={{ margin: '8px 0 4px', fontSize: '16px', color: '#202a27' }}>
-                        Efficiency &amp; Risk Guard
+                        Operating Efficiency Indicators
                       </h3>
 
-                      <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', margin: '10px 0' }}>
+                      {/* 4 Fleet Metric Cards Grid */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', margin: '10px 0' }}>
+                        <div style={{ background: '#fdfbf7', border: '1px solid #ebdcc5', borderRadius: '4px', padding: '8px 10px' }}>
+                          <span style={{ fontSize: '9px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Net Profit / km</span>
+                          <strong style={{ fontSize: '14px', color: '#202a27' }}>₹{transporterTripDecision.netReturnPerKm} <small style={{ fontSize: '10px', color: '#778078' }}>/ km</small></strong>
+                        </div>
+                        <div style={{ background: '#fdfbf7', border: '1px solid #ebdcc5', borderRadius: '4px', padding: '8px 10px' }}>
+                          <span style={{ fontSize: '9px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Net Profit / kg</span>
+                          <strong style={{ fontSize: '14px', color: '#202a27' }}>₹{transporterTripDecision.netReturnPerKg} <small style={{ fontSize: '10px', color: '#778078' }}>/ kg</small></strong>
+                        </div>
+                        <div style={{ background: '#fdfbf7', border: '1px solid #ebdcc5', borderRadius: '4px', padding: '8px 10px' }}>
+                          <span style={{ fontSize: '9px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Break-Even Rate</span>
+                          <strong style={{ fontSize: '14px', color: '#8a2b2b' }}>₹{transporterTripDecision.breakEvenFreightRatePerKm} <small style={{ fontSize: '10px', color: '#778078' }}>/ km</small></strong>
+                        </div>
+                        <div style={{ background: '#fdfbf7', border: '1px solid #ebdcc5', borderRadius: '4px', padding: '8px 10px' }}>
+                          <span style={{ fontSize: '9px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Freight / Ton-km</span>
+                          <strong style={{ fontSize: '14px', color: '#8a6218' }}>₹{transporterTripDecision.revenuePerTonKm} <small style={{ fontSize: '10px', color: '#778078' }}>/ ton-km</small></strong>
+                        </div>
+                      </div>
+
+                      <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', marginBottom: '10px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{ fontSize: '12px', color: '#444d47' }}>Vehicle Class:</span>
                           <strong style={{ fontSize: '13px', color: '#202a27' }}>{transporterTripDecision.specName}</strong>
@@ -10600,8 +10773,8 @@ function App() {
                           <span style={{ fontSize: '13px', color: '#8a2b2b' }}>₹{transporterTripDecision.totalOperatingCost.toLocaleString()}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '6px', marginTop: '6px' }}>
-                          <span style={{ fontSize: '11px', color: '#667269' }}>Escrow Guarantee:</span>
-                          <strong style={{ fontSize: '13px', color: '#2f6838' }}>100% Locked in Vault</strong>
+                          <span style={{ fontSize: '11px', color: '#667269' }}>Total Ton-Km Logged:</span>
+                          <strong style={{ fontSize: '13px', color: '#202a27' }}>{transporterTripDecision.tonKm} Ton-km ({transporterTripDecision.payloadTons}T &times; {transCalcDistanceKm}km)</strong>
                         </div>
                       </div>
 
@@ -10610,7 +10783,7 @@ function App() {
                           Deadhead Risk Factor ({transCalcDeadheadRisk * 100}%)
                         </strong>
                         <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#7a540b', lineHeight: 1.4 }}>
-                          Buffer of ₹{transporterTripDecision.deadheadContingency.toLocaleString()} allocated to safeguard against unpaid empty return miles.
+                          Operating floor is ₹{transporterTripDecision.breakEvenFreightRatePerKm}/km. Buffer of ₹{transporterTripDecision.deadheadContingency.toLocaleString()} safeguards against unpaid empty return haulage.
                         </p>
                       </div>
                     </div>
@@ -10764,13 +10937,13 @@ function App() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px', borderBottom: '1px solid #edebe4', paddingBottom: '12px' }}>
                   <div>
                     <span className="eyebrow" style={{ color: '#2f6838', fontWeight: 700 }}>
-                      Farmer Decision Support Engine &middot; Real Net Realization
+                      Farmer Decision Support Engine &middot; Real Net Realization &amp; Agronomic Profit
                     </span>
                     <h2 style={{ margin: '2px 0 0', fontSize: '20px', color: '#202a27' }}>
                       Where Should This Farmer Sell? (Net Profit Calculator)
                     </h2>
                     <p className="muted" style={{ margin: '3px 0 0', fontSize: '13px' }}>
-                      Calculates true take-home earnings after deducting route transport, handling, and APMC cess. Compare direct buyers vs local mandis.
+                      Calculates both Escrow Net Bank Payout (take-home cash) and True Economic Farm Net Profit (gross revenue minus total cultivation and post-harvest costs).
                     </p>
                   </div>
                   <span className="count" style={{ background: '#2f6838', color: '#ffffff', fontSize: '11px', padding: '4px 10px', borderRadius: '4px' }}>
@@ -10778,7 +10951,7 @@ function App() {
                   </span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '18px', background: '#f8f7f2', padding: '14px', borderRadius: '6px', border: '1px solid #eceae2' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px', marginBottom: '14px', background: '#f8f7f2', padding: '14px', borderRadius: '6px', border: '1px solid #eceae2' }}>
                   <div>
                     <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
                       SELECT CROP
@@ -10787,7 +10960,14 @@ function App() {
                       className="field-input"
                       style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
                       value={sellCalcCrop}
-                      onChange={(e) => setSellCalcCrop(e.target.value)}
+                      onChange={(e) => {
+                        const newCrop = e.target.value;
+                        setSellCalcCrop(newCrop);
+                        const b = CROP_PRODUCTION_BENCHMARKS[newCrop] || CROP_PRODUCTION_BENCHMARKS['Tomato'];
+                        setSellCalcAcres(b.defaultAcres);
+                        setSellCalcQty(b.defaultAcres * b.yieldPerAcreKg);
+                        setCustomCostOverrides({});
+                      }}
                     >
                       <option value="Tomato">Tomato (Hybrid / Roma)</option>
                       <option value="Onion">Nashik Red Onion</option>
@@ -10800,12 +10980,33 @@ function App() {
 
                   <div>
                     <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      QUANTITY (KG)
+                      CULTIVATION AREA (ACRES)
+                    </label>
+                    <input
+                      type="number"
+                      min="0.2"
+                      max="50"
+                      step="0.5"
+                      className="field-input"
+                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                      value={sellCalcAcres}
+                      onChange={(e) => {
+                        const acres = Math.max(0.1, Number(e.target.value));
+                        setSellCalcAcres(acres);
+                        const b = CROP_PRODUCTION_BENCHMARKS[sellCalcCrop] || CROP_PRODUCTION_BENCHMARKS['Tomato'];
+                        setSellCalcQty(Math.round(acres * b.yieldPerAcreKg));
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                      HARVEST QUANTITY (KG)
                     </label>
                     <input
                       type="number"
                       min="50"
-                      step="50"
+                      step="100"
                       className="field-input"
                       style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
                       value={sellCalcQty}
@@ -10847,6 +11048,97 @@ function App() {
                   </div>
                 </div>
 
+                {/* Cultivation Cost Customization Toggle & Breakdown */}
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <button
+                      type="button"
+                      style={{ background: 'none', border: 'none', color: '#2f6838', fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
+                      onClick={() => setShowCultivationCosts(!showCultivationCosts)}
+                    >
+                      {showCultivationCosts ? '[-] Hide Cultivation Cost Breakdown' : '[+] Customize Cultivation Cost Benchmarks (Seeds, Fertilizer, Labour, Irrigation, Tillage)'}
+                    </button>
+                    <span style={{ fontSize: '11px', color: '#687588', fontFamily: "'DM Mono', monospace" }}>
+                      Total Production: <strong>₹{netSellDecision.totalCultivationCost.toLocaleString()}</strong> (₹{netSellDecision.totalCostPerAcre.toLocaleString()}/acre &middot; ₹{netSellDecision.productionCostPerKg}/kg)
+                    </span>
+                  </div>
+
+                  {showCultivationCosts && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px', marginTop: '10px', background: '#f0f5ee', padding: '12px', borderRadius: '6px', border: '1px solid #d4e3d1' }}>
+                      <div>
+                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                          SEEDS / SEEDLINGS (₹/ACRE)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="100"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                          value={netSellDecision.seedCostPerAcre}
+                          onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, seedCost: Number(e.target.value) }))}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                          FERTILIZER &amp; PESTICIDES (₹/ACRE)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="100"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                          value={netSellDecision.fertCostPerAcre}
+                          onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, fertCost: Number(e.target.value) }))}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                          HIRED LABOUR (₹/ACRE)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="100"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                          value={netSellDecision.labourCostPerAcre}
+                          onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, labourCost: Number(e.target.value) }))}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                          TILLAGE &amp; TRACTOR (₹/ACRE)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="100"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                          value={netSellDecision.tillageCostPerAcre}
+                          onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, tillageCost: Number(e.target.value) }))}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                          IRRIGATION &amp; PUMP FUEL (₹/ACRE)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="100"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                          value={netSellDecision.irrigationCostPerAcre}
+                          onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, irrigationCost: Number(e.target.value) }))}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                   <div style={{ border: '2px solid #2f6838', borderRadius: '6px', padding: '16px', background: '#f5faf5', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     <div>
@@ -10885,13 +11177,47 @@ function App() {
                         </div>
                       </div>
 
-                      <div style={{ background: '#202a27', color: '#ffffff', padding: '10px 14px', borderRadius: '4px', marginBottom: '10px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#889e92' }}>NET TAKE-HOME RETURN</span>
-                          <strong style={{ fontSize: '18px', color: '#6e9d68' }}>₹{netSellDecision.buyer.netReturn.toLocaleString()}</strong>
+                      {/* Dual Highlight: Escrow Net Bank Payout vs Economic Farm Profit */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
+                        <div style={{ background: '#253529', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
+                          <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#8fb899', display: 'block', textTransform: 'uppercase' }}>
+                            ESCROW BANK PAYOUT
+                          </span>
+                          <strong style={{ fontSize: '17px', color: '#6e9d68' }}>₹{netSellDecision.buyer.bankPayout.toLocaleString()}</strong>
+                          <small style={{ fontSize: '9px', color: '#b2c0b7', display: 'block', marginTop: '2px' }}>
+                            ₹{netSellDecision.buyer.netPerKg}/kg cash wired to bank
+                          </small>
                         </div>
-                        <div style={{ fontSize: '11px', color: '#b2c0b7', marginTop: '2px' }}>
-                          Net Realization: <strong>₹{netSellDecision.buyer.netPerKg} / kg</strong> (Clean take-home)
+                        <div style={{ background: '#202a27', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
+                          <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#c4ad83', display: 'block', textTransform: 'uppercase' }}>
+                            ECONOMIC NET PROFIT
+                          </span>
+                          <strong style={{ fontSize: '17px', color: netSellDecision.buyer.economicProfit >= 0 ? '#6e9d68' : '#e66b6b' }}>
+                            ₹{netSellDecision.buyer.economicProfit.toLocaleString()}
+                          </strong>
+                          <small style={{ fontSize: '9px', color: '#b2c0b7', display: 'block', marginTop: '2px' }}>
+                            Net after ₹{netSellDecision.totalCultivationCost.toLocaleString()} crop costs
+                          </small>
+                        </div>
+                      </div>
+
+                      {/* 4 Agronomic Key Metric Badges */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '10px' }}>
+                        <div style={{ background: '#ffffff', border: '1px solid #dbe6dc', borderRadius: '4px', padding: '6px 4px', textAlign: 'center' }}>
+                          <span style={{ fontSize: '8px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>B:C Ratio</span>
+                          <strong style={{ fontSize: '12px', color: '#2f6838' }}>{netSellDecision.buyer.benefitCostRatio}:1</strong>
+                        </div>
+                        <div style={{ background: '#ffffff', border: '1px solid #dbe6dc', borderRadius: '4px', padding: '6px 4px', textAlign: 'center' }}>
+                          <span style={{ fontSize: '8px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Profit/Acre</span>
+                          <strong style={{ fontSize: '12px', color: '#202a27' }}>₹{netSellDecision.buyer.profitPerAcre.toLocaleString()}</strong>
+                        </div>
+                        <div style={{ background: '#ffffff', border: '1px solid #dbe6dc', borderRadius: '4px', padding: '6px 4px', textAlign: 'center' }}>
+                          <span style={{ fontSize: '8px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Margin %</span>
+                          <strong style={{ fontSize: '12px', color: '#202a27' }}>{netSellDecision.buyer.marginPercent}%</strong>
+                        </div>
+                        <div style={{ background: '#ffffff', border: '1px solid #dbe6dc', borderRadius: '4px', padding: '6px 4px', textAlign: 'center' }}>
+                          <span style={{ fontSize: '8px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Break-Even</span>
+                          <strong style={{ fontSize: '12px', color: '#8a2b2b' }}>₹{netSellDecision.buyer.breakEvenPricePerKg}/kg</strong>
                         </div>
                       </div>
 
@@ -10939,12 +11265,18 @@ function App() {
                           <strong style={{ fontSize: '13px', color: '#202a27' }}>{netSellDecision.mandi.destinationName}</strong>
                           <span style={{ fontSize: '12px', fontWeight: 600, color: '#444d47' }}>₹{netSellDecision.mandi.pricePerKg}/kg</span>
                         </div>
-                        <p style={{ margin: '2px 0 6px', fontSize: '11px', color: '#778078' }}>
+                        <p style={{ margin: '2px 0 4px', fontSize: '11px', color: '#778078' }}>
                           Gross: ₹{netSellDecision.mandi.grossRevenue.toLocaleString()} &minus; Freight: ₹{netSellDecision.mandi.freight} &minus; Mandi Cess: ₹{netSellDecision.mandi.commissionFee}
                         </p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '6px' }}>
-                          <span style={{ fontSize: '11px', color: '#667269' }}>Net Mandi Return:</span>
-                          <strong style={{ fontSize: '13px', color: '#202a27' }}>₹{netSellDecision.mandi.netReturn.toLocaleString()} (₹{netSellDecision.mandi.netPerKg}/kg)</strong>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '4px' }}>
+                          <span style={{ fontSize: '11px', color: '#667269' }}>Bank Payout:</span>
+                          <strong style={{ fontSize: '12px', color: '#202a27' }}>₹{netSellDecision.mandi.bankPayout.toLocaleString()} (₹{netSellDecision.mandi.netPerKg}/kg)</strong>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
+                          <span style={{ fontSize: '11px', color: '#667269' }}>Economic Net Profit:</span>
+                          <strong style={{ fontSize: '12px', color: netSellDecision.mandi.economicProfit >= 0 ? '#2f6838' : '#8a2b2b' }}>
+                            ₹{netSellDecision.mandi.economicProfit.toLocaleString()} (B:C {netSellDecision.mandi.benefitCostRatio}:1)
+                          </strong>
                         </div>
                       </div>
 
@@ -10953,21 +11285,27 @@ function App() {
                           <strong style={{ fontSize: '13px', color: '#202a27' }}>{netSellDecision.villageTrader.destinationName}</strong>
                           <span style={{ fontSize: '12px', fontWeight: 600, color: '#444d47' }}>₹{netSellDecision.villageTrader.pricePerKg}/kg</span>
                         </div>
-                        <p style={{ margin: '2px 0 6px', fontSize: '11px', color: '#778078' }}>
-                          Zero transport deduction, but discounted farm-gate acquisition rate
+                        <p style={{ margin: '2px 0 4px', fontSize: '11px', color: '#778078' }}>
+                          Zero transport deduction &middot; Discounted farm-gate rate
                         </p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '6px' }}>
-                          <span style={{ fontSize: '11px', color: '#667269' }}>Net Trader Return:</span>
-                          <strong style={{ fontSize: '13px', color: '#8a2b2b' }}>₹{netSellDecision.villageTrader.netReturn.toLocaleString()} (₹{netSellDecision.villageTrader.netPerKg}/kg)</strong>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '4px' }}>
+                          <span style={{ fontSize: '11px', color: '#667269' }}>Bank Payout:</span>
+                          <strong style={{ fontSize: '12px', color: '#8a2b2b' }}>₹{netSellDecision.villageTrader.bankPayout.toLocaleString()} (₹{netSellDecision.villageTrader.netPerKg}/kg)</strong>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
+                          <span style={{ fontSize: '11px', color: '#667269' }}>Economic Net Profit:</span>
+                          <strong style={{ fontSize: '12px', color: netSellDecision.villageTrader.economicProfit >= 0 ? '#2f6838' : '#8a2b2b' }}>
+                            ₹{netSellDecision.villageTrader.economicProfit.toLocaleString()} (B:C {netSellDecision.villageTrader.benefitCostRatio}:1)
+                          </strong>
                         </div>
                       </div>
 
                       <div style={{ background: '#eef4ec', border: '1px solid #c7ddc5', borderRadius: '4px', padding: '10px 12px' }}>
                         <strong style={{ fontSize: '12px', color: '#2f6838', display: 'block' }}>
-                          Decision Takeaway: +₹{netSellDecision.netAdvantage.toLocaleString()} Higher Profit
+                          Decision Takeaway: +₹{netSellDecision.netAdvantage.toLocaleString()} Higher Economic Net Profit
                         </strong>
                         <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#355339', lineHeight: 1.4 }}>
-                          Selling directly to the verified institutional partner yields ₹{netSellDecision.netAdvantage.toLocaleString()} more in take-home profit than the local alternative, even after covering all door-to-door transport costs.
+                          Selling directly through KisanLink institutional escrow yields ₹{netSellDecision.netAdvantage.toLocaleString()} more in real economic net profit than the local alternative, even after covering all door-to-door transport and platform fees.
                         </p>
                       </div>
                     </div>
@@ -11045,7 +11383,7 @@ function App() {
                   style={{ background: '#dce7d3', color: '#3d5940', borderColor: '#b8cba8' }}
                   onClick={handleUseProfileLocation}
                 >
-                  📍 Use My Profile GPS
+                  Use My Profile GPS
                 </button>
               )}
             </div>
@@ -11198,7 +11536,7 @@ function App() {
 
                         <div className="nearby-actions">
                           <span className="route-summary-text">
-                            🧭 {market.routeSummary}
+                            {market.routeSummary}
                           </span>
                           <a
                             href={market.navigationUrl}
@@ -11805,7 +12143,7 @@ function App() {
                 style={{ width: 'auto', background: '#202a27' }}
                 onClick={() => window.print()}
               >
-                Print / Save PDF Receipt 🖨️
+                Print / Save PDF Receipt
               </button>
               <button
                 type="button"
