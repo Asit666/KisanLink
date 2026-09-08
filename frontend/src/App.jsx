@@ -3301,17 +3301,6 @@ function App() {
     return () => { isMounted = false; };
   }, []);
 
-  // System Health & Connectivity State
-  const [showHealthModal, setShowHealthModal] = useState(false);
-  const [healthStatus, setHealthStatus] = useState({
-    backend: 'ONLINE',
-    database: 'CONNECTED',
-    aiService: 'ONLINE',
-    aiMode: 'HEURISTIC_SCREENING',
-    mandiFeed: 'ACTIVE',
-    websocket: 'CONNECTED'
-  });
-
   // Where Should This Farmer Sell? Net Profit Decision Engine State
   const [sellCalcCrop, setSellCalcCrop] = useState('Tomato');
   const [sellCalcQty, setSellCalcQty] = useState(500); // kg
@@ -6159,17 +6148,6 @@ function App() {
               <i className={`ws-dot ${wsConnected ? 'connected' : 'connecting'}`} />
               {wsConnected ? 'Live WS' : text.notificationsStatus}
             </span>
-            <button
-              type="button"
-              className="trade-btn trade-btn-secondary"
-              style={{ padding: '3px 9px', fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
-              onClick={() => setShowHealthModal(true)}
-              title="Inspect platform service health & microservice topology"
-            >
-              <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#6e9d68' }} />
-              System Health
-            </button>
-
             {session && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span
@@ -11454,55 +11432,6 @@ function App() {
               >
                 Open Google Maps &rarr;
               </a>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* MODAL: SYSTEM TOPOLOGY & REAL-TIME SERVICE HEALTH                          */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {showHealthModal && (
-        <div className="drawer-overlay" onClick={() => setShowHealthModal(false)}>
-          <div className="drawer-card" style={{ maxWidth: '560px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="drawer-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <p className="eyebrow">Enterprise Observability</p>
-                <h3 style={{ margin: 0, fontSize: '18px', color: '#202a27' }}>KisanLink System &amp; Service Health</h3>
-              </div>
-              <button type="button" className="drawer-close-btn" onClick={() => setShowHealthModal(false)}>X</button>
-            </div>
-
-            <div className="drawer-body" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {[
-                { name: 'Spring Boot Application Backend', port: '8080', status: healthStatus.backend, note: 'REST APIs, Escrow Service, WebSockets', badgeBg: '#eef4ec', badgeColor: '#2f6838' },
-                { name: 'PostgreSQL Production Database', port: '5432 (Internal)', status: healthStatus.database, note: 'Flyway V1-V16 Migrations Applied, Spatial Support', badgeBg: '#eef4ec', badgeColor: '#2f6838' },
-                { name: 'AI Crop Doctor Microservice', port: '8000', status: healthStatus.aiService, note: 'FastAPI, MobileNet Architecture (Heuristic Screening)', badgeBg: '#fff9e6', badgeColor: '#8a6218' },
-                { name: 'National Mandi Price Feed', port: 'data.gov.in', status: healthStatus.mandiFeed, note: 'Automated AGMARKNET scheduled ingestion pipeline', badgeBg: '#eef4ec', badgeColor: '#2f6838' },
-                { name: 'Real-Time WebSocket Engine', port: '/ws/notifications', status: wsConnected ? 'CONNECTED' : 'CONNECTING', note: 'STOMP / SockJS trade & price alert dispatcher', badgeBg: wsConnected ? '#eef4ec' : '#fff9e6', badgeColor: wsConnected ? '#2f6838' : '#8a6218' },
-                { name: 'Escrow Settlement Gateway', port: '/api/webhooks/payment', status: 'SANDBOX VERIFIED', note: 'HMAC-SHA256 signature verification & idempotency guard', badgeBg: '#eef2f8', badgeColor: '#204068' }
-              ].map((srv, idx) => (
-                <div key={idx} style={{ background: '#f8f7f2', border: '1px solid #eceae2', borderRadius: '6px', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: srv.badgeColor }} />
-                      <strong style={{ fontSize: '13px', color: '#202a27' }}>{srv.name}</strong>
-                    </div>
-                    <p style={{ margin: '2px 0 0', fontSize: '11px', color: '#667269' }}>
-                      Endpoint / Port: {srv.port} &middot; {srv.note}
-                    </p>
-                  </div>
-                  <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: srv.badgeBg, color: srv.badgeColor, padding: '3px 8px', borderRadius: '4px', whiteSpace: 'nowrap' }}>
-                    {srv.status}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <div className="drawer-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-              <button type="button" className="trade-btn trade-btn-primary" onClick={() => setShowHealthModal(false)}>
-                Close Panel
-              </button>
             </div>
           </div>
         </div>
