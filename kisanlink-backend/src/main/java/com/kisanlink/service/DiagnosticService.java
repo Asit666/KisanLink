@@ -86,11 +86,12 @@ public class DiagnosticService {
 
         // Real-time notification push
         if (farmer != null && farmer.getUser() != null) {
+            String confStr = profile.confidenceScore != null ? " (" + profile.confidenceScore + "% confidence)" : " (Uncalibrated Visual Screening)";
             webSocketService.sendUserNotification(
                     farmer.getUser(),
                     "DIAGNOSTIC_COMPLETED",
                     "Crop Doctor AI: " + profile.diseaseName + " Detected",
-                    "Scan completed for " + cropName + " (" + profile.confidenceScore + "% confidence). Review treatment prescription.",
+                    "Scan completed for " + cropName + confStr + ". Review treatment advisory.",
                     saved.getId(),
                     null
             );
@@ -369,14 +370,14 @@ public class DiagnosticService {
 
         String diseaseName;
         String pathogenType;
-        double confidenceScore;
+        Double confidenceScore;
         DiagnosticSeverity severity;
         String symptoms;
         String treatmentPlan;
         List<String> recommendedInputs;
         String defaultSampleImage;
 
-        public DiagnosticProfile(String diseaseName, String pathogenType, double confidenceScore,
+        public DiagnosticProfile(String diseaseName, String pathogenType, Double confidenceScore,
                                  DiagnosticSeverity severity, String symptoms, String treatmentPlan,
                                  List<String> recommendedInputs, String defaultSampleImage) {
             this.diseaseName = diseaseName;

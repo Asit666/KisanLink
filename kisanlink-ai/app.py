@@ -218,76 +218,84 @@ def fallback_diagnosis(image: Image.Image, crop_hint: str = "", notes: str = "")
     metrics = image_metrics(image)
     text = f"{crop_hint} {notes}".lower()
 
+    base_safety_treatment = (
+        "PRELIMINARY VISUAL SCREENING ONLY: Neural network model weights are not loaded.\n"
+        "1. This result is generated via uncalibrated visual heuristics and must NOT be used for chemical dosage decisions.\n"
+        "2. Please consult your local Krishi Vigyan Kendra (KVK), block agricultural extension officer, or a certified agronomist for in-person diagnosis.\n"
+        "3. Remove and isolate visibly damaged foliage to prevent potential spread."
+    )
+    safe_input_advisory = "Consult Local KVK / Agricultural Extension Officer"
+
     if metrics["green_ratio"] >= 50 and metrics["dark_ratio"] < 8 and metrics["yellow_ratio"] < 9 and metrics["rust_ratio"] < 8:
         result = {
             "raw_label": "Tomato___healthy" if "tomato" in text else "Apple___healthy",
             "crop": crop_hint or "General Crop",
-            "condition": "Healthy Foliage",
-            "confidence": 96.0,
+            "condition": "Healthy Foliage (Visual Screening)",
+            "confidence": None,
             "pathogen_type": "None",
             "severity": "HEALTHY",
-            "treatment": "Maintain balanced irrigation, avoid waterlogging, and continue regular nutrient monitoring.",
-            "recommended_inputs": "Seaweed Extract Bio-Stimulant, NPK Complex 19:19:19",
+            "treatment": "Continue routine crop monitoring and maintain balanced irrigation. Neural network model weights not loaded for diagnostic confirmation.",
+            "recommended_inputs": safe_input_advisory,
             "is_healthy": True,
         }
     elif "powder" in text or "mildew" in text or metrics["white_ratio"] > 12:
         result = {
             "raw_label": "Tomato___Early_blight" if "tomato" in text else "Cherry_(including_sour)___Powdery_mildew",
             "crop": crop_hint or "General Crop",
-            "condition": "Powdery Mildew",
-            "confidence": 93.8,
+            "condition": "Powdery Mildew Pattern (Visual Screening)",
+            "confidence": None,
             "pathogen_type": "Ascomycete Fungal Disease",
             "severity": "MODERATE",
-            "treatment": "1. Spray Wettable Sulphur 80% WDG @ 2-3g/L.\n2. Increase spacing and airflow.\n3. Avoid dense canopy overlap.",
-            "recommended_inputs": "Wettable Sulphur 80% WP, Trichoderma Viride Bio-Fungicide, Seaweed Extract Bio-Stimulant",
+            "treatment": base_safety_treatment,
+            "recommended_inputs": safe_input_advisory,
             "is_healthy": False,
         }
     elif "rust" in text or metrics["rust_ratio"] > 8:
         result = {
             "raw_label": "Corn_(maize)___Common_rust_" if "maize" in text or "corn" in text else "Grape___Black_rot",
             "crop": crop_hint or "General Crop",
-            "condition": "Rust / Leaf Spot Complex",
-            "confidence": 94.2,
+            "condition": "Rust / Leaf Spot Pattern (Visual Screening)",
+            "confidence": None,
             "pathogen_type": "Basidiomycete Fungus",
             "severity": "SEVERE",
-            "treatment": "1. Apply Propiconazole or Mancozeb spray at first sign.\n2. Improve field aeration.\n3. Maintain balanced potash nutrition.",
-            "recommended_inputs": "Mancozeb 75% WP, Muriate of Potash (MOP 60% K2O), NPK Complex 19:19:19",
+            "treatment": base_safety_treatment,
+            "recommended_inputs": safe_input_advisory,
             "is_healthy": False,
         }
     elif "curl" in text or "virus" in text or metrics["yellow_ratio"] > 15:
         result = {
             "raw_label": "Tomato___healthy" if "tomato" in text else "Peach___healthy",
             "crop": crop_hint or "General Crop",
-            "condition": "Viral Curl / Chlorosis Pattern",
-            "confidence": 91.6,
+            "condition": "Viral Curl / Chlorosis Pattern (Visual Screening)",
+            "confidence": None,
             "pathogen_type": "Viral Vector-Borne Disease",
             "severity": "MODERATE",
-            "treatment": "1. Control vector insects and remove infected plants.\n2. Apply micronutrient support.\n3. Keep field sanitation strong.",
-            "recommended_inputs": "Imidacloprid 17.8% SL, Neem Bio-Pesticide, Micronutrient Mix",
+            "treatment": base_safety_treatment,
+            "recommended_inputs": safe_input_advisory,
             "is_healthy": False,
         }
     elif metrics["dark_ratio"] > 12:
         result = {
             "raw_label": "Tomato___Early_blight" if "tomato" in text else "Potato___Late_blight",
             "crop": crop_hint or "General Crop",
-            "condition": "Leaf Blight / Necrotic Spotting",
-            "confidence": 92.5,
+            "condition": "Leaf Blight / Necrotic Pattern (Visual Screening)",
+            "confidence": None,
             "pathogen_type": "Fungal Pathogen",
             "severity": "SEVERE",
-            "treatment": "1. Apply broad-spectrum fungicide.\n2. Remove infected foliage immediately.\n3. Reduce humidity around the canopy.",
-            "recommended_inputs": "Mancozeb 75% WP, Trichoderma Viride Bio-Fungicide, Seaweed Extract Bio-Stimulant",
+            "treatment": base_safety_treatment,
+            "recommended_inputs": safe_input_advisory,
             "is_healthy": False,
         }
     else:
         result = {
             "raw_label": "Corn_(maize)___healthy" if "maize" in text or "corn" in text else "Tomato___healthy",
             "crop": crop_hint or "General Crop",
-            "condition": "Healthy Foliage",
-            "confidence": 88.8,
+            "condition": "Healthy Foliage (Visual Screening)",
+            "confidence": None,
             "pathogen_type": "None",
             "severity": "HEALTHY",
-            "treatment": "Continue routine crop monitoring and nutrient management.",
-            "recommended_inputs": "NPK Complex 19:19:19, Seaweed Extract Bio-Stimulant",
+            "treatment": "Routine crop monitoring recommended. Model weights not loaded for definitive pathology diagnosis.",
+            "recommended_inputs": safe_input_advisory,
             "is_healthy": True,
         }
 

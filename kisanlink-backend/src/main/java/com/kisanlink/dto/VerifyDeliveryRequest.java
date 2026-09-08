@@ -9,5 +9,14 @@ public record VerifyDeliveryRequest(
         String deliveryCode,
         @NotNull(message = "Delivered quantity in kg is required")
         BigDecimal deliveredQuantityKg,
+        String vehicleNumber,
+        String driverName,
+        String gpsLocation,
+        String evidencePhotoUrl,
+        String verificationTimestamp,
         String deliveryNotes
-) {}
+) {
+    public VerifyDeliveryRequest(String deliveryCode, BigDecimal deliveredQuantityKg, String deliveryNotes) {
+        this(deliveryCode, deliveredQuantityKg, null, null, null, null, null, deliveryNotes);
+    }
+}

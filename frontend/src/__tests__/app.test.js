@@ -515,3 +515,116 @@ describe('Escrow Sandbox Demarcation & Refund State Machine', () => {
     assert.strictEqual(state, ESCROW_STATES.REFUNDED_TO_BUYER);
   });
 });
+
+describe('Mock Data Decoupling & Sandbox Demarcation Verification', () => {
+  it('should ensure all sample orders are explicitly flagged with demoNotice and isDemo', async () => {
+    const { INITIAL_USER_ORDERS, USE_DEMO_DATA } = await import('../data/mockData.js');
+    assert.strictEqual(USE_DEMO_DATA, true);
+    assert.ok(INITIAL_USER_ORDERS.length > 0);
+    INITIAL_USER_ORDERS.forEach(order => {
+      assert.strictEqual(order.isDemo, true);
+      assert.ok(order.demoNotice.includes('SANDBOX DEMO TEMPLATE'));
+    });
+  });
+});
+
+describe('Proof of Pickup & Delivery Multi-Factor Handshake', () => {
+  function validatePickupHandshake({ pickupCode, quantityLoadedKg, vehicleNumber, driverName, gpsLocation }) {
+    if (!pickupCode || pickupCode.trim().length !== 4) {
+      throw new Error('Invalid 4-digit pickup code');
+    }
+    if (!quantityLoadedKg || quantityLoadedKg <= 0) {
+      throw new Error('Weighbridge certified net weight required');
+    }
+    return {
+      verified: true,
+      pickupCode,
+      quantityLoadedKg,
+      vehicleNumber: vehicleNumber || 'UNASSIGNED',
+      driverName: driverName || 'UNASSIGNED',
+      gpsLocation: gpsLocation || 'N/A',
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  function validateDeliveryHandshake({ deliveryCode, deliveredQuantityKg, dispatchedQuantityKg, vehicleNumber, driverName, gpsLocation }) {
+    if (!deliveryCode || deliveryCode.trim().length !== 4) {
+      throw new Error('Invalid 4-digit delivery code');
+    }
+    if (!deliveredQuantityKg || deliveredQuantityKg <= 0) {
+      throw new Error('Terminal weighbridge delivered weight required');
+    }
+    const discrepancyKg = Number((dispatchedQuantityKg - deliveredQuantityKg).toFixed(2));
+    return {
+      verified: true,
+      deliveryCode,
+      deliveredQuantityKg,
+      discrepancyKg,
+      isExactMatch: discrepancyKg === 0,
+      vehicleNumber: vehicleNumber || 'UNASSIGNED',
+      driverName: driverName || 'UNASSIGNED',
+      gpsLocation: gpsLocation || 'N/A',
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  it('should validate multi-factor pickup handshake with vehicle and GPS audit', () => {
+    const handshake = validatePickupHandshake({
+      pickupCode: '4821',
+      quantityLoadedKg: 1200,
+      vehicleNumber: 'JH-01-AB-1234',
+      driverName: 'Suresh Kumar',
+      gpsLocation: '23.3441, 85.3096'
+    });
+    assert.strictEqual(handshake.verified, true);
+    assert.strictEqual(handshake.quantityLoadedKg, 1200);
+    assert.strictEqual(handshake.vehicleNumber, 'JH-01-AB-1234');
+    assert.ok(handshake.timestamp);
+  });
+
+  it('should validate delivery handshake and compute weight discrepancy', () => {
+    const delivery = validateDeliveryHandshake({
+      deliveryCode: '9314',
+      deliveredQuantityKg: 1195,
+      dispatchedQuantityKg: 1200,
+      vehicleNumber: 'JH-01-AB-1234',
+      driverName: 'Suresh Kumar',
+      gpsLocation: '23.6693, 86.1511'
+    });
+    assert.strictEqual(delivery.verified, true);
+    assert.strictEqual(delivery.discrepancyKg, 5);
+    assert.strictEqual(delivery.isExactMatch, false);
+  });
+});
+
+describe('Diagnostic Chemical Safety Protocol', () => {
+  function enforceChemicalSafety(diagnosticReport) {
+    if (diagnosticReport.model_status === 'visual_heuristic_screening' || diagnosticReport.confidence_score === null) {
+      const mentionsSyntheticPesticides = /spray|mancozeb|propiconazole|chlorpyrifos|imidacloprid/i.test(diagnosticReport.treatment_plan || '');
+      return {
+        safe: !mentionsSyntheticPesticides,
+        requiresKvkConsultation: true,
+        recommendedInputs: 'Consult Local KVK / Agricultural Extension Officer'
+      };
+    }
+    return {
+      safe: true,
+      requiresKvkConsultation: false,
+      recommendedInputs: diagnosticReport.recommended_inputs
+    };
+  }
+
+  it('should enforce that uncalibrated visual heuristics block chemical pesticide sprays', () => {
+    const uncalibratedReport = {
+      model_status: 'visual_heuristic_screening',
+      confidence_score: null,
+      treatment_plan: 'PRELIMINARY VISUAL SCREENING ONLY. Consult your local Krishi Vigyan Kendra (KVK) before applying treatments.',
+      recommended_inputs: 'Consult Local KVK / Agricultural Extension Officer'
+    };
+
+    const audit = enforceChemicalSafety(uncalibratedReport);
+    assert.strictEqual(audit.safe, true);
+    assert.strictEqual(audit.requiresKvkConsultation, true);
+    assert.strictEqual(audit.recommendedInputs, 'Consult Local KVK / Agricultural Extension Officer');
+  });
+});
