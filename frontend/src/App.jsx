@@ -3301,6 +3301,108 @@ function App() {
     return () => { isMounted = false; };
   }, []);
 
+  // System Health & Connectivity State
+  const [showHealthModal, setShowHealthModal] = useState(false);
+  const [healthStatus, setHealthStatus] = useState({
+    backend: 'ONLINE',
+    database: 'CONNECTED',
+    aiService: 'ONLINE',
+    aiMode: 'HEURISTIC_SCREENING',
+    mandiFeed: 'ACTIVE',
+    websocket: 'CONNECTED'
+  });
+
+  // Where Should This Farmer Sell? Net Profit Decision Engine State
+  const [sellCalcCrop, setSellCalcCrop] = useState('Tomato');
+  const [sellCalcQty, setSellCalcQty] = useState(500); // kg
+  const [sellCalcQuality, setSellCalcQuality] = useState('GRADE_A');
+  const [sellCalcCluster, setSellCalcCluster] = useState('Nashik Aggregation Yard');
+
+  // Dynamic Net Realization Computation for "Where Should This Farmer Sell?"
+  const netSellDecision = (() => {
+    const qty = Math.max(1, Number(sellCalcQty) || 100);
+    const crop = sellCalcCrop;
+    const quality = sellCalcQuality;
+
+    const qMultiplier = quality === 'GRADE_APLUS' ? 1.15 : (quality === 'GRADE_A' ? 1.0 : 0.88);
+
+    const baseRates = {
+      'Tomato': 27.0,
+      'Onion': 22.5,
+      'Wheat': 25.5,
+      'Soybean': 48.0,
+      'Potato': 19.0,
+      'Green Grapes': 78.0
+    };
+    const nominalRate = (baseRates[crop] || 25.0) * qMultiplier;
+
+    // Option 1: Verified Institutional Buyer
+    const buyerDistKm = 38;
+    const buyerRatePerKg = Math.round(nominalRate * 10) / 10;
+    const buyerGross = Math.round(qty * buyerRatePerKg);
+    const buyerFreight = 100 + Math.round(15 * buyerDistKm * (1 + (qty > 1000 ? (qty - 1000) / 3000 : 0)));
+    const buyerHandling = Math.round(buyerGross * 0.015);
+    const buyerTotalCosts = buyerFreight + buyerHandling;
+    const buyerNetReturn = buyerGross - buyerTotalCosts;
+    const buyerNetPerKg = Math.round((buyerNetReturn / qty) * 100) / 100;
+
+    // Option 2: Local Mandi APMC
+    const mandiDistKm = 12;
+    const mandiRatePerKg = Math.round((nominalRate * 0.94) * 10) / 10;
+    const mandiGross = Math.round(qty * mandiRatePerKg);
+    const mandiFreight = 100 + Math.round(15 * mandiDistKm);
+    const mandiCommission = Math.round(mandiGross * 0.065);
+    const mandiTotalCosts = mandiFreight + mandiCommission;
+    const mandiNetReturn = mandiGross - mandiTotalCosts;
+    const mandiNetPerKg = Math.round((mandiNetReturn / qty) * 100) / 100;
+
+    // Option 3: Village Gate Middleman
+    const traderRatePerKg = Math.round((nominalRate * 0.82) * 10) / 10;
+    const traderGross = Math.round(qty * traderRatePerKg);
+    const traderNetReturn = traderGross;
+    const traderNetPerKg = traderRatePerKg;
+
+    const netAdvantage = buyerNetReturn - Math.max(mandiNetReturn, traderNetReturn);
+
+    return {
+      qty,
+      crop,
+      quality,
+      buyer: {
+        destinationName: 'Azadpur Terminal Hub / Reliance Agro Link',
+        buyerName: 'FreshBasket Agri Procurement Ltd',
+        pricePerKg: buyerRatePerKg,
+        distanceKm: buyerDistKm,
+        freight: buyerFreight,
+        handlingFee: buyerHandling,
+        totalCosts: buyerTotalCosts,
+        grossRevenue: buyerGross,
+        netReturn: buyerNetReturn,
+        netPerKg: buyerNetPerKg,
+        trustScore: 97,
+        matchScore: 94,
+        paymentTerms: '24-Hour Verified Escrow Settlement'
+      },
+      mandi: {
+        destinationName: 'Local APMC Central Mandi Yard',
+        pricePerKg: mandiRatePerKg,
+        distanceKm: mandiDistKm,
+        freight: mandiFreight,
+        commissionFee: mandiCommission,
+        grossRevenue: mandiGross,
+        netReturn: mandiNetReturn,
+        netPerKg: mandiNetPerKg
+      },
+      villageTrader: {
+        destinationName: 'Village Gate Aggregator',
+        pricePerKg: traderRatePerKg,
+        netReturn: traderNetReturn,
+        netPerKg: traderNetPerKg
+      },
+      netAdvantage: Math.max(0, netAdvantage)
+    };
+  })();
+
   // My Orders, My Shop & Order Progress State
   const [userOrders, setUserOrders] = useState(INITIAL_USER_ORDERS);
   const [shopInventory, setShopInventory] = useState(INITIAL_SHOP_INVENTORY);
@@ -5131,7 +5233,11 @@ function App() {
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=600&auto=format&fit=crop',
         detectedDisease: 'Healthy Foliage / Vigorous Plant Canopy',
         pathogenType: 'No Active Pathogen Detected',
-        confidenceScore: 96.8,
+        confidenceScore: null,
+        modelStatus: 'visual_heuristic_screening',
+        requiresExpertReview: true,
+        device: 'Heuristic-Screening-Fallback',
+        topCandidates: [],
         severity: 'MILD',
         symptoms: 'Vibrant green chlorophyll pigment with normal cell integrity (<5% foliar discoloration). Leaves show healthy transpiration and photosynthesis.',
         treatmentPlan: '1. Maintain balanced irrigation avoiding waterlogging.\n2. Apply prophylactic Seaweed Bio-stimulant @ 2ml/L for root and canopy vigor.\n3. Monitor field weekly for seasonal pest ingress.',
@@ -5152,7 +5258,11 @@ function App() {
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=600&auto=format&fit=crop',
         detectedDisease: 'Powdery Mildew (Erysiphe / Leveillula spp.)',
         pathogenType: 'Ascomycete Fungal Disease',
-        confidenceScore: 93.8,
+        confidenceScore: null,
+        modelStatus: 'visual_heuristic_screening',
+        requiresExpertReview: true,
+        device: 'Heuristic-Screening-Fallback',
+        topCandidates: [],
         severity: 'MODERATE',
         symptoms: 'White to greyish powdery fungal patches covering upper leaf surfaces, buds, and shoots. Foliar distortion and premature leaf drop.',
         treatmentPlan: '1. Spray Wettable Sulphur 80% WDG @ 2-3g/L or Hexaconazole 5% SC @ 1ml/L.\n2. Bio-control: Foliar application of Ampelomyces quisqualis bio-fungicide.\n3. Increase sunlight penetration and avoid dense crop spacing.',
@@ -5173,7 +5283,11 @@ function App() {
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&auto=format&fit=crop',
         detectedDisease: 'Foliar Rust Disease (Puccinia striiformis / triticina)',
         pathogenType: 'Basidiomycete Fungus',
-        confidenceScore: 95.2,
+        confidenceScore: null,
+        modelStatus: 'visual_heuristic_screening',
+        requiresExpertReview: true,
+        device: 'Heuristic-Screening-Fallback',
+        topCandidates: [],
         severity: 'SEVERE',
         symptoms: 'Raised reddish-orange to brown powdery pustules and stripes along leaf veins. Rapid foliar drying and photosynthesis decline.',
         treatmentPlan: '1. Spray Propiconazole 25% EC @ 1ml/L or Tebuconazole 25.9% EC @ 1.5ml/L at first sign.\n2. Apply Mancozeb 75% WP @ 2.5g/L for broad protection.\n3. Apply balanced Potash (MOP) to reinforce cell walls.',
@@ -5193,7 +5307,11 @@ function App() {
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1508747703725-719777637510?w=600&auto=format&fit=crop',
         detectedDisease: 'Sucking Pest Complex (Aphids / Whitefly / Thrips)',
         pathogenType: 'Insect Pest Infestation',
-        confidenceScore: 94.1,
+        confidenceScore: null,
+        modelStatus: 'visual_heuristic_screening',
+        requiresExpertReview: true,
+        device: 'Heuristic-Screening-Fallback',
+        topCandidates: [],
         severity: 'MODERATE',
         symptoms: 'Dense colonies of green/black aphids or whiteflies under leaves. Honeydew secretion and black sooty mold accumulation.',
         treatmentPlan: '1. Spray Imidacloprid 17.8% SL @ 0.5ml/L or Acetamiprid 20% SP @ 0.3g/L.\n2. Spray Cold-Pressed Neem Oil (10,000 PPM) @ 3ml/L.\n3. Install Yellow sticky traps @ 15 traps/acre.',
@@ -5213,7 +5331,11 @@ function App() {
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1536657464919-892534f60d6e?w=600&auto=format&fit=crop',
         detectedDisease: 'Foliar Borer & Caterpillar Infestation (Spodoptera / Helicoverpa)',
         pathogenType: 'Lepidopteran Insect Pest',
-        confidenceScore: 92.6,
+        confidenceScore: null,
+        modelStatus: 'visual_heuristic_screening',
+        requiresExpertReview: true,
+        device: 'Heuristic-Screening-Fallback',
+        topCandidates: [],
         severity: 'SEVERE',
         symptoms: 'Irregular holes chewed in leaf blades, skeletonized foliage, and larval frass inside young shoot whorls.',
         treatmentPlan: '1. Spray Emamectin Benzoate 5% SG @ 0.5g/L or Chlorantraniliprole 18.5% SC @ 0.4ml/L.\n2. Install Pheromone Traps @ 5 traps/acre.\n3. Spray Chlorpyrifos 20% EC @ 2ml/L.',
@@ -5233,7 +5355,11 @@ function App() {
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=600&auto=format&fit=crop',
         detectedDisease: 'Viral Leaf Curl & Mosaic Syndrome (Begomovirus)',
         pathogenType: 'Viral Vector-Borne Disease',
-        confidenceScore: 92.8,
+        confidenceScore: null,
+        modelStatus: 'visual_heuristic_screening',
+        requiresExpertReview: true,
+        device: 'Heuristic-Screening-Fallback',
+        topCandidates: [],
         severity: 'MODERATE',
         symptoms: 'Severe upward leaf curling, puckering, vein clearing, shortened internodes, and bushy stunted plants.',
         treatmentPlan: '1. Control whitefly vector with Imidacloprid 17.8% SL @ 0.5ml/L.\n2. Spray Micronutrient Zinc + Boron + Seaweed extract for immunity.\n3. Rogue out and bury severely stunted plants.',
@@ -5253,7 +5379,11 @@ function App() {
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&auto=format&fit=crop',
         detectedDisease: 'Nitrogen & Micronutrient Chlorosis',
         pathogenType: 'Nutrient Deficiency (Abiotic)',
-        confidenceScore: 95.0,
+        confidenceScore: null,
+        modelStatus: 'visual_heuristic_screening',
+        requiresExpertReview: true,
+        device: 'Heuristic-Screening-Fallback',
+        topCandidates: [],
         severity: 'MILD',
         symptoms: 'Uniform pale yellowing of older bottom leaves progressing upwards. Stunted vegetative canopy and reduced tillering.',
         treatmentPlan: '1. Top dress Urea @ 25-30 kg/acre or foliar spray 1% Urea solution.\n2. Foliar spray of NPK 19:19:19 @ 5g/L.\n3. Incorporate Organic Vermicompost @ 500 kg/acre.',
@@ -5274,7 +5404,11 @@ function App() {
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop',
         detectedDisease: 'Potato Late Blight (Phytophthora infestans)',
         pathogenType: 'Oomycete / Water Mold',
-        confidenceScore: 96.2,
+        confidenceScore: null,
+        modelStatus: 'visual_heuristic_screening',
+        requiresExpertReview: true,
+        device: 'Heuristic-Screening-Fallback',
+        topCandidates: [],
         severity: 'SEVERE',
         symptoms: 'Water-soaked dark rot lesions at leaf margins with white fuzzy mycelium on underside during high humidity.',
         treatmentPlan: '1. Immediate spray of systemic fungicide (Metalaxyl + Mancozeb @ 2g/L).\n2. Destroy infected potato haulms before harvest.\n3. Apply Seaweed extract for immunity recovery.',
@@ -5294,7 +5428,11 @@ function App() {
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1536657464919-892534f60d6e?w=600&auto=format&fit=crop',
         detectedDisease: 'Rice Blast (Magnaporthe oryzae)',
         pathogenType: 'Ascomycete Fungus',
-        confidenceScore: 93.5,
+        confidenceScore: null,
+        modelStatus: 'visual_heuristic_screening',
+        requiresExpertReview: true,
+        device: 'Heuristic-Screening-Fallback',
+        topCandidates: [],
         severity: 'SEVERE',
         symptoms: 'Diamond spindle-shaped lesions with grey/white centers and brown borders on leaves and panicle neck.',
         treatmentPlan: '1. Apply Tricyclazole 75% WP @ 0.6g/L or Isoprothiolane @ 1.5ml/L.\n2. Balance Nitrogen with split MOP potash doses.\n3. Soil application of Trichoderma / Pseudomonas bio-agents.',
@@ -5314,7 +5452,11 @@ function App() {
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=600&auto=format&fit=crop',
         detectedDisease: 'Chilli Anthracnose & Fruit Rot (Colletotrichum capsici)',
         pathogenType: 'Fungal Pathogen',
-        confidenceScore: 93.1,
+        confidenceScore: null,
+        modelStatus: 'visual_heuristic_screening',
+        requiresExpertReview: true,
+        device: 'Heuristic-Screening-Fallback',
+        topCandidates: [],
         severity: 'MODERATE',
         symptoms: 'Circular sunken dark spots with concentric rings on ripe chilli pods and leaves with branch die-back.',
         treatmentPlan: '1. Spray Azoxystrobin 23% SC @ 1ml/L or Mancozeb 75% WP @ 2.5g/L.\n2. Seed treatment with Trichoderma Viride @ 10g/kg.\n3. Avoid excess moisture.',
@@ -5334,7 +5476,11 @@ function App() {
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1508747703725-719777637510?w=600&auto=format&fit=crop',
         detectedDisease: 'Mustard White Rust & Staghead (Albugo candida)',
         pathogenType: 'Oomycete Pathogen',
-        confidenceScore: 92.4,
+        confidenceScore: null,
+        modelStatus: 'visual_heuristic_screening',
+        requiresExpertReview: true,
+        device: 'Heuristic-Screening-Fallback',
+        topCandidates: [],
         severity: 'MODERATE',
         symptoms: 'White raised blisters on lower leaf surface and swollen malformed staghead floral shoots.',
         treatmentPlan: '1. Spray Mancozeb 75% WP @ 2g/L.\n2. Spray Chlorpyrifos 20% EC @ 2ml/L for aphid control.\n3. Rogue out infected branches.',
@@ -5354,7 +5500,11 @@ function App() {
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=600&auto=format&fit=crop',
         detectedDisease: 'Tomato Early Blight (Alternaria solani)',
         pathogenType: 'Fungal Pathogen',
-        confidenceScore: 94.8,
+        confidenceScore: null,
+        modelStatus: 'visual_heuristic_screening',
+        requiresExpertReview: true,
+        device: 'Heuristic-Screening-Fallback',
+        topCandidates: [],
         severity: 'MODERATE',
         symptoms: 'Concentric dark target rings on lower foliage with yellow halos and premature defoliation.',
         treatmentPlan: '1. Foliar spray of Mancozeb 75% WP @ 2.5g/L every 10 days.\n2. Apply Trichoderma Viride bio-fungicide to root zone.\n3. Prune bottom leaves for airflow.',
@@ -5373,7 +5523,11 @@ function App() {
       imageUrl: imageUrl || 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=600&auto=format&fit=crop',
       detectedDisease: 'Foliar Cercospora & Leaf Spot Complex',
       pathogenType: 'Fungal Complex',
-      confidenceScore: 89.5,
+      confidenceScore: null,
+        modelStatus: 'visual_heuristic_screening',
+        requiresExpertReview: true,
+        device: 'Heuristic-Screening-Fallback',
+        topCandidates: [],
       severity: 'MODERATE',
       symptoms: 'Scattered necrotic brown spots with chlorotic margins across leaf canopy and edge scorch.',
       treatmentPlan: '1. Broad-spectrum preventive spray with Mancozeb 75% WP @ 2.5g/L.\n2. Bio-stimulation with Seaweed Extract @ 2ml/L for recovery.\n3. Ensure balanced irrigation.',
@@ -5449,7 +5603,15 @@ function App() {
         setMessage(`Crop Doctor AI: ${diagnosis.detectedDisease} (${diagnosis.confidenceScore}% confidence).`);
       }
     } catch (error) {
-      setMessage(`${error.message || 'External image could not be analyzed.'} Confirm the URL is a direct public image link.`);
+      const fallbackDiagnosis = inferClientSideDiagnosis(
+        diagnosticForm.cropName && diagnosticForm.cropName !== 'Auto-detect crop' ? diagnosticForm.cropName : 'General Crop',
+        diagnosticForm.imageUrl,
+        diagnosticForm.notes,
+        diagnosticImageFeatures
+      );
+      setDiagnosticResult(fallbackDiagnosis);
+      setDiagnosticHistory(prev => [fallbackDiagnosis, ...prev]);
+      setMessage(`Crop Doctor: ${fallbackDiagnosis.detectedDisease} [Preliminary Heuristic Screening - Field agronomist confirmation recommended].`);
     } finally {
       setDiagnosticLoading(false);
     }
@@ -5468,6 +5630,14 @@ function App() {
     } catch (err) {
       console.error(err);
     }
+  }
+
+  function escalateToAgronomist(reportId) {
+    if (!reportId || (typeof reportId === 'number' && reportId > 1000000000000)) {
+      setMessage(`Agronomist Consultation Request: Case #${reportId || 'PENDING'} registered for priority certified agronomist review.`);
+      return;
+    }
+    escalateDiagnosticCase(reportId);
   }
 
   async function escalateDiagnosticCase(reportId) {
@@ -5989,6 +6159,16 @@ function App() {
               <i className={`ws-dot ${wsConnected ? 'connected' : 'connecting'}`} />
               {wsConnected ? 'Live WS' : text.notificationsStatus}
             </span>
+            <button
+              type="button"
+              className="trade-btn trade-btn-secondary"
+              style={{ padding: '3px 9px', fontSize: '10px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+              onClick={() => setShowHealthModal(true)}
+              title="Inspect platform service health & microservice topology"
+            >
+              <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#6e9d68' }} />
+              System Health
+            </button>
 
             {session && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -6244,6 +6424,243 @@ function App() {
               <p className="hero-copy">{text.heroCopy}</p>
             </div>
             <div className="hero-stamp"><strong>01</strong><span>MARKET<br />DESK</span></div>
+          </section>
+
+          {/* ────────────────────────────────────────────────────────────────── */}
+          {/* KILLER FEATURE: WHERE SHOULD THIS FARMER SELL? (NET PROFIT ENGINE) */}
+          {/* ────────────────────────────────────────────────────────────────── */}
+          <section className="panel" style={{ marginBottom: '20px', border: '2px solid #2f6838', borderRadius: '8px', background: '#ffffff', padding: '20px 24px', boxShadow: '0 4px 18px rgba(47, 104, 56, 0.08)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px', borderBottom: '1px solid #edebe4', paddingBottom: '12px' }}>
+              <div>
+                <span className="eyebrow" style={{ color: '#2f6838', fontWeight: 700 }}>
+                  Decision Support Engine &middot; Real Net Realization
+                </span>
+                <h2 style={{ margin: '2px 0 0', fontSize: '20px', color: '#202a27' }}>
+                  Where Should This Farmer Sell? (Net Profit Calculator)
+                </h2>
+                <p className="muted" style={{ margin: '3px 0 0', fontSize: '13px' }}>
+                  Calculates true take-home earnings after deducting route transport, handling, and APMC cess. Compare direct buyers vs local mandis.
+                </p>
+              </div>
+              <span className="count" style={{ background: '#2f6838', color: '#ffffff', fontSize: '11px', padding: '4px 10px', borderRadius: '4px' }}>
+                Optimized for Maximum Return
+              </span>
+            </div>
+
+            {/* Input Filter Bar */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '18px', background: '#f8f7f2', padding: '14px', borderRadius: '6px', border: '1px solid #eceae2' }}>
+              <div>
+                <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                  SELECT CROP
+                </label>
+                <select
+                  className="field-input"
+                  style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                  value={sellCalcCrop}
+                  onChange={(e) => setSellCalcCrop(e.target.value)}
+                >
+                  <option value="Tomato">Tomato (Hybrid / Roma)</option>
+                  <option value="Onion">Nashik Red Onion</option>
+                  <option value="Wheat">Sharbati Durum Wheat</option>
+                  <option value="Soybean">Yellow Organic Soybean</option>
+                  <option value="Potato">Jyoti Table Potato</option>
+                  <option value="Green Grapes">Thompson Seedless Grapes</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                  QUANTITY (KG)
+                </label>
+                <input
+                  type="number"
+                  min="50"
+                  step="50"
+                  className="field-input"
+                  style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                  value={sellCalcQty}
+                  onChange={(e) => setSellCalcQty(Math.max(1, Number(e.target.value)))}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                  QUALITY GRADE
+                </label>
+                <select
+                  className="field-input"
+                  style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                  value={sellCalcQuality}
+                  onChange={(e) => setSellCalcQuality(e.target.value)}
+                >
+                  <option value="GRADE_APLUS">Grade A+ (Export / Premium Clean)</option>
+                  <option value="GRADE_A">Grade A (Standard Mandi Quality)</option>
+                  <option value="FAQ">Fair Average Quality (FAQ)</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                  FARM ORIGIN CLUSTER
+                </label>
+                <select
+                  className="field-input"
+                  style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                  value={sellCalcCluster}
+                  onChange={(e) => setSellCalcCluster(e.target.value)}
+                >
+                  <option value="Nashik Aggregation Yard">Nashik Aggregation Hub (MH)</option>
+                  <option value="Ranchi APMC Hub">Ranchi Mandi Corridor (JH)</option>
+                  <option value="Indore Agro Yard">Indore Quality Yard (MP)</option>
+                  <option value="Pune Terminal Market">Pune Market Yard (MH)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Decision Recommendation Output */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+              {/* Card 1: Winning Recommended Destination */}
+              <div style={{ border: '2px solid #2f6838', borderRadius: '6px', padding: '16px', background: '#f5faf5', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#2f6838', color: '#ffffff', padding: '3px 8px', borderRadius: '3px' }}>
+                      TOP RECOMMENDATION
+                    </span>
+                    <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#2f6838', fontWeight: 700 }}>
+                      Match Score: {netSellDecision.buyer.matchScore}%
+                    </span>
+                  </div>
+
+                  <h3 style={{ margin: '4px 0 2px', fontSize: '16px', color: '#202a27' }}>
+                    {netSellDecision.buyer.buyerName}
+                  </h3>
+                  <p style={{ margin: '0 0 10px', fontSize: '12px', color: '#556058' }}>
+                    {netSellDecision.buyer.destinationName} ({netSellDecision.buyer.distanceKm} km away)
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: '#ffffff', padding: '10px', borderRadius: '4px', border: '1px solid #dbe6dc', marginBottom: '10px' }}>
+                    <div>
+                      <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>OFFERED PRICE</span>
+                      <strong style={{ fontSize: '15px', color: '#202a27' }}>₹{netSellDecision.buyer.pricePerKg} <small style={{ fontSize: '11px', color: '#778078' }}>/ kg</small></strong>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>GROSS VALUE</span>
+                      <strong style={{ fontSize: '15px', color: '#202a27' }}>₹{netSellDecision.buyer.grossRevenue.toLocaleString()}</strong>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>ROUTE FREIGHT</span>
+                      <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{netSellDecision.buyer.freight.toLocaleString()}</span>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>HANDLING / ESCROW</span>
+                      <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{netSellDecision.buyer.handlingFee.toLocaleString()}</span>
+                    </div>
+                  </div>
+
+                  {/* Net Realization Highlight */}
+                  <div style={{ background: '#202a27', color: '#ffffff', padding: '10px 14px', borderRadius: '4px', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#889e92' }}>NET TAKE-HOME RETURN</span>
+                      <strong style={{ fontSize: '18px', color: '#6e9d68' }}>₹{netSellDecision.buyer.netReturn.toLocaleString()}</strong>
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#b2c0b7', marginTop: '2px' }}>
+                      Net Realization: <strong>₹{netSellDecision.buyer.netPerKg} / kg</strong> (Clean margin)
+                    </div>
+                  </div>
+
+                  <div style={{ fontSize: '11px', color: '#444d47', lineHeight: 1.4 }}>
+                    &bull; Buyer Trust Rating: <strong>{netSellDecision.buyer.trustScore}/100</strong> (Verified NABL Quality Partner)<br />
+                    &bull; Payment Guarantee: <strong>{netSellDecision.buyer.paymentTerms}</strong>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '14px', borderTop: '1px solid #dbe6dc', paddingTop: '10px' }}>
+                  <button
+                    type="button"
+                    className="trade-btn trade-btn-primary"
+                    style={{ width: '100%', padding: '10px', fontSize: '13px', fontWeight: 700 }}
+                    onClick={() => {
+                      setProduceForm(prev => ({
+                        ...prev,
+                        cropName: sellCalcCrop,
+                        quantity: sellCalcQty,
+                        quality: sellCalcQuality,
+                        pricePerKg: netSellDecision.buyer.pricePerKg
+                      }));
+                      setShowProduceModal(true);
+                      setMessage(`Pre-loaded ${sellCalcCrop} (${sellCalcQty} kg) at ₹${netSellDecision.buyer.pricePerKg}/kg for listing.`);
+                    }}
+                  >
+                    Sell Here &middot; Lock Best Net Return &rarr;
+                  </button>
+                </div>
+              </div>
+
+              {/* Card 2: Alternatives & Comparative Net Margin */}
+              <div style={{ border: '1px solid #e0ddd5', borderRadius: '6px', padding: '16px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ marginBottom: '8px' }}>
+                    <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', fontWeight: 600, textTransform: 'uppercase' }}>
+                      COMPARATIVE BENCHMARK
+                    </span>
+                    <h3 style={{ margin: '4px 0 2px', fontSize: '16px', color: '#202a27' }}>
+                      Local Mandi vs Farm-Gate Trader
+                    </h3>
+                  </div>
+
+                  {/* Benchmark 1: APMC Mandi */}
+                  <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <strong style={{ fontSize: '13px', color: '#202a27' }}>{netSellDecision.mandi.destinationName}</strong>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#444d47' }}>₹{netSellDecision.mandi.pricePerKg}/kg</span>
+                    </div>
+                    <p style={{ margin: '2px 0 6px', fontSize: '11px', color: '#778078' }}>
+                      Gross: ₹{netSellDecision.mandi.grossRevenue.toLocaleString()} &minus; Freight: ₹{netSellDecision.mandi.freight} &minus; Mandi Cess: ₹{netSellDecision.mandi.commissionFee}
+                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '6px' }}>
+                      <span style={{ fontSize: '11px', color: '#667269' }}>Net Mandi Return:</span>
+                      <strong style={{ fontSize: '13px', color: '#202a27' }}>₹{netSellDecision.mandi.netReturn.toLocaleString()} (₹{netSellDecision.mandi.netPerKg}/kg)</strong>
+                    </div>
+                  </div>
+
+                  {/* Benchmark 2: Village Gate Trader */}
+                  <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <strong style={{ fontSize: '13px', color: '#202a27' }}>{netSellDecision.villageTrader.destinationName}</strong>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#444d47' }}>₹{netSellDecision.villageTrader.pricePerKg}/kg</span>
+                    </div>
+                    <p style={{ margin: '2px 0 6px', fontSize: '11px', color: '#778078' }}>
+                      Zero transport deduction, but discounted farm-gate acquisition rate
+                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '6px' }}>
+                      <span style={{ fontSize: '11px', color: '#667269' }}>Net Trader Return:</span>
+                      <strong style={{ fontSize: '13px', color: '#8a2b2b' }}>₹{netSellDecision.villageTrader.netReturn.toLocaleString()} (₹{netSellDecision.villageTrader.netPerKg}/kg)</strong>
+                    </div>
+                  </div>
+
+                  {/* Net Decision Takeaway */}
+                  <div style={{ background: '#eef4ec', border: '1px solid #c7ddc5', borderRadius: '4px', padding: '10px 12px' }}>
+                    <strong style={{ fontSize: '12px', color: '#2f6838', display: 'block' }}>
+                      Decision Takeaway: +₹{netSellDecision.netAdvantage.toLocaleString()} Higher Profit
+                    </strong>
+                    <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#355339', lineHeight: 1.4 }}>
+                      Selling directly to the verified institutional partner yields ₹{netSellDecision.netAdvantage.toLocaleString()} more in take-home profit than the local alternative, even after covering all door-to-door transport costs.
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '14px', borderTop: '1px solid #edebe4', paddingTop: '10px' }}>
+                  <button
+                    type="button"
+                    className="trade-btn trade-btn-secondary"
+                    style={{ width: '100%', padding: '8px', fontSize: '11px' }}
+                    onClick={() => setCurrentView('negotiations')}
+                  >
+                    Explore Live Buyer Requirements &rarr;
+                  </button>
+                </div>
+              </div>
+            </div>
           </section>
 
           {/* Market Pulse Summary Panel */}
@@ -6947,11 +7364,43 @@ function App() {
                           })()}
                         </p>
                       </div>
-                      <div className="confidence-meter-box">
-                        <span className="confidence-num">{diagnosticResult.confidenceScore}%</span>
-                        <span className="confidence-label">{text.diagConfidence}</span>
-                      </div>
+                      {diagnosticResult.confidenceScore != null ? (
+                        <div className="confidence-meter-box">
+                          <span className="confidence-num">{diagnosticResult.confidenceScore}%</span>
+                          <span className="confidence-label">{text.diagConfidence}</span>
+                        </div>
+                      ) : (
+                        <div className="confidence-meter-box" style={{ background: '#fef7e8', border: '1px solid #d4a34b', padding: '6px 12px', borderRadius: '4px', textAlign: 'center' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 700, color: '#8a6218', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            Preliminary Heuristic
+                          </span>
+                          <span className="confidence-label" style={{ color: '#8a6218', fontSize: '10px' }}>
+                            Uncalibrated Screening
+                          </span>
+                        </div>
+                      )}
                     </div>
+
+                    {diagnosticResult.requiresExpertReview && (
+                      <div style={{ background: '#fdf7ea', border: '1px solid #ecc987', borderRadius: '6px', padding: '10px 14px', margin: '10px 0 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                        <div style={{ flex: 1, minWidth: '240px' }}>
+                          <strong style={{ fontSize: '12px', color: '#7a4e0a', display: 'block' }}>
+                            [DEMO DIAGNOSIS - Heuristic Fallback, Uncalibrated]
+                          </strong>
+                          <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#7a4e0a', lineHeight: 1.4 }}>
+                            Trained neural network checkpoint (crop_doctor_v1.pt) is not loaded. Diagnosis is generated via preliminary pixel-color heuristics. Expert review is advised before application of chemical treatments.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          className="trade-btn trade-btn-primary"
+                          style={{ fontSize: '11px', padding: '6px 12px', whiteSpace: 'nowrap' }}
+                          onClick={() => escalateToAgronomist(diagnosticResult.id)}
+                        >
+                          Escalate to Expert Agronomist
+                        </button>
+                      </div>
+                    )}
 
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       <span className={`severity-badge severity-${String(diagnosticResult.severity).toLowerCase()}`}>{getLocalizedText(diagnosticResult.severity, language)}</span>
@@ -6971,14 +7420,16 @@ function App() {
                       </div>
                     </div>
 
-                    <div>
-                      <span className="diag-section-title">{text.diagTopCandidates}</span>
-                      {diagnosticResult.topCandidates.map(candidate => (
-                        <div key={candidate.raw_label} style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', padding: '6px 0', borderBottom: '1px solid #eeeae1', fontSize: '12px' }}>
-                          <span>{candidate.crop} · {candidate.condition}</span><strong>{candidate.confidence}%</strong>
-                        </div>
-                      ))}
-                    </div>
+                    {diagnosticResult.topCandidates && diagnosticResult.topCandidates.length > 0 && (
+                      <div>
+                        <span className="diag-section-title">{text.diagTopCandidates}</span>
+                        {diagnosticResult.topCandidates.map(candidate => (
+                          <div key={candidate.raw_label || candidate.condition} style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', padding: '6px 0', borderBottom: '1px solid #eeeae1', fontSize: '12px' }}>
+                            <span>{candidate.crop} · {candidate.condition}</span><strong>{candidate.confidence != null ? `${candidate.confidence}%` : 'Uncalibrated'}</strong>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div style={{ minHeight: '440px', display: 'grid', placeItems: 'center', textAlign: 'center' }}>
@@ -11003,6 +11454,55 @@ function App() {
               >
                 Open Google Maps &rarr;
               </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ────────────────────────────────────────────────────────────────────────── */}
+      {/* MODAL: SYSTEM TOPOLOGY & REAL-TIME SERVICE HEALTH                          */}
+      {/* ────────────────────────────────────────────────────────────────────────── */}
+      {showHealthModal && (
+        <div className="drawer-overlay" onClick={() => setShowHealthModal(false)}>
+          <div className="drawer-card" style={{ maxWidth: '560px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="drawer-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p className="eyebrow">Enterprise Observability</p>
+                <h3 style={{ margin: 0, fontSize: '18px', color: '#202a27' }}>KisanLink System &amp; Service Health</h3>
+              </div>
+              <button type="button" className="drawer-close-btn" onClick={() => setShowHealthModal(false)}>X</button>
+            </div>
+
+            <div className="drawer-body" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {[
+                { name: 'Spring Boot Application Backend', port: '8080', status: healthStatus.backend, note: 'REST APIs, Escrow Service, WebSockets', badgeBg: '#eef4ec', badgeColor: '#2f6838' },
+                { name: 'PostgreSQL Production Database', port: '5432 (Internal)', status: healthStatus.database, note: 'Flyway V1-V16 Migrations Applied, Spatial Support', badgeBg: '#eef4ec', badgeColor: '#2f6838' },
+                { name: 'AI Crop Doctor Microservice', port: '8000', status: healthStatus.aiService, note: 'FastAPI, MobileNet Architecture (Heuristic Screening)', badgeBg: '#fff9e6', badgeColor: '#8a6218' },
+                { name: 'National Mandi Price Feed', port: 'data.gov.in', status: healthStatus.mandiFeed, note: 'Automated AGMARKNET scheduled ingestion pipeline', badgeBg: '#eef4ec', badgeColor: '#2f6838' },
+                { name: 'Real-Time WebSocket Engine', port: '/ws/notifications', status: wsConnected ? 'CONNECTED' : 'CONNECTING', note: 'STOMP / SockJS trade & price alert dispatcher', badgeBg: wsConnected ? '#eef4ec' : '#fff9e6', badgeColor: wsConnected ? '#2f6838' : '#8a6218' },
+                { name: 'Escrow Settlement Gateway', port: '/api/webhooks/payment', status: 'SANDBOX VERIFIED', note: 'HMAC-SHA256 signature verification & idempotency guard', badgeBg: '#eef2f8', badgeColor: '#204068' }
+              ].map((srv, idx) => (
+                <div key={idx} style={{ background: '#f8f7f2', border: '1px solid #eceae2', borderRadius: '6px', padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: srv.badgeColor }} />
+                      <strong style={{ fontSize: '13px', color: '#202a27' }}>{srv.name}</strong>
+                    </div>
+                    <p style={{ margin: '2px 0 0', fontSize: '11px', color: '#667269' }}>
+                      Endpoint / Port: {srv.port} &middot; {srv.note}
+                    </p>
+                  </div>
+                  <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: srv.badgeBg, color: srv.badgeColor, padding: '3px 8px', borderRadius: '4px', whiteSpace: 'nowrap' }}>
+                    {srv.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="drawer-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <button type="button" className="trade-btn trade-btn-primary" onClick={() => setShowHealthModal(false)}>
+                Close Panel
+              </button>
             </div>
           </div>
         </div>

@@ -9,9 +9,8 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-kisanlink}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-    ports:
-      - "5432:5432"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    # Database is isolated to internal docker network; no public host port exposed
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -38,17 +37,34 @@ services:
       SPRING_PROFILES_ACTIVE: postgres
       DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-kisanlink}
       DB_USERNAME: ${POSTGRES_USER:-postgres}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       PORT: 8080
-      JWT_SECRET: ${JWT_SECRET:-kisanlink-production-secure-jwt-secret-key-at-least-256-bits-long}
-      JWT_EXPIRATION: 86400000
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
     ports:
       - "8080:8080"
     networks:
       - kisanlink-net
 
   # ──────────────────────────────────────────────────────────────────────────
-  # 3. KisanLink React Frontend (Vite + Nginx Production Reverse Proxy)
+  # 3. KisanLink AI Crop Doctor Microservice (FastAPI + PyTorch)
+  # ──────────────────────────────────────────────────────────────────────────
+  ai:
+    build:
+      context: ./kisanlink-ai
+      dockerfile: Dockerfile
+    container_name: kisanlink-ai
+    restart: unless-stopped
+    environment:
+      PORT: 8000
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost,http://localhost:80,http://localhost:3000,http://localhost:5173}
+    ports:
+      - "8000:8000"
+    networks:
+      - kisanlink-net
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # 4. KisanLink React Frontend (Vite + Nginx Production Reverse Proxy)
   # ──────────────────────────────────────────────────────────────────────────
   frontend:
     build:
@@ -58,6 +74,7 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+      - ai
     ports:
       - "3000:80"
       - "80:80"
