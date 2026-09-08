@@ -22,7 +22,7 @@ public class DiagnosticController {
         this.diagnosticService = diagnosticService;
     }
 
-    @PostMapping("/scan")
+    @PostMapping({"", "/scan"})
     @ResponseStatus(HttpStatus.CREATED)
     public DiagnosticResponse runScan(@Valid @RequestBody DiagnosticRequest request,
                                       @AuthenticationPrincipal UserDetails principal) {

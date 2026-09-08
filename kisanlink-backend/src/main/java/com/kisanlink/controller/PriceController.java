@@ -46,7 +46,7 @@ public class PriceController {
         return priceService.create(request);
     }
 
-    @PostMapping("/sync-agmarknet")
+    @PostMapping({"/sync-agmarknet", "/sync"})
     public MandiDataIngestionService.MandiSyncResult syncAgmarknet(
             @RequestParam(required = false) String state,
             @RequestParam(required = false, defaultValue = "100") Integer limit) {

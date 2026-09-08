@@ -199,6 +199,45 @@ public class EscrowService {
         return mapToResponse(saved);
     }
 
+    public EscrowResponse refundBuyer(Long escrowId, EscrowRefundRequest request, String userEmail) {
+        EscrowPayment escrow = escrowRepository.findById(escrowId)
+                .orElseThrow(() -> new IllegalArgumentException("Escrow account not found: " + escrowId));
+
+        TradeDeal deal = escrow.getTradeDeal();
+        ownershipService.checkTradeDealAccess(deal, userEmail);
+
+        if (escrow.getStatus() != EscrowStatus.FUNDS_HELD_IN_ESCROW && escrow.getStatus() != EscrowStatus.DISPUTED) {
+            throw new IllegalStateException("Cannot refund when escrow status is " + escrow.getStatus());
+        }
+
+        String reason = (request != null && request.reason() != null && !request.reason().isBlank())
+                ? request.reason()
+                : "Cancellation / Dispute Resolution Refund";
+        String refundUtr = "REFUND-NPCI-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+
+        escrow.setStatus(EscrowStatus.REFUNDED_TO_BUYER);
+        escrow.setDisputeReason(reason);
+        escrow.setSettlementUtr(refundUtr);
+        escrow.setReleasedAt(Instant.now());
+
+        if (deal.getStatus() != TradeStatus.CANCELLED) {
+            deal.setStatus(TradeStatus.CANCELLED);
+            tradeDealRepository.save(deal);
+        }
+
+        EscrowPayment saved = escrowRepository.save(escrow);
+
+        String title = "Escrow Refund Processed: ₹" + saved.getDepositAmount();
+        String msg = "Escrow deposit for Trade #" + deal.getId() + " refunded to buyer. UTR: " + refundUtr;
+        notificationWebSocketService.sendUserNotification(deal.getFarmer().getUser(), "ESCROW_REFUNDED", title, msg, deal.getId(), EscrowStatus.REFUNDED_TO_BUYER.name());
+        notificationWebSocketService.sendUserNotification(deal.getBuyer().getUser(), "ESCROW_REFUNDED", title, msg, deal.getId(), EscrowStatus.REFUNDED_TO_BUYER.name());
+
+        notificationWebSocketService.sendTradeUpdate(deal.getFarmer().getUser(), deal, "Escrow Refunded (UTR: " + refundUtr + ")");
+        notificationWebSocketService.sendTradeUpdate(deal.getBuyer().getUser(), deal, "Escrow Refunded (UTR: " + refundUtr + ")");
+
+        return mapToResponse(saved);
+    }
+
     @Transactional
     public EscrowResponse processVerifiedPaymentWebhook(Long escrowId, BigDecimal amount, String gatewayPaymentId, String gatewayName) {
         EscrowPayment escrow = escrowRepository.findById(escrowId)

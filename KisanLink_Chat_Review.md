@@ -2632,3 +2632,106 @@ and make a table like:
 That would be the **best next review**, because we can catch actual code-level/API mismatches rather than just discussing the project's features.
 
 [1]: https://github.com/Asit666/KisanLink "GitHub - Asit666/KisanLink: Farmer Market Linkage & Price Discovery · GitHub"
+------------------------------------------------------------------------------------------------------
+
+new review 2
+
+Sure. Just the **problems/issues** I see in KisanLink for now:
+
+### Main problems
+
+1. **Too much scope**
+
+   * Marketplace, mandi prices, AI forecasting, buyer matching, negotiation, escrow, UPI, logistics, weather, WhatsApp/SMS, and agri-inputs.
+   * This makes the core purpose less clear and increases the chance of incomplete features.
+
+2. **End-to-end integration needs stronger proof**
+
+   * Having backend tests pass and the frontend build successfully doesn't prove that the complete flow works:
+   * `Frontend → Backend → Database → AI → Backend → Frontend`
+
+3. **Some features appear simulated/mock**
+
+   * Especially communication/payment-related functionality.
+   * This can become a problem if the presentation implies these are real integrations.
+
+4. **AI prediction reliability**
+
+   * A prediction can look impressive but still be inaccurate.
+   * The project needs stronger evidence around model accuracy, validation, confidence, and performance on unseen/current data.
+
+5. **Data freshness**
+
+   * Price discovery depends heavily on current mandi data.
+   * Historical/Kaggle data cannot substitute for reliable live market data.
+   * If live data fails or becomes outdated, recommendations can become misleading.
+
+6. **Data-source dependency**
+
+   * e-NAM/AGMARKNET and other sources may have different formats, update frequencies, crop names, units, and missing values.
+   * Data normalization can therefore become a significant issue.
+
+7. **"Best market" can be misleading**
+
+   * Highest mandi price isn't necessarily the most profitable market.
+   * Transport, loading/unloading, commissions, spoilage, quantity, and distance all affect the farmer's actual profit.
+
+8. **Buyer verification is not sufficiently strong**
+
+   * A marketplace needs mechanisms for:
+
+     * genuine buyers
+     * payment reliability
+     * transaction history
+     * fraud prevention
+     * dispute handling
+
+9. **Payment/escrow is high-risk**
+
+   * Real escrow and UPI transaction handling introduces security, compliance, failure/reconciliation, and dispute issues.
+   * A demo implementation should be clearly separated from a production payment system.
+
+10. **Logistics optimization may be oversimplified**
+
+    * Real agricultural logistics involves vehicle availability, load capacity, multiple farmers, perishability, route constraints, timing, etc.
+    * A simple distance-based recommendation isn't enough.
+
+11. **Farmer UX could become too complicated**
+
+    * There are many modules.
+    * A farmer shouldn't have to understand AI graphs, market analytics, logistics, and multiple dashboards just to decide where to sell.
+
+12. **Multilingual/low-connectivity support needs more attention**
+
+    * A farmer-focused application should work well with slow networks and ideally support regional languages/voice.
+    * This is particularly important if the target is rural users.
+
+13. **Security needs serious attention**
+
+    * Authentication, authorization, API validation, secrets, database access, payment-related endpoints, and user data need production-level security checks.
+
+14. **Error/failure handling**
+
+    * What happens when:
+
+      * mandi API is unavailable?
+      * AI prediction fails?
+      * database is down?
+      * price data is missing?
+      * payment fails?
+      * buyer cancels?
+    * These cases need graceful fallbacks.
+
+15. **Documentation may be ahead of implementation**
+
+    * There is a lot of specification/documentation, which is good, but you should make sure every feature described in the documentation actually works in the running application.
+
+### Biggest 5 to fix first
+
+**1. End-to-end integration**
+**2. Live/accurate market data**
+**3. AI prediction validation**
+**4. Security + payment handling**
+**5. Reduce/clarify the huge feature scope**
+
+Those are the issues I'd focus on **before adding more features**.

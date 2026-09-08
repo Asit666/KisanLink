@@ -50,4 +50,11 @@ public class EscrowController {
                                        @AuthenticationPrincipal UserDetails principal) {
         return escrowService.raiseDispute(escrowId, request, principal.getUsername());
     }
+
+    @PostMapping("/{escrowId}/refund")
+    public EscrowResponse refundBuyer(@PathVariable Long escrowId,
+                                      @RequestBody(required = false) EscrowRefundRequest request,
+                                      @AuthenticationPrincipal UserDetails principal) {
+        return escrowService.refundBuyer(escrowId, request, principal.getUsername());
+    }
 }
