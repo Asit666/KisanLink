@@ -28,12 +28,11 @@ public class WeatherAdvisoryService {
 
     private static final Logger log = LoggerFactory.getLogger(WeatherAdvisoryService.class);
     private final CropRepository cropRepository;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient;
 
-    public WeatherAdvisoryService(CropRepository cropRepository, ObjectMapper objectMapper) {
+    public WeatherAdvisoryService(CropRepository cropRepository) {
         this.cropRepository = cropRepository;
-        this.objectMapper = objectMapper;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(3))
                 .build();

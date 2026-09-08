@@ -43,7 +43,7 @@ public class MandiDataIngestionService {
     private final MarketPriceRepository marketPriceRepository;
     private final MarketRepository marketRepository;
     private final CropRepository cropRepository;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient;
 
     @Value("${kisanlink.agmarknet.api-key:}")
@@ -60,12 +60,10 @@ public class MandiDataIngestionService {
 
     public MandiDataIngestionService(MarketPriceRepository marketPriceRepository,
                                      MarketRepository marketRepository,
-                                     CropRepository cropRepository,
-                                     ObjectMapper objectMapper) {
+                                     CropRepository cropRepository) {
         this.marketPriceRepository = marketPriceRepository;
         this.marketRepository = marketRepository;
         this.cropRepository = cropRepository;
-        this.objectMapper = objectMapper;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(5))
                 .build();
