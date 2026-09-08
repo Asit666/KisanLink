@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { KisanLinkWebSocketClient } from './websocket';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const AI_API_URL = import.meta.env.VITE_AI_API_URL || 'http://localhost:8000';
 
 const LANGUAGE_TEXT = {
   en: {
@@ -6385,9 +6386,9 @@ function App() {
             if (diagnosticForm.cropName && diagnosticForm.cropName !== 'Auto-detect crop') {
               formData.append('crop_hint', diagnosticForm.cropName);
             }
-            return fetch('http://localhost:8000/predict', { method: 'POST', body: formData });
+            return fetch(`${AI_API_URL}/predict`, { method: 'POST', body: formData });
           })()
-        : fetch('http://localhost:8000/predict-url', {
+        : fetch(`${AI_API_URL}/predict-url`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -6406,6 +6407,7 @@ function App() {
         crop: selectedCropName || candidate.crop || data.crop || 'General Crop'
       }));
 
+      const isScreening = data.model_status === 'visual_heuristic_screening' || data.requires_expert_review;
       const diagnosis = {
         id: Date.now(),
         farmerId: session?.profileId || null,
@@ -6417,7 +6419,7 @@ function App() {
         pathogenType: data.pathogen_type,
         confidenceScore: data.confidence_score,
         severity: data.severity,
-        symptoms: data.top_candidates?.map(candidate => `${candidate.condition} (${candidate.confidence}%)`).join(' | '),
+        symptoms: data.top_candidates?.map(candidate => `${candidate.condition}${candidate.confidence ? ` (${candidate.confidence}%)` : ''}`).join(' | '),
         treatmentPlan: data.treatment_plan,
         recommendedInputs: data.recommended_inputs?.split(',').map(input => input.trim()).filter(Boolean) || [],
         topCandidates: normalizedTopCandidates,
@@ -6425,11 +6427,17 @@ function App() {
         createdAt: new Date().toISOString(),
         isHealthy: data.is_healthy,
         modelStatus: data.model_status,
+        requiresExpertReview: Boolean(data.requires_expert_review),
         device: data.device
       };
       setDiagnosticResult(diagnosis);
       setDiagnosticHistory(prev => [diagnosis, ...prev]);
-      setMessage(`Crop Doctor AI: ${diagnosis.detectedDisease} (${diagnosis.confidenceScore}% confidence).`);
+
+      if (isScreening) {
+        setMessage(`Crop Doctor: ${diagnosis.detectedDisease} [Visual Heuristic Screening - Field agronomist confirmation recommended].`);
+      } else {
+        setMessage(`Crop Doctor AI: ${diagnosis.detectedDisease} (${diagnosis.confidenceScore}% confidence).`);
+      }
     } catch (error) {
       setMessage(`${error.message || 'External image could not be analyzed.'} Confirm the URL is a direct public image link.`);
     } finally {

@@ -1,5 +1,5 @@
 """
-🌿 KisanLink AI Crop Doctor — High-Speed FastAPI Vision Microservice
+KisanLink AI Crop Doctor - High-Speed FastAPI Vision Microservice
 Exposes REST endpoints for real-time leaf disease diagnosis and treatment planning.
 
 The project plan expects a trained model under kisanlink-ai/models/crop_doctor_v1.pt,
@@ -9,10 +9,12 @@ falling back to deterministic image heuristics when the trained checkpoint is mi
 """
 
 import io
+import ipaddress
 import json
 import os
+import socket
 from urllib.parse import parse_qs, urlparse
-from typing import List
+from typing import List, Optional
 
 import requests
 import torch
@@ -26,13 +28,18 @@ from torchvision import models, transforms
 
 app = FastAPI(
     title="KisanLink AI Crop Doctor Microservice",
-    description="Real-time Computer Vision Disease Diagnosis powered by PyTorch & MobileNetV3-Large",
+    description="Real-time Computer Vision Disease Diagnosis powered by PyTorch and MobileNetV3-Large",
     version="1.0.0",
 )
 
+raw_cors = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:8080,http://127.0.0.1:5173,http://localhost:3000")
+allowed_origins = [origin.strip() for origin in raw_cors.split(",") if origin.strip()]
+if "*" in allowed_origins or os.getenv("CORS_ALLOW_ALL", "").lower() in ("true", "1"):
+    allowed_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -115,7 +122,7 @@ try:
         model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
         print(f"[OK] Loaded trained model weights from: {MODEL_PATH}")
     else:
-        print(f"[INFO] No trained checkpoint found at '{MODEL_PATH}'. Starting in fallback diagnosis mode.")
+        print(f"[INFO] No trained checkpoint found at '{MODEL_PATH}'. Starting in visual heuristic screening mode.")
     model = model.to(DEVICE)
     model.eval()
 except Exception as exc:  # pragma: no cover - defensive startup guard
@@ -127,14 +134,14 @@ class CandidatePrediction(BaseModel):
     raw_label: str
     crop: str
     condition: str
-    confidence: float
+    confidence: Optional[float] = None
 
 
 class DiagnosisResponse(BaseModel):
     crop: str
     condition: str
     is_healthy: bool
-    confidence_score: float
+    confidence_score: Optional[float] = None
     pathogen_type: str
     severity: str
     treatment_plan: str
@@ -142,6 +149,7 @@ class DiagnosisResponse(BaseModel):
     top_candidates: List[CandidatePrediction]
     device: str
     model_status: str
+    requires_expert_review: bool = False
 
 
 def infer_crop_from_label(raw_label: str, fallback: str = "General Crop") -> str:
@@ -297,7 +305,7 @@ def pick_top_candidates(primary_meta, crop_hint: str = ""):
                     raw_label=entry.get("raw_class", "Unknown"),
                     crop=requested_crop or crop_name,
                     condition=entry.get("condition", "Healthy Foliage"),
-                    confidence=95.0 if entry.get("is_healthy") else 92.5,
+                    confidence=None,
                 )
             )
 
@@ -307,7 +315,7 @@ def pick_top_candidates(primary_meta, crop_hint: str = ""):
                 raw_label=primary_meta["raw_label"],
                 crop=requested_crop or primary_meta["crop"],
                 condition=primary_meta["condition"],
-                confidence=float(primary_meta["confidence"]),
+                confidence=None,
             )
         ]
 
@@ -327,7 +335,7 @@ def health():
         "device": f"{DEVICE.type.upper()} ({torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'})",
         "total_classes": len(CLASS_NAMES),
         "model_loaded": os.path.exists(MODEL_PATH),
-        "inference_mode": "trained_model" if os.path.exists(MODEL_PATH) else "fallback_heuristic",
+        "inference_mode": "trained_model" if os.path.exists(MODEL_PATH) else "visual_heuristic_screening",
     }
 
 
@@ -393,33 +401,21 @@ async def predict_leaf_disease(file: UploadFile = File(...), crop_hint: str = ""
                 "is_healthy": primary_meta.get("is_healthy", "healthy" in primary.condition.lower()),
             }
             model_status = "trained_model"
+            requires_expert_review = False
         else:
             result = fallback_diagnosis(image, crop_hint=crop_hint, notes="")
-            model_status = "fallback_heuristic"
+            model_status = "visual_heuristic_screening"
+            requires_expert_review = True
             result["raw_label"] = result.get("raw_label", "Tomato___healthy")
             result["crop"] = crop_hint or result.get("crop", "General Crop")
             result["condition"] = result.get("condition", "Healthy Foliage")
-            result["confidence"] = float(result.get("confidence", 90.0))
+            result["confidence"] = None
             result["pathogen_type"] = result.get("pathogen_type", "None")
             result["severity"] = result.get("severity", "HEALTHY")
             result["treatment"] = result.get("treatment", "Maintain routine crop monitoring.")
             result["recommended_inputs"] = result.get("recommended_inputs", "Seaweed Extract Bio-Stimulant")
             result["is_healthy"] = bool(result.get("is_healthy", True))
             top_candidates = pick_top_candidates(result, crop_hint)
-
-            return DiagnosisResponse(
-                crop=result["crop"],
-                condition=result["condition"],
-                is_healthy=result["is_healthy"],
-                confidence_score=result["confidence"],
-                pathogen_type=result["pathogen_type"],
-                severity=result["severity"],
-                treatment_plan=result["treatment"],
-                recommended_inputs=result["recommended_inputs"],
-                top_candidates=top_candidates,
-                device=str(DEVICE),
-                model_status=model_status,
-            )
 
         return DiagnosisResponse(
             crop=result["crop"],
@@ -433,6 +429,7 @@ async def predict_leaf_disease(file: UploadFile = File(...), crop_hint: str = ""
             top_candidates=top_candidates,
             device=str(DEVICE),
             model_status=model_status,
+            requires_expert_review=requires_expert_review,
         )
 
     except Exception as exc:
@@ -453,23 +450,82 @@ def resolve_direct_image_url(raw_url: str) -> str:
     return raw_url
 
 
+def validate_public_ip(hostname: str):
+    """
+    SSRF Protection: Ensure the target hostname does not resolve to private,
+    loopback, link-local, reserved, multicast, or metadata addresses.
+    """
+    try:
+        # Check if the hostname itself is an IP
+        ip_obj = ipaddress.ip_address(hostname)
+        ips = [ip_obj]
+    except ValueError:
+        # Hostname needs DNS resolution
+        try:
+            addr_info = socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)
+            ips = [ipaddress.ip_address(info[4][0]) for info in addr_info]
+        except socket.gaierror as exc:
+            raise HTTPException(status_code=400, detail=f"Cannot resolve host '{hostname}': {exc}") from exc
+
+    for ip in ips:
+        if (
+            ip.is_private
+            or ip.is_loopback
+            or ip.is_link_local
+            or ip.is_multicast
+            or ip.is_reserved
+            or ip.is_unspecified
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Security violation: Access to non-public / internal network address '{ip}' is blocked."
+            )
+
+
 @app.post("/predict-url", response_model=DiagnosisResponse)
 async def predict_leaf_from_url(payload: dict):
     image_url = payload.get("url", "") if isinstance(payload, dict) else ""
     crop_hint = (payload.get("crop_hint") if isinstance(payload, dict) else "") or ""
     direct_image_url = resolve_direct_image_url(image_url)
     parsed = urlparse(direct_image_url)
+
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
         raise HTTPException(status_code=400, detail="Provide a valid public HTTP or HTTPS image URL.")
 
+    # Validate against SSRF before connecting
+    hostname = parsed.hostname
+    if not hostname:
+        raise HTTPException(status_code=400, detail="Invalid host in image URL.")
+
+    validate_public_ip(hostname)
+
     try:
-        response = requests.get(direct_image_url, timeout=15, headers={"User-Agent": "KisanLink-Crop-Doctor/1.0"})
-        response.raise_for_status()
-        content_type = response.headers.get("content-type", "image/jpeg").split(";", 1)[0]
-        if not content_type.startswith("image/"):
-            raise HTTPException(status_code=400, detail="The URL did not return an image file.")
+        # Stream response with strict 10MB limit and 15s timeout
+        max_bytes = 10 * 1024 * 1024
+        downloaded = io.BytesIO()
+
+        with requests.get(
+            direct_image_url,
+            timeout=15,
+            stream=True,
+            headers={"User-Agent": "KisanLink-Crop-Doctor/1.0"}
+        ) as response:
+            response.raise_for_status()
+            content_type = response.headers.get("content-type", "image/jpeg").split(";", 1)[0].strip().lower()
+            if not content_type.startswith("image/"):
+                raise HTTPException(status_code=400, detail=f"The URL returned non-image content-type: '{content_type}'.")
+
+            total_size = 0
+            for chunk in response.iter_content(chunk_size=65536):
+                if chunk:
+                    total_size += len(chunk)
+                    if total_size > max_bytes:
+                        raise HTTPException(status_code=400, detail="Image file exceeds maximum allowable limit of 10 MB.")
+                    downloaded.write(chunk)
+
+        downloaded.seek(0)
         upload = UploadFile(
-            file=io.BytesIO(response.content),
+            file=downloaded,
             filename=os.path.basename(parsed.path) or "external-image.jpg",
             headers=Headers({"content-type": content_type}),
         )
