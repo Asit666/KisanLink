@@ -299,7 +299,10 @@ describe('Escrow Sandbox Demarcation & Refund State Machine', () => {
 describe('Mock Data Decoupling & Sandbox Demarcation Verification', () => {
   it('should ensure all sample orders are explicitly flagged with demoNotice and isDemo', async () => {
     const { INITIAL_USER_ORDERS, USE_DEMO_DATA } = await import('../data/mockData.js');
-    assert.strictEqual(USE_DEMO_DATA, true);
+    // USE_DEMO_DATA should be a boolean (defaults to false; set VITE_DEMO_MODE=true in dev)
+    assert.strictEqual(typeof USE_DEMO_DATA, 'boolean', 'USE_DEMO_DATA must be a boolean');
+    // Regardless of the flag, every sample order must be explicitly tagged as a demo record
+    // so the application can never accidentally display sandbox data as real trade data.
     assert.ok(INITIAL_USER_ORDERS.length > 0);
     INITIAL_USER_ORDERS.forEach(order => {
       assert.strictEqual(order.isDemo, true);

@@ -62,6 +62,10 @@ MODEL_DIR = os.path.join(BASE_DIR, "models")
 MODEL_PATH = os.path.join(MODEL_DIR, "crop_doctor_v1.pt")
 os.makedirs(MODEL_DIR, exist_ok=True)
 
+# Review 6 fix: REQUIRE_MODEL=true makes a missing model a fatal startup error.
+# Set this in production so the service never silently falls back to heuristic mode.
+REQUIRE_MODEL = os.getenv("REQUIRE_MODEL", "false").lower() in ("true", "1", "yes")
+
 DEFAULT_CLASS_DATA = [
     {
         "id": 0,
@@ -132,9 +136,17 @@ try:
         model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
         print(f"[OK] Loaded trained model weights from: {MODEL_PATH}")
     else:
+        if REQUIRE_MODEL:
+            # Production guard: fail fast rather than silently downgrade to heuristics
+            raise RuntimeError(
+                f"[FATAL] REQUIRE_MODEL=true but no checkpoint found at '{MODEL_PATH}'. "
+                "Deploy the trained model or set REQUIRE_MODEL=false to allow heuristic mode."
+            )
         print(f"[INFO] No trained checkpoint found at '{MODEL_PATH}'. Starting in visual heuristic screening mode.")
     model = model.to(DEVICE)
     model.eval()
+except RuntimeError:
+    raise  # REQUIRE_MODEL failures must propagate to crash the service
 except Exception as exc:  # pragma: no cover - defensive startup guard
     print(f"[WARNING] Model initialization warning: {exc}")
     model = None
@@ -347,13 +359,26 @@ def pick_top_candidates(primary_meta, crop_hint: str = ""):
 
 @app.get("/health")
 def health():
+    model_loaded = os.path.exists(MODEL_PATH)
+    inference_mode = "trained_model" if model_loaded else "visual_heuristic_screening"
+    # Review 6 fix: when REQUIRE_MODEL=true, a missing model makes the service NOT READY
+    if REQUIRE_MODEL and not model_loaded:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "NOT_READY",
+                "reason": "Required model checkpoint is missing. Service cannot accept inference requests.",
+                "model_path": MODEL_PATH,
+            }
+        )
     return {
         "status": "ONLINE",
         "service": "KisanLink AI Crop Doctor Engine",
         "device": f"{DEVICE.type.upper()} ({torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'})",
         "total_classes": len(CLASS_NAMES),
-        "model_loaded": os.path.exists(MODEL_PATH),
-        "inference_mode": "trained_model" if os.path.exists(MODEL_PATH) else "visual_heuristic_screening",
+        "model_loaded": model_loaded,
+        "inference_mode": inference_mode,
+        "require_model": REQUIRE_MODEL,
     }
 
 

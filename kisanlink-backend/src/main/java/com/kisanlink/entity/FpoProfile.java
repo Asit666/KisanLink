@@ -6,11 +6,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "buyers")
+@Table(name = "fpos")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Buyer {
+public class FpoProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,16 +20,11 @@ public class Buyer {
     private User user;
 
     @Column(nullable = false)
-    private String businessName;
+    private String fpoName;
 
-    private String businessType;
-    private String address;
+    private String registrationNo;
     private String district;
     private String state;
-    private Double latitude;
-    private Double longitude;
-    private boolean verified;
-    private String alertEmail;
     
     @Column(nullable = false)
     private Double trustScore = 100.0;

@@ -34,6 +34,10 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatus status = UserStatus.PENDING;
+
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 

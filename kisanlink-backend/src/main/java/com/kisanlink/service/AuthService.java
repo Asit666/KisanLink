@@ -25,18 +25,21 @@ public class AuthService {
     private final FarmerRepository farmerRepository;
     private final BuyerRepository buyerRepository;
     private final TransporterRepository transporterRepository;
+    private final com.kisanlink.repository.FpoProfileRepository fpoProfileRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
     public AuthService(UserRepository userRepository, FarmerRepository farmerRepository,
                        BuyerRepository buyerRepository, TransporterRepository transporterRepository,
+                       com.kisanlink.repository.FpoProfileRepository fpoProfileRepository,
                        PasswordEncoder passwordEncoder,
                        AuthenticationManager authenticationManager, JwtService jwtService) {
         this.userRepository = userRepository;
         this.farmerRepository = farmerRepository;
         this.buyerRepository = buyerRepository;
         this.transporterRepository = transporterRepository;
+        this.fpoProfileRepository = fpoProfileRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
@@ -74,6 +77,11 @@ public class AuthService {
             Transporter transporter = new Transporter();
             transporter.setUser(user);
             profileId = transporterRepository.save(transporter).getId();
+        } else if (request.role().name().equals("FPO")) {
+            com.kisanlink.entity.FpoProfile fpo = new com.kisanlink.entity.FpoProfile();
+            fpo.setUser(user);
+            fpo.setFpoName(request.name().trim());
+            profileId = fpoProfileRepository.save(fpo).getId();
         }
 
         UserDetails details = org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
@@ -94,6 +102,7 @@ public class AuthService {
             case "FARMER" -> farmerRepository.findByUserId(user.getId()).map(Farmer::getId).orElse(null);
             case "BUYER" -> buyerRepository.findByUserId(user.getId()).map(Buyer::getId).orElse(null);
             case "TRANSPORTER" -> transporterRepository.findByUserId(user.getId()).map(Transporter::getId).orElse(null);
+            case "FPO" -> fpoProfileRepository.findByUserId(user.getId()).map(com.kisanlink.entity.FpoProfile::getId).orElse(null);
             default -> null;
         };
         return response(user, profileId, jwtService.generateToken(details));

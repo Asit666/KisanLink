@@ -27,26 +27,83 @@ public class DevDataInitializer {
                                            FarmerRepository farmerRepository,
                                            UserRepository userRepository,
                                            TransporterRepository transporterRepository,
-                                           com.kisanlink.repository.DiagnosticReportRepository diagnosticReportRepository) {
+                                           com.kisanlink.repository.DiagnosticReportRepository diagnosticReportRepository,
+                                           com.kisanlink.repository.FpoProfileRepository fpoProfileRepository,
+                                           com.kisanlink.repository.BuyerRepository buyerRepository,
+                                           com.kisanlink.repository.FarmerProduceRepository produceRepository,
+                                           com.kisanlink.repository.BuyerRequirementRepository requirementRepository,
+                                           com.kisanlink.repository.TradeDealRepository tradeDealRepository) {
         return arguments -> {
             if (cropRepository.count() > 0) {
                 return;
             }
 
-            // --- Create Sample User and Farmer ---
-            User user = new User();
-            user.setName("Ashok Kumar");
-            user.setEmail("ashok@example.com");
-            user.setPhone("9876543210");
-            user.setPassword("password123"); // Default password for dev
-            user.setRole(Role.FARMER); // Set role for user
-            user = userRepository.save(user);
-            
+            String defaultPass = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode("password123");
+
+            // 1. Seed Farmer Ramesh
+            User farmerUser = new User();
+            farmerUser.setName("Ramesh Kumar");
+            farmerUser.setEmail("farmer@kisanlink.in");
+            farmerUser.setPhone("9422288910");
+            farmerUser.setPassword(defaultPass);
+            farmerUser.setRole(Role.FARMER);
+            farmerUser = userRepository.save(farmerUser);
+
             Farmer farmer = new Farmer();
-            farmer.setUser(user);
-            farmer.setDistrict("Ranchi");
-            farmer.setState("Jharkhand");
+            farmer.setUser(farmerUser);
+            farmer.setName("Ramesh Kumar");
+            farmer.setDistrict("Nashik");
+            farmer.setState("Maharashtra");
+            farmer.setLatitude(20.1764);
+            farmer.setLongitude(73.9856);
+            farmer.setAddress("Survey 104, Pimpalgaon Baswant");
             farmer = farmerRepository.save(farmer);
+
+            // 2. Seed Buyer Priya
+            User buyerUser = new User();
+            buyerUser.setName("Priya Sharma");
+            buyerUser.setEmail("buyer@kisanlink.in");
+            buyerUser.setPhone("9822055432");
+            buyerUser.setPassword(defaultPass);
+            buyerUser.setRole(Role.BUYER);
+            buyerUser = userRepository.save(buyerUser);
+
+            Buyer buyer = new Buyer();
+            buyer.setUser(buyerUser);
+            buyer.setBusinessName("Priya Agro Wholesale & Retail Hub");
+            buyer.setBusinessType("WHOLESALER");
+            buyer.setDistrict("Nashik");
+            buyer.setState("Maharashtra");
+            buyer.setLatitude(19.9975);
+            buyer.setLongitude(73.7898);
+            buyer.setVerified(true);
+            buyer = buyerRepository.save(buyer);
+
+            // 3. Seed FPO Sahyadri
+            User fpoUser = new User();
+            fpoUser.setName("Sahyadri Farmers Producer Co.");
+            fpoUser.setEmail("fpo@kisanlink.in");
+            fpoUser.setPhone("9823144102");
+            fpoUser.setPassword(defaultPass);
+            fpoUser.setRole(Role.FPO);
+            fpoUser = userRepository.save(fpoUser);
+
+            FpoProfile fpo = new FpoProfile();
+            fpo.setUser(fpoUser);
+            fpo.setFpoName("Sahyadri Farmers Producer Co.");
+            fpo.setRegistrationNo("FPO-MH-2026-9932");
+            fpo.setState("Maharashtra");
+            fpo.setDistrict("Nashik");
+            fpo = fpoProfileRepository.save(fpo);
+
+            // 4. Seed Platform Admin
+            User adminUser = new User();
+            adminUser.setName("Platform Admin");
+            adminUser.setEmail("admin@kisanlink.in");
+            adminUser.setPhone("9999900000");
+            adminUser.setPassword(defaultPass);
+            adminUser.setRole(Role.ADMIN);
+            userRepository.save(adminUser);
 
             // --- Vegetables ---
             Crop tomato = crop(cropRepository, "Tomato",    CropCategory.VEGETABLE, "kg");
@@ -197,6 +254,46 @@ public class DevDataInitializer {
             r2.setStatus(DiagnosticStatus.ESCALATED);
             r2.setExpertNotes("Agronomist Dr. R. Verma reviewed: Field drainage recommended alongside Tricyclazole spray.");
             diagnosticReportRepository.save(r2);
+
+            // --- Seed Sample Farmer Produce ---
+            FarmerProduce sampleProduce = new FarmerProduce();
+            sampleProduce.setFarmer(farmer);
+            sampleProduce.setCrop(tomato);
+            sampleProduce.setQuantity(new BigDecimal("1200"));
+            sampleProduce.setQuality("GRADE_A");
+            sampleProduce.setExpectedPrice(new BigDecimal("32.0"));
+            sampleProduce.setHarvestDate(LocalDate.now());
+            sampleProduce.setAvailableUntil(LocalDate.now().plusDays(10));
+            sampleProduce.setDescription("NABL certified Grade A+ farm fresh tomatoes.");
+            produceRepository.save(sampleProduce);
+
+            // --- Seed Sample Buyer Requirement ---
+            BuyerRequirement sampleReq = new BuyerRequirement();
+            sampleReq.setBuyer(buyer);
+            sampleReq.setCrop(tomato);
+            sampleReq.setRequiredQuantity(new BigDecimal("2000"));
+            sampleReq.setQualityRequired("GRADE_A");
+            sampleReq.setOfferedPrice(new BigDecimal("34.0"));
+            sampleReq.setLocation("Nashik APMC Terminal Yard");
+            sampleReq.setValidUntil(LocalDate.now().plusDays(14));
+            requirementRepository.save(sampleReq);
+
+            // --- Seed Sample Active Trade Deal ---
+            TradeDeal sampleDeal = new TradeDeal();
+            sampleDeal.setFarmer(farmer);
+            sampleDeal.setBuyer(buyer);
+            sampleDeal.setCrop(tomato);
+            sampleDeal.setProduce(sampleProduce);
+            sampleDeal.setRequirement(sampleReq);
+            sampleDeal.setQuantity(new BigDecimal("1200"));
+            sampleDeal.setAgreedPricePerKg(new BigDecimal("32.0"));
+            sampleDeal.setTransportCost(new BigDecimal("450.0"));
+            sampleDeal.setTotalAmount(new BigDecimal("38400.0"));
+            sampleDeal.setNetFarmerReturn(new BigDecimal("37950.0"));
+            sampleDeal.setStatus(TradeStatus.IN_TRANSIT);
+            sampleDeal.setInitiatedBy(Role.FARMER);
+            sampleDeal.setNotes("Standard Grade A+ sorted dispatch via KisanLink Freight.");
+            tradeDealRepository.save(sampleDeal);
 
             // --- Seed Sample Transporters ---
             seedTransporters(userRepository, transporterRepository,

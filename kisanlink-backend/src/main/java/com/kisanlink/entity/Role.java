@@ -4,5 +4,6 @@ public enum Role {
     FARMER,
     BUYER,
     TRANSPORTER,
-    ADMIN
+    ADMIN,
+    FPO
 }

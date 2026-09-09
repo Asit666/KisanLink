@@ -3,7 +3,15 @@
 // Decoupled from App.jsx for maintainability and clear sandbox demarcation
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const USE_DEMO_DATA = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DEMO_MODE) ? import.meta.env.VITE_DEMO_MODE !== 'false' : true;
+// Review 6 fix: default is true in dev mode or when VITE_DEMO_MODE is 'true'.
+export const USE_DEMO_DATA = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_DEMO_MODE !== undefined)
+  ? import.meta.env.VITE_DEMO_MODE !== 'false'
+  : (typeof import.meta !== 'undefined' && import.meta.env?.PROD ? false : true);
+
+// Production guard: if a production build somehow has demo data active, throw immediately at module load.
+if (typeof import.meta !== 'undefined' && import.meta.env?.PROD && USE_DEMO_DATA) {
+  throw new Error('[KisanLink] Demo mode (USE_DEMO_DATA) cannot be active in a production build. Set VITE_DEMO_MODE=false.');
+}
 
 export const CATEGORIES = [
   { value: 'ALL', label: 'All Items' },
@@ -413,8 +421,8 @@ export const INITIAL_USER_ORDERS = [
     commodity: 'Wheat (Lokwan Sharbati)',
     category: 'GRAIN',
     role: 'BUYER',
-    counterpart: 'Rameshwar Patil (Farmer, Nashik Cluster)',
-    counterpartPhone: '+91 98231 44102',
+    counterpart: 'Sahyadri Farmers Producer Co.',
+    counterpartPhone: '+91 2557 279100',
     quantity: 120,
     unit: 'Quintals',
     pricePerUnit: 2450,
@@ -451,7 +459,7 @@ export const INITIAL_USER_ORDERS = [
     dealId: 102,
     commodity: 'Soybean (JS-335 Organic)',
     category: 'OILSEED',
-    role: 'SELLER',
+    role: 'FPO',
     counterpart: 'Adani Agri Logistics Ltd (Institutional Buyer)',
     counterpartPhone: '+91 22 6650 9900',
     quantity: 80,
@@ -971,3 +979,321 @@ export function getDemoTransporterRequests() {
     }
   ];
 }
+
+export const DEFAULT_CROPS = [
+  { id: 1, name: 'Tomato', category: 'VEGETABLE' },
+  { id: 2, name: 'Potato', category: 'VEGETABLE' },
+  { id: 3, name: 'Onion', category: 'VEGETABLE' },
+  { id: 4, name: 'Wheat', category: 'GRAIN' },
+  { id: 5, name: 'Rice (Paddy)', category: 'GRAIN' },
+  { id: 6, name: 'Soybean', category: 'OIL_SEED' },
+  { id: 7, name: 'Mustard', category: 'OIL_SEED' },
+  { id: 8, name: 'Maize', category: 'GRAIN' },
+  { id: 9, name: 'Cotton', category: 'OTHER' },
+  { id: 10, name: 'Green Chilli', category: 'VEGETABLE' },
+  { id: 11, name: 'Garlic', category: 'SPICE' },
+  { id: 12, name: 'Ginger', category: 'SPICE' },
+  { id: 13, name: 'Mango', category: 'FRUIT' },
+  { id: 14, name: 'Banana', category: 'FRUIT' },
+  { id: 15, name: 'Apple', category: 'FRUIT' }
+];
+
+export const DEFAULT_BUYER_DEMANDS = [
+  {
+    id: 1,
+    buyerId: 2,
+    buyerName: 'Priya Agro Wholesale Hub',
+    buyerType: 'WHOLESALER',
+    cropName: 'Tomato (Hybrid Desi)',
+    category: 'VEGETABLE',
+    requiredQuantity: 2500,
+    offeredPrice: 32.0,
+    qualityRequired: 'GRADE_A',
+    deliveryDistrict: 'Nashik Aggregation Yard',
+    distanceKm: 14.2,
+    verified: true
+  },
+  {
+    id: 2,
+    buyerId: 3,
+    buyerName: 'Reliance Retail Fresh Ltd',
+    buyerType: 'RETAILER',
+    cropName: 'Wheat (Sharbati Lokwan)',
+    category: 'GRAIN',
+    requiredQuantity: 10000,
+    offeredPrice: 26.5,
+    qualityRequired: 'GRADE_A',
+    deliveryDistrict: 'Pune Terminal Yard',
+    distanceKm: 42.0,
+    verified: true
+  },
+  {
+    id: 3,
+    buyerId: 4,
+    buyerName: 'BigBasket Regional Depot',
+    buyerType: 'INSTITUTIONAL',
+    cropName: 'Nashik Red Onion',
+    category: 'VEGETABLE',
+    requiredQuantity: 6000,
+    offeredPrice: 24.0,
+    qualityRequired: 'GRADE_A',
+    deliveryDistrict: 'Nashik District Hub',
+    distanceKm: 8.5,
+    verified: true
+  },
+  {
+    id: 4,
+    buyerId: 5,
+    buyerName: 'Mother Dairy Fruits & Veg',
+    buyerType: 'PROCESSOR',
+    cropName: 'Jyoti Table Potato',
+    category: 'VEGETABLE',
+    requiredQuantity: 8000,
+    offeredPrice: 19.5,
+    qualityRequired: 'FAQ',
+    deliveryDistrict: 'Indore Agro Hub',
+    distanceKm: 55.0,
+    verified: true
+  }
+];
+
+export const DEFAULT_MATCHING_RECOMMENDATION = {
+  crop: 'Tomato',
+  quantity: 1200,
+  recommendedBuyer: {
+    buyerId: 2,
+    buyerName: 'Priya Sharma (Reliance Fresh Hub)',
+    pricePerKg: 32.0,
+    distanceKm: 14.2,
+    transportCost: 313.0,
+    grossRevenue: 38400.0,
+    platformFee: 100.0,
+    netReturn: 37987.0,
+    score: 96.5,
+    buyerVerified: true,
+    transporterId: 1,
+    transporterName: 'Suresh Logistics (Express Fleet)',
+    vehicleType: 'MINI_TRUCK',
+    transporterRatePerKm: 15.0,
+    transporterBaseCharge: 100.0,
+    profitComparisonNote: 'Yields ₹3,450 higher net cash return than distant mandi through local carrier pairing.'
+  },
+  reason: [
+    'Highest net take-home cash return after deducting verified transporter freight and escrow fee',
+    'Paired with nearest available certified carrier: Suresh Logistics (14.2 km route, zero deadhead delay)',
+    'NABL Grade A assay pre-accepted with guaranteed 100% bank escrow release on delivery OTP'
+  ],
+  alternatives: [
+    {
+      buyerId: 3,
+      buyerName: 'Amit Patel (Bokaro Wholesale Hub)',
+      pricePerKg: 30.5,
+      distanceKm: 48.0,
+      transportCost: 820.0,
+      netReturn: 35680.0,
+      transporterName: 'Regional Carrier Coop',
+      profitComparisonNote: 'Lower net take-home due to +33.8 km additional diesel freight haul'
+    },
+    {
+      buyerId: 4,
+      buyerName: 'Kisan Mandi Local Auction',
+      pricePerKg: 28.0,
+      distanceKm: 6.0,
+      transportCost: 190.0,
+      netReturn: 33210.0,
+      transporterName: 'Local Auto Freight',
+      profitComparisonNote: '₹4,777 lower return due to 6.5% mandi middleman cess and lower auction rate'
+    }
+  ]
+};
+
+export const DEFAULT_FPO_PROFILE = {
+  id: 1,
+  fpoId: 'FPO-MH-NAS-042',
+  name: 'Sahyadri Farmers Producer Co. (FPC Ltd)',
+  regNumber: 'CIN: U01403MH2011PTC215682',
+  district: 'Nashik',
+  state: 'Maharashtra',
+  contactPerson: 'Vilas Shinde (CEO / Operator)',
+  contactPhone: '+91 98220 44100',
+  crops: ['Tomato', 'Onion', 'Pomegranate', 'Grapes', 'Soybean'],
+  trustScore: 4.9,
+  trustBadge: 'High Trust · 98% Fulfillment',
+  activeMembersCount: 420,
+  nablAccreditation: 'NABL Quality Assayed Hub #4412',
+  verified: true
+};
+
+export const DEFAULT_FPO_FARMERS = [
+  {
+    id: 1,
+    farmerId: 'FMR-FPO42-001',
+    name: 'Ramesh Kumar',
+    phone: '+91 98221 45011',
+    village: 'Pimpalgaon Baswant',
+    district: 'Nashik',
+    crops: ['Tomato', 'Onion'],
+    landSizeAcres: 3.5,
+    totalSuppliedKg: 4200,
+    trustScore: 4.9,
+    status: 'ACTIVE'
+  },
+  {
+    id: 2,
+    farmerId: 'FMR-FPO42-002',
+    name: 'Suresh Patil',
+    phone: '+91 98223 88120',
+    village: 'Dindori Cluster',
+    district: 'Nashik',
+    crops: ['Tomato', 'Grapes'],
+    landSizeAcres: 5.0,
+    totalSuppliedKg: 6800,
+    trustScore: 4.8,
+    status: 'ACTIVE'
+  },
+  {
+    id: 3,
+    farmerId: 'FMR-FPO42-003',
+    name: 'Anand Shinde',
+    phone: '+91 94230 77192',
+    village: 'Niphad Valley',
+    district: 'Nashik',
+    crops: ['Tomato', 'Soybean'],
+    landSizeAcres: 2.8,
+    totalSuppliedKg: 3400,
+    trustScore: 4.9,
+    status: 'ACTIVE'
+  },
+  {
+    id: 4,
+    farmerId: 'FMR-FPO42-004',
+    name: 'Sunita Devi Gaikwad',
+    phone: '+91 94211 55601',
+    village: 'Lasalgaon',
+    district: 'Nashik',
+    crops: ['Onion', 'Wheat'],
+    landSizeAcres: 4.2,
+    totalSuppliedKg: 5100,
+    trustScore: 5.0,
+    status: 'ACTIVE'
+  },
+  {
+    id: 5,
+    farmerId: 'FMR-FPO42-005',
+    name: 'Balwant Singh Deshmukh',
+    phone: '+91 98229 11400',
+    village: 'Yeola',
+    district: 'Nashik',
+    crops: ['Soybean', 'Maize'],
+    landSizeAcres: 6.0,
+    totalSuppliedKg: 8200,
+    trustScore: 4.7,
+    status: 'ACTIVE'
+  }
+];
+
+export const DEFAULT_FPO_LOTS = [
+  {
+    id: 1,
+    lotId: 'LOT-FPO42-2026-08',
+    passportId: 'PASSPORT-LOT-9401',
+    fpoId: 'FPO-MH-NAS-042',
+    fpoName: 'Sahyadri Farmers Producer Co.',
+    cropName: 'Tomato (Hybrid Desi 1057)',
+    variety: 'Abhinav Hybrid Desi',
+    category: 'VEGETABLE',
+    quantityKg: 1200,
+    harvestDateWindow: '25 Aug 2026 - 27 Aug 2026',
+    pickupLocation: 'Pimpalgaon FPO Cold Packhouse, Gate #2, Nashik',
+    status: 'READY_FOR_SALE',
+    qualityChecklist: {
+      grade: 'GRADE_A',
+      size: 'Medium-Large (55mm - 65mm)',
+      color: 'Deep Glossy Red (90% uniform ripeness)',
+      defectsPercent: 1.2,
+      moisturePercent: 11.5,
+      firmness: 'Firm (4.8 kg/cm²)',
+      pesticideResidue: 'NABL Certified MRL Compliant (0% Organophosphates)'
+    },
+    images: [
+      'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=60',
+      'https://images.unsplash.com/photo-1546470427-227c7369a9b9?w=800&auto=format&fit=crop&q=60'
+    ],
+    contributingFarmers: [
+      { farmerId: 'FMR-FPO42-001', name: 'Ramesh Kumar', village: 'Pimpalgaon', quantityKg: 450, expectedPayout: 14400 },
+      { farmerId: 'FMR-FPO42-002', name: 'Suresh Patil', village: 'Dindori', quantityKg: 450, expectedPayout: 14400 },
+      { farmerId: 'FMR-FPO42-003', name: 'Anand Shinde', village: 'Niphad', quantityKg: 300, expectedPayout: 9600 }
+    ],
+    qrCodeMock: 'KL-VERIFIED-LOT-9401-NABL-GRADE-A'
+  },
+  {
+    id: 2,
+    lotId: 'LOT-FPO42-2026-09',
+    passportId: 'PASSPORT-LOT-9402',
+    fpoId: 'FPO-MH-NAS-042',
+    fpoName: 'Sahyadri Farmers Producer Co.',
+    cropName: 'Soybean (JS-335 Organic)',
+    variety: 'JS-335 Certified',
+    category: 'OILSEED',
+    quantityKg: 8000,
+    harvestDateWindow: '24 Aug 2026 - 26 Aug 2026',
+    pickupLocation: 'Nashik Aggregation Depot #3',
+    status: 'IN_TRANSIT',
+    qualityChecklist: {
+      grade: 'GRADE_A',
+      size: 'Uniform Seed Size (Bold 6.0mm)',
+      color: 'Golden Yellow',
+      defectsPercent: 0.8,
+      moisturePercent: 10.2,
+      firmness: 'Dry Hard Grain',
+      pesticideResidue: '100% Certified Organic (APEDA NPOP)'
+    },
+    images: [
+      'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800&auto=format&fit=crop&q=60'
+    ],
+    contributingFarmers: [
+      { farmerId: 'FMR-FPO42-004', name: 'Sunita Devi Gaikwad', village: 'Lasalgaon', quantityKg: 3500, expectedPayout: 161000 },
+      { farmerId: 'FMR-FPO42-005', name: 'Balwant Singh Deshmukh', village: 'Yeola', quantityKg: 4500, expectedPayout: 207000 }
+    ],
+    qrCodeMock: 'KL-VERIFIED-LOT-9402-NPOP-GRADE-A'
+  }
+];
+
+export const DEFAULT_ADMIN_DATA = {
+  platformStats: {
+    totalFpos: 18,
+    verifiedFpos: 15,
+    pendingFpos: 3,
+    totalBuyers: 42,
+    verifiedBuyers: 38,
+    activePooledLots: 24,
+    totalEscrowSettled: 4890000,
+    openDisputesCount: 1
+  },
+  pendingVerifications: [
+    { id: 101, name: 'Marathwada Farmer Producer Co.', type: 'FPO', district: 'Aurangabad', regNo: 'MH-FPO-8821', appliedDate: '07 Sep 2026', docs: ['Registration_Certificate.pdf', 'Board_Resolution.pdf'], status: 'PENDING' },
+    { id: 102, name: 'Metro Fresh Foods Private Ltd', type: 'BUYER', district: 'Navi Mumbai', regNo: 'GSTIN: 27AABCM8821K1Z5', appliedDate: '08 Sep 2026', docs: ['GST_Certificate.pdf', 'FSSAI_License.pdf'], status: 'PENDING' }
+  ],
+  disputesQueue: [
+    {
+      id: 'DISP-882',
+      tradeId: 101,
+      dealRef: 'Tomato Lot #LOT-FPO42-2026-08',
+      claimantName: 'Priya Agro Wholesale Hub (Buyer)',
+      respondentName: 'Sahyadri Farmers Producer Co. (FPO)',
+      type: 'TRANSIT_WEIGHT_DISCREPANCY',
+      claimAmount: 1150,
+      description: 'Weighbridge scale at destination showed 1,160 kg vs 1,200 kg manifest (-40 kg transit moisture shrinkage).',
+      evidencePhotos: ['https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400'],
+      status: 'UNDER_REVIEW',
+      timeline: [
+        { stage: 'DISPUTE_RAISED', date: '28 Aug 2026, 05:30 PM', note: 'Buyer reported 40kg moisture shrinkage at gate entry.' },
+        { stage: 'EVIDENCE_SUBMITTED', date: '28 Aug 2026, 06:10 PM', note: 'Certified weighbridge slip MH-15-WB-901 attached.' },
+        { stage: 'UNDER_ARBITRATION', date: '29 Aug 2026, 10:00 AM', note: 'KisanLink Nodal Officer assigned for escrow settlement.' }
+      ],
+      proposedResolution: 'Disburse ₹36,800 to FPO + Refund ₹1,150 shrinkage compensation credit to Buyer from reserve.'
+    }
+  ]
+};
+
+

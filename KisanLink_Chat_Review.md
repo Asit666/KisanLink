@@ -3973,3 +3973,1056 @@ This is now the software-fix checklist I'd use for KisanLink. The next step shou
 
 
 
+--------------------------------------------------------------------------------
+
+new review 5
+Yes. I re-checked the **current `main` branch today**. This pass is strictly about **software problems that exist in the current code**, not feature suggestions. The repository is now at **32 commits**, with `frontend`, `kisanlink-backend`, and `kisanlink-ai` as the main application pieces. ([GitHub][1])
+
+## Fresh software review
+
+### 🔴 1. The frontend still has a severe monolithic-code problem
+
+`frontend/src/App.jsx` is **12,255 lines** long. 
+
+This is not just a cleanliness issue. It makes bugs harder to isolate and increases the chance that changing one workflow breaks another.
+
+The file currently contains:
+
+```text
+UI
+state
+API calls
+business calculations
+demo data
+agricultural data
+AI UI
+authentication
+logistics
+marketplace
+tutorials
+```
+
+all together. 
+
+**Fix:** progressively extract pages, reusable components, API services, constants, and business calculations. Don't rewrite the entire frontend at once.
+
+---
+
+### 🔴 2. There is a definite tutorial logic bug
+
+This code is currently:
+
+```javascript
+const seen = localStorage.getItem('kisanlinkTutorialSeen') === 'true';
+
+if (!seen || true) {
+    setTutorialStep(0);
+    setShowTutorial(true);
+}
+```
+
+Because of `|| true`, the condition is **always true**. 
+
+So the tutorial will always be triggered, regardless of whether the user completed it.
+
+It should be:
+
+```javascript
+if (!seen) {
+    setTutorialStep(0);
+    setShowTutorial(true);
+}
+```
+
+This is a **confirmed bug**, not just a design concern.
+
+---
+
+### 🔴 3. Registration silently inserts a fake phone number
+
+The registration payload contains:
+
+```javascript
+phone: account.phone?.trim() || '9876543210'
+```
+
+So when a user leaves the phone field empty, the application submits a fabricated phone number. 
+
+That's bad data integrity.
+
+**Fix:**
+
+Require the phone number:
+
+```javascript
+if (!account.phone?.trim()) {
+    throw new Error('Phone number is required');
+}
+```
+
+or explicitly make it optional and send `null`.
+
+Do **not** silently create fake identity information.
+
+---
+
+### 🔴 4. Demo authentication is embedded directly into the production UI
+
+The frontend contains:
+
+```javascript
+token: 'demo-farmer-jwt'
+token: 'demo-buyer-jwt'
+token: 'demo-transporter-jwt'
+```
+
+inside `handleQuickLogin()`. 
+
+The code does distinguish these tokens later—for example recommendation requests are skipped for `demo-*` sessions. 
+
+So this appears intentional for demo mode, but the problem is that **the demo authentication path is part of the normal application code**.
+
+**Fix:** put demo mode behind an explicit build/runtime flag, e.g.:
+
+```text
+VITE_DEMO_MODE=true
+```
+
+and disable it in production.
+
+---
+
+### 🔴 5. Price-loading failures are being hidden
+
+`loadPriceData()` requests three APIs in parallel:
+
+```javascript
+/api/prices/{cropId}/trend
+/api/prices/{cropId}
+/api/predictions/{cropId}/forecast?days=7
+```
+
+but the outer `catch` is effectively empty:
+
+```javascript
+catch {
+  // Fallback
+}
+```
+
+
+
+That means a network failure can occur and the user receives no meaningful indication of **which part failed or whether the displayed data is stale**.
+
+This is especially problematic because price data is the application's core purpose.
+
+**Fix:** maintain separate states:
+
+```text
+trendLoading
+trendError
+
+priceLoading
+priceError
+
+forecastLoading
+forecastError
+```
+
+and show something such as:
+
+> Latest market data unavailable. Showing cached data from 8 Sep 2026, 18:30.
+
+rather than silently swallowing the failure.
+
+---
+
+### 🔴 6. AGMARKNET sync also masks errors
+
+The sync code currently changes the message to:
+
+```text
+AGMARKNET sync completed with validated local feeds.
+```
+
+when an exception occurs. 
+
+That can make a **failed external synchronization look like a successful operation**.
+
+This is a significant correctness problem.
+
+You need three distinct states:
+
+```text
+LIVE_SYNC_SUCCESS
+CACHED_DATA_USED
+SYNC_FAILED
+```
+
+Don't call a failed sync "completed."
+
+---
+
+### 🔴 7. The AI service can start in heuristic mode
+
+The current AI service constructs the MobileNetV3 model and loads `crop_doctor_v1.pt` only if that checkpoint exists. Otherwise it explicitly enters:
+
+```text
+visual_heuristic_screening
+```
+
+mode. 
+
+The good news is that the current implementation **does expose `model_status` and `requires_expert_review`**, which is a meaningful improvement over the earlier version. 
+
+The remaining software problem is deployment integrity:
+
+**a missing model shouldn't silently turn a production AI endpoint into a different inference implementation.**
+
+For production, either:
+
+```text
+MODEL REQUIRED → service fails health/readiness
+```
+
+or:
+
+```text
+MODEL MISSING → clearly marked DEMO/HEURISTIC environment only
+```
+
+---
+
+### 🔴 8. AI model validity isn't fully verified
+
+The code checks whether the checkpoint exists and then calls:
+
+```python
+model.load_state_dict(torch.load(...))
+```
+
+but it doesn't establish that the checkpoint corresponds to the expected model/data version. 
+
+You need to verify at startup:
+
+```text
+model version
+class count
+class ordering
+preprocessing version
+checkpoint integrity
+```
+
+Otherwise a technically valid `.pt` file can still produce incompatible results.
+
+---
+
+### 🟠 9. The frontend test suite still doesn't test React UI behavior
+
+The current test script is:
+
+```json
+"test": "node --test src/__tests__/app.test.js"
+```
+
+and the test file uses Node's `node:test` and `assert`. 
+
+That's fine for pure JavaScript logic.
+
+But it doesn't prove that:
+
+```text
+React component renders
+button works
+form submits
+API response appears
+modal opens
+routing works
+state updates
+```
+
+So the repository's **19/19 test claim should be understood as logic tests, not complete frontend testing**. The README itself describes them as frontend unit tests. ([GitHub][1])
+
+---
+
+### 🟠 10. Worse: some tests duplicate the production calculations
+
+The test file defines its own:
+
+```javascript
+calculateFarmerNetRealization()
+calculateFarmerEconomicProfit()
+calculateBuyerLandedCost()
+```
+
+inside the test file. 
+
+That means the test can prove that **the test's implementation works**, rather than proving that the application's implementation works.
+
+This is a real testing architecture weakness.
+
+**Fix:**
+
+```text
+src/services/economics.js
+        ↑
+   application
+        ↑
+      tests
+```
+
+Both must import the same production function.
+
+---
+
+### 🟠 11. The backend database/test setup needs closer scrutiny
+
+The backend uses PostgreSQL in the runtime dependencies, but H2 is also included as a runtime dependency. 
+
+That isn't automatically a bug, but if tests end up exercising H2 rather than PostgreSQL, database-specific behavior can escape testing.
+
+For this system I'd prefer integration tests against **PostgreSQL itself**, ideally with Testcontainers.
+
+This is a **verification item**, not something I would label a confirmed production bug without seeing the test configuration.
+
+---
+
+### 🟠 12. Production JWT configuration has an unsafe fallback
+
+The application currently has:
+
+```properties
+jwt.secret=${JWT_SECRET:change-this-development-secret-to-a-long-random-value}
+```
+
+
+
+This is acceptable for local development, but dangerous if someone deploys without setting `JWT_SECRET`.
+
+**Fix:** require the secret outside development:
+
+```text
+dev     → default allowed
+test    → test secret
+prod    → missing secret = startup failure
+```
+
+Never silently run production authentication using a known fallback secret.
+
+---
+
+### 🟠 13. Configuration mixes development and production behavior
+
+The application properties use:
+
+```properties
+spring.profiles.default=dev
+```
+
+
+
+Again, that's convenient for development, but deployment should explicitly select its environment rather than accidentally inheriting the development profile.
+
+---
+
+### 🟠 14. CORS is reasonably improved, but configuration still needs deployment discipline
+
+The AI service now defaults to explicit localhost origins and only allows wildcard origins outside production when configured. 
+
+That's better than the earlier implementation.
+
+The software problem is making sure production actually has:
+
+```text
+ENV=production
+CORS_ORIGINS=https://your-frontend-domain
+```
+
+and isn't launched with permissive development settings.
+
+---
+
+### 🟠 15. AI upload handling is much better now
+
+This is something I **would not mark as an unresolved problem anymore**.
+
+The current service limits:
+
+```text
+10 MB upload
+4096 px max dimension
+16 MP PIL limit
+```
+
+and checks that the upload is an image. 
+
+So compared with the previous review, this portion has clearly been hardened.
+
+---
+
+## What has improved since my previous review
+
+A few earlier concerns are now partially or substantially addressed:
+
+**AI fallback reporting:** improved through `model_status` and `requires_expert_review`. 
+
+**Image upload security:** improved with file-size, dimension and pixel-count restrictions. 
+
+**Frontend dependency versions:** they are now pinned to explicit semver ranges rather than `"latest"`. 
+
+**Testing coverage claims:** the repository now explicitly documents 23 backend and 19 frontend tests. ([GitHub][1])
+
+So I would **not repeat those older criticisms as though nothing changed**.
+
+---
+
+# Current priority
+
+For the software-fixing phase, I'd now use this order:
+
+| Priority | Problem                                                                  |   |                     |
+| -------- | ------------------------------------------------------------------------ | - | ------------------- |
+| 🔴 P0    | Fix `if (!seen                                                           |   | true)` tutorial bug |
+| 🔴 P0    | Remove fake phone-number default                                         |   |                     |
+| 🔴 P0    | Make production AI fail safely when model unavailable                    |   |                     |
+| 🔴 P0    | Stop silently reporting failed price/AGMARKNET sync as successful        |   |                     |
+| 🔴 P0    | Separate demo authentication from production                             |   |                     |
+| 🔴 P0    | Extract business logic so tests test production code                     |   |                     |
+| 🟠 P1    | Add real React/browser tests                                             |   |                     |
+| 🟠 P1    | Verify role-based authorization end-to-end                               |   |                     |
+| 🟠 P1    | Test PostgreSQL integration rather than relying on alternate DB behavior |   |                     |
+| 🟠 P1    | Require production JWT secret                                            |   |                     |
+| 🟡 P2    | Split the 12k-line `App.jsx`                                             |   |                     |
+
+## Bottom line
+
+The **current repository is better than the version I reviewed previously**, particularly around AI input validation and explicit model-status reporting. 
+
+But I found several concrete software defects that should be fixed before adding anything new.
+
+The **first five fixes I would actually make to the code** are:
+
+```text
+1. Fix tutorial condition
+2. Remove fake phone fallback
+3. Correct sync/error-state handling
+4. Isolate demo login
+5. Move shared business calculations out of tests/App.jsx
+```
+
+Those are more important right now than adding another feature.
+
+[1]: https://github.com/Asit666/KisanLink "GitHub - Asit666/KisanLink: Farmer Market Linkage & Price Discovery · GitHub"
+
+----------------------------------------------------------------------------------------
+
+new reviews 6
+Yes. I checked the repository again from the **current `main` branch**, and this time I compared the current implementation against the problems I identified in the earlier passes.
+
+There has been real progress: the economics logic is now centralized, demo data has been moved out of `App.jsx`, the frontend API configuration has been centralized, and the test file imports the production economics module. 
+
+However, I found several **remaining software problems**, including a couple of bugs that are more concrete than the architectural issues we discussed before.
+
+## Current status
+
+| Area                               | Status             |
+| ---------------------------------- | ------------------ |
+| Economics duplicated in tests      | ✅ Fixed            |
+| Demo data separated from `App.jsx` | ✅ Improved         |
+| API configuration centralized      | ✅ Improved         |
+| AI upload limits                   | ✅ Improved         |
+| Tutorial completion bug            | ❌ Still present    |
+| Authentication token inconsistency | ❌ Still present    |
+| AGMARKNET failure reporting        | ❌ Still present    |
+| API errors silently swallowed      | ❌ Still present    |
+| Demo mode enabled by default       | ⚠️ Risk            |
+| Full browser/E2E frontend testing  | ❌ Still missing    |
+| `App.jsx` complexity               | ⚠️ Still very high |
+
+## 1. Confirmed bug: tutorial always opens
+
+This one is still in the current code:
+
+```javascript
+const seen = localStorage.getItem('kisanlinkTutorialSeen') === 'true';
+
+if (!seen || true) {
+    setTutorialStep(0);
+    setShowTutorial(true);
+}
+```
+
+Because of `|| true`, the condition can never be false. 
+
+### Fix
+
+```javascript
+if (!seen) {
+    setTutorialStep(0);
+    setShowTutorial(true);
+}
+```
+
+**Priority: P0**
+
+---
+
+## 2. Confirmed bug: wrong localStorage key for AGMARKNET authentication
+
+The normal authentication flow stores:
+
+```javascript
+localStorage.setItem('kisanlinkToken', data.token);
+```
+
+but `syncAgmarknetData()` looks for:
+
+```javascript
+localStorage.getItem('token')
+```
+
+instead. 
+
+So for a logged-in user, this:
+
+```javascript
+const token = session?.token || localStorage.getItem('token');
+```
+
+works only because `session.token` normally exists in memory.
+
+After a page/session situation where `session` isn't populated as expected, the fallback searches for the **wrong key**.
+
+### Fix
+
+Use one key everywhere:
+
+```javascript
+localStorage.getItem('kisanlinkToken')
+```
+
+Better yet, stop reading auth from localStorage in individual functions and centralize it in an auth client.
+
+**Priority: P0**
+
+---
+
+## 3. Confirmed correctness problem: failed AGMARKNET sync is reported as successful
+
+The current code does:
+
+```javascript
+if (res.ok) {
+    ...
+    'AGMARKNET live mandi feed successfully synchronized...'
+} else {
+    ...
+    'AGMARKNET sync completed (using latest validated cached records).'
+}
+```
+
+and then in the `catch`:
+
+```javascript
+'AGMARKNET sync completed with validated local feeds.'
+```
+
+So an actual network/server failure can result in a message containing **"sync completed"**. 
+
+This is misleading.
+
+### Fix
+
+Use explicit states:
+
+```text
+LIVE_SYNC_SUCCESS
+CACHE_FALLBACK
+SYNC_FAILED
+```
+
+For example:
+
+```text
+AGMARKNET unavailable.
+Showing the latest validated cached data.
+```
+
+or:
+
+```text
+AGMARKNET synchronization failed.
+No new market data was loaded.
+```
+
+**Priority: P0**
+
+---
+
+## 4. Price API failures are still silently swallowed
+
+`loadPriceData()` makes three requests:
+
+```javascript
+/api/prices/{cropId}/trend
+/api/prices/{cropId}
+/api/predictions/{cropId}/forecast?days=7
+```
+
+but the outer failure path is:
+
+```javascript
+catch {
+    // Fallback
+}
+```
+
+There is no error state for trend or prices. 
+
+This can leave old information on screen without making it clear that the new request failed.
+
+For a price-discovery application, that's a serious data-integrity issue.
+
+### Fix
+
+Track freshness:
+
+```javascript
+{
+  status: 'success',
+  fetchedAt: ...,
+  source: 'AGMARKNET'
+}
+```
+
+and on failure:
+
+```text
+Unable to refresh current mandi prices.
+Last successful update: 18:42
+```
+
+**Priority: P0**
+
+---
+
+## 5. Many requests still bypass your new `safeFetch()` wrapper
+
+You created a centralized timeout wrapper:
+
+```javascript
+export async function safeFetch(...)
+```
+
+which is good. 
+
+But the application code still uses ordinary:
+
+```javascript
+fetch(...)
+```
+
+throughout `App.jsx`. 
+
+So the new timeout/error-handling mechanism is mostly **not actually being used**.
+
+That means a request can still hang indefinitely depending on browser/network behavior.
+
+### Fix
+
+Replace important requests with:
+
+```javascript
+safeFetch(...)
+```
+
+especially:
+
+```text
+price APIs
+AI requests
+trade APIs
+escrow APIs
+weather
+analytics
+profile
+market search
+```
+
+**Priority: P1**
+
+---
+
+## 6. The demo mode defaults to ON
+
+The current `mockData.js` says:
+
+```javascript
+export const USE_DEMO_DATA =
+  ... ? import.meta.env.VITE_DEMO_MODE !== 'false'
+      : true;
+```
+
+So when `VITE_DEMO_MODE` is not provided, the default is **true**. 
+
+That's risky because forgetting one environment variable can put the application into demo-data behavior.
+
+### Better
+
+Development:
+
+```text
+VITE_DEMO_MODE=true
+```
+
+Production:
+
+```text
+VITE_DEMO_MODE=false
+```
+
+and ideally:
+
+```javascript
+if (import.meta.env.PROD && USE_DEMO_DATA) {
+    throw new Error('Demo mode cannot be enabled in production');
+}
+```
+
+**Priority: P1**
+
+---
+
+## 7. Demo login is still inside the main application
+
+The quick-login path still creates:
+
+```javascript
+token: 'demo-farmer-jwt'
+token: 'demo-buyer-jwt'
+```
+
+inside `App.jsx`. 
+
+This isn't inherently wrong for a hackathon demo, but it needs stronger separation.
+
+The danger is accidental deployment of demo authentication UI.
+
+### Fix
+
+Make the button conditional:
+
+```javascript
+const showDemoLogin =
+    import.meta.env.DEV || import.meta.env.VITE_DEMO_MODE === 'true';
+```
+
+Production build should not contain the demo-login path at all.
+
+**Priority: P1**
+
+---
+
+## 8. The frontend still has 9,258 source lines in `App.jsx`
+
+The current raw file is still **9,258 lines**. 
+
+This is actually an improvement from the previous version I reviewed, because some things have been extracted.
+
+For example, the application now imports:
+
+```text
+pages/TransporterDashboard
+pages/TradeChatView
+utils/economics
+data/mockData
+config/api
+```
+
+which is good architecture progress. 
+
+But `App.jsx` is still much too large.
+
+I'd now call this **P1 rather than P0**, because it isn't necessarily causing an immediate runtime failure.
+
+---
+
+## 9. There is a likely stale-request/race problem in price loading
+
+This section does:
+
+```javascript
+useEffect(() => {
+    if (crops.length > 0) {
+        ...
+        loadPriceData(target.id);
+    }
+}, [crops, pulseCategory]);
+```
+
+and `handlePulseCropChange()` also immediately calls:
+
+```javascript
+loadPriceData(numericId);
+```
+
+while `loadPriceData()` performs three asynchronous requests. 
+
+That means rapid crop switching can produce:
+
+```text
+Tomato request ────────────────┐
+                               ↓
+Potato request ────────→ finishes first
+                               ↓
+Tomato finishes later → overwrites Potato state
+```
+
+So the UI can potentially show data belonging to the previous crop.
+
+### Fix
+
+Use an `AbortController` or request ID:
+
+```javascript
+const requestId = ++priceRequestId.current;
+
+const result = await ...
+
+if (requestId !== priceRequestId.current) return;
+```
+
+**Priority: P1**
+
+---
+
+## 10. The application can keep stale state after failed requests
+
+For example:
+
+```javascript
+if (trendRes.ok) {
+    setTrend(...)
+}
+```
+
+If a later request fails, there isn't always a corresponding:
+
+```javascript
+setTrend(null)
+```
+
+or stale-data marker.
+
+So:
+
+```text
+Previous crop's data
+        ↓
+New crop selected
+        ↓
+new request fails
+        ↓
+old data may remain visible
+```
+
+This is closely related to the race/error-state problem.
+
+**Priority: P1**
+
+---
+
+## 11. Error handling is inconsistent
+
+Some operations correctly report errors:
+
+```javascript
+setMessage('Could not submit counter-offer...')
+```
+
+while others simply do:
+
+```javascript
+catch {
+    // ignore
+}
+```
+
+Examples include escrow loading, notifications, weather, analytics and nearby markets. 
+
+The result is inconsistent UX:
+
+```text
+API fails
+   ↓
+some screens show error
+some screens silently continue
+some screens retain old data
+```
+
+A common request/error utility would help considerably.
+
+**Priority: P1**
+
+---
+
+## 12. AI model availability is still a deployment risk
+
+The AI service continues to behave like this:
+
+```python
+if os.path.exists(MODEL_PATH):
+    load model
+else:
+    visual heuristic screening
+```
+
+and `/health` reports:
+
+```text
+model_loaded
+inference_mode
+```
+
+which is good. 
+
+The software concern remains:
+
+> A missing production model should not quietly result in a different inference implementation.
+
+For production:
+
+```text
+model missing
+      ↓
+readiness = FAIL
+```
+
+rather than:
+
+```text
+service = ONLINE
+inference_mode = heuristic
+```
+
+unless you explicitly intend a demo environment.
+
+---
+
+## 13. The AI service's error handling is now better
+
+This is worth explicitly marking as **fixed compared with the earlier review**.
+
+The inference endpoint now logs the real exception server-side and returns a generic client error:
+
+```python
+logger.exception(...)
+detail="Inference failed. Unable to process diagnostic image at this time."
+```
+
+That's the correct pattern. 
+
+So I would **not ask you to change this part**.
+
+---
+
+## 14. AI upload security is also substantially improved
+
+The current service has:
+
+```text
+10 MB upload limit
+4096 px dimension limit
+16 MP PIL limit
+3 redirect hops
+15 second timeout
+public-IP validation
+```
+
+according to the current implementation. 
+
+Again, this is something I would consider **largely fixed**, not a current priority.
+
+---
+
+## 15. The economics/test architecture is now much better
+
+This was one of my earlier criticisms, and it has clearly been addressed.
+
+`economics.js` is now explicitly the:
+
+> "Single Source of Truth shared between React UI Components and Test Suites"
+
+and the test imports these functions from `../utils/economics.js`. 
+
+That's exactly the direction I recommended.
+
+So **remove this from the fix list**.
+
+---
+
+# The most important remaining bugs
+
+I'd now reduce the whole software-fix effort to these:
+
+### P0 — fix immediately
+
+```text
+1. Tutorial condition: `!seen || true`
+2. Inconsistent auth localStorage key
+3. AGMARKNET failure falsely reported as successful
+4. Price API failure silently leaving stale data
+```
+
+### P1 — fix next
+
+```text
+5. Actually use safeFetch()
+6. Disable demo mode by default in production
+7. Remove/guard demo login in production
+8. Prevent stale price-request race conditions
+9. Add consistent loading/error/stale-data states
+10. Improve swallowed API errors
+```
+
+### P2 — cleanup
+
+```text
+11. Break App.jsx into smaller modules
+12. Consolidate request/auth handling
+13. Add real browser-level tests
+14. Add production readiness checks for AI model/configuration
+```
+
+## The good news
+
+The current codebase is **not in the same state as when we first reviewed it**.
+
+You've already fixed several of the architectural problems:
+
+```text
+❌ Duplicated economics logic
+        ↓
+✅ Shared economics module
+
+❌ Demo/static data mixed into App.jsx
+        ↓
+✅ mockData.js
+
+❌ Scattered API URL configuration
+        ↓
+✅ config/api.js
+
+❌ Weak AI upload controls
+        ↓
+✅ size/dimension/SSRF protections
+
+❌ Tests implementing their own business logic
+        ↓
+✅ Tests import production economics
+```
+
+
+
+So **I would not restart or redesign KisanLink**. At this point, the right move is to fix the handful of concrete runtime/data-integrity problems above, then perform a true browser-level test of the main workflows.
+
