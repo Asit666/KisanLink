@@ -1,0 +1,38 @@
+name: kisanlink_app
+description: "KisanLink - Unified Agricultural Trade & Logistics Platform for Android and Windows Desktop."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management & DI
+  flutter_riverpod: ^2.5.1
+  
+  # Navigation & Deep Linking
+  go_router: ^14.2.0
+
+  # Networking & HTTP Client
+  dio: ^5.4.3+1
+
+  # Secure Storage for Tokens & Role State
+  flutter_secure_storage: ^9.2.2
+
+  # Typography & Formatting
+  google_fonts: ^6.2.1
+  intl: ^0.19.0
+
+  # Responsive / Adaptive Layouts
+  flutter_layout_grid: ^2.0.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

@@ -50,6 +50,24 @@ public class CropController {
     }
 
 
+    @GetMapping("/{id}/produce")
+    public List<com.kisanlink.dto.CropProduceResponse> findProduceByCrop(@PathVariable Long id) {
+        return cropService.findProduceByCrop(id);
+    }
+
+    @GetMapping("/{id}/mandi-comparison")
+    public List<com.kisanlink.dto.MandiComparisonResponse> getMandiComparison(
+            @PathVariable Long id,
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude) {
+        return cropService.getMandiComparison(id, latitude, longitude);
+    }
+
+    @GetMapping("/{id}/requirements")
+    public List<com.kisanlink.dto.BuyerRequirementResponse> findRequirementsByCrop(@PathVariable Long id) {
+        return cropService.findRequirementsByCrop(id);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Crop create(@Valid @RequestBody Crop crop) {

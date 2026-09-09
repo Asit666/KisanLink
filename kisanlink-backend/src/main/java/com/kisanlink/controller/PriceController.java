@@ -23,6 +23,11 @@ public class PriceController {
         this.mandiDataIngestionService = mandiDataIngestionService;
     }
 
+    @GetMapping("/summary")
+    public List<com.kisanlink.dto.CropPriceSummaryDTO> getSummary() {
+        return priceService.getCropPriceSummaries();
+    }
+
     @GetMapping("/{cropId}")
     public List<MarketPrice> findByCrop(@PathVariable Long cropId) {
         return priceService.findByCrop(cropId);

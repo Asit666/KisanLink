@@ -6,11 +6,14 @@ import com.kisanlink.entity.MarketPrice;
 import com.kisanlink.repository.CropRepository;
 import com.kisanlink.repository.MarketPriceRepository;
 import com.kisanlink.repository.MarketRepository;
+import com.kisanlink.dto.CropPriceSummaryDTO;
+import com.kisanlink.repository.FarmerProduceRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,15 +21,18 @@ public class PriceService {
     private final MarketPriceRepository priceRepository;
     private final MarketRepository marketRepository;
     private final CropRepository cropRepository;
+    private final FarmerProduceRepository produceRepository;
     private final NotificationWebSocketService notificationWebSocketService;
 
     public PriceService(MarketPriceRepository priceRepository,
                         MarketRepository marketRepository,
                         CropRepository cropRepository,
+                        FarmerProduceRepository produceRepository,
                         NotificationWebSocketService notificationWebSocketService) {
         this.priceRepository = priceRepository;
         this.marketRepository = marketRepository;
         this.cropRepository = cropRepository;
+        this.produceRepository = produceRepository;
         this.notificationWebSocketService = notificationWebSocketService;
     }
 
@@ -119,5 +125,56 @@ public class PriceService {
         }
 
         return saved;
+    }
+
+    public List<CropPriceSummaryDTO> getCropPriceSummaries() {
+        List<com.kisanlink.entity.Crop> allCrops = cropRepository.findAll();
+        List<CropPriceSummaryDTO> list = new ArrayList<>();
+
+        for (com.kisanlink.entity.Crop crop : allCrops) {
+            List<MarketPrice> prices = priceRepository.findByCropIdOrderByDateDesc(crop.getId());
+            BigDecimal latest = BigDecimal.ZERO;
+            BigDecimal minP = BigDecimal.ZERO;
+            BigDecimal maxP = BigDecimal.ZERO;
+            BigDecimal change = BigDecimal.ZERO;
+            String direction = "STABLE";
+
+            if (!prices.isEmpty()) {
+                MarketPrice first = prices.getFirst();
+                latest = first.getModalPrice();
+                minP = first.getMinPrice();
+                maxP = first.getMaxPrice();
+
+                BigDecimal previous = prices.size() > 1 ? prices.get(1).getModalPrice() : latest;
+                if (previous.signum() > 0) {
+                    change = latest.subtract(previous).divide(previous, 4, RoundingMode.HALF_UP)
+                            .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+                    direction = change.compareTo(BigDecimal.valueOf(0.5)) > 0 ? "UPWARD"
+                            : change.compareTo(BigDecimal.valueOf(-0.5)) < 0 ? "DOWNWARD" : "STABLE";
+                }
+            } else {
+                latest = crop.getMspPrice() != null ? crop.getMspPrice() : BigDecimal.valueOf(25.0);
+                minP = latest.multiply(BigDecimal.valueOf(0.9)).setScale(2, RoundingMode.HALF_UP);
+                maxP = latest.multiply(BigDecimal.valueOf(1.1)).setScale(2, RoundingMode.HALF_UP);
+            }
+
+            long listingsCount = produceRepository.findByCropId(crop.getId()).size();
+
+            list.add(new CropPriceSummaryDTO(
+                    crop.getId(),
+                    crop.getName(),
+                    crop.getCategory(),
+                    crop.getUnit(),
+                    latest,
+                    minP,
+                    maxP,
+                    direction,
+                    change,
+                    crop.getMspPrice(),
+                    listingsCount
+            ));
+        }
+
+        return list;
     }
 }

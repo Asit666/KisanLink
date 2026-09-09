@@ -54,11 +54,12 @@ public class AuthService {
         if (userRepository.existsByEmail(normalizedEmail)) {
             throw new IllegalArgumentException("Email is already registered");
         }
+        String normalizedPhone = request.phone() != null ? request.phone().trim() : null;
 
         User user = new User();
         user.setName(request.name().trim());
         user.setEmail(normalizedEmail);
-        user.setPhone(request.phone() != null ? request.phone().trim() : null);
+        user.setPhone(normalizedPhone);
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(request.role());
         userRepository.save(user);
@@ -90,15 +91,19 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        String normalizedEmail = request.email() != null ? request.email().trim().toLowerCase() : "";
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(normalizedEmail, request.password()));
+        String identifier = request.email() != null ? request.email().trim() : "";
+        String normalizedEmail = identifier.toLowerCase();
+        
         User user = userRepository.findByEmail(normalizedEmail)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .or(() -> userRepository.findFirstByPhone(identifier))
+                .orElseThrow(() -> new IllegalArgumentException("User not found with provided credentials"));
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getEmail(), request.password()));
+
         UserDetails details = org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
                 .password(user.getPassword()).roles(user.getRole().name()).build();
-        Long profileId;
-        profileId = switch (user.getRole().name()) {
+        Long profileId = switch (user.getRole().name()) {
             case "FARMER" -> farmerRepository.findByUserId(user.getId()).map(Farmer::getId).orElse(null);
             case "BUYER" -> buyerRepository.findByUserId(user.getId()).map(Buyer::getId).orElse(null);
             case "TRANSPORTER" -> transporterRepository.findByUserId(user.getId()).map(Transporter::getId).orElse(null);
@@ -108,8 +113,7 @@ public class AuthService {
         return response(user, profileId, jwtService.generateToken(details));
     }
 
-
     private AuthResponse response(User user, Long profileId, String token) {
-        return new AuthResponse(token, user.getId(), profileId, user.getName(), user.getRole().name());
+        return new AuthResponse(token, user.getId(), profileId, user.getName(), user.getRole().name(), user.getEmail(), user.getPhone());
     }
 }

@@ -24,6 +24,12 @@ public class GlobalExceptionHandler {
         return Map.of("error", exception.getMessage() == null ? "Invalid request" : exception.getMessage());
     }
 
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> handleAuthenticationException(org.springframework.security.core.AuthenticationException exception) {
+        return Map.of("error", "Invalid email/phone or password");
+    }
+
     /**
      * Returns 403 when a user attempts to mutate a resource they do not own.
      * Spring Security's default behaviour would redirect to /error; this ensures

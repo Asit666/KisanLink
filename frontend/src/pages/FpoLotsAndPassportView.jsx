@@ -1,15 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function FpoLotsAndPassportView({
   fpoProfile,
   lots,
   fpoFarmers,
+  intakes = [],
   onNavigate,
   onMatchLot,
-  onCreateLot
+  onCreateLot,
+  onNavigateToIntake,
+  initialAction
 }) {
   const [selectedPassportLot, setSelectedPassportLot] = useState(null);
-  const [isCreatingLot, setIsCreatingLot] = useState(false);
+  const [isCreatingLot, setIsCreatingLot] = useState(initialAction === 'CREATE');
+
+  useEffect(() => {
+    if (initialAction === 'CREATE') {
+      setIsCreatingLot(true);
+    }
+  }, [initialAction]);
   const [newLotForm, setNewLotForm] = useState({
     cropName: 'Tomato',
     variety: 'Hybrid Desi 1057',
@@ -82,11 +91,11 @@ export default function FpoLotsAndPassportView({
     <div className="view-container">
       {/* Clean FPO Accreditation Header */}
       <div style={{
-        background: '#ffffff',
-        border: '1px solid #e2e8f0',
-        borderRadius: '8px',
+        background: 'rgba(255, 252, 245, 0.85)',
+        border: '1px solid #d9d6cc',
+        borderRadius: '6px',
         padding: '16px 20px',
-        marginBottom: '20px',
+        marginBottom: '18px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -95,49 +104,54 @@ export default function FpoLotsAndPassportView({
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div style={{
-            background: '#1b4332',
-            color: '#ffffff',
-            width: '40px',
-            height: '40px',
-            borderRadius: '6px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            background: '#dce7d3',
+            color: '#3e6445',
+            width: '38px',
+            height: '38px',
+            borderRadius: '4px',
+            display: 'grid',
+            placeItems: 'center',
             fontWeight: 700,
-            fontSize: '14px',
-            letterSpacing: '0.5px'
+            fontSize: '11px',
+            fontFamily: "'DM Mono', monospace",
+            letterSpacing: '.04em',
+            flexShrink: 0
           }}>
             FPO
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600, color: '#0f172a' }}>
+              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#202a27' }}>
                 {fpoProfile?.name || 'Sahyadri Farmers Producer Co. (FPC Ltd)'}
               </h3>
               <span style={{
-                fontSize: '11px',
+                fontSize: '10px',
                 fontFamily: "'DM Mono', monospace",
-                background: '#f1f5f9',
-                color: '#334155',
+                background: '#f0ebe0',
+                color: '#526258',
+                border: '1px solid #ded8cb',
                 padding: '2px 8px',
-                borderRadius: '4px',
+                borderRadius: '3px',
                 fontWeight: 600
               }}>
                 ID: {fpoProfile?.fpoId || 'FPO-MH-NAS-042'}
               </span>
               <span style={{
-                fontSize: '11px',
-                background: '#f0fdf4',
-                color: '#166534',
-                border: '1px solid #bbf7d0',
+                fontSize: '10px',
+                fontFamily: "'DM Mono', monospace",
+                textTransform: 'uppercase',
+                letterSpacing: '.04em',
+                background: '#e5ecdb',
+                color: '#446849',
+                border: '1px solid #cad6c2',
                 padding: '2px 8px',
-                borderRadius: '4px',
-                fontWeight: 500
+                borderRadius: '3px',
+                fontWeight: 600
               }}>
                 NABL Lab Verified
               </span>
             </div>
-            <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#64748b' }}>
+            <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#667269' }}>
               {fpoProfile?.regNumber || 'CIN: U01403MH2011PTC215682'} · {fpoProfile?.district || 'Nashik'}, {fpoProfile?.state || 'Maharashtra'} · Contact: {fpoProfile?.contactPerson || 'Vilas Shinde'} ({fpoProfile?.contactPhone || '+91 98220 44100'})
             </p>
           </div>
@@ -145,40 +159,50 @@ export default function FpoLotsAndPassportView({
 
         {/* Clean FPO Trust & Metric */}
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", fontWeight: 600, letterSpacing: '0.5px' }}>
+          <div style={{ fontSize: '10px', color: '#667269', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", fontWeight: 600, letterSpacing: '.08em' }}>
             Trust Rating
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: '4px', marginTop: '2px' }}>
-            <span style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a', lineHeight: 1 }}>
+            <span style={{ fontSize: '20px', fontWeight: 700, color: '#202a27', lineHeight: 1 }}>
               {fpoProfile?.trustScore || '4.9'}
             </span>
-            <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 500 }}>/ 5.0</span>
+            <span style={{ fontSize: '11px', color: '#7b827a', fontWeight: 500 }}>/ 5.0</span>
           </div>
-          <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>
+          <div style={{ fontSize: '11px', color: '#667269', marginTop: '2px' }}>
             {fpoProfile?.trustBadge || 'High Trust · 98% Fulfillment'}
           </div>
         </div>
       </div>
 
       {/* Main Aggregated Lots Panel */}
-      <section className="panel" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-        <div className="panel-heading" style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '14px' }}>
+      <section className="panel" style={{ background: 'rgba(255, 252, 245, 0.65)', border: '1px solid #d9d6cc', borderRadius: '6px', padding: '22px' }}>
+        <div className="panel-heading" style={{ borderBottom: '1px solid #e6e2d8', paddingBottom: '14px' }}>
           <div>
-            <p className="eyebrow" style={{ color: '#64748b', margin: '0 0 4px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: "'DM Mono', monospace" }}>
+            <p className="eyebrow" style={{ color: '#b45a42', margin: '0 0 4px', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.08em', fontFamily: "'DM Mono', monospace" }}>
               Smart India Hackathon · Smallholder Pooling Engine
             </p>
-            <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a', margin: 0 }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#202a27', margin: 0 }}>
               Aggregated Quality-Aware Lots &amp; Lot Passports
             </h2>
-            <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#64748b' }}>
+            <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#667269' }}>
               Pooling fragmented smallholder harvests into standardized institutional trade lots with verifiable farm-to-fork origin.
             </p>
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            {onNavigate && (
+              <button
+                type="button"
+                className="trade-btn trade-btn-secondary"
+                style={{ padding: '8px 14px' }}
+                onClick={() => onNavigate('fpo-intake')}
+              >
+                Village Intake Desk ({intakes.filter(i => i.status === 'UNPOOLED').length} Unpooled)
+              </button>
+            )}
             <button
               type="button"
               className="trade-btn trade-btn-primary"
-              style={{ padding: '8px 14px', fontSize: '13px', fontWeight: 500 }}
+              style={{ padding: '8px 14px' }}
               onClick={() => setIsCreatingLot(true)}
             >
               + Create Aggregated Lot
@@ -187,78 +211,75 @@ export default function FpoLotsAndPassportView({
         </div>
 
         {/* Minimal Summary KPI Strip */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '12px',
+        <div className="kpi-metrics-grid" style={{
           marginTop: '16px',
           marginBottom: '20px'
         }}>
-          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '12px 14px' }}>
-            <span style={{ fontSize: '11px', color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: "'DM Mono', monospace" }}>
+          <div style={{ background: '#fffdf9', border: '1px solid #d9d6cc', borderRadius: '6px', padding: '14px 16px', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
+            <span style={{ fontSize: '10px', color: '#667269', display: 'block', textTransform: 'uppercase', letterSpacing: '.08em', fontFamily: "'DM Mono', monospace" }}>
               Total Pooled Volume
             </span>
-            <strong style={{ display: 'block', fontSize: '18px', fontWeight: 700, color: '#0f172a', margin: '4px 0 2px' }}>
+            <strong style={{ display: 'block', fontSize: '20px', fontWeight: 700, color: '#202a27', margin: '4px 0 2px' }}>
               {(totalPooledKg / 1000).toFixed(1)} Tons
             </strong>
-            <small style={{ fontSize: '11px', color: '#64748b' }}>
+            <small style={{ fontSize: '11px', color: '#7b827a' }}>
               {totalPooledKg.toLocaleString()} kg active
             </small>
           </div>
 
-          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '12px 14px' }}>
-            <span style={{ fontSize: '11px', color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: "'DM Mono', monospace" }}>
+          <div style={{ background: '#fffdf9', border: '1px solid #d9d6cc', borderRadius: '6px', padding: '14px 16px', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
+            <span style={{ fontSize: '10px', color: '#667269', display: 'block', textTransform: 'uppercase', letterSpacing: '.08em', fontFamily: "'DM Mono', monospace" }}>
               Active Lots Ready
             </span>
-            <strong style={{ display: 'block', fontSize: '18px', fontWeight: 700, color: '#0f172a', margin: '4px 0 2px' }}>
+            <strong style={{ display: 'block', fontSize: '20px', fontWeight: 700, color: '#202a27', margin: '4px 0 2px' }}>
               {lots?.length || 0} Lots
             </strong>
-            <small style={{ fontSize: '11px', color: '#64748b' }}>
+            <small style={{ fontSize: '11px', color: '#7b827a' }}>
               Standardized &amp; Assayed
             </small>
           </div>
 
-          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '12px 14px' }}>
-            <span style={{ fontSize: '11px', color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: "'DM Mono', monospace" }}>
+          <div style={{ background: '#fffdf9', border: '1px solid #d9d6cc', borderRadius: '6px', padding: '14px 16px', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
+            <span style={{ fontSize: '10px', color: '#667269', display: 'block', textTransform: 'uppercase', letterSpacing: '.08em', fontFamily: "'DM Mono', monospace" }}>
               Contributing Farmers
             </span>
-            <strong style={{ display: 'block', fontSize: '18px', fontWeight: 700, color: '#0f172a', margin: '4px 0 2px' }}>
+            <strong style={{ display: 'block', fontSize: '20px', fontWeight: 700, color: '#202a27', margin: '4px 0 2px' }}>
               {fpoFarmers?.length || 5} Smallholders
             </strong>
-            <small style={{ fontSize: '11px', color: '#64748b' }}>
+            <small style={{ fontSize: '11px', color: '#7b827a' }}>
               Traceability locked
             </small>
           </div>
 
-          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '12px 14px' }}>
-            <span style={{ fontSize: '11px', color: '#64748b', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: "'DM Mono', monospace" }}>
+          <div style={{ background: '#fffdf9', border: '1px solid #d9d6cc', borderRadius: '6px', padding: '14px 16px', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}>
+            <span style={{ fontSize: '10px', color: '#667269', display: 'block', textTransform: 'uppercase', letterSpacing: '.08em', fontFamily: "'DM Mono', monospace" }}>
               Quality Compliance
             </span>
-            <strong style={{ display: 'block', fontSize: '18px', fontWeight: 700, color: '#166534', margin: '4px 0 2px' }}>
+            <strong style={{ display: 'block', fontSize: '20px', fontWeight: 700, color: '#2f6838', margin: '4px 0 2px' }}>
               100% Grade A
             </strong>
-            <small style={{ fontSize: '11px', color: '#64748b' }}>
+            <small style={{ fontSize: '11px', color: '#7b827a' }}>
               APMARK &amp; NABL standard
             </small>
           </div>
         </div>
 
         {/* Lots Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '16px' }}>
+        <div className="responsive-cards-grid">
           {(lots || []).map((lot) => {
             const isReady = lot.status === 'READY_FOR_SALE';
             return (
               <div
                 key={lot.id}
                 style={{
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  background: '#ffffff',
+                  border: '1px solid #d9d6cc',
+                  borderRadius: '6px',
+                  background: '#fffdf9',
                   padding: '16px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
                 }}
               >
                 <div>
@@ -269,28 +290,32 @@ export default function FpoLotsAndPassportView({
                         fontSize: '11px',
                         fontFamily: "'DM Mono', monospace",
                         fontWeight: 600,
-                        background: '#f1f5f9',
-                        color: '#334155',
+                        background: '#f0ebe0',
+                        color: '#526258',
+                        border: '1px solid #ded8cb',
                         padding: '2px 6px',
-                        borderRadius: '4px'
+                        borderRadius: '3px'
                       }}>
                         {lot.lotId}
                       </span>
-                      <h3 style={{ margin: '6px 0 2px', fontSize: '16px', fontWeight: 600, color: '#0f172a' }}>
+                      <h3 style={{ margin: '6px 0 2px', fontSize: '16px', fontWeight: 700, color: '#202a27' }}>
                         {lot.cropName}
                       </h3>
-                      <span style={{ fontSize: '12px', color: '#64748b' }}>
-                        Variety: <span style={{ color: '#334155', fontWeight: 500 }}>{lot.variety}</span> · {lot.category}
+                      <span style={{ fontSize: '12px', color: '#667269' }}>
+                        Variety: <span style={{ color: '#202a27', fontWeight: 600 }}>{lot.variety}</span> · {lot.category}
                       </span>
                     </div>
                     <span style={{
-                      fontSize: '11px',
+                      fontSize: '10px',
+                      fontFamily: "'DM Mono', monospace",
                       fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '.04em',
                       padding: '3px 8px',
-                      borderRadius: '4px',
-                      background: isReady ? '#f0fdf4' : '#f8fafc',
-                      color: isReady ? '#166534' : '#475569',
-                      border: `1px solid ${isReady ? '#bbf7d0' : '#cbd5e1'}`
+                      borderRadius: '3px',
+                      background: isReady ? '#e5ecdb' : '#fdf2d5',
+                      color: isReady ? '#446849' : '#7a5e18',
+                      border: `1px solid ${isReady ? '#cad6c2' : '#e8dcbb'}`
                     }}>
                       {lot.status?.replace(/_/g, ' ')}
                     </span>
@@ -298,26 +323,26 @@ export default function FpoLotsAndPassportView({
 
                   {/* Quantity & Dispatch Specs */}
                   <div style={{
-                    background: '#f8fafc',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '6px',
+                    background: '#f5f0e7',
+                    border: '1px solid #e0ded5',
+                    borderRadius: '4px',
                     padding: '10px 12px',
                     margin: '10px 0',
                     fontSize: '12px'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                      <span style={{ color: '#64748b' }}>Pooled Quantity:</span>
-                      <strong style={{ fontSize: '13px', color: '#0f172a' }}>
+                      <span style={{ color: '#667269' }}>Pooled Quantity:</span>
+                      <strong style={{ fontSize: '13px', color: '#202a27' }}>
                         {Number(lot.quantityKg).toLocaleString()} kg ({(Number(lot.quantityKg) / 1000).toFixed(1)} T)
                       </strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                      <span style={{ color: '#64748b' }}>Harvest Window:</span>
-                      <span style={{ color: '#334155' }}>{lot.harvestDateWindow}</span>
+                      <span style={{ color: '#667269' }}>Harvest Window:</span>
+                      <span style={{ color: '#202a27' }}>{lot.harvestDateWindow}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748b' }}>Dispatch Yard:</span>
-                      <span style={{ textAlign: 'right', maxWidth: '200px', color: '#334155' }}>{lot.pickupLocation}</span>
+                      <span style={{ color: '#667269' }}>Dispatch Yard:</span>
+                      <span style={{ textAlign: 'right', maxWidth: '200px', color: '#202a27' }}>{lot.pickupLocation}</span>
                     </div>
                   </div>
 
@@ -327,51 +352,51 @@ export default function FpoLotsAndPassportView({
                       fontSize: '10px',
                       fontFamily: "'DM Mono', monospace",
                       textTransform: 'uppercase',
-                      color: '#64748b',
+                      color: '#667269',
                       fontWeight: 600,
                       display: 'block',
                       marginBottom: '6px',
-                      letterSpacing: '0.5px'
+                      letterSpacing: '.06em'
                     }}>
                       Quality Specifications (Assayed)
                     </span>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                      <span style={{ background: '#f8fafc', border: '1px solid #e2e8f0', color: '#1e293b', fontSize: '11px', padding: '2px 8px', borderRadius: '4px', fontWeight: 500 }}>
+                      <span style={{ background: '#eef3e8', border: '1px solid #cad6c2', color: '#3e6445', fontSize: '11px', padding: '2px 8px', borderRadius: '3px', fontWeight: 500 }}>
                         Grade: {lot.qualityChecklist?.grade?.replace(/_/g, ' ')}
                       </span>
-                      <span style={{ background: '#f8fafc', border: '1px solid #e2e8f0', color: '#1e293b', fontSize: '11px', padding: '2px 8px', borderRadius: '4px' }}>
+                      <span style={{ background: '#f5f0e7', border: '1px solid #e0ded5', color: '#404f43', fontSize: '11px', padding: '2px 8px', borderRadius: '3px' }}>
                         Moisture: {lot.qualityChecklist?.moisturePercent}%
                       </span>
-                      <span style={{ background: '#f8fafc', border: '1px solid #e2e8f0', color: '#1e293b', fontSize: '11px', padding: '2px 8px', borderRadius: '4px' }}>
+                      <span style={{ background: '#f5f0e7', border: '1px solid #e0ded5', color: '#404f43', fontSize: '11px', padding: '2px 8px', borderRadius: '3px' }}>
                         Size: {lot.qualityChecklist?.size}
                       </span>
-                      <span style={{ background: '#f8fafc', border: '1px solid #e2e8f0', color: '#166534', fontSize: '11px', padding: '2px 8px', borderRadius: '4px' }}>
+                      <span style={{ background: '#eef3e8', border: '1px solid #cad6c2', color: '#2f6838', fontSize: '11px', padding: '2px 8px', borderRadius: '3px', fontWeight: 600 }}>
                         Defects: &lt; {lot.qualityChecklist?.defectsPercent}%
                       </span>
                     </div>
                   </div>
 
                   {/* Contributing Farmers Micro-list */}
-                  <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px', marginBottom: '12px' }}>
+                  <div style={{ borderTop: '1px solid #ece7dc', paddingTop: '10px', marginBottom: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                      <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 500 }}>
+                      <span style={{ fontSize: '11px', color: '#667269', fontWeight: 500 }}>
                         Contributing Smallholders ({lot.contributingFarmers?.length || 0}):
                       </span>
-                      <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#166534', fontWeight: 500 }}>
+                      <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#2f6838', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em' }}>
                         100% Traceable
                       </span>
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                       {(lot.contributingFarmers || []).map((farmer, idx) => (
                         <span key={idx} style={{
-                          background: '#ffffff',
-                          border: '1px solid #e2e8f0',
-                          borderRadius: '4px',
+                          background: '#f5f0e7',
+                          border: '1px solid #d9d6cc',
+                          borderRadius: '3px',
                           padding: '2px 6px',
                           fontSize: '11px',
-                          color: '#334155'
+                          color: '#404f43'
                         }}>
-                          <span style={{ fontWeight: 600 }}>{farmer.name}</span>: {farmer.quantityKg} kg ({farmer.village})
+                          <span style={{ fontWeight: 600, color: '#202a27' }}>{farmer.name}</span>: {farmer.quantityKg} kg ({farmer.village})
                         </span>
                       ))}
                     </div>
@@ -379,11 +404,11 @@ export default function FpoLotsAndPassportView({
                 </div>
 
                 {/* Clean Actions */}
-                <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
+                <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid #ece7dc', paddingTop: '12px' }}>
                   <button
                     type="button"
                     className="trade-btn trade-btn-secondary"
-                    style={{ flex: 1, padding: '8px 12px', fontSize: '12px', fontWeight: 500 }}
+                    style={{ flex: 1, padding: '8px 12px' }}
                     onClick={() => setSelectedPassportLot(lot)}
                   >
                     View Lot Passport
@@ -391,13 +416,10 @@ export default function FpoLotsAndPassportView({
                   <button
                     type="button"
                     className="trade-btn trade-btn-primary"
-                    style={{ padding: '8px 14px', fontSize: '12px', fontWeight: 500 }}
-                    onClick={() => {
-                      if (onMatchLot) onMatchLot(lot);
-                      onNavigate('matching');
-                    }}
+                    style={{ flex: 1, padding: '8px 12px' }}
+                    onClick={() => onMatchLot && onMatchLot(lot)}
                   >
-                    Match Buyers
+                    Match Demand &rarr;
                   </button>
                 </div>
               </div>
@@ -686,6 +708,54 @@ export default function FpoLotsAndPassportView({
             </div>
 
             <form onSubmit={handleCreateSubmit}>
+              {/* Unpooled Intakes Quick-Select */}
+              {intakes.filter(i => i.status === 'UNPOOLED').length > 0 && (
+                <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '10px 12px', marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: '#0f172a' }}>
+                      Unpooled Village Intakes in Yard ({intakes.filter(i => i.status === 'UNPOOLED').length} available):
+                    </span>
+                    <span style={{ fontSize: '10px', color: '#64748b' }}>Click to auto-populate lot</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '130px', overflowY: 'auto' }}>
+                    {intakes.filter(i => i.status === 'UNPOOLED').map((intake) => (
+                      <div key={intake.intakeId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '4px', padding: '6px 10px', fontSize: '11px' }}>
+                        <div>
+                          <strong>{intake.farmerName}</strong>: {intake.netWeightKg} kg {intake.cropName} ({intake.variety})
+                          <span style={{ display: 'block', fontSize: '10px', color: '#64748b' }}>Slip #{intake.intakeId} · {intake.village} · Grade: {intake.grade?.replace(/_/g, ' ')}</span>
+                        </div>
+                        <button
+                          type="button"
+                          className="trade-btn trade-btn-secondary"
+                          style={{ padding: '3px 8px', fontSize: '10px' }}
+                          onClick={() => {
+                            setNewLotForm(prev => {
+                              const existingQty = Number(prev.contributions[intake.farmerId] || 0);
+                              const newContributions = {
+                                ...prev.contributions,
+                                [intake.farmerId]: existingQty + Number(intake.netWeightKg)
+                              };
+                              const totalCalculated = Object.values(newContributions).reduce((sum, v) => sum + Number(v), 0);
+                              return {
+                                ...prev,
+                                cropName: intake.cropName,
+                                variety: intake.variety,
+                                grade: intake.grade || prev.grade,
+                                category: intake.category || prev.category,
+                                contributions: newContributions,
+                                quantityKg: totalCalculated
+                              };
+                            });
+                          }}
+                        >
+                          + Add to Lot
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <label style={{ fontSize: '12px', color: '#334155' }}>Crop Name
                   <input

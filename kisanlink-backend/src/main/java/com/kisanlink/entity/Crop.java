@@ -23,5 +23,8 @@ public class Crop {
     private CropCategory category;
 
     private String unit = "kg";
+
+    @Column(precision = 10, scale = 2)
+    private java.math.BigDecimal mspPrice;
 }
 

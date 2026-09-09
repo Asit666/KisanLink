@@ -32,7 +32,8 @@ public class DevDataInitializer {
                                            com.kisanlink.repository.BuyerRepository buyerRepository,
                                            com.kisanlink.repository.FarmerProduceRepository produceRepository,
                                            com.kisanlink.repository.BuyerRequirementRepository requirementRepository,
-                                           com.kisanlink.repository.TradeDealRepository tradeDealRepository) {
+                                           com.kisanlink.repository.TradeDealRepository tradeDealRepository,
+                                           com.kisanlink.repository.DemandRepository demandRepository) {
         return arguments -> {
             if (cropRepository.count() > 0) {
                 return;
@@ -106,24 +107,24 @@ public class DevDataInitializer {
             userRepository.save(adminUser);
 
             // --- Vegetables ---
-            Crop tomato = crop(cropRepository, "Tomato",    CropCategory.VEGETABLE, "kg");
-            Crop potato = crop(cropRepository, "Potato",    CropCategory.VEGETABLE, "kg");
-            Crop onion  = crop(cropRepository, "Onion",     CropCategory.VEGETABLE, "kg");
+            Crop tomato = crop(cropRepository, "Tomato",    CropCategory.VEGETABLE, "kg", null);
+            Crop potato = crop(cropRepository, "Potato",    CropCategory.VEGETABLE, "kg", null);
+            Crop onion  = crop(cropRepository, "Onion",     CropCategory.VEGETABLE, "kg", null);
 
             // --- Fruits ---
-            Crop mango  = crop(cropRepository, "Mango",     CropCategory.FRUIT,     "kg");
-            Crop apple  = crop(cropRepository, "Apple",     CropCategory.FRUIT,     "kg");
-            Crop banana = crop(cropRepository, "Banana",    CropCategory.FRUIT,     "dozen");
+            Crop mango  = crop(cropRepository, "Mango",     CropCategory.FRUIT,     "kg", null);
+            Crop apple  = crop(cropRepository, "Apple",     CropCategory.FRUIT,     "kg", null);
+            Crop banana = crop(cropRepository, "Banana",    CropCategory.FRUIT,     "dozen", null);
 
             // --- Seeds ---
-            Crop mustardSeed = crop(cropRepository, "Mustard Seeds",  CropCategory.SEED, "kg");
-            Crop chiaSeed    = crop(cropRepository, "Chia Seeds",     CropCategory.SEED, "kg");
-            Crop sunflower   = crop(cropRepository, "Sunflower Seeds",CropCategory.SEED, "kg");
+            Crop mustardSeed = crop(cropRepository, "Mustard Seeds",  CropCategory.SEED, "kg", new BigDecimal("56.50"));
+            Crop chiaSeed    = crop(cropRepository, "Chia Seeds",     CropCategory.SEED, "kg", null);
+            Crop sunflower   = crop(cropRepository, "Sunflower Seeds",CropCategory.SEED, "kg", new BigDecimal("67.60"));
 
             // --- Grains & Pulses ---
-            Crop rice   = crop(cropRepository, "Rice",      CropCategory.GRAIN,     "kg");
-            Crop wheat  = crop(cropRepository, "Wheat",     CropCategory.GRAIN,     "kg");
-            Crop lentil = crop(cropRepository, "Lentil",    CropCategory.PULSE,     "kg");
+            Crop rice   = crop(cropRepository, "Rice",      CropCategory.GRAIN,     "kg", new BigDecimal("23.00"));
+            Crop wheat  = crop(cropRepository, "Wheat",     CropCategory.GRAIN,     "kg", new BigDecimal("22.75"));
+            Crop lentil = crop(cropRepository, "Lentil",    CropCategory.PULSE,     "kg", new BigDecimal("64.25"));
 
             // --- Fertilizers & Soil Nutrients ---
             Crop urea        = crop(cropRepository, "Urea (Neem Coated 46% N)",    CropCategory.FERTILIZER, "bag (45kg)");
@@ -159,7 +160,7 @@ public class DevDataInitializer {
             Market hazaribaghMandi = market(marketRepository, "Hazaribagh Krishi Mandi", "Kuru Road", "Hazaribagh", "Jharkhand", 23.9961, 85.3685, MarketType.MANDI);
             Market dhanbadYard = market(marketRepository, "Dhanbad Wholesale Yard", "Barwadda Agriculture Complex", "Dhanbad", "Jharkhand", 23.7957, 86.4304, MarketType.WHOLESALE);
 
-            // 7-day price series for Tomato (Vegetable)
+            // 7-day price series for Tomato across Mandis
             savePrice(priceRepository, ranchiMandi, tomato, LocalDate.now().minusDays(6), "19");
             savePrice(priceRepository, ranchiMandi, tomato, LocalDate.now().minusDays(5), "20");
             savePrice(priceRepository, ranchiMandi, tomato, LocalDate.now().minusDays(4), "21");
@@ -167,12 +168,37 @@ public class DevDataInitializer {
             savePrice(priceRepository, ranchiMandi, tomato, LocalDate.now().minusDays(2), "22");
             savePrice(priceRepository, ranchiMandi, tomato, LocalDate.now().minusDays(1), "21");
             savePrice(priceRepository, ranchiMandi, tomato, LocalDate.now(), "24");
+            savePrice(priceRepository, ramgarhMandi, tomato, LocalDate.now(), "26");
+            savePrice(priceRepository, bokaroApmc, tomato, LocalDate.now(), "25");
+            savePrice(priceRepository, jamshedpurYard, tomato, LocalDate.now(), "28");
 
-            // 7-day price series for Potato (Vegetable)
+            // Price series for Potato across Mandis
             savePrice(priceRepository, ranchiMandi, potato, LocalDate.now().minusDays(3), "15");
             savePrice(priceRepository, ranchiMandi, potato, LocalDate.now().minusDays(2), "16");
             savePrice(priceRepository, ranchiMandi, potato, LocalDate.now().minusDays(1), "17");
             savePrice(priceRepository, ranchiMandi, potato, LocalDate.now(), "18");
+            savePrice(priceRepository, ramgarhMandi, potato, LocalDate.now(), "17");
+            savePrice(priceRepository, bokaroApmc, potato, LocalDate.now(), "19");
+
+            // Price series for Wheat (Grain with MSP 22.75) across Mandis
+            savePrice(priceRepository, ranchiMandi, wheat, LocalDate.now().minusDays(2), "24");
+            savePrice(priceRepository, ranchiMandi, wheat, LocalDate.now().minusDays(1), "24.5");
+            savePrice(priceRepository, ranchiMandi, wheat, LocalDate.now(), "25");
+            savePrice(priceRepository, ramgarhMandi, wheat, LocalDate.now(), "24.5");
+            savePrice(priceRepository, bokaroApmc, wheat, LocalDate.now(), "26");
+
+            // Price series for Rice (Grain with MSP 23.00) across Mandis
+            savePrice(priceRepository, ranchiMandi, rice, LocalDate.now().minusDays(2), "26");
+            savePrice(priceRepository, ranchiMandi, rice, LocalDate.now().minusDays(1), "26.5");
+            savePrice(priceRepository, ranchiMandi, rice, LocalDate.now(), "27");
+            savePrice(priceRepository, ramgarhMandi, rice, LocalDate.now(), "26.2");
+            savePrice(priceRepository, bokaroApmc, rice, LocalDate.now(), "28");
+
+            // Price series for Lentil (Pulse with MSP 64.25) across Mandis
+            savePrice(priceRepository, ranchiMandi, lentil, LocalDate.now().minusDays(1), "71");
+            savePrice(priceRepository, ranchiMandi, lentil, LocalDate.now(), "72");
+            savePrice(priceRepository, ramgarhMandi, lentil, LocalDate.now(), "70");
+            savePrice(priceRepository, bokaroApmc, lentil, LocalDate.now(), "74");
 
             // 7-day price series for Mango (Fruit)
             savePrice(priceRepository, ranchiMandi, mango, LocalDate.now().minusDays(4), "65");
@@ -180,6 +206,8 @@ public class DevDataInitializer {
             savePrice(priceRepository, ranchiMandi, mango, LocalDate.now().minusDays(2), "70");
             savePrice(priceRepository, ranchiMandi, mango, LocalDate.now().minusDays(1), "74");
             savePrice(priceRepository, ranchiMandi, mango, LocalDate.now(), "78");
+            savePrice(priceRepository, ramgarhMandi, mango, LocalDate.now(), "80");
+            savePrice(priceRepository, jamshedpurYard, mango, LocalDate.now(), "82");
 
             // 7-day price series for Apple (Fruit)
             savePrice(priceRepository, ranchiMandi, apple, LocalDate.now().minusDays(3), "110");
@@ -194,11 +222,13 @@ public class DevDataInitializer {
             savePrice(priceRepository, ranchiMandi, chiaSeed, LocalDate.now().minusDays(1), "142");
             savePrice(priceRepository, ranchiMandi, chiaSeed, LocalDate.now(), "148");
 
-            // 7-day price series for Mustard Seeds (Seed)
+            // 7-day price series for Mustard Seeds (Seed with MSP 56.50)
             savePrice(priceRepository, ranchiMandi, mustardSeed, LocalDate.now().minusDays(3), "52");
             savePrice(priceRepository, ranchiMandi, mustardSeed, LocalDate.now().minusDays(2), "54");
             savePrice(priceRepository, ranchiMandi, mustardSeed, LocalDate.now().minusDays(1), "55");
             savePrice(priceRepository, ranchiMandi, mustardSeed, LocalDate.now(), "58");
+            savePrice(priceRepository, ramgarhMandi, mustardSeed, LocalDate.now(), "57");
+            savePrice(priceRepository, bokaroApmc, mustardSeed, LocalDate.now(), "60");
 
             // 7-day price series for Urea (Fertilizer)
             savePrice(priceRepository, ranchiMandi, urea, LocalDate.now().minusDays(3), "266");
@@ -260,23 +290,75 @@ public class DevDataInitializer {
             sampleProduce.setFarmer(farmer);
             sampleProduce.setCrop(tomato);
             sampleProduce.setQuantity(new BigDecimal("1200"));
-            sampleProduce.setQuality("GRADE_A");
+            sampleProduce.setQuality("Grade A");
             sampleProduce.setExpectedPrice(new BigDecimal("32.0"));
             sampleProduce.setHarvestDate(LocalDate.now());
             sampleProduce.setAvailableUntil(LocalDate.now().plusDays(10));
             sampleProduce.setDescription("NABL certified Grade A+ farm fresh tomatoes.");
             produceRepository.save(sampleProduce);
 
-            // --- Seed Sample Buyer Requirement ---
+            FarmerProduce sampleProduceWheat = new FarmerProduce();
+            sampleProduceWheat.setFarmer(farmer);
+            sampleProduceWheat.setCrop(wheat);
+            sampleProduceWheat.setQuantity(new BigDecimal("3500"));
+            sampleProduceWheat.setQuality("Grade A");
+            sampleProduceWheat.setExpectedPrice(new BigDecimal("26.5"));
+            sampleProduceWheat.setHarvestDate(LocalDate.now());
+            sampleProduceWheat.setAvailableUntil(LocalDate.now().plusDays(30));
+            sampleProduceWheat.setDescription("Premium Sharbati Wheat, machine cleaned and sorted.");
+            produceRepository.save(sampleProduceWheat);
+
+            FarmerProduce sampleProduceMustard = new FarmerProduce();
+            sampleProduceMustard.setFarmer(farmer);
+            sampleProduceMustard.setCrop(mustardSeed);
+            sampleProduceMustard.setQuantity(new BigDecimal("800"));
+            sampleProduceMustard.setQuality("Grade B");
+            sampleProduceMustard.setExpectedPrice(new BigDecimal("59.0"));
+            sampleProduceMustard.setHarvestDate(LocalDate.now());
+            sampleProduceMustard.setAvailableUntil(LocalDate.now().plusDays(20));
+            sampleProduceMustard.setDescription("High oil content bold mustard seeds, standard Mandi grade.");
+            produceRepository.save(sampleProduceMustard);
+
+            // --- Seed Sample Buyer Requirements ---
             BuyerRequirement sampleReq = new BuyerRequirement();
             sampleReq.setBuyer(buyer);
             sampleReq.setCrop(tomato);
             sampleReq.setRequiredQuantity(new BigDecimal("2000"));
-            sampleReq.setQualityRequired("GRADE_A");
+            sampleReq.setQualityRequired("Grade A");
             sampleReq.setOfferedPrice(new BigDecimal("34.0"));
             sampleReq.setLocation("Nashik APMC Terminal Yard");
             sampleReq.setValidUntil(LocalDate.now().plusDays(14));
             requirementRepository.save(sampleReq);
+
+            BuyerRequirement sampleReqWheat = new BuyerRequirement();
+            sampleReqWheat.setBuyer(buyer);
+            sampleReqWheat.setCrop(wheat);
+            sampleReqWheat.setRequiredQuantity(new BigDecimal("5000"));
+            sampleReqWheat.setQualityRequired("Grade A");
+            sampleReqWheat.setOfferedPrice(new BigDecimal("28.0"));
+            sampleReqWheat.setLocation("Bhopal Mandi Logistics Hub");
+            sampleReqWheat.setValidUntil(LocalDate.now().plusDays(21));
+            requirementRepository.save(sampleReqWheat);
+
+            BuyerRequirement sampleReqMustard = new BuyerRequirement();
+            sampleReqMustard.setBuyer(buyer);
+            sampleReqMustard.setCrop(mustardSeed);
+            sampleReqMustard.setRequiredQuantity(new BigDecimal("1500"));
+            sampleReqMustard.setQualityRequired("Grade B");
+            sampleReqMustard.setOfferedPrice(new BigDecimal("62.5"));
+            sampleReqMustard.setLocation("Jaipur Krishi Upaj Mandi");
+            sampleReqMustard.setValidUntil(LocalDate.now().plusDays(18));
+            requirementRepository.save(sampleReqMustard);
+
+            BuyerRequirement sampleReqRice = new BuyerRequirement();
+            sampleReqRice.setBuyer(buyer);
+            sampleReqRice.setCrop(rice);
+            sampleReqRice.setRequiredQuantity(new BigDecimal("4000"));
+            sampleReqRice.setQualityRequired("Grade A");
+            sampleReqRice.setOfferedPrice(new BigDecimal("24.5"));
+            sampleReqRice.setLocation("Karnal Grain Market Complex");
+            sampleReqRice.setValidUntil(LocalDate.now().plusDays(25));
+            requirementRepository.save(sampleReqRice);
 
             // --- Seed Sample Active Trade Deal ---
             TradeDeal sampleDeal = new TradeDeal();
@@ -295,6 +377,54 @@ public class DevDataInitializer {
             sampleDeal.setNotes("Standard Grade A+ sorted dispatch via KisanLink Freight.");
             tradeDealRepository.save(sampleDeal);
 
+            // --- Seed Active Demands ---
+            if (demandRepository.count() == 0) {
+                Demand d1 = new Demand();
+                d1.setBuyer(buyer);
+                d1.setCropName("Tomato");
+                d1.setMinQuantityKg(1000.0);
+                d1.setMaxQuantityKg(3000.0);
+                d1.setPreferredGrade(Grade.A);
+                d1.setExpectedPricePerKg(34.0);
+                demandRepository.save(d1);
+
+                Demand d2 = new Demand();
+                d2.setBuyer(buyer);
+                d2.setCropName("Wheat");
+                d2.setMinQuantityKg(2000.0);
+                d2.setMaxQuantityKg(8000.0);
+                d2.setPreferredGrade(Grade.A);
+                d2.setExpectedPricePerKg(28.0);
+                demandRepository.save(d2);
+
+                Demand d3 = new Demand();
+                d3.setBuyer(buyer);
+                d3.setCropName("Mustard Seeds");
+                d3.setMinQuantityKg(500.0);
+                d3.setMaxQuantityKg(2500.0);
+                d3.setPreferredGrade(Grade.B);
+                d3.setExpectedPricePerKg(62.5);
+                demandRepository.save(d3);
+
+                Demand d4 = new Demand();
+                d4.setBuyer(buyer);
+                d4.setCropName("Rice (Paddy)");
+                d4.setMinQuantityKg(3000.0);
+                d4.setMaxQuantityKg(10000.0);
+                d4.setPreferredGrade(Grade.A);
+                d4.setExpectedPricePerKg(24.5);
+                demandRepository.save(d4);
+
+                Demand d5 = new Demand();
+                d5.setBuyer(buyer);
+                d5.setCropName("Mango");
+                d5.setMinQuantityKg(400.0);
+                d5.setMaxQuantityKg(1500.0);
+                d5.setPreferredGrade(Grade.A);
+                d5.setExpectedPricePerKg(185.0);
+                demandRepository.save(d5);
+            }
+
             // --- Seed Sample Transporters ---
             seedTransporters(userRepository, transporterRepository,
                     new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder());
@@ -305,10 +435,15 @@ public class DevDataInitializer {
 
 
     private Crop crop(CropRepository repo, String name, CropCategory category, String unit) {
+        return crop(repo, name, category, unit, null);
+    }
+
+    private Crop crop(CropRepository repo, String name, CropCategory category, String unit, BigDecimal mspPrice) {
         Crop c = new Crop();
         c.setName(name);
         c.setCategory(category);
         c.setUnit(unit);
+        c.setMspPrice(mspPrice);
         return repo.save(c);
     }
 
