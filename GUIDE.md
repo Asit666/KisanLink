@@ -221,6 +221,39 @@ Use the notification panel's **SMS** channel and enter a real number in internat
 
 Never commit provider credentials or put them in frontend code.
 
+### MCP Price Prediction Demo
+
+The first MCP vertical slice is available through the Python AI service:
+
+```powershell
+$env:MCP_SERVER_URL = "http://localhost:8080/mcp"
+$env:KISANLINK_MCP_TOKEN = ""
+cd C:\dev_tool\GitHub\doc\kisanlink-ai
+python app.py
+```
+
+Test it after the Spring Boot backend is running:
+
+```powershell
+$body = '{"crop":"Tomato","horizon":7}'
+Invoke-WebRequest -Uri http://localhost:8000/price-prediction -Method Post -ContentType 'application/json' -Body $body
+```
+
+The AI service calls the Spring MCP tools `get_historical_prices` and `get_latest_market_price`; it does not access the database directly. The existing frontend endpoint `GET /api/predictions/{cropId}/forecast` remains on the Java statistical path until the MCP path is enabled for the UI in a later integration step.
+
+For live MCP market data, configure the official data.gov.in API key before starting Spring Boot:
+
+```powershell
+$env:AGMARKNET_API_KEY = "your-data-gov-in-api-key"
+$env:AGMARKNET_DEFAULT_STATE = "Jharkhand"
+$env:KISANLINK_MCP_LIVE_REFRESH_ENABLED = "true"
+$env:KISANLINK_MCP_REFRESH_MINUTES = "15"
+cd C:\dev_tool\GitHub\doc\kisanlink-backend
+.\mvnw.cmd spring-boot:run
+```
+
+MCP refreshes the AGMARKNET cache at most once per configured interval. The response includes `data_status` and `last_refresh`. If the API key is missing or AGMARKNET is unavailable, the system returns the last cached records and reports the failure status; it does not label those records as live.
+
 ---
 
 ## 5. Desktop App Launcher

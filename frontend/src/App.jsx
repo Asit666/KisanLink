@@ -45,11 +45,53 @@ import {
 } from './utils/economics';
 
 
+// Modern Vector Icon Component for Left Navigation
+function NavIcon({ name }) {
+  const p = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", style: { display: "block" } };
+  switch (name) {
+    case 'crops':
+      return <svg {...p}><path d="M7 20h10"/><path d="M12 20v-8"/><path d="M12 12c-3 0-6-3-6-6 4 0 6 3 6 6z"/><path d="M12 12c3 0 6-3 6-6-4 0-6 3-6 6z"/></svg>;
+    case 'inputs':
+      return <svg {...p}><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>;
+    case 'orders':
+      return <svg {...p}><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/></svg>;
+    case 'shop':
+      return <svg {...p}><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>;
+    case 'progress':
+    case 'transport':
+      return <svg {...p}><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-5l-3-4h-5v10Z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>;
+    case 'chat':
+      return <svg {...p}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>;
+    case 'payouts':
+      return <svg {...p}><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/><path d="M6 14h4"/></svg>;
+    case 'intake':
+      return <svg {...p}><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>;
+    case 'lots':
+      return <svg {...p}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>;
+    case 'farmers':
+      return <svg {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+    case 'analytics':
+      return <svg {...p}><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>;
+    case 'trust':
+      return <svg {...p}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>;
+    case 'governance':
+      return <svg {...p}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>;
+    case 'community':
+      return <svg {...p}><path d="M17 6.1H3a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2v3l3-3h9a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2z"/></svg>;
+    case 'diagnostics':
+      return <svg {...p}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>;
+    case 'support':
+      return <svg {...p}><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>;
+    default:
+      return <svg {...p}><circle cx="12" cy="12" r="10"/></svg>;
+  }
+}
+
 function App() {
-  const [currentView, setCurrentView] = useState('prices'); // 'prices' | 'inputs' | 'community' | 'diagnostics' | 'predictions' | 'weather' | 'matching' | 'analytics' | 'map' | 'notifications' | 'profile' | 'trade-chat'
+  const [currentView, setCurrentView] = useState('prices');
   const [activeChatConversationId, setActiveChatConversationId] = useState(null);
-  const [ratingCarrierModal, setRatingCarrierModal] = useState(null); // { trade, rating, tags, notes }
-  const [disputeModal, setDisputeModal] = useState(null); // { trade, disputeType, claimAmount, description }
+  const [ratingCarrierModal, setRatingCarrierModal] = useState(null);
+  const [disputeModal, setDisputeModal] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(() => (typeof window !== 'undefined' ? window.innerWidth >= 768 : true));
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [crops, setCrops] = useState(DEFAULT_CROPS);
@@ -67,11 +109,9 @@ function App() {
   const [routeFarmerId, setRouteFarmerId] = useState(null);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
   const [inputCategoryFilter, setInputCategoryFilter] = useState('ALL');
-
-  // Farmer & Buyer Community State (Krishi Charcha)
   const [communityPosts, setCommunityPosts] = useState(INITIAL_COMMUNITY_POSTS);
   const [communityFilterCrop, setCommunityFilterCrop] = useState('ALL');
-  const [communityParticipantFilter, setCommunityParticipantFilter] = useState('ALL'); // 'ALL' | 'FARMER' | 'BUYER' | 'AGRONOMIST'
+  const [communityParticipantFilter, setCommunityParticipantFilter] = useState('ALL');
   const [communitySearchQuery, setCommunitySearchQuery] = useState('');
   const [newPostModalOpen, setNewPostModalOpen] = useState(false);
   const [newPostForm, setNewPostForm] = useState({
@@ -89,14 +129,14 @@ function App() {
   const communityPhotoInputRef = useRef(null);
 
   const [marketplaceSearchQuery, setMarketplaceSearchQuery] = useState('');
-  const [marketplaceSortBy, setMarketplaceSortBy] = useState('POPULAR'); // 'POPULAR' | 'PRICE_ASC' | 'PRICE_DESC' | 'NAME_ASC'
+  const [marketplaceSortBy, setMarketplaceSortBy] = useState('POPULAR');
   const [quickProduceModal, setQuickProduceModal] = useState(null);
 
   const [quickRequirementModal, setQuickRequirementModal] = useState(null);
   const [quickProcureInputModal, setQuickProcureInputModal] = useState(null);
   const [isSyncingAgmarknet, setIsSyncingAgmarknet] = useState(false);
   const [agmarknetLastSync, setAgmarknetLastSync] = useState('Just now (Live)');
-  const [closingDrawer, setClosingDrawer] = useState(null); // 'COMMUNITY' | 'PRODUCE' | 'REQUIREMENT' | null
+  const [closingDrawer, setClosingDrawer] = useState(null);
   const [cropPriceSummaries, setCropPriceSummaries] = useState({});
   const [mandiComparisons, setMandiComparisons] = useState([]);
   const [loadingMandiComparison, setLoadingMandiComparison] = useState(false);
@@ -136,12 +176,10 @@ function App() {
       setClosingDrawer(null);
     }, 220);
   }
-
-  // Professional Advisory & Government Support State
-  const [supportCategoryFilter, setSupportCategoryFilter] = useState('ALL'); // 'ALL' | 'GOVT_KVK' | 'AGRONOMIST' | 'SOIL_LAB' | 'FPO_HUB' | 'HELPLINE'
+  const [supportCategoryFilter, setSupportCategoryFilter] = useState('ALL');
   const [supportSearchQuery, setSupportSearchQuery] = useState('');
   const [selectedSupportNode, setSelectedSupportNode] = useState(null);
-  const [supportMapViewMode, setSupportMapViewMode] = useState('RADAR'); // 'RADAR' | 'GOOGLE_MAP'
+  const [supportMapViewMode, setSupportMapViewMode] = useState('RADAR');
   const [googleMapModalNode, setGoogleMapModalNode] = useState(null);
   const [supportDirectoryData, setSupportDirectoryData] = useState(SUPPORT_DIRECTORY);
 
@@ -194,15 +232,13 @@ function App() {
     loadSupportCenters();
     return () => { isMounted = false; };
   }, []);
-
-  // Buyer Procurement Landed Cost & Wholesale Margin Decision Engine State
   const [buyerCalcCrop, setBuyerCalcCrop] = useState('Tomato');
-  const [buyerCalcQty, setBuyerCalcQty] = useState(2500); // kg
+  const [buyerCalcQty, setBuyerCalcQty] = useState(2500);
   const [buyerCalcQuality, setBuyerCalcQuality] = useState('GRADE_A');
   const [buyerCalcSource, setBuyerCalcSource] = useState('Direct Farm-Gate');
   const [buyerCalcDistanceKm, setBuyerCalcDistanceKm] = useState(65);
   const [buyerCalcStorageDays, setBuyerCalcStorageDays] = useState(3);
-  const [buyerCalcResaleRate, setBuyerCalcResaleRate] = useState(32.0); // target wholesale selling rate per kg
+  const [buyerCalcResaleRate, setBuyerCalcResaleRate] = useState(32.0);
 
   const buyerDecision = (() => {
     const baseRateMap = {
@@ -253,10 +289,6 @@ function App() {
       apmcCommissionAvoided
     };
   })();
-
-  // ──────────────────────────────────────────────────────────────────────────
-  // TRANSPORTER FLEET & ROUTE DECISION ENGINE STATE & SPECIFICATIONS
-  // ──────────────────────────────────────────────────────────────────────────
   const TRANSPORTER_VEHICLE_SPECS = {
     'MINI_TRUCK': { baseCharge: 150, ratePerKm: 14.0, mileage: 10.5, wearPerKm: 2.2, driverPerTrip: 350, permitInsurancePerTrip: 80, name: 'Mini-Truck (Tata Ace / 2T)' },
     'PICKUP': { baseCharge: 220, ratePerKm: 17.5, mileage: 8.5, wearPerKm: 2.8, driverPerTrip: 450, permitInsurancePerTrip: 100, name: 'Pickup (Bolero Maxi / 1.5T)' },
@@ -268,11 +300,11 @@ function App() {
   const [transCalcDistanceKm, setTransCalcDistanceKm] = useState(85);
   const [transCalcPayloadKg, setTransCalcPayloadKg] = useState(2500);
   const [transCalcVehicleType, setTransCalcVehicleType] = useState('PICKUP');
-  const [transCalcDieselPrice, setTransCalcDieselPrice] = useState(92.0); // Rs/L
-  const [transCalcTollCost, setTransCalcTollCost] = useState(240); // Rs
-  const [transCalcDeadheadRisk, setTransCalcDeadheadRisk] = useState(0.20); // 20% empty return risk
-  const [transCalcDriverWage, setTransCalcDriverWage] = useState(null); // optional override
-  const [transCalcPermitCost, setTransCalcPermitCost] = useState(null); // optional override
+  const [transCalcDieselPrice, setTransCalcDieselPrice] = useState(92.0);
+  const [transCalcTollCost, setTransCalcTollCost] = useState(240);
+  const [transCalcDeadheadRisk, setTransCalcDeadheadRisk] = useState(0.20);
+  const [transCalcDriverWage, setTransCalcDriverWage] = useState(null);
+  const [transCalcPermitCost, setTransCalcPermitCost] = useState(null);
   const [showTransCostDetails, setShowTransCostDetails] = useState(false);
 
   const transporterTripDecision = (() => {
@@ -283,8 +315,8 @@ function App() {
     const tonKm = Number((payloadTons * dist).toFixed(1));
 
     const grossFreightRevenue = Math.round(spec.baseCharge + (dist * spec.ratePerKm));
-    const escrowFee = Math.round(grossFreightRevenue * 0.02); // 2% KisanLink escrow matching fee
-    const escrowNetBankPayout = grossFreightRevenue - escrowFee; // Direct bank credit via KisanLink Escrow
+    const escrowFee = Math.round(grossFreightRevenue * 0.02);
+    const escrowNetBankPayout = grossFreightRevenue - escrowFee;
 
     const fuelPrice = Math.max(50, Number(transCalcDieselPrice) || 92);
     const fuelLitres = dist / spec.mileage;
@@ -325,10 +357,6 @@ function App() {
       payloadTons
     };
   })();
-
-  // ──────────────────────────────────────────────────────────────────────────
-  // FARMER AGRONOMIC & NET PROFIT DECISION ENGINE STATE & BENCHMARKS
-  // ──────────────────────────────────────────────────────────────────────────
   const CROP_PRODUCTION_BENCHMARKS = {
     'Tomato': { defaultAcres: 2.5, yieldPerAcreKg: 2000, seedCostPerAcre: 3500, fertCostPerAcre: 6500, labourCostPerAcre: 8500, tillageCostPerAcre: 3500, irrigationCostPerAcre: 3000 },
     'Onion': { defaultAcres: 2.0, yieldPerAcreKg: 2400, seedCostPerAcre: 4000, fertCostPerAcre: 5500, labourCostPerAcre: 7000, tillageCostPerAcre: 3200, irrigationCostPerAcre: 2800 },
@@ -340,13 +368,11 @@ function App() {
 
   const [sellCalcCrop, setSellCalcCrop] = useState('Tomato');
   const [sellCalcAcres, setSellCalcAcres] = useState(2.5);
-  const [sellCalcQty, setSellCalcQty] = useState(5000); // 2.5 acres * 2000 kg/acre
+  const [sellCalcQty, setSellCalcQty] = useState(5000);
   const [sellCalcQuality, setSellCalcQuality] = useState('GRADE_A');
   const [sellCalcCluster, setSellCalcCluster] = useState('Nashik Aggregation Yard');
   const [showCultivationCosts, setShowCultivationCosts] = useState(false);
   const [customCostOverrides, setCustomCostOverrides] = useState({});
-
-  // Dynamic Full-Cycle Economic Profit & Escrow Payout Computation
   const netSellDecision = (() => {
     const crop = sellCalcCrop;
     const benchmark = CROP_PRODUCTION_BENCHMARKS[crop] || CROP_PRODUCTION_BENCHMARKS['Tomato'];
@@ -374,23 +400,19 @@ function App() {
       'Green Grapes': 78.0
     };
     const nominalRate = (baseRates[crop] || 25.0) * qMultiplier;
-
-    // Channel 1: Verified Institutional Buyer via KisanLink Escrow
     const buyerDistKm = 38;
     const buyerRatePerKg = Math.round(nominalRate * 10) / 10;
     const buyerGross = Math.round(qty * buyerRatePerKg);
     const buyerFreight = 100 + Math.round(15 * buyerDistKm * (1 + (qty > 1000 ? (qty - 1000) / 3000 : 0)));
     const buyerHandling = Math.round(buyerGross * 0.015);
     const buyerPostHarvestCosts = buyerFreight + buyerHandling;
-    const buyerBankPayout = buyerGross - buyerPostHarvestCosts; // Cash wired to farmer bank account
+    const buyerBankPayout = buyerGross - buyerPostHarvestCosts;
     const buyerNetPerKg = Math.round((buyerBankPayout / qty) * 100) / 100;
-    const buyerEconomicProfit = buyerBankPayout - totalCultivationCost; // True Economic Farm Net Profit
+    const buyerEconomicProfit = buyerBankPayout - totalCultivationCost;
     const buyerProfitPerAcre = Math.round(buyerEconomicProfit / acres);
     const buyerMarginPercent = Number(((buyerEconomicProfit / Math.max(1, buyerGross)) * 100).toFixed(1));
     const buyerBenefitCostRatio = Number((buyerGross / Math.max(1, totalCultivationCost + buyerPostHarvestCosts)).toFixed(2));
     const buyerBreakEvenPricePerKg = Number(((totalCultivationCost + buyerPostHarvestCosts) / qty).toFixed(2));
-
-    // Channel 2: Local Mandi APMC
     const mandiDistKm = 12;
     const mandiRatePerKg = Math.round((nominalRate * 0.94) * 10) / 10;
     const mandiGross = Math.round(qty * mandiRatePerKg);
@@ -404,8 +426,6 @@ function App() {
     const mandiMarginPercent = Number(((mandiEconomicProfit / Math.max(1, mandiGross)) * 100).toFixed(1));
     const mandiBenefitCostRatio = Number((mandiGross / Math.max(1, totalCultivationCost + mandiPostHarvestCosts)).toFixed(2));
     const mandiBreakEvenPricePerKg = Number(((totalCultivationCost + mandiPostHarvestCosts) / qty).toFixed(2));
-
-    // Channel 3: Village Gate Middleman
     const traderRatePerKg = Math.round((nominalRate * 0.82) * 10) / 10;
     const traderGross = Math.round(qty * traderRatePerKg);
     const traderBankPayout = traderGross;
@@ -441,7 +461,7 @@ function App() {
         totalCosts: buyerPostHarvestCosts,
         grossRevenue: buyerGross,
         bankPayout: buyerBankPayout,
-        netReturn: buyerBankPayout, // maintain backwards compatibility
+        netReturn: buyerBankPayout,
         netPerKg: buyerNetPerKg,
         economicProfit: buyerEconomicProfit,
         profitPerAcre: buyerProfitPerAcre,
@@ -484,11 +504,10 @@ function App() {
       netAdvantage: Math.max(0, netAdvantage)
     };
   })();
-  // My Orders, My Shop & Order Progress State
   const [userOrders, setUserOrders] = useState(INITIAL_USER_ORDERS);
   const [shopInventory, setShopInventory] = useState(INITIAL_SHOP_INVENTORY);
   const [shopOffers, setShopOffers] = useState(INITIAL_SHOP_OFFERS);
-  const [orderStatusFilter, setOrderStatusFilter] = useState('ALL'); // 'ALL' | 'ESCROW_LOCKED' | 'IN_TRANSIT' | 'DELIVERED' | 'DISPUTED'
+  const [orderStatusFilter, setOrderStatusFilter] = useState('ALL');
   const [selectedTrackingOrderId, setSelectedTrackingOrderId] = useState('KL-ORD-8821');
   const [shopCategoryFilter, setShopCategoryFilter] = useState('ALL');
 
@@ -633,18 +652,7 @@ function App() {
       setRatingCarrierModal(null);
     }
   }
-
-
-
-
-
-
-
-
-
-
-  // Crop Doctor AI Diagnostics State
-  const [imageInputMode, setImageInputMode] = useState('sample'); // 'sample' | 'upload' | 'url'
+  const [imageInputMode, setImageInputMode] = useState('sample');
   const [diagnosticForm, setDiagnosticForm] = useState({
     cropName: '',
     cropId: null,
@@ -661,39 +669,21 @@ function App() {
   const [escalationNotes, setEscalationNotes] = useState('');
   const diagnosticFileInputRef = useRef(null);
   const diagnosticCameraInputRef = useRef(null);
-
-
-
-
-
-
-
-
-
-
-
-  // Market pulse & predictions state
   const [pulseCategory, setPulseCategory] = useState('VEGETABLE');
   const [selectedPulseCropId, setSelectedPulseCropId] = useState(null);
   const [pulseCrop, setPulseCrop] = useState(null);
   const [pulsePrices, setPulsePrices] = useState([]);
   const [trend, setTrend] = useState(null);
   const [forecast, setForecast] = useState(null);
-
-  // Market map & nearby routing state
   const [nearbyMarkets, setNearbyMarkets] = useState([]);
   const [selectedMapMarket, setSelectedMapMarket] = useState(null);
   const [mapCoords, setMapCoords] = useState({ lat: 23.3441, lon: 85.3096, label: 'Ranchi Center' });
   const [mapRadius, setMapRadius] = useState(200);
   const [mapLoading, setMapLoading] = useState(false);
-
-  // Agro-Climatic & Weather state
   const [weatherData, setWeatherData] = useState(null);
   const [weatherCropId, setWeatherCropId] = useState(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
   const [weatherError, setWeatherError] = useState('');
-
-  // Notifications state
   const [notifications, setNotifications] = useState([
     {
       id: 1,
@@ -864,12 +854,8 @@ function App() {
     try {
       localStorage.setItem('kisanlinkLanguage', language);
     } catch {
-      // ignore storage errors
     }
   }, [language]);
-
-
-  // Farmer produce state
   const [produceSource, setProduceSource] = useState('catalog');
   const [produce, setProduce] = useState({
     cropId: 1,
@@ -883,8 +869,6 @@ function App() {
     imageUrl: '',
     description: '',
   });
-
-  // Buyer requirement state
   const [requirementSource, setRequirementSource] = useState('catalog');
   const [requirement, setRequirement] = useState({
     cropId: 1,
@@ -951,21 +935,15 @@ function App() {
   const [profile, setProfile] = useState({ businessName: '', businessType: '', address: '', district: '', state: '', latitude: '23.3441', longitude: '85.3096', phone: '', alertEmail: '' });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
-
-  // Live WebSocket state & toast
   const [wsConnected, setWsConnected] = useState(false);
   const [liveToast, setLiveToast] = useState(null);
   const wsClientRef = useRef(null);
-
-  // Digital Escrow state
   const [escrowMap, setEscrowMap] = useState({});
   const [escrowDepositModal, setEscrowDepositModal] = useState(null);
   const [escrowDepositForm, setEscrowDepositForm] = useState({ buyerUpiId: '', paymentMethod: 'UPI_INSTANT' });
-
-  // SMS & WhatsApp Field Alert State
   const [smsLogs, setSmsLogs] = useState([]);
   const [smsLogLoading, setSmsLogLoading] = useState(false);
-  const [notifSubTab, setNotifSubTab] = useState('app'); // 'app' | 'sms'
+  const [notifSubTab, setNotifSubTab] = useState('app');
   const [testSmsForm, setTestSmsForm] = useState({
     recipientPhone: '+91 98765 43210',
     channel: 'WHATSAPP',
@@ -975,8 +953,6 @@ function App() {
 
   useEffect(() => {
     loadCrops();
-
-    // Initialize real-time WebSocket client
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${wsProtocol}//${window.location.hostname}:8080/ws`;
     const client = new KisanLinkWebSocketClient(wsUrl, (status) => {
@@ -984,8 +960,6 @@ function App() {
     });
     wsClientRef.current = client;
     client.connect();
-
-    // Global Mandi Price Alert subscription
     const unsubPrices = client.subscribe('/topic/prices/alerts', (event) => {
       if (!event) return;
       const newNotif = {
@@ -1011,13 +985,9 @@ function App() {
       client.disconnect();
     };
   }, []);
-
-  // User-specific WebSocket subscriptions (Trade updates & matching buyer push alerts)
   useEffect(() => {
     if (!session || !session.userId || !wsClientRef.current) return;
     const client = wsClientRef.current;
-
-    // 1. User Push Notifications topic
     const unsubNotifs = client.subscribe(`/topic/notifications/user/${session.userId}`, (event) => {
       if (!event) return;
       const newNotif = {
@@ -1034,8 +1004,6 @@ function App() {
       setLiveToast({ title: newNotif.title, message: newNotif.message });
       setTimeout(() => setLiveToast(null), 6000);
     });
-
-    // 2. User Trade State Topic (Triggers automatic live sync without page reload!)
     const unsubTrades = client.subscribe(`/topic/trades/user/${session.userId}`, (event) => {
       if (!event) return;
       loadTrades();
@@ -1089,11 +1057,9 @@ function App() {
         }
       }
     } catch {
-      // ignore
     } finally {
       setAnalyticsLoading(false);
     }
-    // High-fidelity fallback analytics data
     setAnalyticsData({
       farmerName: session?.name || 'Ramesh Kumar',
       totalLifetimeRevenue: 284500,
@@ -1133,9 +1099,7 @@ function App() {
         }
       }
     } catch {
-      // Fallback
     }
-    // High-fidelity fallback active trades ledger
     setTrades([
       {
         id: 101,
@@ -1241,7 +1205,6 @@ function App() {
         }
       }
     } catch {
-      // Keep DEFAULT_BUYER_DEMANDS fallback
     }
   }
 
@@ -1332,9 +1295,7 @@ function App() {
         }
       }
     } catch {
-      // fallback
     }
-    // Update local state cleanly
     setTrades(prev => prev.map(t => t.id === tradeId ? { ...t, status: nextStatus } : t));
     setMessage(`Trade #${tradeId} updated to ${nextStatus} on digital contract ledger.`);
     setNotifications(prev => [
@@ -1412,7 +1373,6 @@ function App() {
         setEscrowMap(prev => ({ ...prev, [tradeId]: data }));
       }
     } catch {
-      // ignore
     }
   }
 
@@ -1520,7 +1480,6 @@ function App() {
         setSmsLogs(await res.json());
       }
     } catch {
-      // ignore
     } finally {
       setSmsLogLoading(false);
     }
@@ -1602,7 +1561,6 @@ function App() {
         }
       }
     } catch {
-      // Fallback
     } finally {
       setMapLoading(false);
     }
@@ -1649,7 +1607,6 @@ function App() {
         setCropPriceSummaries(map);
       }
     } catch {
-      // Keep DEFAULT_CROPS fallback gracefully
     } finally {
       setLoading(false);
     }
@@ -1720,7 +1677,6 @@ function App() {
         setCropRequirementsList([]);
       }
     } catch {
-      // Fallback
     } finally {
       setLoadingMandiComparison(false);
       setLoadingCropProduce(false);
@@ -1997,8 +1953,6 @@ function App() {
     setShowTutorial(false);
     setTutorialStep(0);
   }
-
-  // ─── Bidirectional URL Hash Routing for B1–B12 & C1–C10 ───────────────────
   useEffect(() => {
     function handleHashChange() {
       const rawHash = window.location.hash || '';
@@ -2008,8 +1962,8 @@ function App() {
       const currentSession = sessionRef.current || JSON.parse(localStorage.getItem('kisanlinkSession') || 'null');
 
       const parts = cleanHash.split('/');
-      const section = parts[0]; // 'fpo' | 'buyer' | 'farmer'
-      const resource = parts[1]; // 'register' | 'farmers' | 'collection' | 'lots' | etc.
+      const section = parts[0];
+      const resource = parts[1];
       const param1 = parts[2];
       const param2 = parts[3];
 
@@ -2143,7 +2097,6 @@ function App() {
         }
       }
     } catch {
-      // Use localProduce
     }
     setProduceResult(activeProduce);
     setMessage('Produce listed successfully! Calculating optimal deal match...');
@@ -2170,7 +2123,6 @@ function App() {
         }
       }
     } catch {
-      // Fallback
     }
 
     const qty = Number(targetProduce.quantity) || 1200;
@@ -2347,7 +2299,6 @@ function App() {
           headers: { Authorization: `Bearer ${session.token}` }
         });
       } catch (err) {
-        // quiet fallback
       }
     }
   }
@@ -2605,7 +2556,7 @@ function App() {
       orderDate: today,
       commodity: item.name,
       category: item.category,
-      qualityCertificate: `Quality Assured • ${spec?.composition ? spec.composition.slice(0, 38) + '...' : 'ISO-9001 Certified'}`,
+      qualityCertificate: `Quality Assured · ${spec?.composition ? spec.composition.slice(0, 38) + '...' : 'ISO-9001 Certified'}`,
       quantity: qty,
       unit: item.unit || 'unit',
       pricePerUnit: unitPrice,
@@ -2703,24 +2654,18 @@ function App() {
         const g = imgData[i + 1];
         const b = imgData[i + 2];
         totalSampled++;
-
-        // Yellow chlorosis: High R, High G, Low B
         if (r > 130 && g > 130 && b < 110 && Math.abs(r - g) < 45) {
           yellowPixels++;
         }
-        // Rust / Orange pustules: High R, Medium G, Low B
         else if (r > 140 && g > 60 && g < 130 && b < 70) {
           rustOrangePixels++;
         }
-        // White mildew / powder: High R, G, B with low saturation
         else if (r > 175 && g > 175 && b > 175 && Math.max(r, g, b) - Math.min(r, g, b) < 30) {
           whiteMildewPixels++;
         }
-        // Dark necrotic spot / blight rot: Low overall brightness
         else if (r < 90 && g < 80 && b < 70 && (r + g + b) < 220) {
           darkRotPixels++;
         }
-        // Healthy Green
         else if (g > r + 18 && g > b + 18) {
           greenHealthyPixels++;
         }
@@ -2913,8 +2858,6 @@ function App() {
 
     const features = featuresOverride || diagnosticImageFeatures;
     const query = (cropName + ' ' + (notes || '')).toLowerCase();
-
-    // 0. Visual AI Detection for Healthy Foliage
     if (features && features.greenRatio >= 60 && features.darkRatio < 8 && features.yellowRatio < 10 && !query.includes('blight') && !query.includes('rust') && !query.includes('curl')) {
       return {
         id: Date.now(),
@@ -2938,8 +2881,6 @@ function App() {
         createdAt: new Date().toISOString()
       };
     }
-
-    // 1. Keyword-first detection for distinct pathologies
     if (query.includes('powder') || query.includes('mildew') || query.includes('white dust') || (features && features.whiteRatio > 15)) {
       return {
         id: Date.now(),
@@ -3084,8 +3025,6 @@ function App() {
         createdAt: new Date().toISOString()
       };
     }
-
-    // 2. Crop-specific fallback
     if (query.includes('potato')) {
       return {
         id: Date.now(),
@@ -3409,16 +3348,51 @@ function App() {
 
     return (
       <div className="auth-fullscreen-page">
-        <div className="auth-header-brand">
-          <div className="brand">
-            <span className="brand-mark">K</span>
-            <span style={{ fontSize: '24px', fontWeight: 700, color: '#202a27' }}>KisanLink</span>
+
+        {/* ── Left brand panel ── */}
+        <div className="auth-left-panel">
+          <div className="auth-left-content">
+            <div className="auth-left-logo">
+              <span className="brand-mark">K</span>
+              <span className="brand-name">KisanLink</span>
+            </div>
+            <h2 className="auth-left-tagline">
+              Better prices.<br /><em>Directly to the farm.</em>
+            </h2>
+            <p className="auth-left-sub">
+              India's agricultural trade desk — live mandi prices, FPO lot aggregation, buyer matching, and escrow-protected settlements. All in one platform.
+            </p>
+            <div className="auth-left-stats">
+              <div className="auth-stat-item">
+                <span className="auth-stat-value">12K+</span>
+                <span className="auth-stat-label">Farmers</span>
+              </div>
+              <div className="auth-stat-item">
+                <span className="auth-stat-value">₹4.2Cr</span>
+                <span className="auth-stat-label">Settled</span>
+              </div>
+              <div className="auth-stat-item">
+                <span className="auth-stat-value">340+</span>
+                <span className="auth-stat-label">FPOs</span>
+              </div>
+            </div>
           </div>
-          <p>Agricultural Trade Desk, FPO Aggregation &amp; Escrow Direct Settlement</p>
+          <div className="auth-left-footer">KisanLink · v2.1 · Direct Agri Linkage</div>
+          {/* Decorative leaf */}
+          <svg className="auth-left-deco" viewBox="0 0 200 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100 400 C100 300 20 250 20 150 C20 67 67 20 150 20 C150 20 180 100 180 200 C180 320 100 400 100 400Z" fill="#4caf6e"/>
+            <path d="M100 400 L100 150" stroke="#2f7d45" strokeWidth="3"/>
+            <path d="M100 300 C130 260 160 220 180 180" stroke="#2f7d45" strokeWidth="2"/>
+            <path d="M100 250 C70 210 50 180 30 150" stroke="#2f7d45" strokeWidth="2"/>
+          </svg>
         </div>
 
+        {/* ── Right form panel ── */}
+        <div className="auth-right-panel">
+        <div className="auth-standalone-container">    </div>
+
         <div className="auth-standalone-container">
-          {/* Mode Switcher */}
+          
           <div className="auth-mode-toggle">
             <button
               type="button"
@@ -3446,7 +3420,7 @@ function App() {
             </button>
           </div>
 
-          {/* Feedback Alerts */}
+          
           {authError && (
             <div className="auth-alert-banner auth-alert-error" role="alert">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: '1px' }}>
@@ -3467,7 +3441,7 @@ function App() {
             </div>
           )}
 
-          {/* Registration Role Selector */}
+          
           {authMode === 'register' && (
             <div style={{ marginBottom: '14px' }}>
               <span style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#556058', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -3511,7 +3485,7 @@ function App() {
           )}
 
           <form onSubmit={handleAuth} style={{ marginTop: 0 }}>
-            {/* SIGN IN FORM */}
+            
             {authMode === 'login' ? (
               <>
                 <label style={{ marginTop: 0 }}>
@@ -3539,7 +3513,7 @@ function App() {
                       autoComplete="current-password"
                       value={account.password}
                       onChange={(e) => setAccount({ ...account, password: e.target.value })}
-                      placeholder="••••••••"
+                      placeholder="········"
                       required
                     />
                     <button
@@ -3565,7 +3539,7 @@ function App() {
                 </label>
               </>
             ) : (
-              /* REGISTRATION FORM */
+              
               <>
                 {role === 'FPO' && (
                   <>
@@ -3709,7 +3683,7 @@ function App() {
                   </>
                 )}
 
-                {/* Common Contact Fields for Registration */}
+                
                 <label style={{ marginTop: '10px' }}>
                   10-Digit Mobile Number
                   <input
@@ -3749,7 +3723,7 @@ function App() {
                       autoComplete="new-password"
                       value={account.password}
                       onChange={(e) => setAccount({ ...account, password: e.target.value })}
-                      placeholder="••••••••"
+                      placeholder="········"
                       required
                     />
                     <button
@@ -3791,7 +3765,7 @@ function App() {
             </button>
           </form>
 
-          {/* Quick Demo 1-Click Login */}
+          
           <div className="auth-demo-strip">
             <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
               Instant Personas (1-Click Demo)
@@ -3840,10 +3814,7 @@ function App() {
             </div>
           </div>
         </div>
-
-        <footer style={{ marginTop: '28px', textAlign: 'center', fontSize: '11px', color: '#88928a' }}>
-          <span>KisanLink · Direct Agricultural Linkage &amp; Escrow Settlement System</span>
-        </footer>
+        </div>{/* end auth-right-panel */}
       </div>
     );
   }
@@ -3866,7 +3837,7 @@ function App() {
 
   return (
     <main className="shell">
-      {/* ─── Onboarding Walkthrough Tutorial ─── */}
+      
       {showTutorial && (
         <>
           <style>{`
@@ -3885,7 +3856,7 @@ function App() {
             }
           `}</style>
 
-          {/* Dark Backdrop */}
+          
           <div
             className="tutorial-backdrop"
             onClick={completeTutorial}
@@ -3899,7 +3870,7 @@ function App() {
             }}
           />
 
-          {/* Glowing Target Spotlight if visible */}
+          
           {tutorialFocusRect && (
             <div
               className="tutorial-spotlight"
@@ -3918,7 +3889,7 @@ function App() {
             />
           )}
 
-          {/* Modern Floating Tutorial Dialog Card */}
+          
           <div
             className="tutorial-card-dialog"
             style={{
@@ -3932,7 +3903,7 @@ function App() {
               boxSizing: 'border-box'
             }}
           >
-            {/* Header: Tag + Step indicator + Skip */}
+            
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{
@@ -3972,11 +3943,11 @@ function App() {
                   padding: '4px 6px'
                 }}
               >
-                ✕ Skip
+                Γ£ò Skip
               </button>
             </div>
 
-            {/* Title & Description */}
+            
             <h3 style={{ margin: '0 0 8px', fontSize: '17px', color: '#ffffff', fontWeight: 700 }}>
               {tutorialTargets[tutorialStep]?.title}
             </h3>
@@ -3984,7 +3955,7 @@ function App() {
               {tutorialTargets[tutorialStep]?.description}
             </p>
 
-            {/* Step Progress Bar */}
+            
             <div style={{ display: 'flex', gap: '5px', marginBottom: '18px' }}>
               {tutorialTargets.map((_, idx) => (
                 <div
@@ -4000,7 +3971,7 @@ function App() {
               ))}
             </div>
 
-            {/* Controls: Back, Next/Finish */}
+            
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
               <button
                 type="button"
@@ -4055,7 +4026,7 @@ function App() {
         </>
       )}
 
-      {/* Topbar — Row 1: Brand + Mobile Hamburger + Account, Row 2: Nav tabs */}
+      
       <nav className="topbar">
         <div className="topbar-row">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -4066,8 +4037,12 @@ function App() {
               aria-label="Open mobile navigation menu"
               title="Open menu"
             >
-              <span style={{ fontSize: '18px', lineHeight: 1 }}>☰</span>
-              <span style={{ fontSize: '11px', fontWeight: 700 }}>Menu</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ display: "block" }}>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+              <span style={{ fontSize: "11px", fontWeight: 700 }}>Menu</span>
             </button>
 
             <div className="brand" onClick={() => { setCurrentView('prices'); setMobileNavOpen(false); }}>
@@ -4146,7 +4121,7 @@ function App() {
         </div>
       </nav>
 
-      {/* Real-Time Live Push Notification Toast */}
+      
       {liveToast && (
         <div className="live-toast" onClick={() => setLiveToast(null)}>
           <div style={{ flex: 1 }}>
@@ -4154,11 +4129,11 @@ function App() {
             <strong>{liveToast.title}</strong>
             <p>{liveToast.message}</p>
           </div>
-          <button type="button" className="live-toast-close" onClick={(e) => { e.stopPropagation(); setLiveToast(null); }}>✕</button>
+          <button type="button" className="live-toast-close" onClick={(e) => { e.stopPropagation(); setLiveToast(null); }}>Γ£ò</button>
         </div>
       )}
 
-      {/* Global Notice message */}
+      
       {message && (
         <p className="form-message" style={{ marginTop: '14px' }}>
           {message}{' '}
@@ -4166,10 +4141,10 @@ function App() {
         </p>
       )}
 
-      {/* ─── Left sidebar + main content flex wrapper ─── */}
+      
       <div className="main-with-sidebar">
 
-        {/* Mobile backdrop when off-canvas drawer is open */}
+        
         {mobileNavOpen && (
           <div
             className="mobile-drawer-backdrop"
@@ -4177,7 +4152,7 @@ function App() {
           />
         )}
 
-        {/* Sidebar collapse toggle (desktop only) */}
+        
         <button
           type="button"
           className="sidebar-toggle"
@@ -4187,12 +4162,12 @@ function App() {
           {sidebarOpen ? '\u2190' : '\u2192'}
         </button>
 
-        {/* Left Sidebar — Marketplace Quick Nav (Desktop Sidebar + Mobile Drawer) */}
+        
         <aside
           className={`left-nav${(!sidebarOpen && !mobileNavOpen) ? ' left-nav-hidden' : ''}${mobileNavOpen ? ' mobile-open' : ''}`}
         >
 
-          {/* Mobile Drawer Header with Close Button */}
+          
           <div className="mobile-nav-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span className="brand-mark" style={{ width: '24px', height: '24px', fontSize: '12px' }}>K</span>
@@ -4204,7 +4179,7 @@ function App() {
               onClick={() => setMobileNavOpen(false)}
               aria-label="Close navigation"
             >
-              ✕
+              Γ£ò
             </button>
           </div>
 
@@ -4218,7 +4193,7 @@ function App() {
                   className={`left-nav-item ${(currentView === 'prices') ? 'active' : ''}`}
                   onClick={() => navigateFromMenu('prices')}
                 >
-                  <span className="left-nav-icon">C</span>
+                  <span className="left-nav-icon"><NavIcon name="crops" /></span>
                   <span className="left-nav-label">
                     <strong>{text.sidebarCrops}</strong>
                     <small>{text.sidebarCropsSmall}</small>
@@ -4230,7 +4205,7 @@ function App() {
                   className={`left-nav-item ${(currentView === 'inputs') ? 'active' : ''}`}
                   onClick={() => { setInputCategoryFilter('ALL'); navigateFromMenu('inputs'); }}
                 >
-                  <span className="left-nav-icon">I</span>
+                  <span className="left-nav-icon"><NavIcon name="inputs" /></span>
                   <span className="left-nav-label">
                     <strong>{text.sidebarInputs}</strong>
                     <small>{text.sidebarInputsSmall}</small>
@@ -4239,7 +4214,7 @@ function App() {
               </>
             )}
 
-            {/* Sub-category shortcuts under Farm Inputs */}
+            
             {currentView === 'inputs' && (
               <div className="left-nav-sub">
                 {[
@@ -4267,7 +4242,7 @@ function App() {
               className={`left-nav-item ${(currentView === 'my-orders') ? 'active' : ''}`}
               onClick={() => navigateFromMenu('my-orders')}
             >
-              <span className="left-nav-icon">O</span>
+              <span className="left-nav-icon"><NavIcon name="orders" /></span>
               <span className="left-nav-label">
                 <strong>{text.sidebarOrders}</strong>
                 <small>{text.sidebarOrdersSmall}</small>
@@ -4279,7 +4254,7 @@ function App() {
               className={`left-nav-item ${(currentView === 'my-shop') ? 'active' : ''}`}
               onClick={() => navigateFromMenu('my-shop')}
             >
-              <span className="left-nav-icon">M</span>
+              <span className="left-nav-icon"><NavIcon name="shop" /></span>
               <span className="left-nav-label">
                 <strong>{text.sidebarMyShop}</strong>
                 <small>{text.sidebarMyShopSmall}</small>
@@ -4291,7 +4266,7 @@ function App() {
               className={`left-nav-item ${(currentView === 'order-progress') ? 'active' : ''}`}
               onClick={() => navigateFromMenu('order-progress')}
             >
-              <span className="left-nav-icon">T</span>
+              <span className="left-nav-icon"><NavIcon name="progress" /></span>
               <span className="left-nav-label">
                 <strong>{text.sidebarProgress}</strong>
                 <small>{text.sidebarProgressSmall}</small>
@@ -4304,7 +4279,7 @@ function App() {
                 className={`left-nav-item ${(currentView === 'trade-chat') ? 'active' : ''}`}
                 onClick={() => navigateFromMenu('trade-chat')}
               >
-                <span className="left-nav-icon">CH</span>
+                <span className="left-nav-icon"><NavIcon name="chat" /></span>
                 <span className="left-nav-label">
                   <strong>Trade Chat</strong>
                   <small>Offers &amp; Negotiations</small>
@@ -4318,7 +4293,7 @@ function App() {
                 className={`left-nav-item ${(currentView === 'transporter-dashboard') ? 'active' : ''}`}
                 onClick={() => navigateFromMenu('transporter-dashboard')}
               >
-                <span className="left-nav-icon">TR</span>
+                <span className="left-nav-icon"><NavIcon name="transport" /></span>
                 <span className="left-nav-label">
                   <strong>Transport Hub</strong>
                   <small>Fleet &amp; Hauls</small>
@@ -4326,14 +4301,14 @@ function App() {
               </button>
             )}
 
-            {/* Farmer Harvest Ledger & Realized Escrow */}
+            
             {(session?.role === 'FARMER' || !session || session?.role === 'FPO') && (
               <button
                 type="button"
                 className={`left-nav-item ${(currentView === 'farmer-payouts') ? 'active' : ''}`}
                 onClick={() => navigateFromMenu('farmer-payouts')}
               >
-                <span className="left-nav-icon">PL</span>
+                <span className="left-nav-icon"><NavIcon name="payouts" /></span>
                 <span className="left-nav-label">
                   <strong>Payouts &amp; Escrow</strong>
                   <small>Realized Rates &amp; UTR</small>
@@ -4341,7 +4316,7 @@ function App() {
               </button>
             )}
 
-            {/* FPO Operations Desk */}
+            
             {(session?.role === 'FPO' || session?.role === 'FARMER' || session?.role === 'BUYER' || session?.role === 'ADMIN') && (
               <>
                 <hr className="left-nav-divider" />
@@ -4374,7 +4349,7 @@ function App() {
                   className={`left-nav-item ${(currentView === 'fpo-intake') ? 'active' : ''}`}
                   onClick={() => navigateFromMenu('fpo-intake', '#/fpo/collection')}
                 >
-                  <span className="left-nav-icon">IN</span>
+                  <span className="left-nav-icon"><NavIcon name="intake" /></span>
                   <span className="left-nav-label">
                     <strong>Village Intake Hub</strong>
                     <small>Weigh-Slips ({fpoIntakes.filter(i => i.status === 'UNPOOLED').length} Yard)</small>
@@ -4386,7 +4361,7 @@ function App() {
                   className={`left-nav-item ${(currentView === 'fpo-lots') ? 'active' : ''}`}
                   onClick={() => navigateFromMenu('fpo-lots', '#/fpo/lots')}
                 >
-                  <span className="left-nav-icon">LP</span>
+                  <span className="left-nav-icon"><NavIcon name="lots" /></span>
                   <span className="left-nav-label">
                     <strong>FPO Lots &amp; Passports</strong>
                     <small>Pooling ({fpoLots.length} Lots)</small>
@@ -4398,7 +4373,7 @@ function App() {
                   className={`left-nav-item ${(currentView === 'fpo-farmers') ? 'active' : ''}`}
                   onClick={() => navigateFromMenu('fpo-farmers', '#/fpo/farmers')}
                 >
-                  <span className="left-nav-icon">MF</span>
+                  <span className="left-nav-icon"><NavIcon name="farmers" /></span>
                   <span className="left-nav-label">
                     <strong>Member Farmers</strong>
                     <small>Traceability ({fpoFarmers.length})</small>
@@ -4410,7 +4385,7 @@ function App() {
                   className={`left-nav-item ${(currentView === 'trade-chat') ? 'active' : ''}`}
                   onClick={() => navigateFromMenu('trade-chat', '#/fpo/offers')}
                 >
-                  <span className="left-nav-icon">OF</span>
+                  <span className="left-nav-icon"><NavIcon name="chat" /></span>
                   <span className="left-nav-label">
                     <strong>Buyer Offers &amp; Chat</strong>
                     <small>Negotiate &amp; Accept</small>
@@ -4425,7 +4400,7 @@ function App() {
                     navigateFromMenu('analytics', '#/fpo/dashboard');
                   }}
                 >
-                  <span className="left-nav-icon">DA</span>
+                  <span className="left-nav-icon"><NavIcon name="analytics" /></span>
                   <span className="left-nav-label">
                     <strong>FPO Analytics</strong>
                     <small>Lots, Sales &amp; Buyers</small>
@@ -4440,7 +4415,7 @@ function App() {
                     navigateFromMenu('profile', '#/fpo/profile');
                   }}
                 >
-                  <span className="left-nav-icon">TS</span>
+                  <span className="left-nav-icon"><NavIcon name="trust" /></span>
                   <span className="left-nav-label">
                     <strong>FPO Trust Score</strong>
                     <small>NABL &amp; Fulfillment</small>
@@ -4460,7 +4435,7 @@ function App() {
                   className={`left-nav-item ${(currentView === 'admin-governance') ? 'active' : ''}`}
                   onClick={() => navigateFromMenu('admin-governance')}
                 >
-                  <span className="left-nav-icon">GV</span>
+                  <span className="left-nav-icon"><NavIcon name="governance" /></span>
                   <span className="left-nav-label">
                     <strong>Governance Desk</strong>
                     <small>Disputes &amp; NABL KYC</small>
@@ -4476,7 +4451,7 @@ function App() {
               className={`left-nav-item ${currentView === 'community' ? 'active' : ''}`}
               onClick={() => navigateFromMenu('community')}
             >
-              <span className="left-nav-icon">Q</span>
+              <span className="left-nav-icon"><NavIcon name="community" /></span>
               <span className="left-nav-label">
                 <strong>{text.sidebarCommunity}</strong>
                 <small>{text.sidebarCommunitySmall}</small>
@@ -4490,7 +4465,7 @@ function App() {
                 className={`left-nav-item ${currentView === 'diagnostics' ? 'active' : ''}`}
                 onClick={() => navigateFromMenu('diagnostics')}
               >
-                <span className="left-nav-icon">AI</span>
+                <span className="left-nav-icon"><NavIcon name="diagnostics" /></span>
                 <span className="left-nav-label">
                   <strong>{text.sidebarDiagnostics}</strong>
                   <small>{text.sidebarDiagnosticsSmall}</small>
@@ -4503,7 +4478,7 @@ function App() {
               className={`left-nav-item ${currentView === 'support-network' ? 'active' : ''}`}
               onClick={() => navigateFromMenu('support-network')}
             >
-              <span className="left-nav-icon">S</span>
+              <span className="left-nav-icon"><NavIcon name="support" /></span>
               <span className="left-nav-label">
                 <strong>{text.sidebarNetwork}</strong>
                 <small>{text.sidebarNetworkSmall}</small>
@@ -4516,12 +4491,12 @@ function App() {
 
 
 
-        {/* Main view content */}
+        
         <div className="main-content">
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW 1: CROPS & PRODUCE MARKETPLACE (MINIMAL & SIMPLE)                    */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'prices' && (
         <div className="view-container">
           <section className="hero">
@@ -4530,151 +4505,86 @@ function App() {
               <h1>{text.heroTitle}</h1>
               <p className="hero-copy">{text.heroCopy}</p>
             </div>
-            <div className="hero-stamp"><strong>01</strong><span>MARKET<br />DESK</span></div>
+            <div className="hero-metrics-ticker">
+              <div className="hero-metric-pill">
+                <strong>28+</strong>
+                <span>APMC Mandis</span>
+              </div>
+              <div className="hero-metric-divider" />
+              <div className="hero-metric-pill">
+                <strong>₹4.8 Cr</strong>
+                <span>Escrow Volume</span>
+              </div>
+              <div className="hero-metric-divider" />
+              <div className="hero-metric-pill">
+                <strong>99.4%</strong>
+                <span>Fulfillment</span>
+              </div>
+            </div>
           </section>
 
-          {/* 1-Click Quick Sell Recommendation for Farmers */}
-          {session?.role === 'FARMER' && (
-            <section
-              style={{
-                background: 'linear-gradient(135deg, #f3f8f1 0%, #e8f3e5 100%)',
-                border: '1px solid #b8dab2',
-                borderRadius: '8px',
-                padding: '20px 24px',
-                marginBottom: '20px',
-                boxShadow: '0 2px 8px rgba(47, 104, 56, 0.08)'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-                <div style={{ flex: 1, minWidth: '280px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#2f6838', color: '#ffffff', padding: '3px 8px', borderRadius: '4px', letterSpacing: '0.5px' }}>
-                      RECOMMENDED ACTION · AI HARVEST REALIZATION
-                    </span>
-                    <span style={{ fontSize: '11px', color: '#4d6951', fontWeight: 600 }}>
-                      Live Market Optimal
-                    </span>
-                  </div>
-                  <h2 style={{ fontSize: '19px', color: '#1a331f', margin: '0 0 6px', fontWeight: 700 }}>
-                    1-Click Quick Sell: {pulseCrop?.name || 'Tomato'}
-                  </h2>
-                  <p style={{ margin: 0, fontSize: '13px', color: '#314c35', lineHeight: 1.5, maxWidth: '640px' }}>
-                    Direct Buyer Procurement via KisanLink Escrow yields <strong>₹{((trend?.latestPrice || 25) * 1.08).toFixed(2)}/kg net</strong> take-home compared to <strong>₹{(trend?.latestPrice || 25)}/kg</strong> at nearest local mandi (+₹{(((trend?.latestPrice || 25) * 1.08) - (trend?.latestPrice || 25)).toFixed(2)}/kg net gain after transport deduction).
-                  </p>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignSelf: 'center' }}>
-                  <button
-                    type="button"
-                    className="trade-btn trade-btn-primary"
-                    style={{ background: '#2f6838', borderColor: '#2f6838', padding: '10px 18px', fontSize: '13px', fontWeight: 700, boxShadow: '0 2px 4px rgba(47, 104, 56, 0.2)' }}
-                    onClick={() => setQuickProduceModal({
-                      cropId: pulseCrop?.id || 1,
-                      cropName: pulseCrop?.name || 'Tomato',
-                      category: pulseCrop?.category || 'VEGETABLE',
-                      unit: pulseCrop?.unit || 'kg',
-                      quantity: 500,
-                      expectedPrice: Number(((trend?.latestPrice || 25) * 1.08).toFixed(2)),
-                      availableUntil: '',
-                      description: 'Pre-graded harvest lot listed via 1-Click Quick Sell Recommendation with zero intermediary cut.'
-                    })}
-                  >
-                    1-Click List 500kg Lot (₹{((trend?.latestPrice || 25) * 1.08).toFixed(2)}/kg) -&gt;
-                  </button>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button
-                      type="button"
-                      className="trade-btn trade-btn-secondary"
-                      style={{ fontSize: '11px', padding: '6px 12px', flex: 1 }}
-                      onClick={() => setCurrentView('analytics')}
-                    >
-                      Open Full Net Calculator
-                    </button>
-                    <button
-                      type="button"
-                      className="trade-btn trade-btn-secondary"
-                      style={{ fontSize: '11px', padding: '6px 12px', flex: 1 }}
-                      onClick={() => setCurrentView('matching')}
-                    >
-                      Find Verified Buyers
-                    </button>
-                  </div>
-                </div>
+          
+          {/* Consolidated Market Intelligence & Procurement Desk */}
+          <div className="market-intelligence-bar">
+            <div className="intel-left">
+              <div className="intel-badge-row">
+                <span className="intel-badge-live">● Agmarknet Live Feeds</span>
+                <span className="intel-source-tag">Directorate of Marketing &amp; Inspection (DMI)</span>
               </div>
-
-              <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid #cce3c7', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', fontSize: '11px', color: '#44664a', fontFamily: "'DM Mono', monospace" }}>
-                <span>Calculated via AGMARKNET wholesale feeds · Direct buyer escrow security · 0% commission</span>
-                <span>Recommended Channel: <strong>DIRECT BULK BUYER (ESCROW GUARANTEED)</strong></span>
-              </div>
-            </section>
-          )}
-
-          {/* Contextual Decision Desk Notice & Launcher */}
-          <div style={{ background: '#f8f7f2', border: '1px solid #e7e5dc', borderRadius: '6px', padding: '12px 16px', marginBottom: '18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#2f6838', color: '#ffffff', padding: '3px 8px', borderRadius: '3px' }}>
-                {session?.role === 'BUYER' ? 'BUYER DESK' : session?.role === 'TRANSPORTER' ? 'FLEET DESK' : 'FARMER ADVISORY'}
-              </span>
-              <p style={{ margin: 0, fontSize: '13px', color: '#333d36' }}>
+              <h3 className="intel-title">
                 {session?.role === 'BUYER'
-                  ? 'Planning bulk commodity procurement? Calculate landed costs, inbound freight, and wholesale margins.'
+                  ? `Procurement Quotas & Wholesale Linkages: ${pulseCrop?.name || 'Produce'}`
                   : session?.role === 'TRANSPORTER'
-                  ? 'Operating commercial hauls? Calculate trip operating profit, diesel expenses, and deadhead buffers.'
-                  : 'Need selling guidance? Calculate take-home net earnings across mandis vs direct buyers after transport and fees.'}
+                  ? `Freight Linkage & Route Margins: ${pulseCrop?.name || 'Agricultural Freight'}`
+                  : `Direct Buyer Opportunity: ${pulseCrop?.name || 'Tomato'}`}
+              </h3>
+              <p className="intel-desc">
+                {session?.role === 'BUYER'
+                  ? 'Plan bulk commodity procurement with verified farm origin, digital assay quality grading, and automated escrow lock.'
+                  : session?.role === 'TRANSPORTER'
+                  ? 'Access confirmed farm pickup requests with guaranteed escrow freight settlements and zero deadhead trips.'
+                  : <>Direct buyer procurement yields <strong>₹{((trend?.latestPrice || 25) * 1.08).toFixed(2)}/kg net</strong> (+₹{(((trend?.latestPrice || 25) * 1.08) - (trend?.latestPrice || 25)).toFixed(2)}/kg gain over nearest local mandi). Escrow protected.</>}
               </p>
             </div>
-            <button
-              type="button"
-              className="trade-btn trade-btn-secondary"
-              style={{ fontSize: '11px', padding: '6px 14px', whiteSpace: 'nowrap' }}
-              onClick={() => setCurrentView('analytics')}
-            >
-              {session?.role === 'BUYER'
-                ? 'Open Landed Cost Desk ->'
-                : session?.role === 'TRANSPORTER'
-                ? 'Open Trip Margin Desk ->'
-                : 'Open Net Realization Desk ->'}
-            </button>
-          </div>
-
-          {/* AGMARKNET Live Market Provenance & Normalization Disclosure Banner */}
-          <div style={{ background: '#f5f7f5', border: '1px solid #d4ded4', borderRadius: '6px', padding: '14px 18px', marginBottom: '18px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px' }}>
-              <div style={{ flex: 1, minWidth: '280px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#1c4923', color: '#ffffff', padding: '2px 7px', borderRadius: '3px' }}>
-                    DATA PROVENANCE · AGMARKNET GOVT. API
-                  </span>
-                  <span style={{ fontSize: '11px', color: '#466049', fontWeight: 600 }}>
-                    Official Market Source
-                  </span>
-                </div>
-                <h4 style={{ margin: '0 0 4px', fontSize: '14px', color: '#1a2e1d', fontWeight: 700 }}>
-                  Directorate of Marketing &amp; Inspection (DMI) · Ministry of Agriculture &amp; Farmers Welfare
-                </h4>
-                <p style={{ margin: 0, fontSize: '12px', color: '#445847', lineHeight: 1.5 }}>
-                  Wholesale modal rates are automatically converted from <strong>₹/Quintal (100 kg)</strong> to standard <strong>₹/kg</strong> trade units. Hourly spot feeds are reconciled with daily APMC market closures.
-                </p>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+            <div className="intel-actions">
+              {session?.role === 'FARMER' && (
+                <button
+                  type="button"
+                  className="trade-btn trade-btn-primary"
+                  onClick={() => setQuickProduceModal({
+                    cropId: pulseCrop?.id || 1,
+                    cropName: pulseCrop?.name || 'Tomato',
+                    category: pulseCrop?.category || 'VEGETABLE',
+                    unit: pulseCrop?.unit || 'kg',
+                    quantity: 500,
+                    expectedPrice: Number(((trend?.latestPrice || 25) * 1.08).toFixed(2)),
+                    availableUntil: '',
+                    description: 'Pre-graded harvest lot listed via Direct Buyer Recommendation with zero intermediary cut.'
+                  })}
+                >
+                  List 500kg Lot (₹{((trend?.latestPrice || 25) * 1.08).toFixed(2)}/kg) →
+                </button>
+              )}
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  className="trade-btn trade-btn-secondary"
+                  onClick={() => setCurrentView('analytics')}
+                >
+                  {session?.role === 'BUYER' ? 'Landed Cost Desk' : session?.role === 'TRANSPORTER' ? 'Trip Margins' : 'Net Calculator'}
+                </button>
                 <button
                   type="button"
                   className="trade-btn trade-btn-secondary"
                   disabled={isSyncingAgmarknet}
                   onClick={syncAgmarknetData}
-                  style={{ fontSize: '12px', padding: '7px 14px', background: isSyncingAgmarknet ? '#e2e6e2' : '#ffffff', cursor: isSyncingAgmarknet ? 'not-allowed' : 'pointer' }}
                 >
-                  {isSyncingAgmarknet ? 'Syncing Feeds...' : 'Sync Live AGMARKNET Feed'}
+                  {isSyncingAgmarknet ? 'Syncing...' : 'Sync Live Mandis'}
                 </button>
-                <span style={{ fontSize: '10px', color: '#687e6b', fontFamily: "'DM Mono', monospace" }}>
-                  {agmarknetLastSync ? `Last synced: ${agmarknetLastSync}` : 'Status: Live & Synchronized'}
-                </span>
               </div>
             </div>
           </div>
 
-          {/* Market Pulse Summary Panel */}
           <section className="dashboard-grid">
             <article className="panel market-panel">
               <div className="panel-heading">
@@ -4682,7 +4592,7 @@ function App() {
                 <span className="date-chip">{text.panelAnalytics}</span>
               </div>
 
-              {/* Crop selector */}
+              
               <div className="pulse-controls" style={{ marginTop: '8px' }}>
                 <select
                   value={selectedPulseCropId || ''}
@@ -4712,7 +4622,7 @@ function App() {
                 <p className="muted">{text.loadingMarket}</p>
               )}
 
-              {/* 7-day interactive bar graph */}
+              
               <div className="trend-chart-container">
                 <div className="trend-bar-interactive">
                   {pulsePrices.length > 0 ? (
@@ -4767,7 +4677,7 @@ function App() {
                 </button>
               </div>
 
-              {/* Statutory MSP Benchmark row */}
+              
               {pulseCrop?.mspPrice != null && (
                 <div style={{ marginTop: '12px', padding: '10px 14px', background: '#f5faf6', border: '1px solid #cce5d4', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
@@ -4794,7 +4704,7 @@ function App() {
               )}
             </article>
 
-            {/* Quick Trading Action Card */}
+            
             <aside className="note-panel">
               <p className="eyebrow">{text.panelQuickTrading}</p>
               <h2>{text.panelInstantLinkage}</h2>
@@ -4841,10 +4751,10 @@ function App() {
             </aside>
           </section>
 
-          {/* Multi-Mandi Realization & Harvest Produce Discovery */}
+          
           <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '16px' }}>
             
-            {/* Regional Mandi Price & Realization Comparison */}
+            
             <article className="panel" style={{ margin: 0 }}>
               <div className="panel-heading" style={{ marginBottom: '12px' }}>
                 <div>
@@ -4912,7 +4822,7 @@ function App() {
               )}
             </article>
 
-            {/* Active Farmer Harvest Lots Available for Direct Purchase */}
+            
             <article className="panel" style={{ margin: 0 }}>
               <div className="panel-heading" style={{ marginBottom: '12px' }}>
                 <div>
@@ -5027,7 +4937,7 @@ function App() {
             </article>
           </div>
 
-          {/* Main Marketplace Produce Board */}
+          
           <section style={{ marginTop: '20px' }}>
             <article className="panel crop-panel">
               <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
@@ -5071,7 +4981,7 @@ function App() {
                 </div>
               </div>
 
-              {/* Toolbar: Search + Category Chips + Layout & Sort Toggles */}
+              
               <div className="marketplace-toolbar">
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}>
                   <div style={{ flex: 1, minWidth: '200px', position: 'relative' }}>
@@ -5124,7 +5034,7 @@ function App() {
                   </div>
                 </div>
 
-                {/* Category Filter Bar */}
+                
                 <div className="category-filter-bar" style={{ margin: 0, paddingTop: '4px' }}>
                   {CATEGORIES.map((cat) => (
                     <button
@@ -5139,7 +5049,7 @@ function App() {
                 </div>
               </div>
 
-              {/* Grid View of Commodities */}
+              
               <div className="produce-cards-grid">
                 {filteredCrops
                   .filter(c => {
@@ -5200,7 +5110,7 @@ function App() {
                             </div>
                           </div>
 
-                          {/* Statutory MSP Benchmark row */}
+                          
                           {msp != null && (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px', padding: '4px 8px', background: '#f5faf6', border: '1px solid #dbeae0', borderRadius: '4px', fontSize: '11px' }}>
                               <span style={{ color: '#2c4e36', fontWeight: 600 }}>MSP: ₹{msp}/{crop.unit}</span>
@@ -5212,7 +5122,7 @@ function App() {
                             </div>
                           )}
 
-                          {/* Active farmer harvest lots count */}
+                          
                           {activeCount > 0 && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '6px', fontSize: '11px', color: '#1e5e3a', fontWeight: 600 }}>
                               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2e7d32', display: 'inline-block' }}></span>
@@ -5221,7 +5131,7 @@ function App() {
                           )}
                         </div>
 
-                        {/* Card Actions */}
+                        
                         <div className="commodity-card-actions" onClick={(e) => e.stopPropagation()}>
                           <button
                             type="button"
@@ -5281,9 +5191,9 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW: AGRI-INPUTS & FARM SUPPLIES MARKETPLACE                             */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'inputs' && (
         <div className="view-container">
           <section className="panel" style={{ marginTop: '18px' }}>
@@ -5300,7 +5210,7 @@ function App() {
               {text.inputsSectionSubtitle}
             </p>
 
-            {/* Filter chips & Search */}
+            
             <div className="marketplace-toolbar" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div className="category-filter-bar" style={{ margin: 0 }}>
                 {[
@@ -5322,7 +5232,7 @@ function App() {
               </div>
             </div>
 
-            {/* Agri-Inputs Grid */}
+            
             <div className="agri-inputs-grid" style={{ marginTop: '16px' }}>
               {crops
                 .filter((c) => {
@@ -5411,7 +5321,7 @@ function App() {
             </div>
           </section>
 
-          {/* Quick Procure Input Modal */}
+          
           {quickProcureInputModal && (
             <div className="modal-backdrop" onClick={() => setQuickProcureInputModal(null)}>
               <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
@@ -5482,9 +5392,9 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW: COMMUNITY EXCHANGE (FARMERS, BUYERS & AGRONOMISTS)                   */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'diagnostics' && (
         <div className="view-container">
           <section className="panel" style={{ marginTop: '18px' }}>
@@ -5499,7 +5409,7 @@ function App() {
               <span className="count" style={{ background: '#e8f3ea', color: '#2f6838' }}>AI SERVICE · 8000</span>
             </div>
 
-            {/* Scientific Validation & Model Architecture Disclosure Card */}
+            
             <div style={{ background: '#f8faf7', border: '1px solid #d4dfd2', borderRadius: '6px', padding: '16px 20px', marginTop: '16px', marginBottom: '18px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
@@ -5784,7 +5694,7 @@ function App() {
               </div>
             </div>
 
-            {/* Clean Single-Row Toolbar */}
+            
             <div className="marketplace-toolbar" style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
@@ -5828,7 +5738,7 @@ function App() {
                 </div>
               </div>
 
-              {/* Participant Filter Chips */}
+              
               <div className="category-filter-bar" style={{ margin: 0, paddingTop: '2px' }}>
                 {[
                   { value: 'ALL', label: text.communityAllTopics },
@@ -5848,7 +5758,7 @@ function App() {
               </div>
             </div>
 
-            {/* Clean Feed List */}
+            
             <div className="community-feed">
               {communityPosts
                 .filter(post => {
@@ -5872,7 +5782,7 @@ function App() {
                   return (
                     <div key={post.id} className="community-post-card">
                       
-                      {/* Post Header: Author, Role, Location, Time & Tags */}
+                      
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                           <div style={{ width: '30px', height: '30px', borderRadius: '4px', background: '#202a27', color: '#f6f5f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '12px' }}>
@@ -5914,7 +5824,7 @@ function App() {
                         </div>
                       </div>
 
-                      {/* Content */}
+                      
                       <div>
                         <h3 style={{ fontSize: '15px', margin: '4px 0 4px', color: '#202a27', lineHeight: '1.4' }}>
                           {post.title}
@@ -5924,7 +5834,7 @@ function App() {
                         </p>
                       </div>
 
-                      {/* Attached Photo Thumbnail (if present) */}
+                      
                       {post.imageUrl && (
                         <div style={{ borderRadius: '4px', overflow: 'hidden', border: '1px solid #e2ded4', maxWidth: '340px' }}>
                           <img
@@ -5935,7 +5845,7 @@ function App() {
                         </div>
                       )}
 
-                      {/* Minimal Interaction Row */}
+                      
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #edeae2', paddingTop: '8px', marginTop: '2px' }}>
                         <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
                           <button
@@ -5944,7 +5854,7 @@ function App() {
                             onClick={() => handleLikeCommunityPost(post.id)}
                             title={post.userLiked ? 'Endorsed' : 'Endorse topic'}
                           >
-                            <span style={{ fontSize: '12px' }}>{post.userLiked ? '✓' : '+'}</span>
+                            <span style={{ fontSize: '12px' }}>{post.userLiked ? 'Γ£ô' : '+'}</span>
                             <span>{post.likesCount}</span>
                           </button>
 
@@ -5965,7 +5875,7 @@ function App() {
                         )}
                       </div>
 
-                      {/* Responses Thread */}
+                      
                       {post.answers.length > 0 && (
                         <div className="reply-thread">
                           {post.answers.map((ans) => (
@@ -5998,7 +5908,7 @@ function App() {
                                     onClick={() => handleUpvoteCommunityAnswer(post.id, ans.id)}
                                     title="Endorse response"
                                   >
-                                    <span style={{ fontSize: '11px' }}>{ans.userLiked ? '✓' : '+'}</span>
+                                    <span style={{ fontSize: '11px' }}>{ans.userLiked ? 'Γ£ô' : '+'}</span>
                                     <span>{ans.upvotes || 0}</span>
                                   </button>
                                 </div>
@@ -6032,7 +5942,7 @@ function App() {
                         </div>
                       )}
 
-                      {/* Inline Reply Input Box */}
+                      
                       <div style={{ marginTop: '6px', display: 'flex', gap: '6px' }}>
                         <input
                           type="text"
@@ -6081,9 +5991,9 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW: PROFESSIONAL ADVISORIES, GOVT KVK & SUPPORT DIRECTORY               */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'support-network' && (
         <div className="view-container">
           <section className="panel" style={{ marginTop: '18px' }}>
@@ -6108,7 +6018,7 @@ function App() {
               </div>
             </div>
 
-            {/* Clean Filter Toolbar */}
+            
             <div className="marketplace-toolbar" style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
@@ -6132,7 +6042,7 @@ function App() {
                 </div>
               </div>
 
-              {/* Entity Filter Chips */}
+              
               <div className="category-filter-bar" style={{ margin: 0, paddingTop: '2px' }}>
                 {[
                   { value: 'ALL', label: 'All Directory' },
@@ -6154,7 +6064,7 @@ function App() {
               </div>
             </div>
 
-            {/* Interactive Regional Radar & Google Map Container */}
+            
             <div className="support-radar-container">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
                 <div>
@@ -6169,7 +6079,7 @@ function App() {
                 </div>
 
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  {/* View Mode Toggle Switch */}
+                  
                   <div style={{ display: 'inline-flex', gap: '4px', background: 'rgba(0,0,0,0.5)', padding: '3px', borderRadius: '4px', border: '1px solid #364840' }}>
                     <button
                       type="button"
@@ -6212,19 +6122,19 @@ function App() {
 
               {supportMapViewMode === 'RADAR' ? (
                 <div className="radar-canvas-box">
-                  {/* Concentric distance rings */}
+                  
                   <div className="radar-circle" style={{ width: '80px', height: '80px' }} />
                   <div className="radar-circle" style={{ width: '160px', height: '160px' }} />
                   <div className="radar-circle" style={{ width: '240px', height: '240px' }} />
                   <div className="radar-crosshair-x" />
                   <div className="radar-crosshair-y" />
 
-                  {/* Distance Markers */}
+                  
                   <span style={{ position: 'absolute', top: '52%', left: '56%', fontSize: '8px', fontFamily: "'DM Mono', monospace", color: 'rgba(110, 157, 104, 0.5)', pointerEvents: 'none' }}>5km</span>
                   <span style={{ position: 'absolute', top: '52%', left: '68%', fontSize: '8px', fontFamily: "'DM Mono', monospace", color: 'rgba(110, 157, 104, 0.5)', pointerEvents: 'none' }}>15km</span>
                   <span style={{ position: 'absolute', top: '52%', left: '80%', fontSize: '8px', fontFamily: "'DM Mono', monospace", color: 'rgba(110, 157, 104, 0.5)', pointerEvents: 'none' }}>25km</span>
 
-                  {/* Center Cluster Node: Farmer */}
+                  
                   <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 15, textAlign: 'center' }}>
                     <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ffffff', margin: '0 auto', boxShadow: '0 0 12px #6e9d68' }} />
                     <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#ffffff', background: 'rgba(0,0,0,0.7)', padding: '1px 4px', borderRadius: 2, display: 'inline-block', marginTop: 2 }}>
@@ -6232,7 +6142,7 @@ function App() {
                     </span>
                   </div>
 
-                  {/* Interactive Station Pins */}
+                  
                   {supportDirectoryData.map((node) => {
                     const isSelected = selectedSupportNode === node.id;
                     const pinColor = node.type === 'GOVT_KVK' ? '#6e9d68' : (node.type === 'AGRONOMIST' ? '#4d88ff' : (node.type === 'SOIL_LAB' ? '#e5a93b' : (node.type === 'HELPLINE' ? '#ff6666' : '#20b2aa')));
@@ -6249,7 +6159,7 @@ function App() {
                         title={`${node.name} (${node.distanceKm} km away) - Click to view on Google Maps`}
                       >
                         <div className="radar-pin-dot" style={{ background: pinColor }}>
-                          <span style={{ fontSize: '8px', color: '#ffffff', fontWeight: 'bold' }}>•</span>
+                          <span style={{ fontSize: '8px', color: '#ffffff', fontWeight: 'bold' }}>·</span>
                         </div>
                         <span className="radar-pin-label">
                           {node.name.split(' ')[0]} {node.name.split(' ')[1] || ''} ({node.distanceKm}km)
@@ -6259,7 +6169,7 @@ function App() {
                   })}
                 </div>
               ) : (
-                /* Live Embedded Google Maps View */
+                
                 <div style={{ position: 'relative', width: '100%', height: '320px', borderRadius: '4px', overflow: 'hidden', border: '1px solid #364840' }}>
                   {(() => {
                     const activeNode = supportDirectoryData.find(n => n.id === selectedSupportNode) || supportDirectoryData[0];
@@ -6294,7 +6204,7 @@ function App() {
               )}
             </div>
 
-            {/* Support Directory Cards Grid */}
+            
             <div className="support-directory-grid">
               {supportDirectoryData
                 .filter(node => {
@@ -6317,7 +6227,7 @@ function App() {
                       className={`support-card ${isSelected ? 'card-highlighted' : ''}`}
                     >
                       <div>
-                        {/* Header Badge & Rating */}
+                        
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '6px', marginBottom: '6px' }}>
                           <span style={{
                             fontSize: '9px',
@@ -6332,11 +6242,11 @@ function App() {
                             {node.badge}
                           </span>
                           <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078', fontWeight: 600 }}>
-                            ★ {node.rating} &middot; {node.distanceKm} km
+                            Γÿà {node.rating} &middot; {node.distanceKm} km
                           </span>
                         </div>
 
-                        {/* Title & Organization */}
+                        
                         <h3 style={{ fontSize: '15px', margin: '2px 0 2px', color: '#202a27', lineHeight: '1.3' }}>
                           {node.name}
                         </h3>
@@ -6347,7 +6257,7 @@ function App() {
                           {node.location}
                         </p>
 
-                        {/* In Charge & Hours */}
+                        
                         <div style={{ background: '#f8f7f2', borderRadius: '4px', padding: '6px 10px', fontSize: '11px', color: '#4d5750', marginBottom: '8px', border: '1px solid #eceae2' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <span>{text.supportLead} <strong>{node.inCharge}</strong></span>
@@ -6357,7 +6267,7 @@ function App() {
                           </div>
                         </div>
 
-                        {/* Services List */}
+                        
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '6px' }}>
                           {node.services.map((srv, idx) => (
                             <span key={idx} style={{ fontSize: '10px', background: '#f0eee8', color: '#333b35', padding: '2px 6px', borderRadius: '3px' }}>
@@ -6367,7 +6277,7 @@ function App() {
                         </div>
                       </div>
 
-                      {/* Card Actions Footer */}
+                      
                       <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid #edebe4', paddingTop: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
 
                         <a
@@ -6412,9 +6322,9 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW: TRANSPORTER LOGISTICS & FREIGHT EXCHANGE                             */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'transporter-dashboard' && (
         session?.role === 'TRANSPORTER' ? (
           <TransporterDashboard
@@ -6444,9 +6354,9 @@ function App() {
         )
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW: PRIVATE TRADE CHAT & INTERACTIVE OFFERS                             */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'trade-chat' && (
         <TradeChatView
           session={session}
@@ -6456,12 +6366,12 @@ function App() {
         />
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW: MY ORDERS & PROCUREMENT (ESCROW PROTECTED)                          */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'my-orders' && (
         <div className="view-container">
-          {/* Active Farm Produce Sales & Trade Deals (Real Contracts) */}
+          
           <section className="panel" style={{ marginBottom: '20px', border: '2px solid #2f6838', borderRadius: '8px', background: '#ffffff', padding: '20px 24px', boxShadow: '0 4px 18px rgba(47, 104, 56, 0.08)' }}>
             <div className="panel-heading" style={{ borderBottom: '1px solid #eef2ee', paddingBottom: '12px', marginBottom: '16px' }}>
               <div>
@@ -6548,7 +6458,7 @@ function App() {
             </div>
           </section>
 
-          {/* Sandbox Demo Template Notice */}
+          
           <div style={{ background: '#f8f9f8', border: '1px solid #d4dfd4', borderRadius: '6px', padding: '10px 16px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#365c3b', color: '#ffffff', padding: '2px 6px', borderRadius: '3px' }}>
@@ -6574,7 +6484,7 @@ function App() {
               <span className="count">{userOrders.length} {text.ordersContracts}</span>
             </div>
 
-            {/* Status Filter Chips */}
+            
             <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', padding: '14px 0 8px' }}>
               {[
                 { value: 'ALL', label: text.ordersStatusAll },
@@ -6594,7 +6504,7 @@ function App() {
               ))}
             </div>
 
-            {/* Orders Grid */}
+            
             <div className="orders-grid">
               {userOrders
                 .filter(o => {
@@ -6610,7 +6520,7 @@ function App() {
                   return (
                     <div key={order.id} className="order-card">
                       <div>
-                        {/* Header: ID, Role, Status */}
+                        
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '6px', marginBottom: '8px' }}>
                           <div>
                             <span style={{ fontSize: '12px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#202a27' }}>
@@ -6625,7 +6535,7 @@ function App() {
                           </span>
                         </div>
 
-                        {/* Title & Specs */}
+                        
                         <h3 style={{ fontSize: '16px', margin: '4px 0 2px', color: '#202a27', lineHeight: '1.3' }}>
                           {order.commodity}
                         </h3>
@@ -6633,7 +6543,7 @@ function App() {
                           {order.qualityCertificate}
                         </p>
 
-                        {/* Metrics Strip */}
+                        
                         <div style={{ background: '#faf9f5', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px 12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
                           <div>
                             <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>Volume</span>
@@ -6655,7 +6565,7 @@ function App() {
                           </div>
                         </div>
 
-                        {/* Counterpart & Destination */}
+                        
                         <div style={{ fontSize: '11px', color: '#556058', marginBottom: '8px' }}>
                           <p style={{ margin: '0 0 2px' }}>
                             <strong>{text.ordersCounterpart}</strong> {order.counterpart}
@@ -6666,7 +6576,7 @@ function App() {
                         </div>
                       </div>
 
-                      {/* Card Action Controls */}
+                      
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid #edebe4', paddingTop: '12px' }}>
                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                           <button
@@ -6713,9 +6623,9 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW: MY SHOP & FARMER STOREFRONT                                         */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'my-shop' && (
         <div className="view-container">
           <section className="panel" style={{ marginTop: '18px' }}>
@@ -6744,7 +6654,7 @@ function App() {
               </button>
             </div>
 
-            {/* Shop Summary KPIs Strip */}
+            
             <div className="shop-stats-grid">
               <div className="shop-stat-card">
                 <span>{text.shopActiveListings}</span>
@@ -6770,7 +6680,7 @@ function App() {
               </div>
             </div>
 
-            {/* Storefront Inventory Management */}
+            
             <div style={{ marginTop: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
                 <h3 style={{ margin: 0, fontSize: '16px', color: '#202a27' }}>
@@ -6863,7 +6773,7 @@ function App() {
               </div>
             </div>
 
-            {/* Direct Buyer Offers Section */}
+            
             <div style={{ marginTop: '28px', borderTop: '1px solid #e7e4db', paddingTop: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <div>
@@ -6941,9 +6851,9 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW: ORDER PROGRESS & LIVE MILESTONE TRACKER                             */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'order-progress' && (
         <div className="view-container">
           <section className="panel" style={{ marginTop: '18px' }}>
@@ -6966,7 +6876,7 @@ function App() {
                     </span>
                   </div>
 
-                  {/* Sleek Minimal Order Selector */}
+                  
                   <div className="order-selector-container">
                     {userOrders.map(order => {
                       const isSelected = order.id === activeOrder.id;
@@ -6998,7 +6908,7 @@ function App() {
                   </div>
 
 
-                  {/* Minimal Order Summary & Progress Pipeline Card */}
+                  
                   <div className="progress-summary-card">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
                       <div>
@@ -7023,7 +6933,7 @@ function App() {
                       </div>
                     </div>
 
-                    {/* Horizontal 6-Stage Progress Track */}
+                    
                     <div>
                       <div className="horizontal-step-track">
                         {(() => {
@@ -7040,7 +6950,7 @@ function App() {
                                 return (
                                   <div key={idx} className={`h-step-node ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}`}>
                                     <div className="h-step-dot">
-                                      {isCompleted ? '✓' : idx + 1}
+                                      {isCompleted ? 'Γ£ô' : idx + 1}
                                     </div>
                                     <span className="h-step-label">{shortLabel}</span>
                                   </div>
@@ -7053,7 +6963,7 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Clean Logistics & Dispatch Card */}
+                  
                   <div className="logistics-card-minimal">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
                       <div>
@@ -7098,7 +7008,7 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Clean Milestone History Feed */}
+                  
                   <div style={{ marginTop: '16px' }}>
                     <h4 style={{ fontSize: '13px', margin: '0 0 8px', color: '#202a27', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", letterSpacing: '0.04em' }}>
                       Stage Milestones &amp; Verification Log
@@ -7111,7 +7021,7 @@ function App() {
                         return (
                           <div key={idx} className={`timeline-row ${statusState}`}>
                             <div className="timeline-badge">
-                              {step.completed ? '✓' : idx + 1}
+                              {step.completed ? 'Γ£ô' : idx + 1}
                             </div>
                             <div className="timeline-body">
                               <div className="timeline-header">
@@ -7133,9 +7043,9 @@ function App() {
       )}
 
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW 2: AI PREDICTIONS & CONFIDENCE INTERVALS                             */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'predictions' && (
 
 
@@ -7149,7 +7059,7 @@ function App() {
               <span className="count">{forecast ? `${forecast.confidenceScore}% Certainty` : 'Analyzing'}</span>
             </div>
 
-            {/* Crop selector */}
+            
             <div className="pulse-controls" style={{ marginTop: '14px', maxWidth: '400px' }}>
               <select
                 value={selectedPulseCropId || ''}
@@ -7174,7 +7084,7 @@ function App() {
                     <div className="stat-metric-card">
                       <span>Trend &amp; Volatility</span>
                       <strong style={{ color: forecast.trend === 'UPWARD' ? '#5a8e62' : forecast.trend === 'DOWNWARD' ? '#b45a42' : '#7f8981' }}>
-                        {forecast.trend === 'UPWARD' ? '↗ Bullish' : forecast.trend === 'DOWNWARD' ? '↘ Bearish' : '→ Stable'}
+                        {forecast.trend === 'UPWARD' ? '↔ Bullish' : forecast.trend === 'DOWNWARD' ? '↘ Bearish' : '→ Stable'}
                       </strong>
                       <small style={{ font: "9px 'DM Mono', monospace", textTransform: 'uppercase', color: '#667269' }}>
                         {forecast.volatilityLevel} Volatility · {forecast.historicalPointsCount} points
@@ -7182,7 +7092,7 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Visual Labeled Confidence Bands */}
+                  
                   <div className="confidence-bands-visual" style={{ marginTop: '18px' }}>
                     <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#5a665e', fontWeight: 'bold' }}>
                       Labeled Confidence Intervals (Certainty Bounds)
@@ -7206,7 +7116,7 @@ function App() {
                   </p>
                 </div>
 
-                {/* 7-Day Forward Trajectory Table */}
+                
                 <div style={{ background: '#fffdf9', border: '1px solid #d9d6cc', borderRadius: '6px', padding: '16px' }}>
                   <h3 style={{ margin: '0 0 10px', fontSize: '15px' }}>7-Day Price Trajectory</h3>
                   <table className="trajectory-table">
@@ -7225,7 +7135,7 @@ function App() {
                           <td><strong>₹{fp.predictedPrice}</strong></td>
                           <td>₹{fp.interval90?.lowerBound} – ₹{fp.interval90?.upperBound}</td>
                           <td style={{ color: fp.trend === 'UPWARD' ? '#5a8e62' : fp.trend === 'DOWNWARD' ? '#b45a42' : '#7f8981' }}>
-                            {fp.trend === 'UPWARD' ? '↗' : fp.trend === 'DOWNWARD' ? '↘' : '→'}
+                            {fp.trend === 'UPWARD' ? '↔' : fp.trend === 'DOWNWARD' ? '↘' : '→'}
                           </td>
                         </tr>
                       ))}
@@ -7243,24 +7153,24 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW: AGRO-CLIMATIC & WEATHER ADVISORY                                    */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'weather' && (
         <div className="view-container">
           <section className="panel" style={{ marginTop: '18px' }}>
             <div className="panel-heading">
               <div>
-                <p className="eyebrow">Hyper-Local Micro-Climate &amp; Harvest Advisory</p>
-                <h2>Agro-Climatic Advisory &amp; Spoilage Risk</h2>
+                <p className="eyebrow">{text.weatherEyebrow}</p>
+                <h2>{text.weatherTitle}</h2>
               </div>
-              <span className="count">{weatherData?.harvestSuitability || 'Analyzing'}</span>
+              <span className="count">{weatherData?.harvestSuitability || text.weatherAnalyzing}</span>
             </div>
 
-            {/* Location selector presets */}
+            
             <div className="location-presets-bar">
               <span style={{ font: "10px 'DM Mono', monospace", color: '#6a766c', alignSelf: 'center', marginRight: '4px' }}>
-                Origin: <strong>{mapCoords.label}</strong>
+                {text.weatherOrigin} <strong>{mapCoords.label}</strong>
               </span>
               <button
                 type="button"
@@ -7297,18 +7207,18 @@ function App() {
                   style={{ background: '#dce7d3', color: '#3d5940', borderColor: '#b8cba8' }}
                   onClick={handleUseProfileLocation}
                 >
-                  Use My Profile GPS
+                  {text.weatherUseGps}
                 </button>
               )}
             </div>
 
-            {/* Crop selector to evaluate crop-specific advisory */}
+            
             <div className="pulse-controls" style={{ marginTop: '10px', maxWidth: '380px' }}>
               <select
                 value={weatherCropId || ''}
                 onChange={(e) => setWeatherCropId(e.target.value ? Number(e.target.value) : null)}
               >
-                <option value="">General Agro Conditions (All Crops)</option>
+                <option value="">{text.weatherGeneralConditions}</option>
                 {crops.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name} ({c.category})
@@ -7318,41 +7228,41 @@ function App() {
             </div>
 
             {weatherLoading ? (
-              <p className="muted" style={{ padding: '24px 0' }}>Computing micro-climate and spoilage risk...</p>
+              <p className="muted" style={{ padding: '24px 0' }}>{text.weatherLoading}</p>
             ) : weatherData ? (
               <>
-                {/* Hero Condition Banner */}
+                
                 <div className="weather-hero-card">
                   <div>
                     <p className="eyebrow">{weatherData.locationName} · GPS {weatherData.latitude.toFixed(2)}°N, {weatherData.longitude.toFixed(2)}°E</p>
                     <h3>{weatherData.currentTemp}°C</h3>
                     <p style={{ margin: '6px 0 0', font: "11px 'DM Mono', monospace", color: '#b9c5b7', textTransform: 'uppercase' }}>
-                      Condition: <strong>{weatherData.currentCondition}</strong>
+                      {text.weatherCondition}: <strong>{(weatherData.currentCondition || '').replace(/_/g, ' ')}</strong>
                     </p>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <span className="count" style={{ background: '#35453e', color: '#fffaf1' }}>
-                      Suitability: {weatherData.harvestSuitability}
+                      {text.weatherSuitability}: {weatherData.harvestSuitability}
                     </span>
                   </div>
                 </div>
 
-                {/* 4-Metric Grid */}
+                
                 <div className="weather-grid-metrics">
                   <div className="weather-metric-item">
-                    <span>Ambient Humidity</span>
+                    <span>{text.weatherHumidity}</span>
                     <strong>{weatherData.humidityPercent}%</strong>
                   </div>
                   <div className="weather-metric-item">
-                    <span>Rainfall Intensity</span>
+                    <span>{text.weatherRainfall}</span>
                     <strong>{weatherData.rainfallMm} mm</strong>
                   </div>
                   <div className="weather-metric-item">
-                    <span>Surface Wind</span>
+                    <span>{text.weatherWind}</span>
                     <strong>{weatherData.windSpeedKmh} km/h</strong>
                   </div>
                   <div className="weather-metric-item">
-                    <span>Harvest Suitability</span>
+                    <span>{text.weatherSuitability}</span>
                     <strong style={{ color: weatherData.harvestSuitability === 'EXCELLENT' ? '#5a8e62' : weatherData.harvestSuitability === 'HAZARDOUS' ? '#b45a42' : '#202a27' }}>
                       {weatherData.harvestSuitability}
                     </strong>
@@ -7361,18 +7271,18 @@ function App() {
 
                 <div className="two-col-view-layout" style={{ marginTop: '16px' }}>
                   <div>
-                    {/* Harvest Window Box */}
+                    
                     <div className="harvest-box">
-                      <h4>Recommended Daily Harvest Window</h4>
+                      <h4>{text.weatherHarvestWindow}</h4>
                       <p><strong>{weatherData.recommendedHarvestWindow}</strong></p>
                     </div>
 
-                    {/* Transit Spoilage Risk Index */}
+                    
                     <div className="spoilage-card">
                       <div className="spoilage-header">
-                        <h4>Produce Transit Spoilage Risk</h4>
+                        <h4>{text.weatherSpoilageRisk}</h4>
                         <span className={`spoilage-badge spoilage-${weatherData.spoilageRiskIndex.toLowerCase()}`}>
-                          {weatherData.spoilageRiskIndex} Risk
+                          {weatherData.spoilageRiskIndex} {text.weatherRisk}
                         </span>
                       </div>
                       <p style={{ margin: '10px 0 0', fontSize: '13px', color: '#5a665e', lineHeight: '1.5' }}>
@@ -7381,10 +7291,10 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Tailored Agronomic Advisories */}
+                  
                   <div className="advisory-list-box">
                     <p style={{ margin: 0, font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981', fontWeight: 'bold' }}>
-                      Agronomic Protection &amp; Post-Harvest Guidelines
+                      {text.weatherGuidelines}
                     </p>
                     <ul>
                       {weatherData.cropAdvisories?.map((adv, idx) => (
@@ -7394,17 +7304,17 @@ function App() {
                   </div>
                 </div>
 
-                {/* 5-Day Forward Daily Forecast Strip */}
+                
                 <div style={{ marginTop: '20px' }}>
                   <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#5a665e', fontWeight: 'bold' }}>
-                    5-Day Agro-Weather Forecast
+                    {text.weatherForecast}
                   </p>
                   <div className="five-day-forecast-grid">
                     {weatherData.forecast?.map((day) => (
                       <div className="forecast-card-item" key={day.date}>
                         <span className="f-day">{day.dayName}</span>
                         <div className="f-temp">{day.tempMax}° / {day.tempMin}°</div>
-                        <span className="f-rain">{day.precipitationProbability}% Rain · {day.condition}</span>
+                        <span className="f-rain">{day.precipitationProbability}% {text.weatherRain} · {(day.condition || '').replace(/_/g, ' ')}</span>
                         <div className="f-adv">{day.advisory}</div>
                       </div>
                     ))}
@@ -7413,16 +7323,16 @@ function App() {
               </>
             ) : (
               <p className="muted" style={{ padding: '24px 0' }}>
-                {weatherError || 'Weather data is unavailable. Try selecting a location again.'}
+                {weatherError || text.weatherUnavailable}
               </p>
             )}
           </section>
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VILLAGE INTAKE HUB & DIGITAL WEIGH-SLIP                                     */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'fpo-intake' && (
         <FpoIntakeView
           intakes={fpoIntakes}
@@ -7435,9 +7345,9 @@ function App() {
         />
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* FARMER HARVEST REALIZATION & ESCROW PAYOUT LEDGER                          */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'farmer-payouts' && (
         <FarmerPayoutsLedgerView
           farmerId={session?.farmerId || 'FMR-FPO42-001'}
@@ -7450,9 +7360,9 @@ function App() {
         />
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* FPO AGGREGATED LOTS & LOT PASSPORTS                                        */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'fpo-lots' && (
         <FpoLotsAndPassportView
           fpoProfile={fpoProfile}
@@ -7481,7 +7391,6 @@ function App() {
           }}
           onCreateLot={(newLot) => {
             setFpoLots(prev => [newLot, ...prev]);
-            // Auto-mark matched unpooled intakes as pooled
             setFpoIntakes(prev => prev.map(intake => {
               if (newLot.contributingFarmers?.some(cf => cf.farmerId === intake.farmerId) && intake.cropName === newLot.cropName && intake.status === 'UNPOOLED') {
                 return { ...intake, status: 'POOLED', lotId: newLot.lotId };
@@ -7493,9 +7402,9 @@ function App() {
         />
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* FPO MEMBER FARMERS REGISTRY & TRACEABILITY                                 */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'fpo-farmers' && (
         <FpoMemberFarmersView
           farmers={fpoFarmers}
@@ -7523,9 +7432,9 @@ function App() {
         />
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* SIH MODULE: PLATFORM ADMIN GOVERNANCE & ARBITRATION                        */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'admin-governance' && (
         <AdminGovernanceView
           adminData={adminData}
@@ -7546,12 +7455,12 @@ function App() {
         />
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW 3: BUYER MATCHING & TRADE DESK                                       */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'matching' && (
         <div className="view-container">
-          {/* Farmer Workspace */}
+          
           {(session.role === 'FARMER' || session.role === 'FPO' || !session.role) && (
             <>
                 <section className="workspace-grid" style={{ marginTop: '18px' }}>
@@ -7674,7 +7583,7 @@ function App() {
                           style={{ width: 'auto', marginLeft: 'auto', padding: '8px 14px', marginTop: 0 }}
                           onClick={findRecommendation}
                         >
-                          Find best buyer <span>↗</span>
+                          Find best buyer <span>↔</span>
                         </button>
                       </div>
                     )}
@@ -7701,9 +7610,9 @@ function App() {
                         </div>
                       </div>
 
-                      {/* Side-by-Side Pairing Grid: Buyer + Carrier */}
+                      
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px', marginTop: '18px' }}>
-                        {/* Buyer Partner Card */}
+                        
                         <div style={{ background: '#f8faf8', border: '1px solid #e1e8e2', borderRadius: '8px', padding: '14px' }}>
                           <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#55695a', fontWeight: 'bold' }}>
                             1. Recommended Buyer Partner
@@ -7719,7 +7628,7 @@ function App() {
                           </p>
                         </div>
 
-                        {/* Paired Carrier Card */}
+                        
                         <div style={{ background: '#f8faf8', border: '1px solid #e1e8e2', borderRadius: '8px', padding: '14px' }}>
                           <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#55695a', fontWeight: 'bold' }}>
                             2. Paired Fleet Transporter
@@ -7736,7 +7645,7 @@ function App() {
                         </div>
                       </div>
 
-                      {/* Transparent Net Profit Breakdown Banner */}
+                      
                       <div style={{ marginTop: '16px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '14px 18px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                           <div>
@@ -7763,7 +7672,7 @@ function App() {
                         )}
                       </div>
 
-                      {/* Key Reasons List */}
+                      
                       {recommendation.reason && recommendation.reason.length > 0 && (
                         <div style={{ marginTop: '14px' }}>
                           <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#374151' }}>Why this deal is recommended:</span>
@@ -7775,7 +7684,7 @@ function App() {
                         </div>
                       )}
 
-                      {/* Alternative Combinations Comparison Table */}
+                      
                       {recommendation.alternatives && recommendation.alternatives.length > 0 && (
                         <div style={{ marginTop: '18px' }}>
                           <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#374151', textTransform: 'uppercase' }}>
@@ -7820,7 +7729,7 @@ function App() {
                         </div>
                       )}
 
-                      {/* Action Buttons */}
+                      
                       <div style={{ display: 'flex', gap: '10px', marginTop: '20px', flexWrap: 'wrap' }}>
                         <button
                           type="button"
@@ -7862,7 +7771,7 @@ function App() {
                   )}
                 </section>
 
-                {/* Active Institutional Buyer Procurement Demands (Live RFQs) */}
+                
                 <section className="panel" style={{ marginTop: '24px' }}>
                   <div className="panel-heading">
                     <div>
@@ -7957,7 +7866,7 @@ function App() {
                     })}
                   </div>
                 </section>
-            {/* Live Backend Spot Orders from cropRequirementsList */}
+            
             {cropRequirementsList.length > 0 && (
               <section className="panel" style={{ marginTop: '24px' }}>
                 <div className="panel-heading">
@@ -7997,7 +7906,7 @@ function App() {
             </>
           )}
 
-              {/* Buyer Workspace */}
+              
               {session.role === 'BUYER' && (
                 <section className="workspace-grid" style={{ marginTop: '18px' }}>
                   <article className="panel workspace-panel">
@@ -8107,7 +8016,7 @@ function App() {
                 </section>
               )}
 
-              {/* Active Trades & Orders Ledger */}
+              
               <section className="trade-ledger-section">
                 <div className="panel-heading">
                   <div>
@@ -8145,7 +8054,7 @@ function App() {
                           <span className={`status-pill status-${statusKey}`}>{t.status}</span>
                         </div>
 
-                        {/* Lifecycle Stepper */}
+                        
                         {!isCancelled && (
                           <div className="trade-stepper">
                             <div className={`step-node ${(isProposed || isNegotiating) ? 'active' : (isAccepted || isInTransit || isDelivered || isCompleted) ? 'done' : ''}`}>
@@ -8185,7 +8094,7 @@ function App() {
                           </p>
                         )}
 
-                        {/* Negotiation Thread History */}
+                        
                         {t.negotiations && t.negotiations.length > 0 && (
                           <div className="negotiation-section">
                             <div className="negotiation-title">
@@ -8211,7 +8120,7 @@ function App() {
                           </div>
                         )}
 
-                        {/* Inline Counter-Offer Proposal Form */}
+                        
                         {isNegotiatingThis && (
                           <form className="counter-form-box" onSubmit={(e) => submitCounterOffer(t.id, e)}>
                             <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#dc664a', fontWeight: 'bold' }}>
@@ -8250,7 +8159,7 @@ function App() {
                             </label>
                             <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
                               <button type="submit" className="trade-btn trade-btn-accent">
-                                Submit Counter-Offer ↗
+                                Submit Counter-Offer ↔
                               </button>
                               <button type="button" className="trade-btn trade-btn-secondary" onClick={() => setNegotiatingDealId(null)}>
                                 Close
@@ -8259,7 +8168,7 @@ function App() {
                           </form>
                         )}
 
-                        {/* Digital Escrow & UPI Milestone Vault */}
+                        
                         {!isCancelled && (
                           <div className={`escrow-vault-card ${escrowMap[t.id]?.status === 'FUNDS_HELD_IN_ESCROW' ? 'locked' : (escrowMap[t.id]?.status === 'RELEASED_TO_FARMER' || isCompleted) ? 'released' : 'pending'}`}>
                             <div className="escrow-vault-header">
@@ -8280,7 +8189,7 @@ function App() {
                               <span style={{ fontFamily: "'DM Mono', monospace", fontWeight: 600, color: '#2b5231' }}>Compliant with RBI Payment Aggregator Norms</span>
                             </div>
 
-                            {/* 5-stage Milestone Stepper */}
+                            
                             <div className="escrow-milestone-grid">
                               <div className={`milestone-col ${(isAccepted || isInTransit || isDelivered || isCompleted) ? 'done' : 'active'}`}>
                                 <div className="milestone-dot" />
@@ -8304,7 +8213,7 @@ function App() {
                               </div>
                             </div>
 
-                            {/* Escrow Details & Live Guarantee */}
+                            
                             <div className="escrow-details-row">
                               <span>Deal Value: <strong>₹{t.totalAmount}</strong></span>
                               <span>Farmer Net Return: <strong>₹{t.netFarmerReturn}</strong></span>
@@ -8358,7 +8267,7 @@ function App() {
                           </div>
                         )}
 
-                        {/* Contextual Action Buttons */}
+                        
                         <div className="trade-actions">
                           {(isProposed || isNegotiating) && (
                             <>
@@ -8367,7 +8276,7 @@ function App() {
                                 className="trade-btn trade-btn-primary"
                                 onClick={() => updateTradeStatus(t.id, 'ACCEPTED')}
                               >
-                                Accept Terms (₹{t.agreedPricePerKg}/kg) ↗
+                                Accept Terms (₹{t.agreedPricePerKg}/kg) ↔
                               </button>
 
                               {!isNegotiatingThis && (
@@ -8376,7 +8285,7 @@ function App() {
                                   className="trade-btn trade-btn-secondary"
                                   onClick={() => handleOpenNegotiation(t)}
                                 >
-                                  Counter-Offer ⇄
+                                  Counter-Offer ↔
                                 </button>
                               )}
 
@@ -8447,7 +8356,7 @@ function App() {
                               className="trade-btn trade-btn-primary"
                               onClick={() => updateTradeStatus(t.id, 'DELIVERED')}
                             >
-                              Confirm Delivery &amp; Received ↗
+                              Confirm Delivery &amp; Received ↔
                             </button>
                           )}
 
@@ -8463,7 +8372,7 @@ function App() {
                               className="trade-btn trade-btn-primary"
                               onClick={() => releaseEscrowPayout(t.id, escrowMap[t.id].id)}
                             >
-                              Release Escrow Payout (₹{escrowMap[t.id].farmerPayout}) ↗
+                              Release Escrow Payout (₹{escrowMap[t.id].farmerPayout}) ↔
                             </button>
                           )}
 
@@ -8473,13 +8382,13 @@ function App() {
                               className="trade-btn trade-btn-primary"
                               onClick={() => updateTradeStatus(t.id, 'COMPLETED')}
                             >
-                              Settle Payment &amp; Complete ↗
+                              Settle Payment &amp; Complete ↔
                             </button>
                           )}
 
                           {isCompleted && (
                             <span style={{ font: "10px 'DM Mono', monospace", color: '#5a8e62', fontWeight: 'bold', alignSelf: 'center' }}>
-                              ✓ Settled &amp; Completed
+                              Γ£ô Settled &amp; Completed
                             </span>
                           )}
 
@@ -8489,7 +8398,7 @@ function App() {
                             </span>
                           )}
 
-                          {/* Formal printable receipt button */}
+                          
                           <button
                             type="button"
                             className="trade-btn trade-btn-secondary"
@@ -8539,7 +8448,7 @@ function App() {
                 </div>
               </section>
 
-              {/* Carrier Rating & Feedback Modal */}
+              
               {ratingCarrierModal && (
                 <div style={{
                   position: 'fixed',
@@ -8582,7 +8491,7 @@ function App() {
                     </p>
 
                     <form onSubmit={submitCarrierRating}>
-                      {/* 1-5 Star Selection Buttons */}
+                      
                       <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '8px' }}>
                         Service Rating (1 to 5 Stars) *
                       </label>
@@ -8609,7 +8518,7 @@ function App() {
                         ))}
                       </div>
 
-                      {/* Quality Feedback Tags */}
+                      
                       <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '6px' }}>
                         Highlight Carrier Strengths
                       </label>
@@ -8636,13 +8545,13 @@ function App() {
                                 fontWeight: isSelected ? 700 : 500
                               }}
                             >
-                              {isSelected ? '✓ ' : '+ '}{tag}
+                              {isSelected ? 'Γ£ô ' : '+ '}{tag}
                             </button>
                           );
                         })}
                       </div>
 
-                      {/* Review Notes */}
+                      
                       <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>
                         Review &amp; Experience Notes
                       </label>
@@ -8689,7 +8598,7 @@ function App() {
                 </div>
               )}
 
-              {/* Trade & Logistics Dispute Filing Modal */}
+              
               {disputeModal && (
                 <div style={{
                   position: 'fixed',
@@ -8792,15 +8701,15 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW: FARMER EARNINGS & REALIZED PREMIUM ANALYTICS                        */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'analytics' && (
         <div className="view-container">
 
-          {/* ══════════════════════════════════════════════════════════════════════════ */}
-          {/* CASE 0: FPO OPERATIONS & SMALLHOLDER AGGREGATION ANALYTICS (B11)           */}
-          {/* ══════════════════════════════════════════════════════════════════════════ */}
+          
+          
+          
           {session?.role === 'FPO' && (
             <>
               <section className="panel" style={{ marginTop: '18px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
@@ -8862,7 +8771,7 @@ function App() {
                   </div>
                 </div>
 
-                {/* Top Institutional Buyers Table */}
+                
                 <div style={{ marginTop: '20px', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
                   <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', color: '#475569', fontWeight: 700, display: 'block', marginBottom: '10px' }}>
                     Top Institutional &amp; Corporate Buyers (Feature B11)
@@ -8918,9 +8827,9 @@ function App() {
             </>
           )}
 
-          {/* ══════════════════════════════════════════════════════════════════════════ */}
-          {/* CASE 1: BUYER PROCUREMENT ANALYTICS & LANDED COST CALCULATOR               */}
-          {/* ══════════════════════════════════════════════════════════════════════════ */}
+          
+          
+          
           {session?.role === 'BUYER' && (
             <>
               <section className="panel" style={{ marginTop: '18px' }}>
@@ -8990,7 +8899,7 @@ function App() {
                 </div>
               </section>
 
-              {/* BUYER DECISION ENGINE: LANDED COST & WHOLESALE MARGIN CALCULATOR */}
+              
               <section className="panel" style={{ marginTop: '20px', border: '2px solid #204068', borderRadius: '8px', background: '#ffffff', padding: '20px 24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px', borderBottom: '1px solid #edebe4', paddingBottom: '12px' }}>
                   <div>
@@ -9206,9 +9115,9 @@ function App() {
             </>
           )}
 
-          {/* ══════════════════════════════════════════════════════════════════════════ */}
-          {/* CASE 2: TRANSPORTER FREIGHT ANALYTICS & TRIP MARGIN CALCULATOR             */}
-          {/* ══════════════════════════════════════════════════════════════════════════ */}
+          
+          
+          
           {session?.role === 'TRANSPORTER' && (
             <>
               <section className="panel" style={{ marginTop: '18px' }}>
@@ -9278,7 +9187,7 @@ function App() {
                 </div>
               </section>
 
-              {/* TRANSPORTER DECISION ENGINE: TRIP OPERATING PROFIT & MARGIN CALCULATOR */}
+              
               <section className="panel" style={{ marginTop: '20px', border: '2px solid #8a6218', borderRadius: '8px', background: '#ffffff', padding: '20px 24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px', borderBottom: '1px solid #edebe4', paddingBottom: '12px' }}>
                   <div>
@@ -9397,7 +9306,7 @@ function App() {
                   </div>
                 </div>
 
-                {/* Optional Expandable Driver Wage & RTO Permit Override */}
+                
                 <div style={{ marginBottom: '16px' }}>
                   <button
                     type="button"
@@ -9469,7 +9378,7 @@ function App() {
                         </div>
                       </div>
 
-                      {/* Dual Highlight: Escrow Payout vs Real Economic Profit */}
+                      
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
                         <div style={{ background: '#253529', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
                           <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#8fb899', display: 'block', textTransform: 'uppercase' }}>
@@ -9516,7 +9425,7 @@ function App() {
                         Operating Efficiency Indicators
                       </h3>
 
-                      {/* 4 Fleet Metric Cards Grid */}
+                      
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', margin: '10px 0' }}>
                         <div style={{ background: '#fdfbf7', border: '1px solid #ebdcc5', borderRadius: '4px', padding: '8px 10px' }}>
                           <span style={{ fontSize: '9px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Net Profit / km</span>
@@ -9575,9 +9484,9 @@ function App() {
             </>
           )}
 
-          {/* ══════════════════════════════════════════════════════════════════════════ */}
-          {/* CASE 3: FARMER ANALYTICS & WHERE SHOULD THIS FARMER SELL? CALCULATOR       */}
-          {/* ══════════════════════════════════════════════════════════════════════════ */}
+          
+          
+          
           {(session?.role === 'FARMER' || !session?.role) && (
             <>
               <section className="panel" style={{ marginTop: '18px' }}>
@@ -9641,7 +9550,7 @@ function App() {
                       </div>
                     </div>
 
-                    {/* Monthly progression bars */}
+                    
                     <div style={{ marginTop: '24px', borderTop: '1px solid #d9d6cc', paddingTop: '20px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                         <div>
@@ -9705,7 +9614,7 @@ function App() {
                 )}
               </section>
 
-              {/* FARMER DECISION ENGINE: WHERE SHOULD THIS FARMER SELL? */}
+              
               <section className="panel" style={{ marginTop: '20px', border: '2px solid #2f6838', borderRadius: '8px', background: '#ffffff', padding: '20px 24px', boxShadow: '0 4px 18px rgba(47, 104, 56, 0.08)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px', borderBottom: '1px solid #edebe4', paddingBottom: '12px' }}>
                   <div>
@@ -9821,7 +9730,7 @@ function App() {
                   </div>
                 </div>
 
-                {/* Cultivation Cost Customization Toggle & Breakdown */}
+                
                 <div style={{ marginBottom: '16px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                     <button
@@ -9950,7 +9859,7 @@ function App() {
                         </div>
                       </div>
 
-                      {/* Dual Highlight: Escrow Net Bank Payout vs Economic Farm Profit */}
+                      
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
                         <div style={{ background: '#253529', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
                           <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#8fb899', display: 'block', textTransform: 'uppercase' }}>
@@ -9974,7 +9883,7 @@ function App() {
                         </div>
                       </div>
 
-                      {/* 4 Agronomic Key Metric Badges */}
+                      
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '10px' }}>
                         <div style={{ background: '#ffffff', border: '1px solid #dbe6dc', borderRadius: '4px', padding: '6px 4px', textAlign: 'center' }}>
                           <span style={{ fontSize: '8px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>B:C Ratio</span>
@@ -10097,7 +10006,7 @@ function App() {
                 </div>
               </section>
 
-              {/* RECENT FARM SALES & SETTLED DEAL RECORDS */}
+              
               <section className="panel" style={{ marginTop: '24px' }}>
                 <div className="panel-heading">
                   <div>
@@ -10110,7 +10019,7 @@ function App() {
                   <span className="count">{trades.length} {trades.length === 1 ? 'Sale' : 'Sales'} Recorded</span>
                 </div>
 
-                {/* Sales summary KPI strip */}
+                
                 <div className="prediction-deep-grid" style={{ marginTop: '16px', marginBottom: '20px' }}>
                   <div className="stat-metric-card">
                     <span>Total Realized Sales</span>
@@ -10144,7 +10053,7 @@ function App() {
                   </div>
                 </div>
 
-                {/* Sales deals table */}
+                
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
                     <thead>
@@ -10272,9 +10181,9 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW 4: MARKET MAP & REGIONAL RADAR                                       */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'map' && (
         <div className="view-container">
           <section className="market-map-section">
@@ -10286,10 +10195,10 @@ function App() {
               <span className="count">{nearbyMarkets.length} Markets within {mapRadius} km</span>
             </div>
 
-            {/* Location selector presets */}
+            
             <div className="location-presets-bar">
               <span style={{ font: "10px 'DM Mono', monospace", color: '#6a766c', alignSelf: 'center', marginRight: '4px' }}>
-                Origin: <strong>{mapCoords.label}</strong>
+                {text.weatherOrigin} <strong>{mapCoords.label}</strong>
               </span>
               <button
                 type="button"
@@ -10326,13 +10235,13 @@ function App() {
                   style={{ background: '#dce7d3', color: '#3d5940', borderColor: '#b8cba8' }}
                   onClick={handleUseProfileLocation}
                 >
-                  Use My Profile GPS
+                  {text.weatherUseGps}
                 </button>
               )}
             </div>
 
             <div className="market-map-layout">
-              {/* Radar Visual Canvas */}
+              
               <div className="map-radar-container">
                 <svg className="map-radar-svg" viewBox="0 0 300 300">
                   <defs>
@@ -10360,7 +10269,7 @@ function App() {
                   <text x="146" y="280" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">S</text>
                   <text x="18" y="153" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">W</text>
 
-                  {/* Active Route Line */}
+                  
                   {(() => {
                     if (!selectedMapMarket) return null;
                     const maxRange = Math.max(130, ...nearbyMarkets.map(m => Number(m.distanceKm || 0)));
@@ -10379,7 +10288,7 @@ function App() {
                     );
                   })()}
 
-                  {/* Origin Center Point */}
+                  
                   <circle cx="150" cy="150" r="7" fill="#f2c45f" stroke="#1d2724" strokeWidth="2" />
                   <circle cx="150" cy="150" r="14" fill="none" stroke="#f2c45f" strokeWidth="1" opacity="0.4">
                     <animate attributeName="r" values="7;18;7" dur="2.2s" repeatCount="indefinite" />
@@ -10388,7 +10297,7 @@ function App() {
                     ORIGIN (YOU)
                   </text>
 
-                  {/* Market Nodes */}
+                  
                   {nearbyMarkets.map((m) => {
                     const maxRange = Math.max(130, ...nearbyMarkets.map(item => Number(item.distanceKm || 0)));
                     const scale = 115.0 / maxRange;
@@ -10437,7 +10346,7 @@ function App() {
                 </div>
               </div>
 
-              {/* Nearby Markets List */}
+              
               <div className="nearby-list-container">
                 {mapLoading ? (
                   <p className="muted">Calculating distances and freight costs...</p>
@@ -10488,7 +10397,7 @@ function App() {
                             className="nav-link-btn"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            Navigate ↗
+                            Navigate ↔
                           </a>
                         </div>
                       </div>
@@ -10503,9 +10412,9 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW 5: NOTIFICATIONS & ALERTS FEED                                       */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'notifications' && (
         <div className="view-container">
           <section className="panel" style={{ marginTop: '18px' }}>
@@ -10524,7 +10433,7 @@ function App() {
               </div>
             </div>
 
-            {/* Sub-tab switcher */}
+            
             <div className="tab-toggle-group" style={{ marginBottom: '16px' }}>
               <button
                 type="button"
@@ -10542,7 +10451,7 @@ function App() {
               </button>
             </div>
 
-            {/* SUB-TAB 1: IN-APP DESK FEED */}
+            
             {notifSubTab === 'app' && (
               <div className="notif-list">
                 {notifications.map((n) => (
@@ -10569,7 +10478,7 @@ function App() {
                             setCurrentView(n.viewTarget);
                           }}
                         >
-                          View ↗
+                          View ↔
                         </button>
                       </div>
                     </div>
@@ -10581,7 +10490,7 @@ function App() {
               </div>
             )}
 
-            {/* SUB-TAB 2: FIELD DISPATCH FEED */}
+            
             {notifSubTab === 'sms' && (
               <div>
                 <div style={{ borderBottom: '1px solid #d9d6cc', paddingBottom: '18px', marginBottom: '18px' }}>
@@ -10661,14 +10570,14 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* VIEW 6: PROFILE & LOCATION MANAGEMENT                                     */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {currentView === 'profile' && (
         <div className="view-container">
           <section className="panel" style={{ marginTop: '18px' }}>
-            {/* Header row */}
-                        {/* Demo Account Persona Switcher */}
+            
+                        
             <div style={{ background: '#f8f7f2', border: '1px solid #d9d6cc', borderRadius: '8px', padding: '12px 16px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
               <div>
                 <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#2f6838', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
@@ -10738,7 +10647,7 @@ function App() {
             </div>
 
 
-              {/* Identity summary strip */}
+              
               <div className="profile-id-strip">
                 <div className="profile-id-item">
                   <span>Email</span>
@@ -10754,7 +10663,7 @@ function App() {
                 </div>
               </div>
 
-              {/* FPO 4-Pillar Trust Score Card (Feature B12) */}
+              
               {session?.role === 'FPO' && (
                 <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '16px', margin: '16px 0' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
@@ -10797,7 +10706,7 @@ function App() {
                 </div>
               )}
 
-              {/* Buyer Credibility & Escrow Score Card (Feature C10) */}
+              
               {session?.role === 'BUYER' && (
                 <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '16px', margin: '16px 0' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
@@ -10835,10 +10744,10 @@ function App() {
                 </div>
               )}
 
-              {/* Edit form — uses existing .profile-form 2-col grid */}
+              
               <form className="profile-form" onSubmit={saveProfile} style={{ marginTop: '24px' }}>
 
-                {/* ─── ROLE-SPECIFIC FIELDS: TRANSPORTER ─── */}
+                
                 {session.role === 'TRANSPORTER' && (
                   <>
                     <label>Fleet / Transport Name
@@ -10900,7 +10809,7 @@ function App() {
                   </>
                 )}
 
-                {/* ─── ROLE-SPECIFIC FIELDS: BUYER ─── */}
+                
                 {session.role === 'BUYER' && (
                   <>
                     <label>Business Name
@@ -10934,7 +10843,7 @@ function App() {
                   </>
                 )}
 
-                {/* ─── ROLE-SPECIFIC FIELDS: FARMER ─── */}
+                
                 {session.role === 'FARMER' && (
                   <>
                     <label>Landholding (Acres)
@@ -10970,7 +10879,7 @@ function App() {
                   </>
                 )}
 
-                {/* ─── SHARED LOCATION & CONTACT FIELDS ─── */}
+                
                 <label style={{ gridColumn: '1 / -1' }}>Address / Operational Base
                   <input
                     value={profile.address || ''}
@@ -11037,7 +10946,7 @@ function App() {
                 <button type="submit">Save Profile &amp; Sync GPS <span>&rarr;</span></button>
               </form>
 
-              {/* Alert routing summary — plain table style */}
+              
               <div className="profile-alert-table">
                 <p className="eyebrow" style={{ marginBottom: '12px' }}>Notification Routing</p>
                 <table className="profile-routing-table">
@@ -11088,9 +10997,9 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* FPO REGISTRATION & STATUTORY NABL VERIFICATION MODAL (/fpo/register) (B1)  */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {showFpoRegisterModal && (
         <div style={{
           position: 'fixed',
@@ -11261,9 +11170,9 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* BUYER REGISTRATION & TRADE ONBOARDING MODAL (/buyer/register) (C1)        */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {showBuyerRegisterModal && (
         <div style={{
           position: 'fixed',
@@ -11430,10 +11339,10 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* PRINTABLE / DOWNLOADABLE TRADE DEAL CONTRACT RECEIPT & INVOICE MODAL      */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* Digital 2FA OTP Handshake Confirmation Modal */}
+      
+      
+      
+      
       {dealOtpModal && (
         <div style={{
           position: 'fixed',
@@ -11513,7 +11422,7 @@ function App() {
                   setMessage(`Trade #${tId} contract digitally signed and escrow locked via OTP 2FA!`);
                 }}
               >
-                Verify &amp; Sign Contract ✓
+                Verify &amp; Sign Contract Γ£ô
               </button>
             </div>
           </div>
@@ -11536,7 +11445,7 @@ function App() {
               </span>
             </div>
 
-            {/* Parties Details Grid */}
+            
             <div className="invoice-party-grid">
               <div className="party-block">
                 <span style={{ font: "9px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981' }}>Seller / Producer</span>
@@ -11552,7 +11461,7 @@ function App() {
               </div>
             </div>
 
-            {/* Itemized Produce Specification Table */}
+            
             <table className="invoice-table">
               <thead>
                 <tr>
@@ -11579,7 +11488,7 @@ function App() {
               </tbody>
             </table>
 
-            {/* Financial Totals & Freight Breakdown */}
+            
             <div className="invoice-totals-box">
               <div className="invoice-totals-row">
                 <span>Gross Value:</span>
@@ -11595,14 +11504,14 @@ function App() {
               </div>
             </div>
 
-            {/* Terms & Digital Stamp */}
+            
             <div style={{ background: '#faf7f0', padding: '12px 16px', borderRadius: '4px', border: '1px solid #ded9cc', fontSize: '11px', color: '#68776b', lineHeight: '1.5' }}>
               <p style={{ margin: 0 }}>
                 <strong>Direct Trade Guarantee:</strong> This contract represents a direct farmer-to-buyer transaction facilitated via KisanLink's smart matching and freight calculation protocol. All settlements are tracked under digital hash <code>#KL-HASH-{selectedInvoiceTrade.id}-{Date.now().toString(36).toUpperCase()}</code>.
               </p>
             </div>
 
-            {/* Actions Bar */}
+            
             <div className="invoice-actions">
               <button
                 type="button"
@@ -11625,9 +11534,9 @@ function App() {
         </div>
       )}
 
-      {/* ────────────────────────────────────────────────────────────────────────── */}
-      {/* DIGITAL ESCROW & UPI DEPOSIT MODAL                                        */}
-      {/* ────────────────────────────────────────────────────────────────────────── */}
+      
+      
+      
       {escrowDepositModal && (
         <div className="modal-backdrop" onClick={() => setEscrowDepositModal(null)}>
           <div className="invoice-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
@@ -11690,16 +11599,16 @@ function App() {
         </div>
       )}
 
-        </div>{/* end main-content */}
-      </div>{/* end main-with-sidebar */}
+        </div>
+      </div>
 
-      {/* Right Slide-in Drawer: New Discussion / Notice */}
+      
       {newPostModalOpen && (
         <div className={`drawer-backdrop ${closingDrawer === 'COMMUNITY' ? 'drawer-closing' : ''}`} onClick={closeCommunityDrawer}>
 
           <div className={`slide-drawer ${closingDrawer === 'COMMUNITY' ? 'drawer-closing' : ''}`} onClick={(e) => e.stopPropagation()}>
             
-            {/* Drawer Header */}
+            
             <div className="drawer-header">
               <div>
                 <p className="eyebrow">Farmers Community</p>
@@ -11711,10 +11620,10 @@ function App() {
 
             <form onSubmit={handleCreateCommunityPost} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
               
-              {/* Scrollable Drawer Body */}
+              
               <div className="drawer-body">
                 
-                {/* Segmented Role Selector */}
+                
                 <div className="field-group">
                   <label className="field-label">Posting Role</label>
                   <div className="role-segment-container">
@@ -11747,7 +11656,7 @@ function App() {
                   </p>
                 </div>
 
-                {/* Category Pill Selector */}
+                
                 <div className="field-group">
                   <label className="field-label">Topic Category</label>
                   <div className="modal-category-pills">
@@ -11769,7 +11678,7 @@ function App() {
                   </div>
                 </div>
 
-                {/* Author Name & Designation */}
+                
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div className="field-group">
                     <label className="field-label">Your Name / Organization</label>
@@ -11794,7 +11703,7 @@ function App() {
                   </div>
                 </div>
 
-                {/* Commodity & Location */}
+                
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div className="field-group">
                     <label className="field-label">Commodity</label>
@@ -11827,7 +11736,7 @@ function App() {
                   </div>
                 </div>
 
-                {/* Discussion Title */}
+                
                 <div className="field-group">
                   <label className="field-label">Topic Title *</label>
                   <input
@@ -11846,7 +11755,7 @@ function App() {
                   />
                 </div>
 
-                {/* Description & Specifications */}
+                
                 <div className="field-group">
                   <label className="field-label">Details / Terms / Symptoms</label>
                   <textarea
@@ -11858,7 +11767,7 @@ function App() {
                   />
                 </div>
 
-                {/* Specimen / Reference Image Box */}
+                
                 <div className="field-group">
                   <label className="field-label">Attach Leaf Photo / Quality Specimen (Optional)</label>
                   <div className="specimen-upload-box">
@@ -11902,7 +11811,7 @@ function App() {
 
               </div>
 
-              {/* Drawer Sticky Footer */}
+              
               <div className="drawer-footer">
                 <button type="button" className="trade-btn trade-btn-secondary" onClick={closeCommunityDrawer}>
                   Cancel
@@ -11917,7 +11826,7 @@ function App() {
         </div>
       )}
 
-      {/* Right Slide-in Drawer: Sell Produce Lot */}
+      
       {quickProduceModal && (
         <div className={`drawer-backdrop ${closingDrawer === 'PRODUCE' ? 'drawer-closing' : ''}`} onClick={closeProduceDrawer}>
           <div className={`slide-drawer ${closingDrawer === 'PRODUCE' ? 'drawer-closing' : ''}`} onClick={(e) => e.stopPropagation()}>
@@ -12043,7 +11952,7 @@ function App() {
         </div>
       )}
 
-      {/* Right Slide-in Drawer: Post Buy Requirement */}
+      
       {quickRequirementModal && (
         <div className={`drawer-backdrop ${closingDrawer === 'REQUIREMENT' ? 'drawer-closing' : ''}`} onClick={closeRequirementDrawer}>
           <div className={`slide-drawer ${closingDrawer === 'REQUIREMENT' ? 'drawer-closing' : ''}`} onClick={(e) => e.stopPropagation()}>
@@ -12171,7 +12080,7 @@ function App() {
         </div>
       )}
 
-      {/* Right Slide-in Drawer: Google Map & Facility Inspector */}
+      
       {googleMapModalNode && (
         <div
           className={`drawer-backdrop ${closingDrawer === 'GOOGLE_MAP' ? 'drawer-closing' : ''}`}
@@ -12193,7 +12102,7 @@ function App() {
             </div>
 
             <div className="drawer-body">
-              {/* Live Embedded Google Map */}
+              
               <div style={{ borderRadius: '4px', overflow: 'hidden', border: '1px solid #d9d6cc', height: '270px', position: 'relative' }}>
                 <iframe
                   title={`Google Map - ${googleMapModalNode.name}`}
@@ -12205,7 +12114,7 @@ function App() {
                 />
               </div>
 
-              {/* Facility Address & Proximity */}
+              
               <div style={{ background: '#faf9f5', border: '1px solid #e7e4db', borderRadius: '4px', padding: '12px 14px', marginTop: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', gap: '8px' }}>
                   <div>
@@ -12235,7 +12144,7 @@ function App() {
                 </div>
               </div>
 
-              {/* Services & Assistance Offerings */}
+              
               <div style={{ marginTop: '14px' }}>
                 <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, textTransform: 'uppercase' }}>
                   Services &amp; Key Focus Areas

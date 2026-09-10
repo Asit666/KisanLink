@@ -45,13 +45,10 @@ public class MarketService {
         return marketRepository.save(market);
     }
 
-    /**
-     * Finds markets ordered by shortest distance from the given coordinates.
-     * Computes transport freight cost, travel time estimates, compass direction, and navigation links.
-     */
+    
     public List<NearbyMarketResponse> findNearbyMarkets(Double originLat, Double originLon,
                                                         Double maxDistanceKm, Integer limit) {
-        // Fallback to default coordinates if origin not provided (e.g. Ranchi center: 23.3441, 85.3096)
+        
         double lat = originLat != null ? originLat : 23.3441;
         double lon = originLon != null ? originLon : 85.3096;
 
@@ -70,7 +67,7 @@ public class MarketService {
                     BigDecimal distance = DistanceCalculator.between(lat, lon, m.getLatitude(), m.getLongitude());
                     BigDecimal transportCost = ProfitCalculator.transport(distance, baseCharge, ratePerKm);
 
-                    // Average agricultural freight transit speed ~40 km/h
+                    // Average agricultural freight transit speed 40 km/h
                     int durationMinutes = Math.max(5, (int) Math.round(distance.doubleValue() / 40.0 * 60));
 
                     String direction = calculateCardinalDirection(lat, lon, m.getLatitude(), m.getLongitude());

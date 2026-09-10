@@ -52,6 +52,9 @@ public class MandiDataIngestionService {
     @Value("${kisanlink.agmarknet.resource-id:9ef84268-d588-465a-a308-a864a43d0070}")
     private String resourceId;
 
+    @Value("${kisanlink.agmarknet.fallback-resource-id:35985678-0d79-46b4-9ed6-6f13308a1d24}")
+    private String fallbackResourceId;
+
     @Value("${kisanlink.agmarknet.default-state:Jharkhand}")
     private String defaultState;
 
@@ -100,26 +103,16 @@ public class MandiDataIngestionService {
         }
 
         try {
-            String encodedState = URLEncoder.encode(targetState, StandardCharsets.UTF_8);
-            String url = String.format(Locale.US,
-                    "https://api.data.gov.in/resource/%s?api-key=%s&format=json&limit=%d&filters[state]=%s",
-                    resourceId, apiKey, maxRecords, encodedState);
-
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .timeout(Duration.ofSeconds(10))
-                    .header("User-Agent", "KisanLink-Mandi-Ingestion/1.0")
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                return new MandiSyncResult(0, 0, 0, "HTTP_ERROR_" + response.statusCode(),
-                        "AGMARKNET endpoint returned HTTP " + response.statusCode());
-            }
-
-            JsonNode root = objectMapper.readTree(response.body());
-            JsonNode recordsNode = root.path("records");
+                JsonNode recordsNode = fetchRecords(resourceId, targetState, maxRecords, true);
+                String usedResourceId = resourceId;
+                if (recordsNode.isEmpty() && fallbackResourceId != null && !fallbackResourceId.isBlank()
+                    && !fallbackResourceId.equals(resourceId)) {
+                recordsNode = fetchRecords(fallbackResourceId, targetState, maxRecords, true);
+                usedResourceId = fallbackResourceId;
+                }
+                if (recordsNode.isEmpty()) {
+                recordsNode = fetchRecords(usedResourceId, targetState, maxRecords, false);
+                }
             if (!recordsNode.isArray() || recordsNode.isEmpty()) {
                 return new MandiSyncResult(0, 0, 0, "NO_RECORDS",
                         "No mandi price records returned for state: " + targetState);
@@ -139,12 +132,34 @@ public class MandiDataIngestionService {
             }
 
             return new MandiSyncResult(fetched, ingested, skipped, "SUCCESS",
-                    String.format("Successfully ingested %d of %d mandi records for %s.", ingested, fetched, targetState));
+                    String.format("Successfully ingested %d of %d live mandi records for %s using resource %s.", ingested, fetched, targetState, usedResourceId));
 
         } catch (Exception e) {
             log.error("Failed to sync AGMARKNET mandi prices: {}", e.getMessage(), e);
             return new MandiSyncResult(0, 0, 0, "EXCEPTION", "Error syncing AGMARKNET: " + e.getMessage());
         }
+    }
+
+    private JsonNode fetchRecords(String requestedResourceId, String state, int limit, boolean filterByState) throws Exception {
+        StringBuilder url = new StringBuilder(String.format(Locale.US,
+                "https://api.data.gov.in/resource/%s?api-key=%s&format=json&limit=%d",
+                requestedResourceId, apiKey, limit));
+        if (filterByState) {
+            url.append("&filters[state]=").append(URLEncoder.encode(state, StandardCharsets.UTF_8));
+        }
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url.toString()))
+                .timeout(Duration.ofSeconds(10))
+                .header("User-Agent", "KisanLink-Mandi-Ingestion/1.0")
+                .GET()
+                .build();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != 200) {
+            log.warn("AGMARKNET resource {} returned HTTP {}", requestedResourceId, response.statusCode());
+            return objectMapper.createArrayNode();
+        }
+        JsonNode records = objectMapper.readTree(response.body()).path("records");
+        return records.isArray() ? records : objectMapper.createArrayNode();
     }
 
     private boolean processRecord(JsonNode record, String defaultStateName) {
@@ -154,6 +169,10 @@ public class MandiDataIngestionService {
             String district = record.path("district").asText("").trim();
             String state = record.path("state").asText(defaultStateName).trim();
             String arrivalDateStr = record.path("arrival_date").asText("").trim();
+
+            if (!state.isBlank() && !state.equalsIgnoreCase(defaultStateName)) {
+                return false;
+            }
 
             double minPriceVal = record.path("min_price").asDouble(0.0);
             double maxPriceVal = record.path("max_price").asDouble(0.0);

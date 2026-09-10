@@ -18,6 +18,7 @@ public record WeatherAdvisoryResponse(
         String transitAdvisory,
         List<String> cropAdvisories,
         List<WeatherDailyForecast> forecast,
+        String dataStatus,
         Instant generatedAt
 ) {
 }

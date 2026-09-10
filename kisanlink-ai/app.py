@@ -26,6 +26,7 @@ from PIL import Image
 from pydantic import BaseModel
 from starlette.datastructures import Headers
 from torchvision import models, transforms
+from mcp_client import KisanLinkMcpClient, McpClientError
 
 # Configure structured logging
 logging.basicConfig(level=logging.INFO)
@@ -172,6 +173,27 @@ class DiagnosisResponse(BaseModel):
     device: str
     model_status: str
     requires_expert_review: bool = False
+
+
+class PricePredictionRequest(BaseModel):
+    crop: str
+    market: Optional[str] = None
+    horizon: int = 7
+
+
+class PricePredictionResponse(BaseModel):
+    crop: str
+    market: Optional[str]
+    current_price: float
+    forecast: List[float]
+    trend: str
+    confidence: float
+    observation_count: int
+    source: str
+    data_status: str
+    last_refresh: Optional[str] = None
+    model_version: str
+    disclaimer: str
 
 
 def infer_crop_from_label(raw_label: str, fallback: str = "General Crop") -> str:
@@ -385,6 +407,48 @@ def health():
 @app.get("/classes")
 def list_classes():
     return CLASS_DATA
+
+
+@app.post("/price-prediction", response_model=PricePredictionResponse)
+def predict_price(payload: PricePredictionRequest):
+    horizon = min(max(payload.horizon, 1), 14)
+    try:
+        result = KisanLinkMcpClient().historical_prices(payload.crop, payload.market, 365)
+    except McpClientError as exc:
+        raise HTTPException(status_code=502, detail=f"Market data MCP unavailable: {exc}") from exc
+
+    observations = result.get("data", [])
+    observations = sorted(observations, key=lambda row: row.get("date", ""))
+    prices = [float(row["modal_price"]) for row in observations if row.get("modal_price") is not None]
+    if not prices:
+        raise HTTPException(status_code=422, detail="MCP returned insufficient market history for prediction.")
+
+    latest = prices[-1]
+    if len(prices) < 2:
+        slope = 0.0
+    else:
+        mean_x = (len(prices) + 1) / 2
+        mean_y = sum(prices) / len(prices)
+        denominator = sum((index + 1 - mean_x) ** 2 for index in range(len(prices)))
+        slope = sum((index + 1 - mean_x) * (price - mean_y) for index, price in enumerate(prices)) / denominator if denominator else 0.0
+
+    forecast = [round(max(1.0, latest + slope * day * (0.92 ** (day - 1))), 2) for day in range(1, horizon + 1)]
+    trend = "UP" if slope > 0.15 else "DOWN" if slope < -0.15 else "STABLE"
+    confidence = round(min(98.0, max(55.0, 65.0 + min(len(prices) * 3.5, 25.0))), 1)
+    return PricePredictionResponse(
+        crop=payload.crop,
+        market=payload.market,
+        current_price=round(latest, 2),
+        forecast=forecast,
+        trend=trend,
+        confidence=confidence,
+        observation_count=len(prices),
+        source=f"KisanLink MCP market tools ({result.get('data_status', 'UNKNOWN')})",
+        data_status=result.get("data_status", "UNKNOWN"),
+        last_refresh=result.get("last_refresh"),
+        model_version="price-model-mcp-v1.0",
+        disclaimer="Estimated market price based on historical market data; not a guaranteed price.",
+    )
 
 
 @app.post("/predict", response_model=DiagnosisResponse)

@@ -8,5 +8,6 @@ pillow>=10.4.0
 python-multipart>=0.0.9
 pydantic>=2.8.0
 requests>=2.32.0
+# MCP transport uses the existing requests dependency; no database access is allowed here.
 streamlit>=1.38.0
 matplotlib>=3.9.0

@@ -52,6 +52,7 @@ public class WeatherAdvisoryService {
         String cropName = crop != null ? crop.getName() : "General Produce";
 
         WeatherData liveData = fetchLiveWeatherData(lat, lon);
+        String dataStatus = liveData != null ? "LIVE_OPEN_METEO" : "FALLBACK_ESTIMATE";
 
         double currentTemp;
         int humidity;
@@ -164,6 +165,7 @@ public class WeatherAdvisoryService {
                 transitAdvisory,
                 cropAdvisories,
                 forecastList,
+                dataStatus,
                 Instant.now()
         );
     }
