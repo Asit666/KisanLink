@@ -1002,9 +1002,9 @@ The backend should only believe the payment provider.
 
 ---
 
-# 2. 🚨 SMS / WhatsApp — SIMULATION
+# 2. SMS / WhatsApp — Simulation by default, MSG91 SMS opt-in
 
-The repository explicitly identifies this as a simulation.
+The default development mode is a simulation, but the backend now supports opt-in real SMS through MSG91.
 
 The backend's `SmsWhatsAppService` generates its own provider message ID:
 
@@ -1019,7 +1019,7 @@ and immediately sets:
 MessageStatus.DELIVERED
 ```
 
-There is no SMS or WhatsApp provider call in this service.
+When `KISANLINK_SMS_MODE=real` is enabled with `MSG91_AUTH_KEY` and `MSG91_TEMPLATE_ID`, SMS is sent through the MSG91 Flow API. WhatsApp remains simulated until a WhatsApp Business provider is configured.
 
 The frontend also explicitly provides:
 
@@ -1079,13 +1079,13 @@ rather than having the business logic depend directly on a fake sender.
 
 ---
 
-# 3. 🚨 Weather — SYNTHETIC, NOT LIVE WEATHER
+# 3. Weather — Live Open-Meteo data with offline fallback
 
-This one is very clearly simulated.
+The current service requests live weather from Open-Meteo and retains a deterministic offline fallback for network outages.
 
-`WeatherAdvisoryService` doesn't call a weather API.
+`WeatherAdvisoryService` calls Open-Meteo for current conditions and a five-day forecast.
 
-Instead it calculates weather using coordinates:
+If the external request fails, it calculates a clearly fallback weather estimate using coordinates:
 
 ```text
 currentTemp = ...
@@ -1128,11 +1128,11 @@ formula
 5-day forecast
 ```
 
-is **not a real weather forecast**.
+is a fallback estimate, not a replacement for live provider data.
 
 ### How to fix it
 
-Integrate an actual weather provider.
+Keep the Open-Meteo integration monitored and label fallback estimates clearly in the UI when provider access fails.
 
 ```text
 GPS
@@ -1903,10 +1903,10 @@ Hash chaining gives you tamper-evident history without adding blockchain complex
 | Escrow | 🔴 Simulation | Real payment provider |
 | UPI | 🔴 Simulation | UPI/payment integration + webhook |
 | Payout UTR | 🔴 Generated/simulated | Provider-generated settlement reference |
-| SMS | 🔴 Simulation | SMS provider |
+| SMS | 🟠 Simulation by default; real MSG91 SMS is opt-in | Provider credentials, approved DLT template, delivery reports |
 | WhatsApp | 🔴 Simulation | WhatsApp Business API |
 | Inbound SMS | 🟠 Functional simulation/webhook shape | Real provider webhook |
-| Weather | 🔴 Synthetic | Weather API |
+| Weather | 🟢 Live Open-Meteo with deterministic offline fallback | Provider monitoring and explicit fallback labeling |
 | Crop Doctor | 🔴 Heuristic fallback | Trained + validated model |
 | AI confidence | 🔴 Not trustworthy in fallback | Calibrated model confidence |
 | Price database | 🟢 Real backend CRUD | Official live data ingestion |
@@ -1924,7 +1924,7 @@ Hash chaining gives you tamper-evident history without adding blockchain complex
 | Quality certificates | 🔴 Demo/sample data | Lab integration/upload verification |
 | Blockchain claims | 🔴 Appears simulated | Remove or implement audit ledger |
 
-The README itself confirms that SMS/WhatsApp is explicitly a simulation, while the AI code confirms that the model falls back to heuristics when the checkpoint isn't present.
+The default SMS/WhatsApp mode remains simulation for safe development, while MSG91 SMS can be enabled explicitly with environment variables. Weather now uses Open-Meteo live data and falls back to a deterministic estimate when the provider is unavailable.
 
 ---
 

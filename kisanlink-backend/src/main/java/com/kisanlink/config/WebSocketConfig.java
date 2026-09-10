@@ -48,7 +48,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        String[] allowedOrigins = {"http://localhost:5173", "http://localhost:3000", "http://localhost:5174", "http://localhost:5175"};
+        String[] allowedOrigins = {"http://localhost:5173", "http://localhost:3000", "http://localhost:5174", "http://localhost:5175", "http://192.168.137.1:*", "http://172.16.10.242:*"};
         // Native WebSocket STOMP endpoint with restricted CORS
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns(allowedOrigins);

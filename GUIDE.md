@@ -182,6 +182,8 @@ npm.cmd run dev
 
 Open your browser to: **`http://localhost:5173`**
 
+For a physical phone, use the PC's Wi-Fi/LAN address instead, for example `http://172.16.10.242:5173`. Keep both devices on the same network. Development API and WebSocket requests are proxied through Vite, so the phone does not need direct access to backend port `8080`.
+
 ---
 
 ### Ports Summary
@@ -195,10 +197,29 @@ Open your browser to: **`http://localhost:5173`**
 | **AI Backend** | `http://localhost:8000` | PyTorch inference microservice |
 | **AI Swagger Docs** | `http://localhost:8000/docs` | Interactive OpenAPI documentation |
 
+For phone testing, use the same host address for the frontend, such as `http://172.16.10.242:5173`. If the page cannot be reached, allow Node.js/Vite through Windows Firewall for private networks and confirm the Vite process is listening with `--host 0.0.0.0`.
+
 **H2 Console Login (Dev Profile):**
 - **JDBC URL**: `jdbc:h2:mem:kisanlink-dev`
 - **User Name**: `sa`
 - **Password**: *(leave blank)*
+
+### Real SMS Demo (MSG91)
+
+SMS delivery is simulated by default. To send a real SMS, create a MSG91 Flow template whose message contains the `VAR1` variable, then set these environment variables in the same PowerShell window used to start Spring Boot:
+
+```powershell
+$env:KISANLINK_SMS_MODE = "real"
+$env:MSG91_AUTH_KEY = "your-msg91-auth-key"
+$env:MSG91_TEMPLATE_ID = "your-approved-flow-template-id"
+$env:MSG91_SENDER_ID = "KISAN"
+cd C:\dev_tool\GitHub\doc\kisanlink-backend
+.\mvnw.cmd spring-boot:run
+```
+
+Use the notification panel's **SMS** channel and enter a real number in international or Indian format. In real mode, the response status is `SENT` when MSG91 accepts the request; final delivery depends on MSG91 and carrier delivery reports. WhatsApp remains simulated until a WhatsApp Business provider is configured.
+
+Never commit provider credentials or put them in frontend code.
 
 ---
 
@@ -561,7 +582,7 @@ kisanlink.transport.max-distance-km=500.0
 
 ### Frontend (`frontend/.env`)
 ```properties
-VITE_API_URL=http://localhost:8080
+VITE_API_URL=
 VITE_AI_API_URL=http://localhost:8000
 ```
 

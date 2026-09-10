@@ -1076,8 +1076,11 @@ Never trust a role or price sent by the Flutter client.
 Use separate configurations:
 
 ``` text
-Development
-    API_BASE_URL=http://localhost:8080
+Development (Windows desktop)
+      API_BASE_URL=http://localhost:8080/api
+
+Physical Android device on the same Wi-Fi as the development PC
+      API_BASE_URL=http://<PC_LAN_IP>:8080/api
 
 Testing
     API_BASE_URL=<test-server>
@@ -1087,7 +1090,9 @@ Production
 ```
 
 For Windows local development, `localhost` can be used when the backend
-is running locally.
+is running locally. For a physical phone, use the PC's LAN IP and allow
+backend port 8080 through the private-network firewall, or use the React
+web app's Vite proxy at `http://<PC_LAN_IP>:5173`.
 
 For Android emulator, remember that Android emulator networking may
 require a special host address when accessing the developer machine.

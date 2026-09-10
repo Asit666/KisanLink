@@ -54,7 +54,7 @@ flutter_app/
 |---|---|---|
 | **Windows Desktop** | `http://localhost:8080/api` | Connects directly via loopback |
 | **Android Emulator** | `http://10.0.2.2:8080/api` | Standard Android Studio emulator loopback alias |
-| **Physical Android Device** | `http://<LAN_IP>:8080/api` | Configurable in `SecureStorageService` or environment |
+| **Physical Android Device** | `http://<LAN_IP>:8080/api` | Requires same Wi-Fi and Windows Firewall access to port 8080 |
 
 ---
 
@@ -75,6 +75,9 @@ flutter run -d windows
 
 # Run on Android Device / Emulator
 flutter run -d android
+
+# Physical device: configure the backend base URL to the PC LAN address,
+# for example http://172.16.10.242:8080/api. Do not use localhost.
 
 # Execute Unit Tests
 flutter test test/models_test.dart

@@ -34,7 +34,7 @@ Workspace:
 - Baseline price estimate API with an explicit estimate disclaimer.
 - Notification read and mark-read APIs.
 - Explainable recommendation engine using quality matching, quantity, distance, transport cost, gross revenue, net return, and score.
-- CORS support for localhost ports 3000, 5173, 5174, and 5175.
+- CORS support for localhost ports 3000, 3001, 5173, 5174, and 5175 plus configured LAN development origins.
 - Development sample data: 10 crops across VEGETABLE, FRUIT, GRAIN, PULSE, OIL_SEED categories; Ranchi Main Mandi market; two Tomato modal prices.
 - Root health endpoint: `GET /`.
 - Password hashes excluded from JSON responses.
@@ -42,7 +42,7 @@ Workspace:
 - Secured Notification APIs: Added `GET /api/notifications/me` (authenticated principal scoping) and owner-verified `PATCH /api/notifications/{id}/read`.
 - Hardened Inbound SMS/WhatsApp Webhook with configurable `X-Webhook-Secret` validation (`kisanlink.webhook.secret`).
 - Fixed frontend WebSocket price-alert callback (replaced undefined `loadMarketPrices` with `loadPriceData(selectedPulseCropId)`).
-- Frontend dynamic API configuration via `import.meta.env.VITE_API_URL` with fallback to `http://localhost:8080`.
+- Frontend development API requests use the Vite same-origin proxy (`/api` -> `http://localhost:8080`), which also supports physical phones over the LAN.
 - All 18 backend integration tests verified passing with 0 failures and 0 errors.
 
 - `CropCategory` enum (VEGETABLE, FRUIT, GRAIN, PULSE, SEED, SPICE, OIL_SEED, FLOWER, OTHER) on the `Crop` entity.
@@ -79,7 +79,7 @@ Workspace:
   6. `map`: Interactive SVG Mandi Radar map with user origin pin, distance rings (30km, 75km, 120km+), color-coded mandi nodes (APMC/Mandi/Wholesale), active route polyline, transit times, and instant directions.
   7. `notifications`: Real-time alerts feed for price spikes, matching buyer requirements, and market routes with unread counters.
   8. `profile`: Location & profile management with GPS coordinates and session sign in/out.
-- Frontend API base URL is `http://localhost:8080`.
+- Frontend API requests use the Vite proxy in development. Desktop API traffic is forwarded to `http://localhost:8080`; a phone should open the Vite LAN URL, for example `http://<PC_LAN_IP>:5173`.
 
 ## Verified commands and results
 Backend compile:
@@ -128,6 +128,8 @@ cd C:\dev_tool\GitHub\doc\frontend
 npm.cmd run dev
 ```
 Vite may use port 5173 or 5174 if the first port is occupied.
+
+For a physical phone, start Vite with `npm.cmd run dev -- --host 0.0.0.0 --port 5173`, keep the phone and PC on the same Wi-Fi, and open `http://<PC_LAN_IP>:5173`. Do not use `localhost` on the phone.
 
 ## PostgreSQL setup
 PostgreSQL has been downloaded by the user but still needs to be installed/configured.

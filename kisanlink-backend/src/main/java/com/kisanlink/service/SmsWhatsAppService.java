@@ -1,5 +1,7 @@
 package com.kisanlink.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kisanlink.dto.InboundSmsWebhookRequest;
 import com.kisanlink.dto.SmsAlertRequest;
 import com.kisanlink.dto.SmsAlertResponse;
@@ -10,8 +12,15 @@ import com.kisanlink.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.Instant;
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -22,6 +31,20 @@ public class SmsWhatsAppService {
     private final UserRepository userRepository;
     private final TradeDealRepository tradeDealRepository;
     private final NotificationWebSocketService notificationWebSocketService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final HttpClient httpClient;
+
+    @org.springframework.beans.factory.annotation.Value("${kisanlink.sms.mode:simulated}")
+    private String smsMode;
+
+    @org.springframework.beans.factory.annotation.Value("${kisanlink.sms.msg91.auth-key:}")
+    private String msg91AuthKey;
+
+    @org.springframework.beans.factory.annotation.Value("${kisanlink.sms.msg91.template-id:}")
+    private String msg91TemplateId;
+
+    @org.springframework.beans.factory.annotation.Value("${kisanlink.sms.msg91.sender-id:}")
+    private String msg91SenderId;
 
     public SmsWhatsAppService(SmsWhatsAppLogRepository logRepository,
                               UserRepository userRepository,
@@ -31,6 +54,9 @@ public class SmsWhatsAppService {
         this.userRepository = userRepository;
         this.tradeDealRepository = tradeDealRepository;
         this.notificationWebSocketService = notificationWebSocketService;
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
     }
 
     public interface NotificationGatewayProvider {
@@ -57,7 +83,9 @@ public class SmsWhatsAppService {
                 : (user != null && user.getPhone() != null ? user.getPhone() : "+91-9876543210");
 
         MessageChannel targetChannel = channel != null ? channel : MessageChannel.SMS;
-        GatewayResult gatewayResult = gatewayProvider.dispatch(phone, targetChannel, text);
+        GatewayResult gatewayResult = isRealMode()
+            ? dispatchThroughMsg91(phone, targetChannel, text)
+            : gatewayProvider.dispatch(phone, targetChannel, text);
 
         SmsWhatsAppLog log = new SmsWhatsAppLog();
         log.setUser(user);
@@ -71,6 +99,65 @@ public class SmsWhatsAppService {
 
         SmsWhatsAppLog saved = logRepository.save(log);
         return mapToResponse(saved);
+    }
+
+    private boolean isRealMode() {
+        return "real".equalsIgnoreCase(smsMode);
+    }
+
+    private GatewayResult dispatchThroughMsg91(String recipientPhone, MessageChannel channel, String text) {
+        if (channel != MessageChannel.SMS) {
+            throw new IllegalStateException("Real mode currently supports SMS only. Configure a WhatsApp provider separately.");
+        }
+        if (msg91AuthKey.isBlank() || msg91TemplateId.isBlank()) {
+            throw new IllegalStateException("MSG91 is not configured. Set MSG91_AUTH_KEY and MSG91_TEMPLATE_ID.");
+        }
+
+        try {
+            Map<String, Object> recipient = new HashMap<>();
+            recipient.put("mobiles", normalizeForMsg91(recipientPhone));
+            recipient.put("VAR1", text);
+
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("template_id", msg91TemplateId);
+            payload.put("recipients", List.of(recipient));
+            if (!msg91SenderId.isBlank()) {
+                payload.put("sender", msg91SenderId);
+            }
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://control.msg91.com/api/v5/flow/"))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("authkey", msg91AuthKey)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(payload)))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                throw new IllegalStateException("MSG91 rejected the SMS request with HTTP " + response.statusCode());
+            }
+
+            JsonNode responseBody = objectMapper.readTree(response.body());
+            String providerId = responseBody.path("request_id").asText("");
+            if (providerId.isBlank()) {
+                providerId = "MSG91-" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
+            }
+            return new GatewayResult(providerId, MessageStatus.SENT, false);
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("MSG91 SMS request was interrupted.", exception);
+        } catch (Exception exception) {
+            if (exception instanceof IllegalStateException illegalStateException) {
+                throw illegalStateException;
+            }
+            throw new IllegalStateException("MSG91 SMS request failed.", exception);
+        }
+    }
+
+    private String normalizeForMsg91(String phone) {
+        String digits = phone.replaceAll("[^0-9]", "");
+        return digits.startsWith("91") ? digits : "91" + digits;
     }
 
     public SmsAlertResponse handleInboundWebhook(InboundSmsWebhookRequest req) {

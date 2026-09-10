@@ -691,6 +691,7 @@ function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [weatherCropId, setWeatherCropId] = useState(null);
   const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherError, setWeatherError] = useState('');
 
   // Notifications state
   const [notifications, setNotifications] = useState([
@@ -1197,15 +1198,18 @@ function App() {
 
   async function loadWeatherAdvisory(lat, lon, cropId, locLabel) {
     setWeatherLoading(true);
+    setWeatherError('');
     try {
       const cropParam = cropId ? `&cropId=${cropId}` : '';
       const locParam = locLabel ? `&locationName=${encodeURIComponent(locLabel)}` : '';
       const res = await fetch(`${API_URL}/api/weather/advisory?latitude=${lat}&longitude=${lon}${cropParam}${locParam}`);
       if (res.ok) {
         setWeatherData(await res.json());
+      } else {
+        setWeatherError(`Weather service returned HTTP ${res.status}.`);
       }
-    } catch {
-      // Fallback
+    } catch (error) {
+      setWeatherError(error instanceof Error ? error.message : 'Weather service is unavailable.');
     } finally {
       setWeatherLoading(false);
     }
@@ -7407,7 +7411,11 @@ function App() {
                   </div>
                 </div>
               </>
-            ) : null}
+            ) : (
+              <p className="muted" style={{ padding: '24px 0' }}>
+                {weatherError || 'Weather data is unavailable. Try selecting a location again.'}
+              </p>
+            )}
           </section>
         </div>
       )}
