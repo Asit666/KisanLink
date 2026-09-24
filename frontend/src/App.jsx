@@ -45,62 +45,34 @@ import {
   computeQuickSellMetrics
 } from './utils/economics';
 import AboutPage from './views/landing/AboutPage';
-
-
-// Modern Vector Icon Component for Left Navigation
-function NavIcon({ name }) {
-  const p = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", style: { display: "block" } };
-  switch (name) {
-    case 'crops':
-      return <svg {...p}><path d="M7 20h10" /><path d="M12 20v-8" /><path d="M12 12c-3 0-6-3-6-6 4 0 6 3 6 6z" /><path d="M12 12c3 0 6-3 6-6-4 0-6 3-6 6z" /></svg>;
-    case 'inputs':
-      return <svg {...p}><path d="m7.5 4.27 9 5.15" /><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" /></svg>;
-    case 'orders':
-      return <svg {...p}><rect width="16" height="20" x="4" y="2" rx="2" /><path d="M9 22v-4h6v4" /><path d="M8 6h.01" /><path d="M16 6h.01" /><path d="M12 6h.01" /><path d="M12 10h.01" /><path d="M12 14h.01" /></svg>;
-    case 'shop':
-      return <svg {...p}><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" /><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" /><path d="M2 7h20" /></svg>;
-    case 'progress':
-    case 'transport':
-      return <svg {...p}><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" /><path d="M15 18H9" /><path d="M19 18h2a1 1 0 0 0 1-1v-5l-3-4h-5v10Z" /><circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" /></svg>;
-    case 'chat':
-      return <svg {...p}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>;
-    case 'payouts':
-      return <svg {...p}><rect width="20" height="14" x="2" y="5" rx="2" /><line x1="2" x2="22" y1="10" y2="10" /><path d="M6 14h4" /></svg>;
-    case 'intake':
-      return <svg {...p}><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" /><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" /><path d="M7 21h10" /><path d="M12 3v18" /><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" /></svg>;
-    case 'lots':
-      return <svg {...p}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" /></svg>;
-    case 'farmers':
-      return <svg {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>;
-    case 'analytics':
-      return <svg {...p}><line x1="18" x2="18" y1="20" y2="10" /><line x1="12" x2="12" y1="20" y2="4" /><line x1="6" x2="6" y1="20" y2="14" /></svg>;
-    case 'trust':
-      return <svg {...p}><circle cx="12" cy="8" r="6" /><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" /></svg>;
-    case 'governance':
-      return <svg {...p}><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg>;
-    case 'community':
-      return <svg {...p}><path d="M17 6.1H3a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2v3l3-3h9a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2z" /></svg>;
-    case 'diagnostics':
-      return <svg {...p}><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>;
-    case 'support':
-      return <svg {...p}><circle cx="12" cy="12" r="10" /><path d="m4.93 4.93 4.24 4.24" /><path d="m14.83 9.17 4.24-4.24" /><path d="m14.83 14.83 4.24 4.24" /><path d="m9.17 14.83-4.24 4.24" /><circle cx="12" cy="12" r="4" /></svg>;
-    case 'about':
-      return <svg {...p}><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>;
-    default:
-      return <svg {...p}><circle cx="12" cy="12" r="10" /></svg>;
-  }
-}
+import NavIcon from './components/common/NavIcon';
+import { PricePredictionsView, AgroWeatherView, MarketMapView } from './views/market';
+import AgriInputsView from './views/farmer/AgriInputsView';
+import { CommunityView, SupportNetworkView } from './views/community';
+import NotificationsView from './views/admin/NotificationsView';
 
 function App() {
   const [currentView, setCurrentView] = useState(() => {
-    if (typeof window !== 'undefined' && (window.location.pathname === '/about' || window.location.hash === '#/about')) {
-      return 'about';
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace(/^#\/?/, '');
+      if (hash === 'about' || window.location.pathname === '/about') return 'about';
+      if (hash === 'notifications') return 'notifications';
+      if (hash === 'predictions') return 'predictions';
+      if (hash === 'weather') return 'weather';
+      if (hash === 'map') return 'map';
+      if (hash === 'inputs') return 'inputs';
+      if (hash === 'community') return 'community';
+      if (hash === 'support' || hash === 'support-network') return 'support-network';
     }
     return 'prices';
   });
   const [unauthScreen, setUnauthScreen] = useState(() => {
-    if (typeof window !== 'undefined' && (window.location.pathname === '/auth' || window.location.hash === '#/auth')) {
-      return 'auth';
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace(/^#\/?/, '');
+      if (hash === 'auth' || window.location.pathname === '/auth') return 'auth';
+      if (hash === 'notifications' || hash === 'prices' || hash === 'predictions' || hash === 'weather' || hash === 'map' || hash === 'inputs' || hash === 'community' || hash === 'support' || hash === 'support-network') {
+        return 'app';
+      }
     }
     return 'about';
   });
@@ -2000,6 +1972,52 @@ function App() {
       const param1 = parts[2];
       const param2 = parts[3];
 
+      if (cleanHash === 'notifications') {
+        setUnauthScreen('app');
+        setCurrentView('notifications');
+        return;
+      }
+      if (cleanHash === 'predictions') {
+        setUnauthScreen('app');
+        setCurrentView('predictions');
+        return;
+      }
+      if (cleanHash === 'weather') {
+        setUnauthScreen('app');
+        setCurrentView('weather');
+        return;
+      }
+      if (cleanHash === 'map') {
+        setUnauthScreen('app');
+        setCurrentView('map');
+        return;
+      }
+      if (cleanHash === 'inputs') {
+        setUnauthScreen('app');
+        setCurrentView('inputs');
+        return;
+      }
+      if (cleanHash === 'community') {
+        setUnauthScreen('app');
+        setCurrentView('community');
+        return;
+      }
+      if (cleanHash === 'support' || cleanHash === 'support-network') {
+        setUnauthScreen('app');
+        setCurrentView('support-network');
+        return;
+      }
+      if (cleanHash === 'prices') {
+        setUnauthScreen('app');
+        setCurrentView('prices');
+        return;
+      }
+      if (cleanHash === 'about') {
+        setUnauthScreen('about');
+        setCurrentView('about');
+        return;
+      }
+
       if (section === 'fpo') {
         if (resource === 'register') {
           setShowFpoRegisterModal(true);
@@ -3360,6 +3378,7 @@ function App() {
     { id: 'prices', label: 'Mandi Oversight' },
     { id: 'my-orders', label: 'Platform Trades' },
     { id: 'analytics', label: 'State Analytics' },
+    { id: 'notifications', label: text.navNotifications, badge: unreadCount },
     { id: 'profile', label: text.navProfile },
   ] : [
     { id: 'prices', label: text.navPrices },
@@ -4408,7 +4427,7 @@ function App() {
             </div>
           )}
 
-          <p className="left-nav-heading" style={{ marginTop: '16px' }}>{text.sidebarTradeShop}</p>
+          <p className="left-nav-heading">{text.sidebarTradeShop}</p>
 
           <button
             type="button"
@@ -4496,7 +4515,7 @@ function App() {
           {(session?.role === 'FPO' || session?.role === 'FARMER' || session?.role === 'BUYER' || session?.role === 'ADMIN') && (
             <>
               <hr className="left-nav-divider" />
-              <p className="left-nav-heading" style={{ marginTop: '8px', marginBottom: '4px' }}>
+              <p className="left-nav-heading">
                 <span>FPO Operations</span>
                 <button
                   type="button"
@@ -4599,7 +4618,7 @@ function App() {
 
           {session?.role === 'ADMIN' && (
             <>
-              <p className="left-nav-heading" style={{ marginTop: '16px' }}>
+              <p className="left-nav-heading">
                 Nodal Governance
               </p>
 
@@ -4617,7 +4636,7 @@ function App() {
             </>
           )}
 
-          <p className="left-nav-heading" style={{ marginTop: '16px' }}>{text.sidebarAdvisory}</p>
+          <p className="left-nav-heading">{text.sidebarAdvisory}</p>
 
           <button
             type="button"
@@ -4660,14 +4679,19 @@ function App() {
 
           <button
             type="button"
-            className={`left-nav-item ${currentView === 'about' ? 'active' : ''}`}
-            onClick={() => navigateFromMenu('about')}
+            className={`left-nav-item ${currentView === 'notifications' ? 'active' : ''}`}
+            onClick={() => navigateFromMenu('notifications', '#/notifications')}
           >
-            <span className="left-nav-icon"><NavIcon name="about" /></span>
+            <span className="left-nav-icon"><NavIcon name="notifications" /></span>
             <span className="left-nav-label">
-              <strong>About Platform</strong>
-              <small>Ecosystem &amp; Specs</small>
+              <strong>{text.navNotifications || 'Notifications'}</strong>
+              <small>{unreadCount > 0 ? `${unreadCount} unread signals` : 'Field alerts & signals'}</small>
             </span>
+            {unreadCount > 0 && (
+              <span className="count" style={{ marginLeft: 'auto', background: '#dc664a', color: '#fff', fontSize: '10px', padding: '1px 6px', borderRadius: '10px' }}>
+                {unreadCount}
+              </span>
+            )}
           </button>
         </aside>
 
@@ -5417,201 +5441,16 @@ function App() {
 
 
           {currentView === 'inputs' && (
-            <div className="view-container">
-              <section className="panel" style={{ marginTop: '18px' }}>
-                <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
-                  <div>
-                    <p className="eyebrow">{text.inputsSectionTitle}</p>
-                    <h2>{text.inputsSectionTitle}</h2>
-                  </div>
-                  <span className="count">
-                    {crops.filter(c => ['FERTILIZER', 'PESTICIDE', 'BIO_INPUT', 'FARM_EQUIPMENT'].includes(c.category)).length} {text.inputsAvailable}
-                  </span>
-                </div>
-                <p className="muted" style={{ margin: '4px 0 14px', fontSize: '13px' }}>
-                  {text.inputsSectionSubtitle}
-                </p>
-
-
-                <div className="marketplace-toolbar" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div className="category-filter-bar" style={{ margin: 0 }}>
-                    {[
-                      { value: 'ALL', label: text.inputsCategoryAll || 'All' },
-                      { value: 'FERTILIZER', label: text.inputsCategoryFertilizers || 'Fertilizers' },
-                      { value: 'PESTICIDE', label: text.inputsCategoryPesticides || 'Pesticides' },
-                      { value: 'BIO_INPUT', label: text.inputsCategoryBioInputs || 'Bio-Inputs' },
-                      { value: 'FARM_EQUIPMENT', label: 'Farm Equipment' },
-                    ].map((cat) => (
-                      <button
-                        key={cat.value}
-                        type="button"
-                        className={`filter-chip ${inputCategoryFilter === cat.value ? 'active' : ''}`}
-                        onClick={() => setInputCategoryFilter(cat.value)}
-                      >
-                        {cat.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-
-                <div className="agri-inputs-grid" style={{ marginTop: '16px' }}>
-                  {crops
-                    .filter((c) => {
-                      const isInput = ['FERTILIZER', 'PESTICIDE', 'BIO_INPUT', 'FARM_EQUIPMENT'].includes(c.category);
-                      if (!isInput) return false;
-                      if (inputCategoryFilter === 'ALL') return true;
-                      return c.category === inputCategoryFilter;
-                    })
-                    .map((item) => {
-                      const spec = AGRI_INPUT_SPECS[item.name] || {
-                        category: item.category,
-                        composition: 'Certified agricultural grade formulation',
-                        dosage: 'As recommended by agronomic officer',
-                        type: item.category,
-                        subsidized: false,
-                        indicativePrice: `Per ${item.unit || 'unit'}`,
-                        rating: '4.8/5',
-                        dealers: 'Authorized Agro-Dealers Network',
-                      };
-
-                      return (
-                        <div key={item.id} className="agri-input-card">
-                          <div className="agri-input-header">
-                            <div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                                <span className={`category-badge category-${item.category?.toLowerCase()}`}>
-                                  {item.category}
-                                </span>
-                                {spec.subsidized && (
-                                  <span className="subsidized-pill">{text.inputsGovtSubsidized}</span>
-                                )}
-                              </div>
-                              <h3 style={{ margin: '4px 0 2px', fontSize: '15px' }}>{item.name}</h3>
-                              <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
-                                {text.inputsStandardUnit} {item.unit}
-                              </span>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                              <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', textTransform: 'uppercase', display: 'block' }}>{text.inputsIndicativeRate}</span>
-                              <strong style={{ fontSize: '15px', color: '#202a27' }}>{spec.indicativePrice}</strong>
-                            </div>
-                          </div>
-
-                          <div className="agri-input-specs">
-                            <div className="spec-row">
-                              <span className="spec-label">{text.inputsComposition}</span>
-                              <span className="spec-value">{spec.composition}</span>
-                            </div>
-                            <div className="spec-row">
-                              <span className="spec-label">{text.inputsDosage}</span>
-                              <span className="spec-value">{spec.dosage}</span>
-                            </div>
-                            <div className="spec-row">
-                              <span className="spec-label">{text.inputsDistributorHubs}</span>
-                              <span className="spec-value">{spec.dealers} ({spec.rating})</span>
-                            </div>
-                          </div>
-
-                          <div className="agri-input-actions">
-                            <button
-                              type="button"
-                              className="trade-btn trade-btn-primary"
-                              onClick={() => setQuickProcureInputModal({
-                                item,
-                                spec,
-                                quantity: 5,
-                                deliveryDistrict: 'Local Farm Depot'
-                              })}
-                            >
-                              {text.inputsProcure}
-                            </button>
-                            <button
-                              type="button"
-                              className="trade-btn trade-btn-secondary"
-                              onClick={() => handleSellInput(item, spec)}
-                            >
-                              {text.inputsListStock}
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  {crops.filter(c => ['FERTILIZER', 'PESTICIDE', 'BIO_INPUT', 'FARM_EQUIPMENT'].includes(c.category)).length === 0 && (
-                    <p className="muted" style={{ padding: '16px 0' }}>{text.inputsConnectingCatalog}</p>
-                  )}
-                </div>
-              </section>
-
-
-              {quickProcureInputModal && (
-                <div className="modal-backdrop" onClick={() => setQuickProcureInputModal(null)}>
-                  <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
-                    <div className="modal-header">
-                      <div>
-                        <p className="eyebrow">{text.inputProcurementTitle}</p>
-                        <h3 style={{ margin: '2px 0 0', fontSize: '16px' }}>{text.inputProcureItem.replace('{item}', quickProcureInputModal.item.name)}</h3>
-                      </div>
-                      <button type="button" className="close-btn" onClick={() => setQuickProcureInputModal(null)}>&times;</button>
-                    </div>
-
-                    <form onSubmit={handleQuickProcureInputSubmit} style={{ padding: '14px 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      <div style={{ background: '#faf9f5', border: '1px solid #d9d6cc', borderRadius: '4px', padding: '10px 12px' }}>
-                        <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>{text.inputUnitRate}</span>
-                        <strong style={{ marginLeft: '8px', fontSize: '13px' }}>{quickProcureInputModal.spec.indicativePrice}</strong>
-                        <div style={{ fontSize: '11px', color: '#566057', marginTop: '4px' }}>
-                          {text.inputDistributors} {quickProcureInputModal.spec.dealers}
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                        <div className="field-group">
-                          <label className="field-label">{text.inputOrderQuantity}</label>
-                          <input
-                            type="number"
-                            className="field-input"
-                            min="1"
-                            value={quickProcureInputModal.quantity}
-                            onChange={(e) => setQuickProcureInputModal(p => ({ ...p, quantity: e.target.value }))}
-                            required
-                          />
-                        </div>
-                        <div className="field-group">
-                          <label className="field-label">{text.inputCalculatedTotal}</label>
-                          <input
-                            type="text"
-                            className="field-input"
-                            disabled
-                            value={`₹${(Number(quickProcureInputModal.spec.indicativePrice.replace(/[^0-9.]/g, '')) || 450) * Number(quickProcureInputModal.quantity || 1)}`}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="field-group">
-                        <label className="field-label">{text.inputDeliveryDistrict}</label>
-                        <input
-                          type="text"
-                          className="field-input"
-                          value={quickProcureInputModal.deliveryDistrict}
-                          onChange={(e) => setQuickProcureInputModal(p => ({ ...p, deliveryDistrict: e.target.value }))}
-                          required
-                        />
-                      </div>
-
-                      <div className="modal-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '6px' }}>
-                        <button type="button" className="trade-btn trade-btn-secondary" onClick={() => setQuickProcureInputModal(null)}>
-                          {text.inputCancel}
-                        </button>
-                        <button type="submit" className="trade-btn trade-btn-primary">
-                          {text.inputConfirmProcurement}
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              )}
-
-            </div>
+            <AgriInputsView
+              text={text}
+              crops={crops}
+              onSellInput={handleSellInput}
+              inputCategoryFilter={inputCategoryFilter}
+              setInputCategoryFilter={setInputCategoryFilter}
+              quickProcureInputModal={quickProcureInputModal}
+              setQuickProcureInputModal={setQuickProcureInputModal}
+              onSubmitProcure={handleQuickProcureInputSubmit}
+            />
           )}
 
 
@@ -5880,7 +5719,7 @@ function App() {
                     ) : (
                       <div style={{ minHeight: '440px', display: 'grid', placeItems: 'center', textAlign: 'center' }}>
                         <div>
-                          <div style={{ fontSize: '34px', marginBottom: '10px' }}>+</div>
+                          <div style={{ fontSize: '34px', marginBottom: '10px' }}>🌾</div>
                           <h3 style={{ margin: 0, color: '#202a27' }}>{text.diagEmptyStateTitle}</h3>
                           <p className="muted" style={{ maxWidth: '280px', lineHeight: '1.5' }}>{text.diagEmptyStateText}</p>
                         </div>
@@ -5893,655 +5732,30 @@ function App() {
           )}
 
           {currentView === 'community' && (
-
-            <div className="view-container">
-              <section className="panel" style={{ marginTop: '18px' }}>
-                <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
-                  <div>
-                    <p className="eyebrow">{text.communityEyebrow}</p>
-                    <h2>{text.communitySection}</h2>
-                    <p className="muted" style={{ margin: '4px 0 0', fontSize: '13px' }}>
-                      Open bulletin for crop health discussions, procurement notices, and agronomic advisories.
-                    </p>
-                  </div>
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <button
-                      type="button"
-                      className="trade-btn trade-btn-primary"
-                      onClick={() => setNewPostModalOpen(true)}
-                      style={{ padding: '8px 18px', fontSize: '12px' }}
-                    >
-                      {text.communityNewDiscussion}
-                    </button>
-                  </div>
-                </div>
-
-
-                <div className="marketplace-toolbar" style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
-                      <input
-                        type="text"
-                        className="field-input"
-                        placeholder={text.communitySearchPlaceholder}
-                        value={communitySearchQuery}
-                        onChange={(e) => setCommunitySearchQuery(e.target.value)}
-                        style={{ fontSize: '13px', padding: '8px 12px' }}
-                      />
-                      {communitySearchQuery && (
-                        <button
-                          type="button"
-                          onClick={() => setCommunitySearchQuery('')}
-                          style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#778078', fontSize: '11px', fontFamily: "'DM Mono', monospace" }}
-                        >
-                          {text.communityClear}
-                        </button>
-                      )}
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                      <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>{text.communityCommodity}</span>
-                      <select
-                        className="field-input"
-                        value={communityFilterCrop}
-                        onChange={(e) => setCommunityFilterCrop(e.target.value)}
-                        style={{ fontSize: '12px', padding: '7px 10px', width: 'auto', minWidth: '130px' }}
-                      >
-                        <option value="ALL">{text.communityAllCommodities}</option>
-                        <option value="Tomato">Tomato</option>
-                        <option value="Chilli">Chilli / Pepper</option>
-                        <option value="Rice">Rice / Paddy</option>
-                        <option value="Potato">Potato</option>
-                        <option value="Wheat">Wheat</option>
-                        <option value="Mustard">Mustard</option>
-                        <option value="Cotton">Cotton</option>
-                        <option value="Onion">Onion</option>
-                      </select>
-                    </div>
-                  </div>
-
-
-                  <div className="category-filter-bar" style={{ margin: 0, paddingTop: '2px' }}>
-                    {[
-                      { value: 'ALL', label: text.communityAllTopics },
-                      { value: 'FARMER', label: text.communityFarmerQueries },
-                      { value: 'BUYER', label: text.communityBuyerNotices },
-                      { value: 'AGRONOMIST', label: text.communityAgronomistProtocols }
-                    ].map(tab => (
-                      <button
-                        key={tab.value}
-                        type="button"
-                        className={`filter-chip ${communityParticipantFilter === tab.value ? 'active' : ''}`}
-                        onClick={() => setCommunityParticipantFilter(tab.value)}
-                      >
-                        {tab.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-
-                <div className="community-feed">
-                  {communityPosts
-                    .filter(post => {
-                      const matchesParticipant = communityParticipantFilter === 'ALL' ||
-                        post.authorType === communityParticipantFilter ||
-                        post.answers.some(a => a.authorType === communityParticipantFilter);
-                      const matchesCrop = communityFilterCrop === 'ALL' ||
-                        post.cropName.toLowerCase().includes(communityFilterCrop.toLowerCase());
-                      const q = communitySearchQuery.toLowerCase().trim();
-                      const matchesSearch = !q ||
-                        post.title.toLowerCase().includes(q) ||
-                        post.description.toLowerCase().includes(q) ||
-                        post.authorName.toLowerCase().includes(q) ||
-                        post.cropName.toLowerCase().includes(q) ||
-                        post.answers.some(a => a.text.toLowerCase().includes(q) || a.authorName.toLowerCase().includes(q));
-                      return matchesParticipant && matchesCrop && matchesSearch;
-                    })
-                    .map((post) => {
-                      const postTypeLabel = post.postType === 'PROCUREMENT' ? 'BUYER PROCUREMENT' : (post.postType === 'QUALITY_ADVICE' ? 'QUALITY STANDARD' : (post.postType === 'AGRI_ADVICE' ? 'AGRONOMY ADVISORY' : 'CROP HEALTH'));
-
-                      return (
-                        <div key={post.id} className="community-post-card">
-
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              <div style={{ width: '30px', height: '30px', borderRadius: '4px', background: '#202a27', color: '#f6f5f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '12px' }}>
-                                {post.authorName.charAt(0)}
-                              </div>
-                              <div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                                  <strong style={{ fontSize: '13px', color: '#202a27' }}>{post.authorName}</strong>
-                                  <span style={{
-                                    fontSize: '9px',
-                                    fontFamily: "'DM Mono', monospace",
-                                    padding: '1px 5px',
-                                    borderRadius: '2px',
-                                    fontWeight: 600,
-                                    background: post.authorType === 'BUYER' ? '#eef2f8' : (post.authorType === 'AGRONOMIST' ? '#f5f2e8' : '#eef4ec'),
-                                    color: post.authorType === 'BUYER' ? '#204068' : (post.authorType === 'AGRONOMIST' ? '#685420' : '#2f6838')
-                                  }}>
-                                    {post.authorType} {post.authorRole ? `· ${post.authorRole}` : ''}
-                                  </span>
-                                </div>
-                                <span style={{ font: "10px 'DM Mono', monospace", color: '#778078' }}>
-                                  {post.location} &middot; {post.timestamp}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                              <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", background: '#f5f3eb', color: '#685420', padding: '2px 7px', borderRadius: '3px', fontWeight: 600 }}>
-                                {post.cropName.toUpperCase()}
-                              </span>
-                              <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", background: '#eceae2', color: '#333b35', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>
-                                [{postTypeLabel}]
-                              </span>
-                              {post.resolved && (
-                                <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", background: '#e8f4ea', color: '#226330', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>
-                                  [RESOLVED]
-                                </span>
-                              )}
-                            </div>
-                          </div>
-
-
-                          <div>
-                            <h3 style={{ fontSize: '15px', margin: '4px 0 4px', color: '#202a27', lineHeight: '1.4' }}>
-                              {post.title}
-                            </h3>
-                            <p style={{ fontSize: '13px', color: '#444d47', lineHeight: '1.55', margin: 0 }}>
-                              {post.description}
-                            </p>
-                          </div>
-
-
-                          {post.imageUrl && (
-                            <div style={{ borderRadius: '4px', overflow: 'hidden', border: '1px solid #e2ded4', maxWidth: '340px' }}>
-                              <img
-                                src={post.imageUrl}
-                                alt={post.title}
-                                style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', display: 'block' }}
-                              />
-                            </div>
-                          )}
-
-
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #edeae2', paddingTop: '8px', marginTop: '2px' }}>
-                            <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-                              <button
-                                type="button"
-                                className={`endorse-btn ${post.userLiked ? 'endorsed' : ''}`}
-                                onClick={() => handleLikeCommunityPost(post.id)}
-                                title={post.userLiked ? 'Endorsed' : 'Endorse topic'}
-                              >
-                                <span style={{ fontSize: '12px' }}>{post.userLiked ? 'Γ£ô' : '+'}</span>
-                                <span>{post.likesCount}</span>
-                              </button>
-
-                              <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>
-                                {post.answers.length} {post.answers.length === 1 ? text.communityReplyCount : text.communityReplyCountPlural}
-                              </span>
-                            </div>
-
-                            {post.prescribedInput && (
-                              <button
-                                type="button"
-                                className="trade-btn trade-btn-primary"
-                                style={{ fontSize: '10px', padding: '3px 8px' }}
-                                onClick={() => handleOrderPrescriptionInput(post.prescribedInput)}
-                              >
-                                Order {post.prescribedInput.split(' ')[0]} &rarr;
-                              </button>
-                            )}
-                          </div>
-
-
-                          {post.answers.length > 0 && (
-                            <div className="reply-thread">
-                              {post.answers.map((ans) => (
-                                <div
-                                  key={ans.id}
-                                  className={`reply-item ${ans.isVerifiedSolution ? 'verified-reply' : ''}`}
-                                >
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '6px' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                      <strong style={{ fontSize: '12px', color: '#202a27' }}>{ans.authorName}</strong>
-                                      <span style={{
-                                        fontSize: '9px',
-                                        fontFamily: "'DM Mono', monospace",
-                                        background: ans.authorType === 'BUYER' ? '#eef2f8' : (ans.authorType === 'AGRONOMIST' ? '#2f6838' : '#e4e2d8'),
-                                        color: ans.authorType === 'BUYER' ? '#204068' : (ans.authorType === 'AGRONOMIST' ? '#ffffff' : '#333b35'),
-                                        padding: '1px 4px',
-                                        borderRadius: '2px',
-                                        fontWeight: 600
-                                      }}>
-                                        {ans.authorRole.toUpperCase()}
-                                      </span>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                      <span style={{ font: "10px 'DM Mono', monospace", color: '#778078' }}>
-                                        {ans.timestamp}
-                                      </span>
-                                      <button
-                                        type="button"
-                                        className={`endorse-btn ${ans.userLiked ? 'endorsed' : ''}`}
-                                        onClick={() => handleUpvoteCommunityAnswer(post.id, ans.id)}
-                                        title="Endorse response"
-                                      >
-                                        <span style={{ fontSize: '11px' }}>{ans.userLiked ? 'Γ£ô' : '+'}</span>
-                                        <span>{ans.upvotes || 0}</span>
-                                      </button>
-                                    </div>
-                                  </div>
-
-                                  {ans.isVerifiedSolution && (
-                                    <div style={{ display: 'inline-block', background: '#2f6838', color: '#ffffff', fontSize: '8px', fontFamily: "'DM Mono', monospace", padding: '1px 5px', borderRadius: '2px', fontWeight: 600, width: 'fit-content' }}>
-                                      VERIFIED AGRONOMIST PROTOCOL
-                                    </div>
-                                  )}
-
-                                  <p style={{ fontSize: '12px', color: '#2b332d', lineHeight: '1.5', margin: '2px 0', whiteSpace: 'pre-line' }}>
-                                    {ans.text}
-                                  </p>
-
-                                  {ans.prescribedInput && (
-                                    <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                      <span style={{ fontSize: '10px', color: '#566057' }}>Prescribed:</span>
-                                      <button
-                                        type="button"
-                                        className="prescription-btn"
-                                        style={{ padding: '2px 6px', fontSize: '9px' }}
-                                        onClick={() => handleOrderPrescriptionInput(ans.prescribedInput)}
-                                      >
-                                        Order {ans.prescribedInput} &rarr;
-                                      </button>
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-
-
-                          <div style={{ marginTop: '6px', display: 'flex', gap: '6px' }}>
-                            <input
-                              type="text"
-                              className="field-input"
-                              placeholder={text.communityAddReply}
-                              value={replyInputByPostId[post.id] || ''}
-                              onChange={(e) => setReplyInputByPostId(prev => ({ ...prev, [post.id]: e.target.value }))}
-                              onKeyDown={(e) => { if (e.key === 'Enter') handleAddCommunityReply(post.id); }}
-                              style={{ fontSize: '12px', padding: '6px 10px' }}
-                            />
-                            <button
-                              type="button"
-                              className="trade-btn trade-btn-secondary"
-                              onClick={() => handleAddCommunityReply(post.id)}
-                              style={{ padding: '6px 12px', fontSize: '11px', whiteSpace: 'nowrap' }}
-                            >
-                              {text.communityReply}
-                            </button>
-                          </div>
-
-                        </div>
-                      );
-                    })}
-
-                  {communityPosts.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '36px 20px', background: '#faf9f5', borderRadius: '4px', border: '1px dashed #d9d6cc' }}>
-                      <p style={{ fontSize: '14px', fontWeight: 600, color: '#202a27', margin: '0 0 4px' }}>
-                        {text.communityNoDiscussions}
-                      </p>
-                      <p style={{ fontSize: '12px', color: '#778078', margin: '0 0 12px' }}>
-                        {text.communityNoDiscussionsSub}
-                      </p>
-                      <button
-                        type="button"
-                        className="trade-btn trade-btn-primary"
-                        onClick={() => setNewPostModalOpen(true)}
-                      >
-                        {text.communityNewDiscussion}
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-              </section>
-
-            </div>
+            <CommunityView
+              text={text}
+              communityPosts={communityPosts}
+              onLikePost={handleLikeCommunityPost}
+              onUpvoteAnswer={handleUpvoteCommunityAnswer}
+              onAddReply={handleAddCommunityReply}
+              onOrderPrescriptionInput={handleOrderPrescriptionInput}
+              onOpenNewPostModal={() => setNewPostModalOpen(true)}
+            />
           )}
 
-
-
-
           {currentView === 'support-network' && (
-            <div className="view-container">
-              <section className="panel" style={{ marginTop: '18px' }}>
-                <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
-                  <div>
-                    <p className="eyebrow">Institutional &amp; Expert Field Directory</p>
-                    <h2>{text.supportSectionTitle}</h2>
-                    <p className="muted" style={{ margin: '4px 0 0', fontSize: '13px' }}>
-                      {text.supportSectionSubtitle}
-                    </p>
-                  </div>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <span className="count" style={{ background: '#202a27', color: '#f6f5f0', fontSize: '11px' }}>
-                      {supportDirectoryData.filter(n => n.type === 'GOVT_KVK').length} {text.supportCenters}
-                    </span>
-                    <span className="count" style={{ background: '#2f6838', color: '#f6f5f0', fontSize: '11px' }}>
-                      {supportDirectoryData.filter(n => n.type === 'AGRONOMIST').length} {text.supportAgronomists}
-                    </span>
-                    <span className="count" style={{ background: '#35453e', color: '#f6f5f0', fontSize: '11px' }}>
-                      {supportDirectoryData.filter(n => n.type === 'SOIL_LAB').length} {text.supportSoilLabs}
-                    </span>
-                  </div>
-                </div>
-
-
-                <div className="marketplace-toolbar" style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
-                      <input
-                        type="text"
-                        className="field-input"
-                        placeholder={text.supportSearchPlaceholder}
-                        value={supportSearchQuery}
-                        onChange={(e) => setSupportSearchQuery(e.target.value)}
-                        style={{ fontSize: '13px', padding: '8px 12px' }}
-                      />
-                      {supportSearchQuery && (
-                        <button
-                          type="button"
-                          onClick={() => setSupportSearchQuery('')}
-                          style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#778078', fontSize: '11px', fontFamily: "'DM Mono', monospace" }}
-                        >
-                          Clear
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-
-                  <div className="category-filter-bar" style={{ margin: 0, paddingTop: '2px' }}>
-                    {[
-                      { value: 'ALL', label: 'All Directory' },
-                      { value: 'GOVT_KVK', label: 'Govt KVK & Research' },
-                      { value: 'AGRONOMIST', label: 'Certified Agronomists' },
-                      { value: 'SOIL_LAB', label: 'Soil & Testing Labs' },
-                      { value: 'FPO_HUB', label: 'FPO Hubs' },
-                      { value: 'HELPLINE', label: '24x7 Helplines' }
-                    ].map(tab => (
-                      <button
-                        key={tab.value}
-                        type="button"
-                        className={`filter-chip ${supportCategoryFilter === tab.value ? 'active' : ''}`}
-                        onClick={() => setSupportCategoryFilter(tab.value)}
-                      >
-                        {tab.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-
-                <div className="support-radar-container">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
-                    <div>
-                      <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#889e92', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        {text.supportRadarViewLabel}
-                      </span>
-                      <p style={{ margin: '2px 0 0', fontSize: '13px', color: '#ffffff', fontWeight: 600 }}>
-                        {supportMapViewMode === 'RADAR'
-                          ? text.supportRadarSubtitle
-                          : `${text.supportMapSubtitle}: ${supportDirectoryData.find(n => n.id === selectedSupportNode)?.name || text.supportSectionTitle}`}
-                      </p>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-
-                      <div style={{ display: 'inline-flex', gap: '4px', background: 'rgba(0,0,0,0.5)', padding: '3px', borderRadius: '4px', border: '1px solid #364840' }}>
-                        <button
-                          type="button"
-                          className="trade-btn"
-                          onClick={() => setSupportMapViewMode('RADAR')}
-                          style={{
-                            background: supportMapViewMode === 'RADAR' ? '#2f6838' : 'transparent',
-                            color: supportMapViewMode === 'RADAR' ? '#ffffff' : '#97ab9f',
-                            border: 'none',
-                            padding: '4px 10px',
-                            fontSize: '10px',
-                            borderRadius: '3px',
-                            cursor: 'pointer',
-                            lineHeight: 1.2
-                          }}
-                        >
-                          {text.supportRadarViewBtn}
-                        </button>
-                        <button
-                          type="button"
-                          className="trade-btn"
-                          onClick={() => setSupportMapViewMode('GOOGLE_MAP')}
-                          style={{
-                            background: supportMapViewMode === 'GOOGLE_MAP' ? '#2f6838' : 'transparent',
-                            color: supportMapViewMode === 'GOOGLE_MAP' ? '#ffffff' : '#97ab9f',
-                            border: 'none',
-                            padding: '4px 10px',
-                            fontSize: '10px',
-                            borderRadius: '3px',
-                            cursor: 'pointer',
-                            lineHeight: 1.2
-                          }}
-                        >
-                          {text.supportGoogleMapBtn}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-
-                  {supportMapViewMode === 'RADAR' ? (
-                    <div className="radar-canvas-box">
-
-                      <div className="radar-circle" style={{ width: '80px', height: '80px' }} />
-                      <div className="radar-circle" style={{ width: '160px', height: '160px' }} />
-                      <div className="radar-circle" style={{ width: '240px', height: '240px' }} />
-                      <div className="radar-crosshair-x" />
-                      <div className="radar-crosshair-y" />
-
-
-                      <span style={{ position: 'absolute', top: '52%', left: '56%', fontSize: '8px', fontFamily: "'DM Mono', monospace", color: 'rgba(110, 157, 104, 0.5)', pointerEvents: 'none' }}>5km</span>
-                      <span style={{ position: 'absolute', top: '52%', left: '68%', fontSize: '8px', fontFamily: "'DM Mono', monospace", color: 'rgba(110, 157, 104, 0.5)', pointerEvents: 'none' }}>15km</span>
-                      <span style={{ position: 'absolute', top: '52%', left: '80%', fontSize: '8px', fontFamily: "'DM Mono', monospace", color: 'rgba(110, 157, 104, 0.5)', pointerEvents: 'none' }}>25km</span>
-
-
-                      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 15, textAlign: 'center' }}>
-                        <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ffffff', margin: '0 auto', boxShadow: '0 0 12px #6e9d68' }} />
-                        <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#ffffff', background: 'rgba(0,0,0,0.7)', padding: '1px 4px', borderRadius: 2, display: 'inline-block', marginTop: 2 }}>
-                          {text.supportYourFarm}
-                        </span>
-                      </div>
-
-
-                      {supportDirectoryData.map((node) => {
-                        const isSelected = selectedSupportNode === node.id;
-                        const pinColor = node.type === 'GOVT_KVK' ? '#6e9d68' : (node.type === 'AGRONOMIST' ? '#4d88ff' : (node.type === 'SOIL_LAB' ? '#e5a93b' : (node.type === 'HELPLINE' ? '#ff6666' : '#20b2aa')));
-
-                        return (
-                          <div
-                            key={node.id}
-                            className={`radar-pin ${isSelected ? 'pin-active' : ''}`}
-                            style={{ top: `${node.mapCoords.y}%`, left: `${node.mapCoords.x}%` }}
-                            onClick={() => {
-                              setSelectedSupportNode(node.id);
-                              setGoogleMapModalNode(node);
-                            }}
-                            title={`${node.name} (${node.distanceKm} km away) - Click to view on Google Maps`}
-                          >
-                            <div className="radar-pin-dot" style={{ background: pinColor }}>
-                              <span style={{ fontSize: '8px', color: '#ffffff', fontWeight: 'bold' }}>·</span>
-                            </div>
-                            <span className="radar-pin-label">
-                              {node.name.split(' ')[0]} {node.name.split(' ')[1] || ''} ({node.distanceKm}km)
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-
-                    <div style={{ position: 'relative', width: '100%', height: '320px', borderRadius: '4px', overflow: 'hidden', border: '1px solid #364840' }}>
-                      {(() => {
-                        const activeNode = supportDirectoryData.find(n => n.id === selectedSupportNode) || supportDirectoryData[0];
-                        return (
-                          <>
-                            <iframe
-                              title={`Google Map - ${activeNode.name}`}
-                              width="100%"
-                              height="100%"
-                              style={{ border: 0, display: 'block' }}
-                              loading="lazy"
-                              src={`https://maps.google.com/maps?q=${encodeURIComponent(activeNode.mapQuery || `${activeNode.lat},${activeNode.lng}`)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
-                            />
-                            <div style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'rgba(20, 26, 24, 0.92)', padding: '6px 12px', borderRadius: '4px', border: '1px solid #41554c', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                              <span style={{ fontSize: '11px', color: '#f6f5f0', fontFamily: "'DM Mono', monospace" }}>
-                                {activeNode.name}
-                              </span>
-                              <a
-                                href={activeNode.googleMapsUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="trade-btn trade-btn-primary"
-                                style={{ padding: '4px 10px', fontSize: '10px', textDecoration: 'none' }}
-                              >
-                                {text.supportOpenMap}
-                              </a>
-                            </div>
-                          </>
-                        );
-                      })()}
-                    </div>
-                  )}
-                </div>
-
-
-                <div className="support-directory-grid">
-                  {supportDirectoryData
-                    .filter(node => {
-                      if (supportCategoryFilter !== 'ALL' && node.type !== supportCategoryFilter) return false;
-                      const q = supportSearchQuery.toLowerCase().trim();
-                      if (!q) return true;
-                      return node.name.toLowerCase().includes(q) ||
-                        node.department.toLowerCase().includes(q) ||
-                        node.location.toLowerCase().includes(q) ||
-                        node.services.some(s => s.toLowerCase().includes(q));
-                    })
-                    .map(node => {
-                      const isSelected = selectedSupportNode === node.id;
-                      const badgeBg = node.type === 'GOVT_KVK' ? '#eef4ec' : (node.type === 'AGRONOMIST' ? '#eef2f8' : (node.type === 'SOIL_LAB' ? '#fdf5e8' : (node.type === 'HELPLINE' ? '#fbeeee' : '#eaf4f4')));
-                      const badgeColor = node.type === 'GOVT_KVK' ? '#2f6838' : (node.type === 'AGRONOMIST' ? '#204068' : (node.type === 'SOIL_LAB' ? '#7a5214' : (node.type === 'HELPLINE' ? '#a32020' : '#1b6b6b')));
-
-                      return (
-                        <div
-                          key={node.id}
-                          className={`support-card ${isSelected ? 'card-highlighted' : ''}`}
-                        >
-                          <div>
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '6px', marginBottom: '6px' }}>
-                              <span style={{
-                                fontSize: '9px',
-                                fontFamily: "'DM Mono', monospace",
-                                padding: '2px 6px',
-                                borderRadius: '3px',
-                                fontWeight: 700,
-                                background: badgeBg,
-                                color: badgeColor,
-                                letterSpacing: '0.3px'
-                              }}>
-                                {node.badge}
-                              </span>
-                              <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078', fontWeight: 600 }}>
-                                Γÿà {node.rating} &middot; {node.distanceKm} km
-                              </span>
-                            </div>
-
-
-                            <h3 style={{ fontSize: '15px', margin: '2px 0 2px', color: '#202a27', lineHeight: '1.3' }}>
-                              {node.name}
-                            </h3>
-                            <p style={{ margin: '0 0 6px', fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#667269' }}>
-                              {node.department}
-                            </p>
-                            <p style={{ margin: '0 0 8px', fontSize: '12px', color: '#444d47' }}>
-                              {node.location}
-                            </p>
-
-
-                            <div style={{ background: '#f8f7f2', borderRadius: '4px', padding: '6px 10px', fontSize: '11px', color: '#4d5750', marginBottom: '8px', border: '1px solid #eceae2' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span>{text.supportLead} <strong>{node.inCharge}</strong></span>
-                              </div>
-                              <div style={{ font: "10px 'DM Mono', monospace", color: '#778078', marginTop: '2px' }}>
-                                {text.supportHours} {node.hours}
-                              </div>
-                            </div>
-
-
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '6px' }}>
-                              {node.services.map((srv, idx) => (
-                                <span key={idx} style={{ fontSize: '10px', background: '#f0eee8', color: '#333b35', padding: '2px 6px', borderRadius: '3px' }}>
-                                  {getLocalizedText(srv, language)}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-
-
-                          <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid #edebe4', paddingTop: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-
-                            <a
-                              href={`tel:${node.phone.replace(/[^0-9+]/g, '')}`}
-                              className="trade-btn trade-btn-primary"
-                              style={{ flex: '1 1 140px', padding: '7px 12px', fontSize: '11px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', whiteSpace: 'nowrap' }}
-                              onClick={(e) => {
-                                if (!node.phone.startsWith('+91') && !node.phone.startsWith('1800')) {
-                                  e.preventDefault();
-                                  setMessage(`Direct helpline: ${node.phone}`);
-                                }
-                              }}
-                            >
-                              {text.supportCallDesk} {node.phone}
-                            </a>
-
-                            <button
-                              type="button"
-                              className="trade-btn trade-btn-secondary"
-                              style={{ flex: '0 0 auto', padding: '7px 12px', fontSize: '11px', fontFamily: "'DM Mono', monospace", whiteSpace: 'nowrap' }}
-                              title="View on Google Maps"
-                              onClick={() => {
-                                setSelectedSupportNode(node.id);
-                                setGoogleMapModalNode(node);
-                              }}
-                            >
-                              {text.supportGoogleMapAction}
-                            </button>
-                          </div>
-
-                        </div>
-                      );
-                    })}
-
-                </div>
-
-                {supportDirectoryData.length === 0 && (
-                  <p className="muted" style={{ padding: '24px 0', textAlign: 'center' }}>No support directory nodes found.</p>
-                )}
-
-              </section>
-            </div>
+            <SupportNetworkView
+              text={text}
+              language={language}
+              supportDirectoryData={supportDirectoryData}
+              selectedSupportNode={selectedSupportNode}
+              onSelectSupportNode={setSelectedSupportNode}
+              onOpenGoogleMapModal={(node) => {
+                setSelectedSupportNode(node.id);
+                setGoogleMapModalNode(node);
+              }}
+              onShowMessage={setMessage}
+            />
           )}
 
 
@@ -7264,292 +6478,30 @@ function App() {
             </div>
           )}
 
-
-
-
-
           {currentView === 'predictions' && (
-
-
-            <div className="view-container">
-              <section className="panel" style={{ marginTop: '18px' }}>
-                <div className="panel-heading">
-                  <div>
-                    <p className="eyebrow">Statistical Machine Intelligence &amp; Volatility</p>
-                    <h2>Price Forecasting &amp; Confidence Bands</h2>
-                  </div>
-                  <span className="count">{forecast ? `${forecast.confidenceScore}% Certainty` : 'Analyzing'}</span>
-                </div>
-
-
-                <div className="pulse-controls" style={{ marginTop: '14px', maxWidth: '400px' }}>
-                  <select
-                    value={selectedPulseCropId || ''}
-                    onChange={(e) => handlePulseCropChange(e.target.value)}
-                  >
-                    {crops.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name} ({c.category})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {forecast ? (
-                  <div className="two-col-view-layout">
-                    <div>
-                      <div className="prediction-deep-grid">
-                        <div className="stat-metric-card">
-                          <span>Next Day Target Price</span>
-                          <strong>₹{forecast.estimatedPrice} <small style={{ fontSize: '13px' }}>/ {pulseCrop?.unit || 'kg'}</small></strong>
-                        </div>
-                        <div className="stat-metric-card">
-                          <span>Trend &amp; Volatility</span>
-                          <strong style={{ color: forecast.trend === 'UPWARD' ? '#5a8e62' : forecast.trend === 'DOWNWARD' ? '#b45a42' : '#7f8981' }}>
-                            {forecast.trend === 'UPWARD' ? '↔ Bullish' : forecast.trend === 'DOWNWARD' ? '↘ Bearish' : '→ Stable'}
-                          </strong>
-                          <small style={{ font: "9px 'DM Mono', monospace", textTransform: 'uppercase', color: '#667269' }}>
-                            {forecast.volatilityLevel} Volatility · {forecast.historicalPointsCount} points
-                          </small>
-                        </div>
-                      </div>
-
-
-                      <div className="confidence-bands-visual" style={{ marginTop: '18px' }}>
-                        <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#5a665e', fontWeight: 'bold' }}>
-                          Labeled Confidence Intervals (Certainty Bounds)
-                        </p>
-                        {forecast.confidenceIntervals?.map((ci, idx) => (
-                          <div className="band-item" key={ci.label || idx}>
-                            <span className="band-label">{ci.label}</span>
-                            <div className="band-bar-wrap">
-                              <div
-                                className={`band-bar-fill ${idx === 0 ? 'band-fill-80' : idx === 1 ? 'band-fill-90' : 'band-fill-95'}`}
-                                style={{ width: `${Math.min(100, Math.max(30, ci.confidenceLevel * 100))}%` }}
-                              />
-                            </div>
-                            <span className="band-range-val">₹{ci.lowerBound} – ₹{ci.upperBound}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <p style={{ font: "10px 'DM Mono', monospace", color: '#77837a', marginTop: '12px' }}>
-                        <strong>Methodology:</strong> {forecast.methodology}
-                      </p>
-                    </div>
-
-
-                    <div style={{ background: '#fffdf9', border: '1px solid #d9d6cc', borderRadius: '6px', padding: '16px' }}>
-                      <h3 style={{ margin: '0 0 10px', fontSize: '15px' }}>7-Day Price Trajectory</h3>
-                      <table className="trajectory-table">
-                        <thead>
-                          <tr>
-                            <th>Horizon</th>
-                            <th>Target</th>
-                            <th>90% Likely Range</th>
-                            <th>Trend</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {forecast.multiDayForecast?.map((fp) => (
-                            <tr key={fp.dayAhead}>
-                              <td><strong>+{fp.dayAhead}d</strong> ({new Date(fp.date).toLocaleDateString(undefined, { weekday: 'short' })})</td>
-                              <td><strong>₹{fp.predictedPrice}</strong></td>
-                              <td>₹{fp.interval90?.lowerBound} – ₹{fp.interval90?.upperBound}</td>
-                              <td style={{ color: fp.trend === 'UPWARD' ? '#5a8e62' : fp.trend === 'DOWNWARD' ? '#b45a42' : '#7f8981' }}>
-                                {fp.trend === 'UPWARD' ? '↔' : fp.trend === 'DOWNWARD' ? '↘' : '→'}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      <p style={{ font: "9px 'DM Mono', monospace", color: '#88928a', marginTop: '10px' }}>
-                        * {forecast.disclaimer}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="muted" style={{ padding: '30px 0' }}>Computing price trajectory and confidence intervals...</p>
-                )}
-              </section>
-            </div>
+            <PricePredictionsView
+              forecast={forecast}
+              crops={crops}
+              selectedPulseCropId={selectedPulseCropId}
+              pulseCrop={pulseCrop}
+              onCropChange={handlePulseCropChange}
+            />
           )}
 
-
-
-
           {currentView === 'weather' && (
-            <div className="view-container">
-              <section className="panel" style={{ marginTop: '18px' }}>
-                <div className="panel-heading">
-                  <div>
-                    <p className="eyebrow">{text.weatherEyebrow}</p>
-                    <h2>{text.weatherTitle}</h2>
-                  </div>
-                  <span className="count">{weatherData?.harvestSuitability || text.weatherAnalyzing}</span>
-                </div>
-
-
-                <div className="location-presets-bar">
-                  <span style={{ font: "10px 'DM Mono', monospace", color: '#6a766c', alignSelf: 'center', marginRight: '4px' }}>
-                    {text.weatherOrigin} <strong>{mapCoords.label}</strong>
-                  </span>
-                  <button
-                    type="button"
-                    className={`location-pill ${mapCoords.label === 'Ranchi Center' ? 'active' : ''}`}
-                    onClick={() => handleLocationPreset(23.3441, 85.3096, 'Ranchi Center')}
-                  >
-                    Ranchi
-                  </button>
-                  <button
-                    type="button"
-                    className={`location-pill ${mapCoords.label === 'Ramgarh' ? 'active' : ''}`}
-                    onClick={() => handleLocationPreset(23.6332, 85.5149, 'Ramgarh')}
-                  >
-                    Ramgarh
-                  </button>
-                  <button
-                    type="button"
-                    className={`location-pill ${mapCoords.label === 'Bokaro' ? 'active' : ''}`}
-                    onClick={() => handleLocationPreset(23.6693, 86.1511, 'Bokaro')}
-                  >
-                    Bokaro
-                  </button>
-                  <button
-                    type="button"
-                    className={`location-pill ${mapCoords.label === 'Jamshedpur' ? 'active' : ''}`}
-                    onClick={() => handleLocationPreset(22.8046, 86.2029, 'Jamshedpur')}
-                  >
-                    Jamshedpur
-                  </button>
-                  {session && (
-                    <button
-                      type="button"
-                      className="location-pill"
-                      style={{ background: '#dce7d3', color: '#3d5940', borderColor: '#b8cba8' }}
-                      onClick={handleUseProfileLocation}
-                    >
-                      {text.weatherUseGps}
-                    </button>
-                  )}
-                </div>
-
-
-                <div className="pulse-controls" style={{ marginTop: '10px', maxWidth: '380px' }}>
-                  <select
-                    value={weatherCropId || ''}
-                    onChange={(e) => setWeatherCropId(e.target.value ? Number(e.target.value) : null)}
-                  >
-                    <option value="">{text.weatherGeneralConditions}</option>
-                    {crops.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name} ({c.category})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {weatherLoading ? (
-                  <p className="muted" style={{ padding: '24px 0' }}>{text.weatherLoading}</p>
-                ) : weatherData ? (
-                  <>
-
-                    <div className="weather-hero-card">
-                      <div>
-                        <p className="eyebrow">{weatherData.locationName} · GPS {weatherData.latitude.toFixed(2)}°N, {weatherData.longitude.toFixed(2)}°E</p>
-                        <h3>{weatherData.currentTemp}°C</h3>
-                        <p style={{ margin: '6px 0 0', font: "11px 'DM Mono', monospace", color: '#b9c5b7', textTransform: 'uppercase' }}>
-                          {text.weatherCondition}: <strong>{(weatherData.currentCondition || '').replace(/_/g, ' ')}</strong>
-                        </p>
-                      </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <span className="count" style={{ background: '#35453e', color: '#fffaf1' }}>
-                          {text.weatherSuitability}: {weatherData.harvestSuitability}
-                        </span>
-                      </div>
-                    </div>
-
-
-                    <div className="weather-grid-metrics">
-                      <div className="weather-metric-item">
-                        <span>{text.weatherHumidity}</span>
-                        <strong>{weatherData.humidityPercent}%</strong>
-                      </div>
-                      <div className="weather-metric-item">
-                        <span>{text.weatherRainfall}</span>
-                        <strong>{weatherData.rainfallMm} mm</strong>
-                      </div>
-                      <div className="weather-metric-item">
-                        <span>{text.weatherWind}</span>
-                        <strong>{weatherData.windSpeedKmh} km/h</strong>
-                      </div>
-                      <div className="weather-metric-item">
-                        <span>{text.weatherSuitability}</span>
-                        <strong style={{ color: weatherData.harvestSuitability === 'EXCELLENT' ? '#5a8e62' : weatherData.harvestSuitability === 'HAZARDOUS' ? '#b45a42' : '#202a27' }}>
-                          {weatherData.harvestSuitability}
-                        </strong>
-                      </div>
-                    </div>
-
-                    <div className="two-col-view-layout" style={{ marginTop: '16px' }}>
-                      <div>
-
-                        <div className="harvest-box">
-                          <h4>{text.weatherHarvestWindow}</h4>
-                          <p><strong>{weatherData.recommendedHarvestWindow}</strong></p>
-                        </div>
-
-
-                        <div className="spoilage-card">
-                          <div className="spoilage-header">
-                            <h4>{text.weatherSpoilageRisk}</h4>
-                            <span className={`spoilage-badge spoilage-${weatherData.spoilageRiskIndex.toLowerCase()}`}>
-                              {weatherData.spoilageRiskIndex} {text.weatherRisk}
-                            </span>
-                          </div>
-                          <p style={{ margin: '10px 0 0', fontSize: '13px', color: '#5a665e', lineHeight: '1.5' }}>
-                            {weatherData.transitAdvisory}
-                          </p>
-                        </div>
-                      </div>
-
-
-                      <div className="advisory-list-box">
-                        <p style={{ margin: 0, font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981', fontWeight: 'bold' }}>
-                          {text.weatherGuidelines}
-                        </p>
-                        <ul>
-                          {weatherData.cropAdvisories?.map((adv, idx) => (
-                            <li key={idx}>{adv}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-
-
-                    <div style={{ marginTop: '20px' }}>
-                      <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#5a665e', fontWeight: 'bold' }}>
-                        {text.weatherForecast}
-                      </p>
-                      <div className="five-day-forecast-grid">
-                        {weatherData.forecast?.map((day) => (
-                          <div className="forecast-card-item" key={day.date}>
-                            <span className="f-day">{day.dayName}</span>
-                            <div className="f-temp">{day.tempMax}° / {day.tempMin}°</div>
-                            <span className="f-rain">{day.precipitationProbability}% {text.weatherRain} · {(day.condition || '').replace(/_/g, ' ')}</span>
-                            <div className="f-adv">{day.advisory}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <p className="muted" style={{ padding: '24px 0' }}>
-                    {weatherError || text.weatherUnavailable}
-                  </p>
-                )}
-              </section>
-            </div>
+            <AgroWeatherView
+              text={text}
+              weatherData={weatherData}
+              weatherLoading={weatherLoading}
+              weatherError={weatherError}
+              mapCoords={mapCoords}
+              onLocationPreset={handleLocationPreset}
+              session={session}
+              onUseProfileLocation={handleUseProfileLocation}
+              weatherCropId={weatherCropId}
+              onWeatherCropChange={(cropId) => setWeatherCropId(cropId ? Number(cropId) : null)}
+              crops={crops}
+            />
           )}
 
 
@@ -10407,389 +9359,51 @@ function App() {
 
 
           {currentView === 'map' && (
-            <div className="view-container">
-              <section className="market-map-section">
-                <div className="panel-heading">
-                  <div>
-                    <p className="eyebrow">Geographical Market Discovery &amp; Routing</p>
-                    <h2>Nearby Markets &amp; Freight Radar</h2>
-                  </div>
-                  <span className="count">{nearbyMarkets.length} Markets within {mapRadius} km</span>
-                </div>
-
-
-                <div className="location-presets-bar">
-                  <span style={{ font: "10px 'DM Mono', monospace", color: '#6a766c', alignSelf: 'center', marginRight: '4px' }}>
-                    {text.weatherOrigin} <strong>{mapCoords.label}</strong>
-                  </span>
-                  <button
-                    type="button"
-                    className={`location-pill ${mapCoords.label === 'Ranchi Center' ? 'active' : ''}`}
-                    onClick={() => handleLocationPreset(23.3441, 85.3096, 'Ranchi Center')}
-                  >
-                    Ranchi
-                  </button>
-                  <button
-                    type="button"
-                    className={`location-pill ${mapCoords.label === 'Ramgarh' ? 'active' : ''}`}
-                    onClick={() => handleLocationPreset(23.6332, 85.5149, 'Ramgarh')}
-                  >
-                    Ramgarh
-                  </button>
-                  <button
-                    type="button"
-                    className={`location-pill ${mapCoords.label === 'Bokaro' ? 'active' : ''}`}
-                    onClick={() => handleLocationPreset(23.6693, 86.1511, 'Bokaro')}
-                  >
-                    Bokaro
-                  </button>
-                  <button
-                    type="button"
-                    className={`location-pill ${mapCoords.label === 'Jamshedpur' ? 'active' : ''}`}
-                    onClick={() => handleLocationPreset(22.8046, 86.2029, 'Jamshedpur')}
-                  >
-                    Jamshedpur
-                  </button>
-                  {session && (
-                    <button
-                      type="button"
-                      className="location-pill"
-                      style={{ background: '#dce7d3', color: '#3d5940', borderColor: '#b8cba8' }}
-                      onClick={handleUseProfileLocation}
-                    >
-                      {text.weatherUseGps}
-                    </button>
-                  )}
-                </div>
-
-                <div className="market-map-layout">
-
-                  <div className="map-radar-container">
-                    <svg className="map-radar-svg" viewBox="0 0 300 300">
-                      <defs>
-                        <radialGradient id="radarGlow" cx="50%" cy="50%" r="50%">
-                          <stop offset="0%" stopColor="#2c4038" stopOpacity="0.8" />
-                          <stop offset="100%" stopColor="#141c19" stopOpacity="0.9" />
-                        </radialGradient>
-                      </defs>
-
-                      <rect width="300" height="300" rx="8" fill="url(#radarGlow)" />
-
-                      <line x1="150" y1="15" x2="150" y2="285" stroke="#2e4239" strokeWidth="1" strokeDasharray="2 2" />
-                      <line x1="15" y1="150" x2="285" y2="150" stroke="#2e4239" strokeWidth="1" strokeDasharray="2 2" />
-
-                      <circle cx="150" cy="150" r="40" fill="none" stroke="#2e4239" strokeWidth="1" />
-                      <circle cx="150" cy="150" r="80" fill="none" stroke="#2e4239" strokeWidth="1" />
-                      <circle cx="150" cy="150" r="120" fill="none" stroke="#375246" strokeWidth="1.2" />
-
-                      <text x="154" y="112" fill="#587567" fontSize="8" fontFamily="DM Mono">30 km</text>
-                      <text x="154" y="72" fill="#587567" fontSize="8" fontFamily="DM Mono">75 km</text>
-                      <text x="154" y="32" fill="#587567" fontSize="8" fontFamily="DM Mono">120+ km</text>
-
-                      <text x="146" y="24" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">N</text>
-                      <text x="278" y="153" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">E</text>
-                      <text x="146" y="280" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">S</text>
-                      <text x="18" y="153" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">W</text>
-
-
-                      {(() => {
-                        if (!selectedMapMarket) return null;
-                        const maxRange = Math.max(130, ...nearbyMarkets.map(m => Number(m.distanceKm || 0)));
-                        const scale = 115.0 / maxRange;
-                        const dx = (selectedMapMarket.longitude - mapCoords.lon) * 111.0 * Math.cos(mapCoords.lat * Math.PI / 180);
-                        const dy = -(selectedMapMarket.latitude - mapCoords.lat) * 111.0;
-                        const tx = Math.min(275, Math.max(25, 150 + dx * scale));
-                        const ty = Math.min(275, Math.max(25, 150 + dy * scale));
-                        return (
-                          <g>
-                            <line x1="150" y1="150" x2={tx} y2={ty} stroke="#dc664a" strokeWidth="2.5" strokeDasharray="4 2" />
-                            <circle cx={tx} cy={ty} r="12" fill="none" stroke="#dc664a" strokeWidth="1.5" opacity="0.6">
-                              <animate attributeName="r" values="8;16;8" dur="1.8s" repeatCount="indefinite" />
-                            </circle>
-                          </g>
-                        );
-                      })()}
-
-
-                      <circle cx="150" cy="150" r="7" fill="#f2c45f" stroke="#1d2724" strokeWidth="2" />
-                      <circle cx="150" cy="150" r="14" fill="none" stroke="#f2c45f" strokeWidth="1" opacity="0.4">
-                        <animate attributeName="r" values="7;18;7" dur="2.2s" repeatCount="indefinite" />
-                      </circle>
-                      <text x="150" y="172" fill="#f2c45f" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="DM Mono">
-                        ORIGIN (YOU)
-                      </text>
-
-
-                      {nearbyMarkets.map((m) => {
-                        const maxRange = Math.max(130, ...nearbyMarkets.map(item => Number(item.distanceKm || 0)));
-                        const scale = 115.0 / maxRange;
-                        const dx = (m.longitude - mapCoords.lon) * 111.0 * Math.cos(mapCoords.lat * Math.PI / 180);
-                        const dy = -(m.latitude - mapCoords.lat) * 111.0;
-                        const mx = Math.min(275, Math.max(25, 150 + dx * scale));
-                        const my = Math.min(275, Math.max(25, 150 + dy * scale));
-                        const isSelected = selectedMapMarket?.id === m.id;
-                        const pinColor = m.marketType === 'APMC' ? '#6ba3d6' : m.marketType === 'WHOLESALE' ? '#e5a84b' : '#78b87d';
-
-                        return (
-                          <g
-                            key={m.id}
-                            onClick={() => setSelectedMapMarket(m)}
-                            style={{ cursor: 'pointer' }}
-                          >
-                            <circle
-                              cx={mx}
-                              cy={my}
-                              r={isSelected ? "7" : "5"}
-                              fill={pinColor}
-                              stroke="#ffffff"
-                              strokeWidth={isSelected ? "2" : "1"}
-                            />
-                            <text
-                              x={mx}
-                              y={my - 9}
-                              fill={isSelected ? '#fff' : '#c8d4cc'}
-                              fontSize={isSelected ? '9' : '7.5'}
-                              fontWeight={isSelected ? 'bold' : 'normal'}
-                              textAnchor="middle"
-                              fontFamily="DM Mono"
-                            >
-                              {m.name.split(' ')[0]} ({m.distanceKm}km)
-                            </text>
-                          </g>
-                        );
-                      })}
-                    </svg>
-
-                    <div className="map-radar-legend">
-                      <span><i style={{ background: '#78b87d' }} /> Market</span>
-                      <span><i style={{ background: '#6ba3d6' }} /> APMC Yard</span>
-                      <span><i style={{ background: '#e5a84b' }} /> Wholesale Yard</span>
-                      <span><i style={{ background: '#f2c45f' }} /> Your Origin</span>
-                    </div>
-                  </div>
-
-
-                  <div className="nearby-list-container">
-                    {mapLoading ? (
-                      <p className="muted">Calculating distances and freight costs...</p>
-                    ) : nearbyMarkets.length > 0 ? (
-                      nearbyMarkets.map((market) => {
-                        const isSelected = selectedMapMarket?.id === market.id;
-                        return (
-                          <div
-                            key={market.id}
-                            className={`nearby-card ${isSelected ? 'active' : ''}`}
-                            onClick={() => setSelectedMapMarket(market)}
-                          >
-                            <div className="nearby-header">
-                              <div>
-                                <h3>{market.name}</h3>
-                                <small style={{ color: '#778078', fontSize: '11px' }}>
-                                  {market.address || market.district}, {market.state}
-                                </small>
-                              </div>
-                              <span className={`market-type-badge badge-${market.marketType?.toLowerCase()}`}>
-                                {market.marketType}
-                              </span>
-                            </div>
-
-                            <div className="nearby-meta-grid">
-                              <div className="nearby-meta-item">
-                                <span>Distance</span>
-                                <strong>{market.distanceKm} km {market.direction && `(${market.direction})`}</strong>
-                              </div>
-                              <div className="nearby-meta-item">
-                                <span>Est. Transit</span>
-                                <strong>~{market.estimatedDurationMinutes} mins</strong>
-                              </div>
-                              <div className="nearby-meta-item">
-                                <span>Freight Cost</span>
-                                <strong>₹{market.estimatedTransportCost}</strong>
-                              </div>
-                            </div>
-
-                            <div className="nearby-actions">
-                              <span className="route-summary-text">
-                                {market.routeSummary}
-                              </span>
-                              <a
-                                href={market.navigationUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="nav-link-btn"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                Navigate ↔
-                              </a>
-                            </div>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <p className="muted">No agricultural markets found in this radius.</p>
-                    )}
-                  </div>
-                </div>
-              </section>
-            </div>
+            <MarketMapView
+              text={text}
+              nearbyMarkets={nearbyMarkets}
+              mapRadius={mapRadius}
+              mapCoords={mapCoords}
+              onLocationPreset={handleLocationPreset}
+              session={session}
+              onUseProfileLocation={handleUseProfileLocation}
+              selectedMapMarket={selectedMapMarket}
+              onSelectMapMarket={setSelectedMapMarket}
+              mapLoading={mapLoading}
+            />
           )}
 
-
-
-
           {currentView === 'notifications' && (
-            <div className="view-container">
-              <section className="panel" style={{ marginTop: '18px' }}>
-                <div className="panel-heading">
-                  <div>
-                    <p className="eyebrow">Market activity &amp; signals</p>
-                    <h2>{text.labelNotifications}</h2>
-                  </div>
-                  <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-                    {unreadCount > 0 && notifSubTab === 'app' && (
-                      <button type="button" className="text-button" onClick={markAllNotificationsRead} style={{ marginTop: 0 }}>
-                        Mark all read
-                      </button>
-                    )}
-                    <span className="count">{notifSubTab === 'app' ? `${unreadCount} unread` : `${smsLogs.length} field alerts`}</span>
-                  </div>
-                </div>
-
-
-                <div className="tab-toggle-group" style={{ marginBottom: '16px' }}>
-                  <button
-                    type="button"
-                    className={notifSubTab === 'app' ? 'active' : ''}
-                    onClick={() => setNotifSubTab('app')}
-                  >
-                    In-App Desk Feed ({unreadCount})
-                  </button>
-                  <button
-                    type="button"
-                    className={notifSubTab === 'sms' ? 'active' : ''}
-                    onClick={() => { setNotifSubTab('sms'); loadSmsLogs(); }}
-                  >
-                    SMS &amp; WhatsApp Field Dispatch ({smsLogs.length})
-                  </button>
-                </div>
-
-
-                {notifSubTab === 'app' && (
-                  <div className="notif-list">
-                    {notifications.map((n) => (
-                      <div
-                        key={n.id}
-                        className={`notif-card ${n.unread ? 'unread' : ''}`}
-                        onClick={() => markNotificationRead(n.id)}
-                        style={{ cursor: 'default' }}
-                      >
-                        <span className={`notif-dot ${n.unread ? '' : 'read'}`} />
-                        <div className="notif-body">
-                          <p className="notif-title"><strong>{n.title}</strong> — {n.message}</p>
-                          <div className="notif-meta">
-                            <span>{n.time}</span>
-                            <span>·</span>
-                            <span>{n.type}</span>
-                            <span>·</span>
-                            <button
-                              type="button"
-                              className="notif-link"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                markNotificationRead(n.id);
-                                setCurrentView(n.viewTarget);
-                              }}
-                            >
-                              View ↔
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    {notifications.length === 0 && (
-                      <p className="muted" style={{ padding: '16px 0' }}>No notifications received yet.</p>
-                    )}
-                  </div>
-                )}
-
-
-                {notifSubTab === 'sms' && (
-                  <div>
-                    <div style={{ borderBottom: '1px solid #d9d6cc', paddingBottom: '18px', marginBottom: '18px' }}>
-                      <p className="eyebrow" style={{ marginBottom: '6px' }}>Field Dispatch Gateway — Simulated</p>
-                      <p style={{ fontSize: '12px', color: '#647068', margin: '0 0 18px', lineHeight: '1.6' }}>
-                        Farmers receive SMS and WhatsApp alerts for trade proposals, escrow confirmations, and payouts. Replying <code>ACCEPT &lt;id&gt;</code> via SMS confirms a deal offline.
-                      </p>
-
-                      <form onSubmit={handleSendTestSms} style={{ marginTop: 0 }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
-                          <label style={{ marginTop: 0 }}>Recipient Phone
-                            <input
-                              value={testSmsForm.recipientPhone}
-                              onChange={(e) => setTestSmsForm({ ...testSmsForm, recipientPhone: e.target.value })}
-                              required
-                            />
-                          </label>
-                          <label style={{ marginTop: 0 }}>Channel
-                            <select
-                              value={testSmsForm.channel}
-                              onChange={(e) => setTestSmsForm({ ...testSmsForm, channel: e.target.value })}
-                            >
-                              <option value="SMS">SMS</option>
-                              <option value="WHATSAPP">WhatsApp</option>
-                            </select>
-                          </label>
-                        </div>
-                        <label>Message Text
-                          <input
-                            value={testSmsForm.text}
-                            onChange={(e) => setTestSmsForm({ ...testSmsForm, text: e.target.value })}
-                            required
-                          />
-                        </label>
-                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '18px', flexWrap: 'wrap' }}>
-                          <button type="submit" style={{ width: 'auto', margin: 0 }}>
-                            Send Test Alert &rarr;
-                          </button>
-                          <button
-                            type="button"
-                            className="secondary-button"
-                            style={{ width: 'auto', margin: 0 }}
-                            onClick={() => handleSimulateInboundSms(testSmsForm.text)}
-                          >
-                            Simulate Inbound SMS Reply &rarr;
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-
-                    <div className="sms-feed-grid">
-                      {smsLogLoading ? (
-                        <p className="muted">Loading field dispatch log...</p>
-                      ) : smsLogs.length > 0 ? (
-                        smsLogs.map((log) => {
-                          const isWa = log.channel === 'WHATSAPP';
-                          return (
-                            <div key={log.id} className={`sms-log-row ${isWa ? 'sms-log-wa' : 'sms-log-sms'}`}>
-                              <div className="sms-log-meta">
-                                <span className="sms-log-channel">{isWa ? 'WhatsApp' : 'SMS'}</span>
-                                <span>{log.recipientPhone}</span>
-                                <span>{new Date(log.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                <span style={{ marginLeft: 'auto', color: '#5a8e62' }}>{log.status}</span>
-                              </div>
-                              <p className="sms-log-body">{log.body}</p>
-                              <div className="sms-log-ref">Ref: {log.providerMessageId || `MSG-${log.id}`} &middot; {log.messageType}</div>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <p className="muted" style={{ paddingTop: '8px' }}>No field alerts dispatched yet. Use the form above to send a test.</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </section>
-            </div>
+            <NotificationsView
+              text={text}
+              notifications={notifications}
+              unreadCount={unreadCount}
+              smsLogs={smsLogs}
+              smsLogLoading={smsLogLoading}
+              onMarkNotificationRead={markNotificationRead}
+              onMarkAllNotificationsRead={markAllNotificationsRead}
+              onNavigateToView={setCurrentView}
+              onLoadSmsLogs={loadSmsLogs}
+              notifSubTab={notifSubTab}
+              setNotifSubTab={setNotifSubTab}
+              onSendTestSms={async (form) => {
+                try {
+                  const res = await fetch(`${API_URL}/api/notifications/sms-whatsapp/test-send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...(session ? { Authorization: `Bearer ${session.token}` } : {}) },
+                    body: JSON.stringify(form)
+                  });
+                  if (res.ok) {
+                    const sent = await res.json();
+                    setSmsLogs(prev => [sent, ...prev]);
+                    setMessage(`${form.channel} alert dispatched to ${form.recipientPhone}.`);
+                  }
+                } catch {
+                  setMessage('Could not dispatch test field alert.');
+                }
+              }}
+              onSimulateInboundSms={handleSimulateInboundSms}
+            />
           )}
 
 

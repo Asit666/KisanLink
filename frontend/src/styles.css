@@ -403,7 +403,7 @@ button, input, select, textarea { font: inherit; }
 .left-nav {
   position: sticky;
   top: 16px;
-  max-height: calc(100vh - 32px);
+  max-height: calc(100vh - 145px);
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
@@ -411,7 +411,7 @@ button, input, select, textarea { font: inherit; }
   width: 252px;
   min-width: 252px;
   max-width: 252px;
-  padding: 10px 10px 16px;
+  padding: 10px 10px 14px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 14px;
@@ -439,18 +439,18 @@ button, input, select, textarea { font: inherit; }
 
 
 .left-nav::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 .left-nav::-webkit-scrollbar-track {
   background: transparent;
 }
 .left-nav::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
+  background: #cbd5e1;
   border-radius: 99px;
   transition: background 0.15s ease;
 }
 .left-nav::-webkit-scrollbar-thumb:hover {
-  background: #cbd5e1;
+  background: #94a3b8;
 }
 
 
@@ -461,7 +461,7 @@ button, input, select, textarea { font: inherit; }
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #64748b;
-  margin: 10px 0 4px 6px;
+  margin: 12px 0 5px 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -494,7 +494,7 @@ button, input, select, textarea { font: inherit; }
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 7.5px 9px;
+  padding: 7px 9px;
   background: transparent;
   color: #334155;
   border: none;
@@ -532,6 +532,11 @@ button, input, select, textarea { font: inherit; }
   transition: background-color 0.1s ease, color 0.1s ease;
 }
 
+.left-nav-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
 .left-nav-item:hover .left-nav-icon {
   background: #e2e8f0;
   color: #0f172a;
@@ -553,7 +558,7 @@ button, input, select, textarea { font: inherit; }
   font-size: 12.5px;
   font-weight: 600;
   color: #1e293b;
-  line-height: 1.25;
+  line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -562,8 +567,8 @@ button, input, select, textarea { font: inherit; }
 .left-nav-label small {
   font-size: 10.5px;
   color: #64748b;
-  line-height: 1.2;
-  margin-top: 1px;
+  line-height: 1.25;
+  margin-top: 1.5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -600,7 +605,7 @@ button, input, select, textarea { font: inherit; }
 .left-nav-divider {
   border: 0;
   border-top: 1px solid #f1f5f9;
-  margin: 8px 6px;
+  margin: 7px 6px;
   width: calc(100% - 12px);
 }
 
