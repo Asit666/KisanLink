@@ -53,12 +53,7 @@ public class TransportService {
         this.smsService = smsService;
     }
 
-    // ─── Suggestions ──────────────────────────────────────────────────────────
-
-    /**
-     * Returns up to 5 ranked transporter suggestions for an ACCEPTED deal.
-     * Incorporates crop perishability priority, driver reliability, and favorite carrier boosts.
-     */
+    
     @Transactional(readOnly = true)
     public List<TransportSuggestionResponse> getSuggestions(Long dealId, String userEmail) {
         TradeDeal deal = findDealAndVerifyParticipant(dealId, userEmail);

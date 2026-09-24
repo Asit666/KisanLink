@@ -6,7 +6,7 @@ KisanLink uses Model Context Protocol (MCP) as a controlled bridge between the P
 
 MCP provides approved market-data tools. MCP does not predict prices and is not itself an AI model.
 
-```text
+
 React / Flutter
       |
       v
@@ -21,7 +21,7 @@ Spring Boot API
                |
                v
         Price forecast model
-```
+
 
 ## Current Implementation
 

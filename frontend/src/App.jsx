@@ -3,6 +3,7 @@ import { KisanLinkWebSocketClient } from './websocket';
 
 
 import { LANGUAGE_TEXT, getLocalizedText } from './i18n/translations';
+import { AUTH_TRANSLATIONS } from './i18n/authTranslations';
 
 import {
   CATEGORIES,
@@ -43,6 +44,7 @@ import {
   normalizeMandiPricePerQuintal,
   computeQuickSellMetrics
 } from './utils/economics';
+import AboutPage from './views/landing/AboutPage';
 
 
 // Modern Vector Icon Component for Left Navigation
@@ -50,45 +52,59 @@ function NavIcon({ name }) {
   const p = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", style: { display: "block" } };
   switch (name) {
     case 'crops':
-      return <svg {...p}><path d="M7 20h10"/><path d="M12 20v-8"/><path d="M12 12c-3 0-6-3-6-6 4 0 6 3 6 6z"/><path d="M12 12c3 0 6-3 6-6-4 0-6 3-6 6z"/></svg>;
+      return <svg {...p}><path d="M7 20h10" /><path d="M12 20v-8" /><path d="M12 12c-3 0-6-3-6-6 4 0 6 3 6 6z" /><path d="M12 12c3 0 6-3 6-6-4 0-6 3-6 6z" /></svg>;
     case 'inputs':
-      return <svg {...p}><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>;
+      return <svg {...p}><path d="m7.5 4.27 9 5.15" /><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" /></svg>;
     case 'orders':
-      return <svg {...p}><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/></svg>;
+      return <svg {...p}><rect width="16" height="20" x="4" y="2" rx="2" /><path d="M9 22v-4h6v4" /><path d="M8 6h.01" /><path d="M16 6h.01" /><path d="M12 6h.01" /><path d="M12 10h.01" /><path d="M12 14h.01" /></svg>;
     case 'shop':
-      return <svg {...p}><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>;
+      return <svg {...p}><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" /><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" /><path d="M2 7h20" /></svg>;
     case 'progress':
     case 'transport':
-      return <svg {...p}><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-5l-3-4h-5v10Z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>;
+      return <svg {...p}><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" /><path d="M15 18H9" /><path d="M19 18h2a1 1 0 0 0 1-1v-5l-3-4h-5v10Z" /><circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" /></svg>;
     case 'chat':
-      return <svg {...p}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>;
+      return <svg {...p}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>;
     case 'payouts':
-      return <svg {...p}><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/><path d="M6 14h4"/></svg>;
+      return <svg {...p}><rect width="20" height="14" x="2" y="5" rx="2" /><line x1="2" x2="22" y1="10" y2="10" /><path d="M6 14h4" /></svg>;
     case 'intake':
-      return <svg {...p}><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>;
+      return <svg {...p}><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" /><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" /><path d="M7 21h10" /><path d="M12 3v18" /><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" /></svg>;
     case 'lots':
-      return <svg {...p}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>;
+      return <svg {...p}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" /></svg>;
     case 'farmers':
-      return <svg {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+      return <svg {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>;
     case 'analytics':
-      return <svg {...p}><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>;
+      return <svg {...p}><line x1="18" x2="18" y1="20" y2="10" /><line x1="12" x2="12" y1="20" y2="4" /><line x1="6" x2="6" y1="20" y2="14" /></svg>;
     case 'trust':
-      return <svg {...p}><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>;
+      return <svg {...p}><circle cx="12" cy="8" r="6" /><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" /></svg>;
     case 'governance':
-      return <svg {...p}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>;
+      return <svg {...p}><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg>;
     case 'community':
-      return <svg {...p}><path d="M17 6.1H3a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2v3l3-3h9a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2z"/></svg>;
+      return <svg {...p}><path d="M17 6.1H3a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2v3l3-3h9a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2z" /></svg>;
     case 'diagnostics':
-      return <svg {...p}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>;
+      return <svg {...p}><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>;
     case 'support':
-      return <svg {...p}><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>;
+      return <svg {...p}><circle cx="12" cy="12" r="10" /><path d="m4.93 4.93 4.24 4.24" /><path d="m14.83 9.17 4.24-4.24" /><path d="m14.83 14.83 4.24 4.24" /><path d="m9.17 14.83-4.24 4.24" /><circle cx="12" cy="12" r="4" /></svg>;
+    case 'about':
+      return <svg {...p}><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>;
     default:
-      return <svg {...p}><circle cx="12" cy="12" r="10"/></svg>;
+      return <svg {...p}><circle cx="12" cy="12" r="10" /></svg>;
   }
 }
 
 function App() {
-  const [currentView, setCurrentView] = useState('prices');
+  const [currentView, setCurrentView] = useState(() => {
+    if (typeof window !== 'undefined' && (window.location.pathname === '/about' || window.location.hash === '#/about')) {
+      return 'about';
+    }
+    return 'prices';
+  });
+  const [unauthScreen, setUnauthScreen] = useState(() => {
+    if (typeof window !== 'undefined' && (window.location.pathname === '/auth' || window.location.hash === '#/auth')) {
+      return 'auth';
+    }
+    return 'about';
+  });
+  const [authTransition, setAuthTransition] = useState('slide-enter');
   const [activeChatConversationId, setActiveChatConversationId] = useState(null);
   const [ratingCarrierModal, setRatingCarrierModal] = useState(null);
   const [disputeModal, setDisputeModal] = useState(null);
@@ -774,6 +790,19 @@ function App() {
   const tutorialLastRectRef = useRef(null);
 
   const text = LANGUAGE_TEXT[language] || LANGUAGE_TEXT.en;
+  const authT = AUTH_TRANSLATIONS[language] || AUTH_TRANSLATIONS.en;
+  const activeLangIndex = language === 'mr' ? 2 : language === 'hi' ? 1 : 0;
+
+  const handleLanguageChange = (newLang) => {
+    setLanguage(newLang);
+    try {
+      localStorage.setItem('kisanlinkLanguage', newLang);
+      document.documentElement.className = 'lang-' + newLang;
+      document.documentElement.setAttribute('lang', newLang);
+    } catch {
+      // ignore
+    }
+  };
   const tutorialTargets = [
     { key: 'market', title: text.tutorialStep1Title || 'Live Mandi & Market Trading', description: text.tutorialStep1Text || 'Monitor real-time Agmarknet mandi arrivals, wholesale modal rates, and price trends across major agricultural hubs.' },
     { key: 'sidebarMarket', title: text.tutorialStep2Title || 'Commodity & Inputs Desk', description: text.tutorialStep2Text || 'Access certified farm inputs, fertilizer catalogues, seed varieties, and direct harvest order management.' },
@@ -854,6 +883,10 @@ function App() {
     try {
       localStorage.setItem('kisanlinkLanguage', language);
     } catch {
+    }
+    if (typeof document !== 'undefined') {
+      document.documentElement.className = 'lang-' + language;
+      document.documentElement.setAttribute('lang', language);
     }
   }, [language]);
   const [produceSource, setProduceSource] = useState('catalog');
@@ -1738,12 +1771,12 @@ function App() {
     const payload = authMode === 'login'
       ? { email: identifier, password: password }
       : {
-          name: (role === 'FPO' ? (account.orgName?.trim() || account.name?.trim()) : account.name?.trim()) || 'New User',
-          email: identifier,
-          phone: account.phone?.trim().replace(/\D/g, ''),
-          password: password,
-          role: role || 'FARMER'
-        };
+        name: (role === 'FPO' ? (account.orgName?.trim() || account.name?.trim()) : account.name?.trim()) || 'New User',
+        email: identifier,
+        phone: account.phone?.trim().replace(/\D/g, ''),
+        password: password,
+        role: role || 'FARMER'
+      };
 
     try {
       const response = await fetch(`${API_URL}${endpoint}`, {
@@ -3155,10 +3188,10 @@ function App() {
       detectedDisease: 'Foliar Cercospora & Leaf Spot Complex',
       pathogenType: 'Fungal Complex',
       confidenceScore: null,
-        modelStatus: 'visual_heuristic_screening',
-        requiresExpertReview: true,
-        device: 'Heuristic-Screening-Fallback',
-        topCandidates: [],
+      modelStatus: 'visual_heuristic_screening',
+      requiresExpertReview: true,
+      device: 'Heuristic-Screening-Fallback',
+      topCandidates: [],
       severity: 'MODERATE',
       symptoms: 'Scattered necrotic brown spots with chlorotic margins across leaf canopy and edge scorch.',
       treatmentPlan: '1. Broad-spectrum preventive spray with Mancozeb 75% WP @ 2.5g/L.\n2. Bio-stimulation with Seaweed Extract @ 2ml/L for recovery.\n3. Ensure balanced irrigation.',
@@ -3176,21 +3209,21 @@ function App() {
       let file = diagnosticFile;
       const request = file
         ? (() => {
-            const formData = new FormData();
-            formData.append('file', file);
-            if (diagnosticForm.cropName && diagnosticForm.cropName !== 'Auto-detect crop') {
-              formData.append('crop_hint', diagnosticForm.cropName);
-            }
-            return fetch(`${AI_API_URL}/predict`, { method: 'POST', body: formData });
-          })()
+          const formData = new FormData();
+          formData.append('file', file);
+          if (diagnosticForm.cropName && diagnosticForm.cropName !== 'Auto-detect crop') {
+            formData.append('crop_hint', diagnosticForm.cropName);
+          }
+          return fetch(`${AI_API_URL}/predict`, { method: 'POST', body: formData });
+        })()
         : fetch(`${AI_API_URL}/predict-url`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              url: diagnosticForm.imageUrl,
-              crop_hint: diagnosticForm.cropName && diagnosticForm.cropName !== 'Auto-detect crop' ? diagnosticForm.cropName : ''
-            })
-          });
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: diagnosticForm.imageUrl,
+            crop_hint: diagnosticForm.cropName && diagnosticForm.cropName !== 'Auto-detect crop' ? diagnosticForm.cropName : ''
+          })
+        });
       const res = await request;
       if (!res.ok) throw new Error(`AI service returned ${res.status}`);
 
@@ -3341,479 +3374,583 @@ function App() {
   ];
 
   if (!session) {
+    if (unauthScreen === 'about') {
+      return (
+        <AboutPage
+          session={null}
+          language={language}
+          onLanguageChange={setLanguage}
+          onLaunchApp={(targetRole) => {
+            if (typeof window !== 'undefined') window.location.hash = '#/';
+            handleQuickLogin(targetRole || 'FARMER');
+          }}
+          onSignIn={() => {
+            if (typeof window !== 'undefined') window.location.hash = '#/auth';
+            setAuthTransition('slide-enter');
+            setUnauthScreen('auth');
+            setAuthMode('login');
+          }}
+          onSignUp={() => {
+            if (typeof window !== 'undefined') window.location.hash = '#/auth';
+            setAuthTransition('slide-enter');
+            setUnauthScreen('auth');
+            setAuthMode('register');
+          }}
+          onBackToApp={() => {
+            if (typeof window !== 'undefined') window.location.hash = '#/';
+            handleQuickLogin('FARMER');
+          }}
+        />
+      );
+    }
     const isPhoneIdentifier = /^[6-9]\d{9}$/.test(account.email?.trim() || '');
     const isEmailIdentifier = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(account.email?.trim() || '');
     const phoneValid = !account.phone || /^[6-9]\d{9}$/.test(account.phone.trim().replace(/\D/g, ''));
     const passValid = !account.password || account.password.length >= 6;
 
     return (
-      <div className="auth-fullscreen-page">
+      <div className={`auth-fullscreen-page kl-lang-scope-${language} ${authTransition ? 'auth-page-' + authTransition : ''}`}>
 
         {/* ── Left brand panel ── */}
         <div className="auth-left-panel">
-          <div className="auth-left-content">
+          <div key={language} className="auth-left-content kl-lang-animated-content">
+            <button
+              type="button"
+              className="auth-back-to-about-btn"
+              onClick={() => {
+                setAuthTransition('slide-exit');
+                setTimeout(() => {
+                  if (typeof window !== 'undefined') window.location.hash = '#/about';
+                  setUnauthScreen('about');
+                  setAuthTransition(null);
+                }, 280);
+              }}
+              title={authT.backTooltip || "Back"}
+              aria-label={authT.backTooltip || "Back"}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
             <div className="auth-left-logo">
               <span className="brand-mark">K</span>
               <span className="brand-name">KisanLink</span>
             </div>
             <h2 className="auth-left-tagline">
-              Better prices.<br /><em>Directly to the farm.</em>
+              {authT.tagline1}<br /><em>{authT.tagline2}</em>
             </h2>
             <p className="auth-left-sub">
-              India's agricultural trade desk — live mandi prices, FPO lot aggregation, buyer matching, and escrow-protected settlements. All in one platform.
+              {authT.sub}
             </p>
-            <div className="auth-left-stats">
-              <div className="auth-stat-item">
-                <span className="auth-stat-value">12K+</span>
-                <span className="auth-stat-label">Farmers</span>
+            <div className="auth-left-highlights">
+              <div className="auth-highlight-item">
+                <span className="auth-highlight-icon">✓</span>
+                <div>
+                  <strong>{authT.highlight1Title}</strong>
+                  <p>{authT.highlight1Desc}</p>
+                </div>
               </div>
-              <div className="auth-stat-item">
-                <span className="auth-stat-value">₹4.2Cr</span>
-                <span className="auth-stat-label">Settled</span>
+              <div className="auth-highlight-item">
+                <span className="auth-highlight-icon">✓</span>
+                <div>
+                  <strong>{authT.highlight2Title}</strong>
+                  <p>{authT.highlight2Desc}</p>
+                </div>
               </div>
-              <div className="auth-stat-item">
-                <span className="auth-stat-value">340+</span>
-                <span className="auth-stat-label">FPOs</span>
+              <div className="auth-highlight-item">
+                <span className="auth-highlight-icon">✓</span>
+                <div>
+                  <strong>{authT.highlight3Title}</strong>
+                  <p>{authT.highlight3Desc}</p>
+                </div>
               </div>
             </div>
           </div>
-          <div className="auth-left-footer">KisanLink · v2.1 · Direct Agri Linkage</div>
+          <div key={`footer-${language}`} className="auth-left-footer kl-lang-animated-content">{authT.footer}</div>
           {/* Decorative leaf */}
           <svg className="auth-left-deco" viewBox="0 0 200 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M100 400 C100 300 20 250 20 150 C20 67 67 20 150 20 C150 20 180 100 180 200 C180 320 100 400 100 400Z" fill="#4caf6e"/>
-            <path d="M100 400 L100 150" stroke="#2f7d45" strokeWidth="3"/>
-            <path d="M100 300 C130 260 160 220 180 180" stroke="#2f7d45" strokeWidth="2"/>
-            <path d="M100 250 C70 210 50 180 30 150" stroke="#2f7d45" strokeWidth="2"/>
+            <path d="M100 400 C100 300 20 250 20 150 C20 67 67 20 150 20 C150 20 180 100 180 200 C180 320 100 400 100 400Z" fill="#4caf6e" />
+            <path d="M100 400 L100 150" stroke="#2f7d45" strokeWidth="3" />
+            <path d="M100 300 C130 260 160 220 180 180" stroke="#2f7d45" strokeWidth="2" />
+            <path d="M100 250 C70 210 50 180 30 150" stroke="#2f7d45" strokeWidth="2" />
           </svg>
         </div>
 
         {/* ── Right form panel ── */}
         <div className="auth-right-panel">
-        <div className="auth-standalone-container">    </div>
+          <div className="auth-standalone-container">
+            {/* Language Switcher Bar matching About Page slider */}
+            <div className="auth-card-topbar">
+              <div className="auth-lang-switch-wrap">
+                <div className="kl-lang-switch auth-lang-switch" role="group" aria-label="Language selector">
+                  <span
+                    className="kl-lang-slider"
+                    style={{ transform: `translateX(${activeLangIndex * 100}%)` }}
+                    aria-hidden="true"
+                  />
+                  <button
+                    type="button"
+                    className={`kl-lang-btn ${language === 'en' ? 'active' : ''}`}
+                    onClick={() => handleLanguageChange('en')}
+                    title="English"
+                  >
+                    EN
+                  </button>
+                  <button
+                    type="button"
+                    className={`kl-lang-btn ${language === 'hi' ? 'active' : ''}`}
+                    onClick={() => handleLanguageChange('hi')}
+                    title="हिन्दी"
+                  >
+                    हिन्दी
+                  </button>
+                  <button
+                    type="button"
+                    className={`kl-lang-btn ${language === 'mr' ? 'active' : ''}`}
+                    onClick={() => handleLanguageChange('mr')}
+                    title="मराठी"
+                  >
+                    मराठी
+                  </button>
+                </div>
+              </div>
+            </div>
 
-        <div className="auth-standalone-container">
-          
-          <div className="auth-mode-toggle">
-            <button
-              type="button"
-              className={authMode === 'login' ? 'active' : ''}
-              onClick={() => {
-                setAuthMode('login');
-                setAuthError('');
-                setAuthSuccess('');
-                setMessage('');
-              }}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              className={authMode === 'register' ? 'active' : ''}
-              onClick={() => {
-                setAuthMode('register');
-                setAuthError('');
-                setAuthSuccess('');
-                setMessage('');
-              }}
-            >
-              Create Account
-            </button>
+            <div key={language} className="auth-card-body-animated kl-lang-animated-content">
+              <div className="auth-mode-toggle">
+              <div
+                className="auth-toggle-slider"
+                style={{
+                  transform: authMode === 'login' ? 'translateX(0%)' : 'translateX(100%)'
+                }}
+              />
+              <button
+                type="button"
+                className={`auth-toggle-btn ${authMode === 'login' ? 'active' : ''}`}
+                onClick={() => {
+                  setAuthMode('login');
+                  setAuthError('');
+                  setAuthSuccess('');
+                  setMessage('');
+                }}
+              >
+                {authT.tabSignIn}
+              </button>
+              <button
+                type="button"
+                className={`auth-toggle-btn ${authMode === 'register' ? 'active' : ''}`}
+                onClick={() => {
+                  setAuthMode('register');
+                  setAuthError('');
+                  setAuthSuccess('');
+                  setMessage('');
+                }}
+              >
+                {authT.tabCreateAccount}
+              </button>
+            </div>
+
+            {authError && (
+              <div className="auth-alert-banner auth-alert-error" role="alert">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: '1px' }}>
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span>{authError}</span>
+              </div>
+            )}
+            {authSuccess && (
+              <div className="auth-alert-banner auth-alert-success" role="alert">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: '1px' }}>
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+                <span>{authSuccess}</span>
+              </div>
+            )}
+
+            <div key={authMode} className="auth-form-animated-block">
+              {authMode === 'register' && (
+                <div style={{ marginBottom: '14px' }}>
+                <span style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#556058', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  {authT.selectProfile}
+                </span>
+                <div className="auth-role-grid">
+                  <button
+                    type="button"
+                    className={`auth-role-card ${role === 'FARMER' ? 'active' : ''}`}
+                    onClick={() => setRole('FARMER')}
+                  >
+                    <span className="auth-role-card-title">{authT.roleFarmer}</span>
+                    <span className="auth-role-card-desc">{authT.roleFarmerDesc}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`auth-role-card ${role === 'FPO' ? 'active' : ''}`}
+                    onClick={() => setRole('FPO')}
+                  >
+                    <span className="auth-role-card-title">{authT.roleFpo}</span>
+                    <span className="auth-role-card-desc">{authT.roleFpoDesc}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`auth-role-card ${role === 'BUYER' ? 'active' : ''}`}
+                    onClick={() => setRole('BUYER')}
+                  >
+                    <span className="auth-role-card-title">{authT.roleBuyer}</span>
+                    <span className="auth-role-card-desc">{authT.roleBuyerDesc}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`auth-role-card ${role === 'TRANSPORTER' ? 'active' : ''}`}
+                    onClick={() => setRole('TRANSPORTER')}
+                  >
+                    <span className="auth-role-card-title">{authT.roleTransporter}</span>
+                    <span className="auth-role-card-desc">{authT.roleTransporterDesc}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleAuth} style={{ marginTop: 0 }}>
+
+              {authMode === 'login' ? (
+                <>
+                  <label style={{ marginTop: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>{authT.labelEmailOrPhone}</span>
+                      {isPhoneIdentifier && <span className="auth-badge-pill" style={{ color: '#2f6838', background: '#eef4ec' }}>{authT.badgePhone}</span>}
+                      {isEmailIdentifier && <span className="auth-badge-pill" style={{ color: '#1e3a8a', background: '#eff6ff' }}>{authT.badgeEmail}</span>}
+                    </div>
+                    <input
+                      type="text"
+                      inputMode="text"
+                      autoComplete="username"
+                      value={account.email}
+                      onChange={(e) => setAccount({ ...account, email: e.target.value })}
+                      placeholder={authT.placeholderEmailOrPhone}
+                      required
+                    />
+                  </label>
+
+                  <label style={{ marginTop: '12px' }}>
+                    <span>{authT.labelPassword}</span>
+                    <div className="auth-input-wrapper">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        autoComplete="current-password"
+                        value={account.password}
+                        onChange={(e) => setAccount({ ...account, password: e.target.value })}
+                        placeholder="········"
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="auth-password-toggle"
+                        onClick={() => setShowPassword(!showPassword)}
+                        title={showPassword ? authT.toggleHidePassword : authT.toggleShowPassword}
+                        aria-label={showPassword ? authT.toggleHidePassword : authT.toggleShowPassword}
+                      >
+                        {showPassword ? (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                            <line x1="1" y1="1" x2="23" y2="23" />
+                          </svg>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </label>
+                </>
+              ) : (
+
+                <>
+                  {role === 'FPO' && (
+                    <>
+                      <label style={{ marginTop: 0 }}>
+                        {authT.fpoLegalName}
+                        <input
+                          value={account.orgName}
+                          onChange={(e) => setAccount({ ...account, orgName: e.target.value })}
+                          placeholder={authT.fpoLegalNamePlaceholder}
+                          required
+                        />
+                      </label>
+                      <label style={{ marginTop: '10px' }}>
+                        {authT.fpoRegNumber}
+                        <input
+                          value={account.regNumber}
+                          onChange={(e) => setAccount({ ...account, regNumber: e.target.value })}
+                          placeholder={authT.fpoRegNumberPlaceholder}
+                        />
+                      </label>
+                      <label style={{ marginTop: '10px' }}>
+                        {authT.fpoDistrictState}
+                        <input
+                          value={account.district}
+                          onChange={(e) => setAccount({ ...account, district: e.target.value })}
+                          placeholder={authT.fpoDistrictStatePlaceholder}
+                        />
+                      </label>
+                      <label style={{ marginTop: '10px' }}>
+                        {authT.fpoRepName}
+                        <input
+                          value={account.name}
+                          onChange={(e) => setAccount({ ...account, name: e.target.value })}
+                          placeholder={authT.fpoRepNamePlaceholder}
+                          required
+                        />
+                      </label>
+                    </>
+                  )}
+
+                  {role === 'BUYER' && (
+                    <>
+                      <label style={{ marginTop: 0 }}>
+                        {authT.buyerOrgName}
+                        <input
+                          value={account.orgName}
+                          onChange={(e) => setAccount({ ...account, orgName: e.target.value })}
+                          placeholder={authT.buyerOrgNamePlaceholder}
+                          required
+                        />
+                      </label>
+                      <label style={{ marginTop: '10px' }}>
+                        {authT.buyerCategory}
+                        <select
+                          value={account.businessType}
+                          onChange={(e) => setAccount({ ...account, businessType: e.target.value })}
+                          style={{ width: '100%', padding: '8px 10px', border: '1px solid #d9d6cc', borderRadius: '4px', background: '#ffffff' }}
+                        >
+                          <option value="Wholesaler">{authT.buyerCatWholesaler}</option>
+                          <option value="Food Processor">{authT.buyerCatFoodProcessor}</option>
+                          <option value="Institutional Buyer">{authT.buyerCatInstitutional}</option>
+                          <option value="Exporter">{authT.buyerCatExporter}</option>
+                          <option value="Modern Retailer">{authT.buyerCatRetailer}</option>
+                        </select>
+                      </label>
+                      <label style={{ marginTop: '10px' }}>
+                        {authT.buyerContactName}
+                        <input
+                          value={account.name}
+                          onChange={(e) => setAccount({ ...account, name: e.target.value })}
+                          placeholder={authT.buyerContactNamePlaceholder}
+                          required
+                        />
+                      </label>
+                    </>
+                  )}
+
+                  {role === 'TRANSPORTER' && (
+                    <>
+                      <label style={{ marginTop: 0 }}>
+                        {authT.transporterOrgName}
+                        <input
+                          value={account.orgName}
+                          onChange={(e) => setAccount({ ...account, orgName: e.target.value })}
+                          placeholder={authT.transporterOrgNamePlaceholder}
+                          required
+                        />
+                      </label>
+                      <label style={{ marginTop: '10px' }}>
+                        {authT.transporterVehicleType}
+                        <select
+                          value={account.vehicleType}
+                          onChange={(e) => setAccount({ ...account, vehicleType: e.target.value })}
+                          style={{ width: '100%', padding: '8px 10px', border: '1px solid #d9d6cc', borderRadius: '4px', background: '#ffffff' }}
+                        >
+                          <option value="Small Commercial (Pick-up / Bolero)">{authT.transporterVeh1}</option>
+                          <option value="Medium Commercial (Eicher / 407)">{authT.transporterVeh2}</option>
+                          <option value="Heavy Commercial (10+ Wheeler)">{authT.transporterVeh3}</option>
+                          <option value="Reefer / Cold Chain Container">{authT.transporterVeh4}</option>
+                        </select>
+                      </label>
+                      <label style={{ marginTop: '10px' }}>
+                        {authT.transporterRegNumber}
+                        <input
+                          value={account.vehicleNumber}
+                          onChange={(e) => setAccount({ ...account, vehicleNumber: e.target.value })}
+                          placeholder={authT.transporterRegNumberPlaceholder}
+                        />
+                      </label>
+                      <label style={{ marginTop: '10px' }}>
+                        {authT.transporterFleetManager}
+                        <input
+                          value={account.name}
+                          onChange={(e) => setAccount({ ...account, name: e.target.value })}
+                          placeholder={authT.transporterFleetManagerPlaceholder}
+                          required
+                        />
+                      </label>
+                    </>
+                  )}
+
+                  {role === 'FARMER' && (
+                    <>
+                      <label style={{ marginTop: 0 }}>
+                        {authT.farmerFullName}
+                        <input
+                          value={account.name}
+                          onChange={(e) => setAccount({ ...account, name: e.target.value })}
+                          placeholder={authT.farmerFullNamePlaceholder}
+                          required
+                        />
+                      </label>
+                      <label style={{ marginTop: '10px' }}>
+                        {authT.farmerVillageDistrict}
+                        <input
+                          value={account.district}
+                          onChange={(e) => setAccount({ ...account, district: e.target.value })}
+                          placeholder={authT.farmerVillageDistrictPlaceholder}
+                        />
+                      </label>
+                    </>
+                  )}
+
+
+                  <label style={{ marginTop: '10px' }}>
+                    {authT.farmerPhone}
+                    <input
+                      type="tel"
+                      inputMode="numeric"
+                      maxLength={10}
+                      value={account.phone}
+                      onChange={(e) => setAccount({ ...account, phone: e.target.value })}
+                      placeholder={authT.farmerPhonePlaceholder}
+                      required
+                    />
+                    {!phoneValid && (
+                      <span className="auth-field-error">{authT.errorPhone}</span>
+                    )}
+                  </label>
+
+                  <label style={{ marginTop: '10px' }}>
+                    {authT.farmerEmail}
+                    <input
+                      type="email"
+                      value={account.email}
+                      onChange={(e) => setAccount({ ...account, email: e.target.value })}
+                      placeholder={
+                        role === 'FARMER' ? 'farmer@kisanlink.in' :
+                          role === 'FPO' ? 'contact@fpo.org' :
+                            role === 'BUYER' ? 'procure@company.com' : 'dispatch@logistics.in'
+                      }
+                      required
+                    />
+                  </label>
+
+                  <label style={{ marginTop: '10px' }}>
+                    {authT.labelCreatePassword}
+                    <div className="auth-input-wrapper">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        autoComplete="new-password"
+                        value={account.password}
+                        onChange={(e) => setAccount({ ...account, password: e.target.value })}
+                        placeholder="········"
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="auth-password-toggle"
+                        onClick={() => setShowPassword(!showPassword)}
+                        title={showPassword ? authT.toggleHidePassword : authT.toggleShowPassword}
+                        aria-label={showPassword ? authT.toggleHidePassword : authT.toggleShowPassword}
+                      >
+                        {showPassword ? (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                            <line x1="1" y1="1" x2="23" y2="23" />
+                          </svg>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                    {!passValid && (
+                      <span className="auth-field-error">{authT.errorPass}</span>
+                    )}
+                  </label>
+                </>
+              )}
+
+              <button
+                type="submit"
+                className="auth-submit-btn"
+                disabled={authLoading}
+              >
+                {authLoading ? (
+                  authMode === 'login' ? authT.authAuthenticating : authT.authCreating
+                ) : (
+                  <>
+                    <span>
+                      {authMode === 'login'
+                        ? authT.btnSignIn
+                        : role === 'FPO'
+                          ? authT.btnRegisterFpo
+                          : role === 'BUYER'
+                            ? authT.btnRegisterBuyer
+                            : role === 'TRANSPORTER'
+                              ? authT.btnRegisterTransporter
+                              : authT.btnRegisterFarmer}
+                    </span>
+                    <span className="auth-btn-arrow">→</span>
+                  </>
+                )}
+              </button>
+            </form>
           </div>
 
-          
-          {authError && (
-            <div className="auth-alert-banner auth-alert-error" role="alert">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: '1px' }}>
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="12"/>
-                <line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
-              <span>{authError}</span>
-            </div>
-          )}
-          {authSuccess && (
-            <div className="auth-alert-banner auth-alert-success" role="alert">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: '1px' }}>
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
-              </svg>
-              <span>{authSuccess}</span>
-            </div>
-          )}
-
-          
-          {authMode === 'register' && (
-            <div style={{ marginBottom: '14px' }}>
-              <span style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#556058', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Select User Profile
-              </span>
-              <div className="auth-role-grid">
+            <div className="auth-demo-strip">
+              <span className="auth-demo-title">{authT.quickDemo}</span>
+              <div className="auth-demo-grid">
                 <button
                   type="button"
-                  className={`auth-role-card ${role === 'FARMER' ? 'active' : ''}`}
-                  onClick={() => setRole('FARMER')}
+                  className="auth-persona-pill persona-fpo"
+                  onClick={() => handleQuickLogin('FPO')}
                 >
-                  <span className="auth-role-card-title">Farmer</span>
-                  <span className="auth-role-card-desc">Individual producer &amp; harvest sales</span>
+                  {authT.demoFpo}
                 </button>
                 <button
                   type="button"
-                  className={`auth-role-card ${role === 'FPO' ? 'active' : ''}`}
-                  onClick={() => setRole('FPO')}
+                  className="auth-persona-pill persona-farmer"
+                  onClick={() => handleQuickLogin('FARMER')}
                 >
-                  <span className="auth-role-card-title">FPO Operator</span>
-                  <span className="auth-role-card-desc">Aggregation, lot grading &amp; contracts</span>
+                  {authT.demoFarmer}
                 </button>
                 <button
                   type="button"
-                  className={`auth-role-card ${role === 'BUYER' ? 'active' : ''}`}
-                  onClick={() => setRole('BUYER')}
+                  className="auth-persona-pill persona-buyer"
+                  onClick={() => handleQuickLogin('BUYER')}
                 >
-                  <span className="auth-role-card-title">Buyer</span>
-                  <span className="auth-role-card-desc">Procurement, wholesale &amp; processing</span>
+                  {authT.demoBuyer}
                 </button>
                 <button
                   type="button"
-                  className={`auth-role-card ${role === 'TRANSPORTER' ? 'active' : ''}`}
-                  onClick={() => setRole('TRANSPORTER')}
+                  className="auth-persona-pill persona-transporter"
+                  onClick={() => handleQuickLogin('TRANSPORTER')}
                 >
-                  <span className="auth-role-card-title">Transporter</span>
-                  <span className="auth-role-card-desc">Haulage, fleet routes &amp; delivery</span>
+                  {authT.demoTransporter}
+                </button>
+                <button
+                  type="button"
+                  className="auth-persona-pill persona-admin"
+                  onClick={() => handleQuickLogin('ADMIN')}
+                >
+                  {authT.demoAdmin}
                 </button>
               </div>
             </div>
-          )}
-
-          <form onSubmit={handleAuth} style={{ marginTop: 0 }}>
-            
-            {authMode === 'login' ? (
-              <>
-                <label style={{ marginTop: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>Email or Mobile Number</span>
-                    {isPhoneIdentifier && <span className="auth-badge-pill" style={{ color: '#2f6838', background: '#eef4ec' }}>Mobile Number</span>}
-                    {isEmailIdentifier && <span className="auth-badge-pill" style={{ color: '#1e3a8a', background: '#eff6ff' }}>Email Address</span>}
-                  </div>
-                  <input
-                    type="text"
-                    inputMode="text"
-                    autoComplete="username"
-                    value={account.email}
-                    onChange={(e) => setAccount({ ...account, email: e.target.value })}
-                    placeholder="e.g. 9876543210 or user@kisanlink.in"
-                    required
-                  />
-                </label>
-
-                <label style={{ marginTop: '12px' }}>
-                  <span>Password</span>
-                  <div className="auth-input-wrapper">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      autoComplete="current-password"
-                      value={account.password}
-                      onChange={(e) => setAccount({ ...account, password: e.target.value })}
-                      placeholder="········"
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="auth-password-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
-                      title={showPassword ? 'Hide password' : 'Show password'}
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showPassword ? (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                          <line x1="1" y1="1" x2="23" y2="23"/>
-                        </svg>
-                      ) : (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                          <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                </label>
-              </>
-            ) : (
-              
-              <>
-                {role === 'FPO' && (
-                  <>
-                    <label style={{ marginTop: 0 }}>
-                      FPO / Cooperative Legal Name
-                      <input
-                        value={account.orgName}
-                        onChange={(e) => setAccount({ ...account, orgName: e.target.value })}
-                        placeholder="e.g. Sahyadri Farmers Producer Co Ltd"
-                        required
-                      />
-                    </label>
-                    <label style={{ marginTop: '10px' }}>
-                      CIN / Cooperative Registration Number
-                      <input
-                        value={account.regNumber}
-                        onChange={(e) => setAccount({ ...account, regNumber: e.target.value })}
-                        placeholder="e.g. U01100MH2020PTC123456"
-                      />
-                    </label>
-                    <label style={{ marginTop: '10px' }}>
-                      Operational District &amp; State
-                      <input
-                        value={account.district}
-                        onChange={(e) => setAccount({ ...account, district: e.target.value })}
-                        placeholder="e.g. Nashik, Maharashtra"
-                      />
-                    </label>
-                    <label style={{ marginTop: '10px' }}>
-                      Authorized Representative / CEO Name
-                      <input
-                        value={account.name}
-                        onChange={(e) => setAccount({ ...account, name: e.target.value })}
-                        placeholder="e.g. Rajesh Patil"
-                        required
-                      />
-                    </label>
-                  </>
-                )}
-
-                {role === 'BUYER' && (
-                  <>
-                    <label style={{ marginTop: 0 }}>
-                      Enterprise / Trading Name
-                      <input
-                        value={account.orgName}
-                        onChange={(e) => setAccount({ ...account, orgName: e.target.value })}
-                        placeholder="e.g. Reliance Fresh Agro Procurement"
-                        required
-                      />
-                    </label>
-                    <label style={{ marginTop: '10px' }}>
-                      Business Category
-                      <select
-                        value={account.businessType}
-                        onChange={(e) => setAccount({ ...account, businessType: e.target.value })}
-                        style={{ width: '100%', padding: '8px 10px', border: '1px solid #d9d6cc', borderRadius: '4px', background: '#ffffff' }}
-                      >
-                        <option value="Wholesaler">Wholesaler / Mandi Trader</option>
-                        <option value="Food Processor">Food Processor &amp; Packaging</option>
-                        <option value="Institutional Buyer">Institutional Buyer / Hotel Chain</option>
-                        <option value="Exporter">Agricultural Exporter</option>
-                        <option value="Modern Retailer">Modern Supermarket / Retail Chain</option>
-                      </select>
-                    </label>
-                    <label style={{ marginTop: '10px' }}>
-                      Contact Person Full Name
-                      <input
-                        value={account.name}
-                        onChange={(e) => setAccount({ ...account, name: e.target.value })}
-                        placeholder="e.g. Priya Sharma"
-                        required
-                      />
-                    </label>
-                  </>
-                )}
-
-                {role === 'TRANSPORTER' && (
-                  <>
-                    <label style={{ marginTop: 0 }}>
-                      Transport Agency / Fleet Name
-                      <input
-                        value={account.orgName}
-                        onChange={(e) => setAccount({ ...account, orgName: e.target.value })}
-                        placeholder="e.g. Maharashtra Kisan Express Logistics"
-                        required
-                      />
-                    </label>
-                    <label style={{ marginTop: '10px' }}>
-                      Primary Vehicle Type
-                      <select
-                        value={account.vehicleType}
-                        onChange={(e) => setAccount({ ...account, vehicleType: e.target.value })}
-                        style={{ width: '100%', padding: '8px 10px', border: '1px solid #d9d6cc', borderRadius: '4px', background: '#ffffff' }}
-                      >
-                        <option value="Small Commercial (Pick-up / Bolero)">Small Commercial (Pick-up / Bolero 1-2T)</option>
-                        <option value="Medium Commercial (Eicher / 407)">Medium Commercial (Eicher / 407 3-6T)</option>
-                        <option value="Heavy Commercial (10+ Wheeler)">Heavy Commercial (10+ Wheeler 10-25T)</option>
-                        <option value="Reefer / Cold Chain Container">Refrigerated Reefer / Cold Chain</option>
-                      </select>
-                    </label>
-                    <label style={{ marginTop: '10px' }}>
-                      Vehicle Registration Number
-                      <input
-                        value={account.vehicleNumber}
-                        onChange={(e) => setAccount({ ...account, vehicleNumber: e.target.value })}
-                        placeholder="e.g. MH-15-AB-5678"
-                      />
-                    </label>
-                    <label style={{ marginTop: '10px' }}>
-                      Operator / Fleet Manager Name
-                      <input
-                        value={account.name}
-                        onChange={(e) => setAccount({ ...account, name: e.target.value })}
-                        placeholder="e.g. Suresh Shinde"
-                        required
-                      />
-                    </label>
-                  </>
-                )}
-
-                {role === 'FARMER' && (
-                  <>
-                    <label style={{ marginTop: 0 }}>
-                      Farmer Full Name
-                      <input
-                        value={account.name}
-                        onChange={(e) => setAccount({ ...account, name: e.target.value })}
-                        placeholder="e.g. Ramesh Narayan Kumar"
-                        required
-                      />
-                    </label>
-                    <label style={{ marginTop: '10px' }}>
-                      Village &amp; District
-                      <input
-                        value={account.district}
-                        onChange={(e) => setAccount({ ...account, district: e.target.value })}
-                        placeholder="e.g. Dindori, Nashik"
-                      />
-                    </label>
-                  </>
-                )}
-
-                
-                <label style={{ marginTop: '10px' }}>
-                  10-Digit Mobile Number
-                  <input
-                    type="tel"
-                    inputMode="numeric"
-                    maxLength={10}
-                    value={account.phone}
-                    onChange={(e) => setAccount({ ...account, phone: e.target.value })}
-                    placeholder="e.g. 9876543210"
-                    required
-                  />
-                  {!phoneValid && (
-                    <span className="auth-field-error">Mobile number must be 10 digits starting with 6, 7, 8, or 9.</span>
-                  )}
-                </label>
-
-                <label style={{ marginTop: '10px' }}>
-                  Email Address
-                  <input
-                    type="email"
-                    value={account.email}
-                    onChange={(e) => setAccount({ ...account, email: e.target.value })}
-                    placeholder={
-                      role === 'FARMER' ? 'farmer@kisanlink.in' :
-                      role === 'FPO' ? 'contact@fpo.org' :
-                      role === 'BUYER' ? 'procure@company.com' : 'dispatch@logistics.in'
-                    }
-                    required
-                  />
-                </label>
-
-                <label style={{ marginTop: '10px' }}>
-                  Create Password (min. 6 characters)
-                  <div className="auth-input-wrapper">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      autoComplete="new-password"
-                      value={account.password}
-                      onChange={(e) => setAccount({ ...account, password: e.target.value })}
-                      placeholder="········"
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="auth-password-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
-                      title={showPassword ? 'Hide password' : 'Show password'}
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showPassword ? (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                          <line x1="1" y1="1" x2="23" y2="23"/>
-                        </svg>
-                      ) : (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                          <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                  {!passValid && (
-                    <span className="auth-field-error">Password must contain at least 6 characters.</span>
-                  )}
-                </label>
-              </>
-            )}
-
-            <button
-              type="submit"
-              className="auth-submit-btn"
-              disabled={authLoading}
-            >
-              {authLoading
-                ? (authMode === 'login' ? 'Authenticating Desk Access...' : 'Creating Account & Initializing Profile...')
-                : (authMode === 'login' ? 'Sign In to Trade Desk &rarr;' : `Register as ${role === 'FPO' ? 'FPO Operator' : role === 'BUYER' ? 'Buyer' : role === 'TRANSPORTER' ? 'Transporter' : 'Farmer'} →`)
-              }
-            </button>
-          </form>
-
-          
-          <div className="auth-demo-strip">
-            <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
-              Instant Personas (1-Click Demo)
-            </span>
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '8px', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                className="trade-btn trade-btn-secondary"
-                style={{ fontSize: '11px', padding: '5px 10px', borderColor: '#2f6838', color: '#2f6838', fontWeight: 600 }}
-                onClick={() => handleQuickLogin('FPO')}
-              >
-                FPO Operator (Sahyadri)
-              </button>
-              <button
-                type="button"
-                className="trade-btn trade-btn-secondary"
-                style={{ fontSize: '11px', padding: '5px 10px' }}
-                onClick={() => handleQuickLogin('FARMER')}
-              >
-                Farmer (Ramesh)
-              </button>
-              <button
-                type="button"
-                className="trade-btn trade-btn-secondary"
-                style={{ fontSize: '11px', padding: '5px 10px' }}
-                onClick={() => handleQuickLogin('BUYER')}
-              >
-                Buyer (Priya)
-              </button>
-              <button
-                type="button"
-                className="trade-btn trade-btn-secondary"
-                style={{ fontSize: '11px', padding: '5px 10px', borderColor: '#e07b39', color: '#e07b39' }}
-                onClick={() => handleQuickLogin('TRANSPORTER')}
-              >
-                Transporter (Suresh)
-              </button>
-              <button
-                type="button"
-                className="trade-btn trade-btn-secondary"
-                style={{ fontSize: '11px', padding: '5px 10px', borderColor: '#1e3a8a', color: '#1e3a8a', fontWeight: 600 }}
-                onClick={() => handleQuickLogin('ADMIN')}
-              >
-                Nodal Admin (Gov)
-              </button>
-            </div>
+            </div>{/* end auth-card-body-animated */}
           </div>
-        </div>
         </div>{/* end auth-right-panel */}
       </div>
     );
@@ -3837,7 +3974,7 @@ function App() {
 
   return (
     <main className="shell">
-      
+
       {showTutorial && (
         <>
           <style>{`
@@ -3856,7 +3993,7 @@ function App() {
             }
           `}</style>
 
-          
+
           <div
             className="tutorial-backdrop"
             onClick={completeTutorial}
@@ -3870,7 +4007,7 @@ function App() {
             }}
           />
 
-          
+
           {tutorialFocusRect && (
             <div
               className="tutorial-spotlight"
@@ -3889,7 +4026,7 @@ function App() {
             />
           )}
 
-          
+
           <div
             className="tutorial-card-dialog"
             style={{
@@ -3903,7 +4040,7 @@ function App() {
               boxSizing: 'border-box'
             }}
           >
-            
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{
@@ -3947,7 +4084,7 @@ function App() {
               </button>
             </div>
 
-            
+
             <h3 style={{ margin: '0 0 8px', fontSize: '17px', color: '#ffffff', fontWeight: 700 }}>
               {tutorialTargets[tutorialStep]?.title}
             </h3>
@@ -3955,7 +4092,7 @@ function App() {
               {tutorialTargets[tutorialStep]?.description}
             </p>
 
-            
+
             <div style={{ display: 'flex', gap: '5px', marginBottom: '18px' }}>
               {tutorialTargets.map((_, idx) => (
                 <div
@@ -3971,7 +4108,7 @@ function App() {
               ))}
             </div>
 
-            
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
               <button
                 type="button"
@@ -4026,7 +4163,7 @@ function App() {
         </>
       )}
 
-      
+
       <nav className="topbar">
         <div className="topbar-row">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -4049,6 +4186,20 @@ function App() {
               <span className="brand-mark">K</span>
               <span>KisanLink</span>
             </div>
+
+            <button
+              type="button"
+              className="desktop-sidebar-toggle"
+              onClick={() => setSidebarOpen(o => !o)}
+              title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+              aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <line x1="9" y1="3" x2="9" y2="21" />
+                {sidebarOpen ? <polyline points="15 15 12 12 15 9" /> : <polyline points="12 15 15 12 12 9" />}
+              </svg>
+            </button>
           </div>
 
           <div className="topbar-actions">
@@ -4121,7 +4272,7 @@ function App() {
         </div>
       </nav>
 
-      
+
       {liveToast && (
         <div className="live-toast" onClick={() => setLiveToast(null)}>
           <div style={{ flex: 1 }}>
@@ -4133,7 +4284,7 @@ function App() {
         </div>
       )}
 
-      
+
       {message && (
         <p className="form-message" style={{ marginTop: '14px' }}>
           {message}{' '}
@@ -4141,10 +4292,25 @@ function App() {
         </p>
       )}
 
-      
-      <div className="main-with-sidebar">
 
-        
+      {/* Sidebar expand tab — docked to left edge, outside grid so it doesn't affect layout */}
+      {!sidebarOpen && !mobileNavOpen && (
+        <button
+          type="button"
+          className="sidebar-expand-tab"
+          onClick={() => setSidebarOpen(true)}
+          title="Show Navigation"
+          aria-label="Show Navigation"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      )}
+
+      <div className={`main-with-sidebar${(!sidebarOpen && !mobileNavOpen) ? ' sidebar-collapsed' : ''}`}>
+
+
         {mobileNavOpen && (
           <div
             className="mobile-drawer-backdrop"
@@ -4152,22 +4318,29 @@ function App() {
           />
         )}
 
-        
-        <button
-          type="button"
-          className="sidebar-toggle"
-          onClick={() => setSidebarOpen(o => !o)}
-          title={sidebarOpen ? 'Hide sidebar' : 'Show marketplace sidebar'}
-        >
-          {sidebarOpen ? '\u2190' : '\u2192'}
-        </button>
 
-        
         <aside
-          className={`left-nav${(!sidebarOpen && !mobileNavOpen) ? ' left-nav-hidden' : ''}${mobileNavOpen ? ' mobile-open' : ''}`}
+          className={`left-nav${(!sidebarOpen && !mobileNavOpen) ? ' collapsed' : ''}${mobileNavOpen ? ' mobile-open' : ''}`}
         >
+          <div className="left-nav-header">
+            <div className="left-nav-brand-title">
+              <span className="left-nav-pulse-dot" />
+              <span>Navigation</span>
+            </div>
+            <button
+              type="button"
+              className="sidebar-collapse-btn"
+              onClick={() => setSidebarOpen(false)}
+              title="Hide navigation"
+              aria-label="Hide navigation"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+          </div>
 
-          
+
           <div className="mobile-nav-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span className="brand-mark" style={{ width: '24px', height: '24px', fontSize: '12px' }}>K</span>
@@ -4179,3734 +4352,3783 @@ function App() {
               onClick={() => setMobileNavOpen(false)}
               aria-label="Close navigation"
             >
-              Γ£ò
+              ✕
             </button>
           </div>
 
-            <p className="left-nav-heading">{text.sidebarMarketplace}</p>
+          <p className="left-nav-heading">{text.sidebarMarketplace}</p>
 
-            {session?.role !== 'TRANSPORTER' && (
-              <>
-                <button
-                  ref={(el) => { tutorialRefs.current.sidebarMarket = el; }}
-                  type="button"
-                  className={`left-nav-item ${(currentView === 'prices') ? 'active' : ''}`}
-                  onClick={() => navigateFromMenu('prices')}
-                >
-                  <span className="left-nav-icon"><NavIcon name="crops" /></span>
-                  <span className="left-nav-label">
-                    <strong>{text.sidebarCrops}</strong>
-                    <small>{text.sidebarCropsSmall}</small>
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`left-nav-item ${(currentView === 'inputs') ? 'active' : ''}`}
-                  onClick={() => { setInputCategoryFilter('ALL'); navigateFromMenu('inputs'); }}
-                >
-                  <span className="left-nav-icon"><NavIcon name="inputs" /></span>
-                  <span className="left-nav-label">
-                    <strong>{text.sidebarInputs}</strong>
-                    <small>{text.sidebarInputsSmall}</small>
-                  </span>
-                </button>
-              </>
-            )}
-
-            
-            {currentView === 'inputs' && (
-              <div className="left-nav-sub">
-                {[
-                  { value: 'ALL', label: text.allInputs },
-                  { value: 'FERTILIZER', label: 'Fertilizers' },
-                  { value: 'PESTICIDE', label: 'Pesticides' },
-                  { value: 'BIO_INPUT', label: 'Bio-Inputs' },
-                ].map(sub => (
-                  <button
-                    key={sub.value}
-                    type="button"
-                    className={`left-nav-sub-item ${inputCategoryFilter === sub.value ? 'active' : ''}`}
-                    onClick={() => { setInputCategoryFilter(sub.value); setMobileNavOpen(false); }}
-                  >
-                    {sub.label}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <p className="left-nav-heading" style={{ marginTop: '16px' }}>{text.sidebarTradeShop}</p>
-
-            <button
-              type="button"
-              className={`left-nav-item ${(currentView === 'my-orders') ? 'active' : ''}`}
-              onClick={() => navigateFromMenu('my-orders')}
-            >
-              <span className="left-nav-icon"><NavIcon name="orders" /></span>
-              <span className="left-nav-label">
-                <strong>{text.sidebarOrders}</strong>
-                <small>{text.sidebarOrdersSmall}</small>
-              </span>
-            </button>
-
-            <button
-              type="button"
-              className={`left-nav-item ${(currentView === 'my-shop') ? 'active' : ''}`}
-              onClick={() => navigateFromMenu('my-shop')}
-            >
-              <span className="left-nav-icon"><NavIcon name="shop" /></span>
-              <span className="left-nav-label">
-                <strong>{text.sidebarMyShop}</strong>
-                <small>{text.sidebarMyShopSmall}</small>
-              </span>
-            </button>
-
-            <button
-              type="button"
-              className={`left-nav-item ${(currentView === 'order-progress') ? 'active' : ''}`}
-              onClick={() => navigateFromMenu('order-progress')}
-            >
-              <span className="left-nav-icon"><NavIcon name="progress" /></span>
-              <span className="left-nav-label">
-                <strong>{text.sidebarProgress}</strong>
-                <small>{text.sidebarProgressSmall}</small>
-              </span>
-            </button>
-
-            {(session?.role === 'FARMER' || session?.role === 'BUYER') && (
+          {session?.role !== 'TRANSPORTER' && (
+            <>
               <button
+                ref={(el) => { tutorialRefs.current.sidebarMarket = el; }}
                 type="button"
-                className={`left-nav-item ${(currentView === 'trade-chat') ? 'active' : ''}`}
-                onClick={() => navigateFromMenu('trade-chat')}
+                className={`left-nav-item ${(currentView === 'prices') ? 'active' : ''}`}
+                onClick={() => navigateFromMenu('prices')}
               >
-                <span className="left-nav-icon"><NavIcon name="chat" /></span>
+                <span className="left-nav-icon"><NavIcon name="crops" /></span>
                 <span className="left-nav-label">
-                  <strong>Trade Chat</strong>
-                  <small>Offers &amp; Negotiations</small>
+                  <strong>{text.sidebarCrops}</strong>
+                  <small>{text.sidebarCropsSmall}</small>
                 </span>
               </button>
-            )}
 
-            {session?.role === 'TRANSPORTER' && (
               <button
                 type="button"
-                className={`left-nav-item ${(currentView === 'transporter-dashboard') ? 'active' : ''}`}
-                onClick={() => navigateFromMenu('transporter-dashboard')}
+                className={`left-nav-item ${(currentView === 'inputs') ? 'active' : ''}`}
+                onClick={() => { setInputCategoryFilter('ALL'); navigateFromMenu('inputs'); }}
               >
-                <span className="left-nav-icon"><NavIcon name="transport" /></span>
+                <span className="left-nav-icon"><NavIcon name="inputs" /></span>
                 <span className="left-nav-label">
-                  <strong>Transport Hub</strong>
-                  <small>Fleet &amp; Hauls</small>
+                  <strong>{text.sidebarInputs}</strong>
+                  <small>{text.sidebarInputsSmall}</small>
                 </span>
               </button>
-            )}
-
-            
-            {(session?.role === 'FARMER' || !session || session?.role === 'FPO') && (
-              <button
-                type="button"
-                className={`left-nav-item ${(currentView === 'farmer-payouts') ? 'active' : ''}`}
-                onClick={() => navigateFromMenu('farmer-payouts')}
-              >
-                <span className="left-nav-icon"><NavIcon name="payouts" /></span>
-                <span className="left-nav-label">
-                  <strong>Payouts &amp; Escrow</strong>
-                  <small>Realized Rates &amp; UTR</small>
-                </span>
-              </button>
-            )}
-
-            
-            {(session?.role === 'FPO' || session?.role === 'FARMER' || session?.role === 'BUYER' || session?.role === 'ADMIN') && (
-              <>
-                <hr className="left-nav-divider" />
-                <p className="left-nav-heading" style={{ marginTop: '8px', marginBottom: '4px' }}>
-                  FPO Operations
-                  <button
-                    type="button"
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#7f8981',
-                      fontSize: '9px',
-                      fontFamily: "'DM Mono', monospace",
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      padding: '0 0 0 6px',
-                      letterSpacing: '.06em',
-                      textTransform: 'uppercase',
-                      verticalAlign: 'middle'
-                    }}
-                    onClick={() => { setShowFpoRegisterModal(true); setMobileNavOpen(false); }}
-                    title="Register New FPO"
-                  >
-                    + New
-                  </button>
-                </p>
-
-                <button
-                  type="button"
-                  className={`left-nav-item ${(currentView === 'fpo-intake') ? 'active' : ''}`}
-                  onClick={() => navigateFromMenu('fpo-intake', '#/fpo/collection')}
-                >
-                  <span className="left-nav-icon"><NavIcon name="intake" /></span>
-                  <span className="left-nav-label">
-                    <strong>Village Intake Hub</strong>
-                    <small>Weigh-Slips ({fpoIntakes.filter(i => i.status === 'UNPOOLED').length} Yard)</small>
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`left-nav-item ${(currentView === 'fpo-lots') ? 'active' : ''}`}
-                  onClick={() => navigateFromMenu('fpo-lots', '#/fpo/lots')}
-                >
-                  <span className="left-nav-icon"><NavIcon name="lots" /></span>
-                  <span className="left-nav-label">
-                    <strong>FPO Lots &amp; Passports</strong>
-                    <small>Pooling ({fpoLots.length} Lots)</small>
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`left-nav-item ${(currentView === 'fpo-farmers') ? 'active' : ''}`}
-                  onClick={() => navigateFromMenu('fpo-farmers', '#/fpo/farmers')}
-                >
-                  <span className="left-nav-icon"><NavIcon name="farmers" /></span>
-                  <span className="left-nav-label">
-                    <strong>Member Farmers</strong>
-                    <small>Traceability ({fpoFarmers.length})</small>
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`left-nav-item ${(currentView === 'trade-chat') ? 'active' : ''}`}
-                  onClick={() => navigateFromMenu('trade-chat', '#/fpo/offers')}
-                >
-                  <span className="left-nav-icon"><NavIcon name="chat" /></span>
-                  <span className="left-nav-label">
-                    <strong>Buyer Offers &amp; Chat</strong>
-                    <small>Negotiate &amp; Accept</small>
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`left-nav-item ${(currentView === 'analytics' && session?.role === 'FPO') ? 'active' : ''}`}
-                  onClick={() => {
-                    if (session?.role !== 'FPO') handleQuickLogin('FPO');
-                    navigateFromMenu('analytics', '#/fpo/dashboard');
-                  }}
-                >
-                  <span className="left-nav-icon"><NavIcon name="analytics" /></span>
-                  <span className="left-nav-label">
-                    <strong>FPO Analytics</strong>
-                    <small>Lots, Sales &amp; Buyers</small>
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`left-nav-item ${(currentView === 'profile' && session?.role === 'FPO') ? 'active' : ''}`}
-                  onClick={() => {
-                    if (session?.role !== 'FPO') handleQuickLogin('FPO');
-                    navigateFromMenu('profile', '#/fpo/profile');
-                  }}
-                >
-                  <span className="left-nav-icon"><NavIcon name="trust" /></span>
-                  <span className="left-nav-label">
-                    <strong>FPO Trust Score</strong>
-                    <small>NABL &amp; Fulfillment</small>
-                  </span>
-                </button>
-              </>
-            )}
-
-            {session?.role === 'ADMIN' && (
-              <>
-                <p className="left-nav-heading" style={{ marginTop: '16px' }}>
-                  Nodal Governance
-                </p>
-
-                <button
-                  type="button"
-                  className={`left-nav-item ${(currentView === 'admin-governance') ? 'active' : ''}`}
-                  onClick={() => navigateFromMenu('admin-governance')}
-                >
-                  <span className="left-nav-icon"><NavIcon name="governance" /></span>
-                  <span className="left-nav-label">
-                    <strong>Governance Desk</strong>
-                    <small>Disputes &amp; NABL KYC</small>
-                  </span>
-                </button>
-              </>
-            )}
-
-            <p className="left-nav-heading" style={{ marginTop: '16px' }}>{text.sidebarAdvisory}</p>
-
-            <button
-              type="button"
-              className={`left-nav-item ${currentView === 'community' ? 'active' : ''}`}
-              onClick={() => navigateFromMenu('community')}
-            >
-              <span className="left-nav-icon"><NavIcon name="community" /></span>
-              <span className="left-nav-label">
-                <strong>{text.sidebarCommunity}</strong>
-                <small>{text.sidebarCommunitySmall}</small>
-              </span>
-            </button>
-
-            {session?.role === 'FARMER' && (
-              <button
-                ref={(el) => { tutorialRefs.current.diagnostics = el; }}
-                type="button"
-                className={`left-nav-item ${currentView === 'diagnostics' ? 'active' : ''}`}
-                onClick={() => navigateFromMenu('diagnostics')}
-              >
-                <span className="left-nav-icon"><NavIcon name="diagnostics" /></span>
-                <span className="left-nav-label">
-                  <strong>{text.sidebarDiagnostics}</strong>
-                  <small>{text.sidebarDiagnosticsSmall}</small>
-                </span>
-              </button>
-            )}
-
-            <button
-              type="button"
-              className={`left-nav-item ${currentView === 'support-network' ? 'active' : ''}`}
-              onClick={() => navigateFromMenu('support-network')}
-            >
-              <span className="left-nav-icon"><NavIcon name="support" /></span>
-              <span className="left-nav-label">
-                <strong>{text.sidebarNetwork}</strong>
-                <small>{text.sidebarNetworkSmall}</small>
-              </span>
-            </button>
-          </aside>
-
-
-
-
-
-
-        
-        <div className="main-content">
-
-      
-      
-      
-      {currentView === 'prices' && (
-        <div className="view-container">
-          <section className="hero">
-            <div>
-              <p className="eyebrow">{text.heroEyebrow}</p>
-              <h1>{text.heroTitle}</h1>
-              <p className="hero-copy">{text.heroCopy}</p>
-            </div>
-            <div className="hero-metrics-ticker">
-              <div className="hero-metric-pill">
-                <strong>28+</strong>
-                <span>APMC Mandis</span>
-              </div>
-              <div className="hero-metric-divider" />
-              <div className="hero-metric-pill">
-                <strong>₹4.8 Cr</strong>
-                <span>Escrow Volume</span>
-              </div>
-              <div className="hero-metric-divider" />
-              <div className="hero-metric-pill">
-                <strong>99.4%</strong>
-                <span>Fulfillment</span>
-              </div>
-            </div>
-          </section>
-
-          
-          {/* Consolidated Market Intelligence & Procurement Desk */}
-          <div className="market-intelligence-bar">
-            <div className="intel-left">
-              <div className="intel-badge-row">
-                <span className="intel-badge-live">● Agmarknet Live Feeds</span>
-                <span className="intel-source-tag">Directorate of Marketing &amp; Inspection (DMI)</span>
-              </div>
-              <h3 className="intel-title">
-                {session?.role === 'BUYER'
-                  ? `Procurement Quotas & Wholesale Linkages: ${pulseCrop?.name || 'Produce'}`
-                  : session?.role === 'TRANSPORTER'
-                  ? `Freight Linkage & Route Margins: ${pulseCrop?.name || 'Agricultural Freight'}`
-                  : `Direct Buyer Opportunity: ${pulseCrop?.name || 'Tomato'}`}
-              </h3>
-              <p className="intel-desc">
-                {session?.role === 'BUYER'
-                  ? 'Plan bulk commodity procurement with verified farm origin, digital assay quality grading, and automated escrow lock.'
-                  : session?.role === 'TRANSPORTER'
-                  ? 'Access confirmed farm pickup requests with guaranteed escrow freight settlements and zero deadhead trips.'
-                  : <>Direct buyer procurement yields <strong>₹{((trend?.latestPrice || 25) * 1.08).toFixed(2)}/kg net</strong> (+₹{(((trend?.latestPrice || 25) * 1.08) - (trend?.latestPrice || 25)).toFixed(2)}/kg gain over nearest local mandi). Escrow protected.</>}
-              </p>
-            </div>
-            <div className="intel-actions">
-              {session?.role === 'FARMER' && (
-                <button
-                  type="button"
-                  className="trade-btn trade-btn-primary"
-                  onClick={() => setQuickProduceModal({
-                    cropId: pulseCrop?.id || 1,
-                    cropName: pulseCrop?.name || 'Tomato',
-                    category: pulseCrop?.category || 'VEGETABLE',
-                    unit: pulseCrop?.unit || 'kg',
-                    quantity: 500,
-                    expectedPrice: Number(((trend?.latestPrice || 25) * 1.08).toFixed(2)),
-                    availableUntil: '',
-                    description: 'Pre-graded harvest lot listed via Direct Buyer Recommendation with zero intermediary cut.'
-                  })}
-                >
-                  List 500kg Lot (₹{((trend?.latestPrice || 25) * 1.08).toFixed(2)}/kg) →
-                </button>
-              )}
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button
-                  type="button"
-                  className="trade-btn trade-btn-secondary"
-                  onClick={() => setCurrentView('analytics')}
-                >
-                  {session?.role === 'BUYER' ? 'Landed Cost Desk' : session?.role === 'TRANSPORTER' ? 'Trip Margins' : 'Net Calculator'}
-                </button>
-                <button
-                  type="button"
-                  className="trade-btn trade-btn-secondary"
-                  disabled={isSyncingAgmarknet}
-                  onClick={syncAgmarknetData}
-                >
-                  {isSyncingAgmarknet ? 'Syncing...' : 'Sync Live Mandis'}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <section className="dashboard-grid">
-            <article className="panel market-panel">
-              <div className="panel-heading">
-                <div><p className="eyebrow">{text.panelPriceDiscovery}</p><h2>{text.panelMarketPulse}</h2></div>
-                <span className="date-chip">{text.panelAnalytics}</span>
-              </div>
-
-              
-              <div className="pulse-controls" style={{ marginTop: '8px' }}>
-                <select
-                  value={selectedPulseCropId || ''}
-                  onChange={(e) => handlePulseCropChange(e.target.value)}
-                >
-                  {pulseFilteredCrops.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name} ({c.category})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {trend ? (
-                <div className="price-feature">
-                  <div>
-                    <span className="crop-label">
-                      {pulseCrop?.name || text.selectedCrop} <span className="category-badge">{pulseCrop?.category || text.produceUnit}</span>
-                    </span>
-                    <strong>₹{trend.latestPrice}<small> / {pulseCrop?.unit || 'kg'}</small></strong>
-                  </div>
-                  <span className={trend.trend === 'DOWNWARD' ? 'trend-down' : 'trend-up'}>
-                    {trend.trend === 'UPWARD' ? '+' : trend.trend === 'DOWNWARD' ? '-' : ''}{trend.changePercent}% {trend.trend}
-                  </span>
-                </div>
-              ) : (
-                <p className="muted">{text.loadingMarket}</p>
-              )}
-
-              
-              <div className="trend-chart-container">
-                <div className="trend-bar-interactive">
-                  {pulsePrices.length > 0 ? (
-                    pulsePrices.map((p, idx) => {
-                      const val = Number(p.modalPrice || p.maxPrice || 20);
-                      const heightPercent = maxPrice > minPrice
-                        ? Math.round(((val - minPrice) / (maxPrice - minPrice)) * 60 + 25)
-                        : 50;
-                      const dateStr = p.date ? new Date(p.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : `Day ${idx + 1}`;
-                      const isLatest = idx === pulsePrices.length - 1;
-                      return (
-                        <div className="bar-col" key={p.id || idx} title={`${dateStr}: ₹${val} (Min: ₹${p.minPrice || val-2}, Max: ₹${p.maxPrice || val+2})`}>
-                          <span className="bar-val">₹{val}</span>
-                          <div
-                            className="bar-fill"
-                            style={{
-                              height: `${heightPercent}%`,
-                              backgroundColor: isLatest ? '#b45a42' : '#7c9a72',
-                            }}
-                          />
-                          <span className="bar-date">{isLatest ? 'Today' : dateStr}</span>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    [20, 21, 22, 21, 23, 22, 24].map((v, i) => (
-                      <div className="bar-col" key={i}>
-                        <span className="bar-val">₹{v}</span>
-                        <div
-                          className="bar-fill"
-                          style={{
-                            height: `${((v - 18) / 8) * 60 + 25}%`,
-                            backgroundColor: i === 6 ? '#b45a42' : '#7c9a72',
-                          }}
-                        />
-                        <span className="bar-date">{i === 6 ? 'Today' : `D-${6 - i}`}</span>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              <div className="trend-caption">
-                <span>{text.marketRange}: ₹{minPrice} - ₹{maxPrice}</span>
-                <button
-                  type="button"
-                  className="text-button"
-                  onClick={() => setCurrentView('predictions')}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {text.viewPredictions}
-                </button>
-              </div>
-
-              
-              {pulseCrop?.mspPrice != null && (
-                <div style={{ marginTop: '12px', padding: '10px 14px', background: '#f5faf6', border: '1px solid #cce5d4', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <span style={{ fontSize: '11px', color: '#2c4e36', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Statutory Benchmark (MSP)</span>
-                    <div style={{ fontSize: '15px', fontWeight: 700, color: '#163821', marginTop: '2px' }}>
-                      ₹{pulseCrop.mspPrice} <small style={{ fontWeight: 400, fontSize: '12px', color: '#556058' }}>/ {pulseCrop.unit || 'kg'}</small>
-                    </div>
-                  </div>
-                  {trend?.latestPrice != null && (
-                    <div style={{ textAlign: 'right' }}>
-                      <span style={{ fontSize: '11px', color: '#556058', display: 'block' }}>Net vs Guarantee</span>
-                      <span style={{
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        color: Number(trend.latestPrice) >= Number(pulseCrop.mspPrice) ? '#1b5e20' : '#b45a42'
-                      }}>
-                        {Number(trend.latestPrice) >= Number(pulseCrop.mspPrice)
-                          ? `+₹${(Number(trend.latestPrice) - Number(pulseCrop.mspPrice)).toFixed(2)} above MSP (+${(((Number(trend.latestPrice) - Number(pulseCrop.mspPrice)) / Number(pulseCrop.mspPrice)) * 100).toFixed(1)}%)`
-                          : `-₹${(Number(pulseCrop.mspPrice) - Number(trend.latestPrice)).toFixed(2)} below MSP (-${(((Number(pulseCrop.mspPrice) - Number(trend.latestPrice)) / Number(pulseCrop.mspPrice)) * 100).toFixed(1)}%)`}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </article>
-
-            
-            <aside className="note-panel">
-              <p className="eyebrow">{text.panelQuickTrading}</p>
-              <h2>{text.panelInstantLinkage}</h2>
-              <p>Post a harvest lot or publish a bulk procurement order in seconds with guaranteed escrow settlement.</p>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
-                <button
-                  type="button"
-                  className="trade-btn trade-btn-primary"
-                  onClick={() => setQuickProduceModal({
-                    cropId: pulseCrop?.id || 1,
-                    cropName: pulseCrop?.name || 'Tomato',
-                    category: pulseCrop?.category || 'VEGETABLE',
-                    unit: pulseCrop?.unit || 'kg',
-                    quantity: 100,
-                    quality: 'Grade A',
-                    harvestDate: new Date().toISOString().split('T')[0],
-                    expectedPrice: trend?.latestPrice || 25,
-                    availableUntil: '',
-                    description: ''
-                  })}
-                  style={{ width: '100%', padding: '10px 14px', fontSize: '12px' }}
-                >
-                  {text.sellProduceLot}
-                </button>
-                <button
-                  type="button"
-                  className="trade-btn trade-btn-secondary"
-                  onClick={() => setQuickRequirementModal({
-                    cropId: pulseCrop?.id || 1,
-                    cropName: pulseCrop?.name || 'Tomato',
-                    category: pulseCrop?.category || 'VEGETABLE',
-                    unit: pulseCrop?.unit || 'kg',
-                    requiredQuantity: 50,
-                    offeredPrice: trend?.latestPrice || 25,
-                    maxPrice: (trend?.latestPrice || 25) + 5,
-                    deliveryLocation: 'Regional Market Hub'
-                  })}
-                  style={{ width: '100%', padding: '10px 14px', fontSize: '12px' }}
-                >
-                  {text.postBuyRequirement}
-                </button>
-              </div>
-            </aside>
-          </section>
-
-          
-          <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '16px' }}>
-            
-            
-            <article className="panel" style={{ margin: 0 }}>
-              <div className="panel-heading" style={{ marginBottom: '12px' }}>
-                <div>
-                  <p className="eyebrow">Regional Mandi Benchmarks</p>
-                  <h3 style={{ margin: '2px 0 0', fontSize: '16px', color: '#202a27' }}>
-                    {pulseCrop?.name || 'Crop'} Mandi Realization Comparison
-                  </h3>
-                </div>
-                <span className="date-chip">Net Realization</span>
-              </div>
-              <p style={{ margin: '0 0 12px', fontSize: '12px', color: '#556058' }}>
-                Modal auction price minus estimated freight deduction based on transport proximity to determine your highest in-hand farmer return.
-              </p>
-
-              {loadingMandiComparison ? (
-                <p className="muted" style={{ padding: '16px 0', textAlign: 'center' }}>Calculating regional Mandi deductions...</p>
-              ) : mandiComparisons.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {mandiComparisons.map((m, idx) => {
-                    const isBest = idx === 0 || m.estimatedNetRealization === Math.max(...mandiComparisons.map(x => Number(x.estimatedNetRealization || 0)));
-                    return (
-                      <div
-                        key={m.marketId || idx}
-                        style={{
-                          padding: '10px 12px',
-                          borderRadius: '6px',
-                          border: isBest ? '1.5px solid #2e7d32' : '1px solid #e2ebe0',
-                          background: isBest ? '#f6fbf6' : '#ffffff',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          gap: '12px'
-                        }}
-                      >
-                        <div style={{ minWidth: 0 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <strong style={{ fontSize: '13px', color: '#202a27' }}>{m.marketName}</strong>
-                            {isBest && (
-                              <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 5px', borderRadius: '3px', background: '#2e7d32', color: '#ffffff' }}>
-                                BEST REALIZATION
-                              </span>
-                            )}
-                          </div>
-                          <span style={{ fontSize: '11px', color: '#68776d', display: 'block', marginTop: '2px' }}>
-                            {m.district}, {m.state} &middot; {m.distanceKm != null ? `${m.distanceKm} km away` : 'Regional yard'}
-                          </span>
-                        </div>
-
-                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                          <div style={{ fontSize: '11px', color: '#778078' }}>
-                            Mandi: <strong>₹{m.modalPrice}</strong> &middot; Freight: -₹{m.estimatedFreightCost || '2.50'}/kg
-                          </div>
-                          <div style={{ fontSize: '14px', fontWeight: 700, color: isBest ? '#1b5e20' : '#202a27', marginTop: '2px' }}>
-                            Net: ₹{m.estimatedNetRealization}/{pulseCrop?.unit || 'kg'}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div style={{ padding: '16px', background: '#f8faf7', borderRadius: '6px', textAlign: 'center', fontSize: '12px', color: '#68776d' }}>
-                  No regional Mandi price series currently logged for {pulseCrop?.name || 'this crop'}.
-                </div>
-              )}
-            </article>
-
-            
-            <article className="panel" style={{ margin: 0 }}>
-              <div className="panel-heading" style={{ marginBottom: '12px' }}>
-                <div>
-                  <p className="eyebrow">Spot Harvest Lots</p>
-                  <h3 style={{ margin: '2px 0 0', fontSize: '16px', color: '#202a27' }}>
-                    Active {pulseCrop?.name || 'Crop'} Farmer Lots
-                  </h3>
-                </div>
-                <span className="date-chip">{cropProduceList.length} Lots Active</span>
-              </div>
-              <p style={{ margin: '0 0 12px', fontSize: '12px', color: '#556058' }}>
-                Verified farmer harvest lots available for direct purchase with guaranteed escrow payment and logistics routing.
-              </p>
-
-              {loadingCropProduce ? (
-                <p className="muted" style={{ padding: '16px 0', textAlign: 'center' }}>Loading active farmer harvest lots...</p>
-              ) : cropProduceList.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {cropProduceList.map((lot) => (
-                    <div
-                      key={lot.id}
-                      style={{
-                        padding: '12px',
-                        borderRadius: '6px',
-                        border: '1px solid #dbe6da',
-                        background: '#ffffff',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px'
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <strong style={{ fontSize: '14px', color: '#202a27' }}>{lot.farmerName}</strong>
-                            <span style={{
-                              fontSize: '10px',
-                              fontWeight: 700,
-                              padding: '2px 6px',
-                              borderRadius: '3px',
-                              background: lot.quality === 'Grade A' ? '#eaf5eb' : lot.quality === 'Grade B' ? '#e8f0fe' : '#f5f5f5',
-                              color: lot.quality === 'Grade A' ? '#1b5e20' : lot.quality === 'Grade B' ? '#1a73e8' : '#556058'
-                            }}>
-                              {lot.quality || 'Grade A'}
-                            </span>
-                          </div>
-                          <span style={{ fontSize: '11px', color: '#68776d', display: 'block', marginTop: '2px' }}>
-                            Location: {lot.villageOrDistrict || 'Local Farm'}, {lot.state || ''} &middot; Harvest: {lot.harvestDate || 'Fresh'}
-                          </span>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', display: 'block' }}>EXPECTED PRICE</span>
-                          <strong style={{ fontSize: '15px', color: '#1e5e3a' }}>₹{lot.expectedPrice}/{lot.unit || 'kg'}</strong>
-                        </div>
-                      </div>
-
-                      {lot.description && (
-                        <p style={{ margin: 0, fontSize: '11px', color: '#556058', fontStyle: 'italic' }}>
-                          &ldquo;{lot.description}&rdquo;
-                        </p>
-                      )}
-
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '6px', borderTop: '1px solid #f0f4ef' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 600, color: '#334036' }}>
-                          Available: {lot.quantity} {lot.unit || 'kg'}
-                        </span>
-                        <button
-                          type="button"
-                          className="trade-btn trade-btn-primary"
-                          style={{ padding: '5px 12px', fontSize: '11px' }}
-                          onClick={() => setQuickRequirementModal({
-                            cropId: lot.cropId,
-                            cropName: lot.cropName,
-                            category: pulseCrop?.category || 'VEGETABLE',
-                            unit: lot.unit || 'kg',
-                            requiredQuantity: lot.quantity,
-                            offeredPrice: lot.expectedPrice,
-                            maxPrice: lot.expectedPrice,
-                            deliveryLocation: `${lot.villageOrDistrict || 'Origin'} Farm Gate`
-                          })}
-                        >
-                          Initiate Escrow Trade &rarr;
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div style={{ padding: '20px', background: '#f8faf7', borderRadius: '6px', textAlign: 'center' }}>
-                  <p style={{ margin: '0 0 8px', fontSize: '12px', color: '#556058' }}>
-                    No active harvest lots currently listed for {pulseCrop?.name || 'this crop'}.
-                  </p>
-                  <button
-                    type="button"
-                    className="trade-btn trade-btn-secondary"
-                    style={{ fontSize: '11px', padding: '6px 12px' }}
-                    onClick={() => setQuickRequirementModal({
-                      cropId: pulseCrop?.id || 1,
-                      cropName: pulseCrop?.name || 'Tomato',
-                      category: pulseCrop?.category || 'VEGETABLE',
-                      unit: pulseCrop?.unit || 'kg',
-                      requiredQuantity: 100,
-                      offeredPrice: trend?.latestPrice || 25,
-                      maxPrice: (trend?.latestPrice || 25) + 4,
-                      deliveryLocation: 'Regional Market Hub'
-                    })}
-                  >
-                    + Post Procurement Requirement
-                  </button>
-                </div>
-              )}
-            </article>
-          </div>
-
-          
-          <section style={{ marginTop: '20px' }}>
-            <article className="panel crop-panel">
-              <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
-                <div>
-                  <p className="eyebrow">{text.panelActiveBoard}</p>
-                  <h2>{text.panelCommodities}</h2>
-                </div>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    className="trade-btn trade-btn-primary"
-                    onClick={() => setQuickProduceModal({
-                      cropId: crops[0]?.id || 1,
-                      cropName: crops[0]?.name || 'Tomato',
-                      category: crops[0]?.category || 'VEGETABLE',
-                      unit: crops[0]?.unit || 'kg',
-                      quantity: 100,
-                      expectedPrice: 25,
-                      availableUntil: '',
-                      description: ''
-                    })}
-                  >
-                    {text.sellProduce}
-                  </button>
-                  <button
-                    type="button"
-                    className="trade-btn trade-btn-secondary"
-                    onClick={() => setQuickRequirementModal({
-                      cropId: crops[0]?.id || 1,
-                      cropName: crops[0]?.name || 'Tomato',
-                      category: crops[0]?.category || 'VEGETABLE',
-                      unit: crops[0]?.unit || 'kg',
-                      requiredQuantity: 50,
-                      offeredPrice: 25,
-                      maxPrice: 30,
-                      deliveryLocation: 'Main Market Hub'
-                    })}
-                  >
-                    {text.postBuyOrder}
-                  </button>
-                </div>
-              </div>
-
-              
-              <div className="marketplace-toolbar">
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}>
-                  <div style={{ flex: 1, minWidth: '200px', position: 'relative' }}>
-                    <input
-                      type="text"
-                      className="field-input"
-                      placeholder={text.panelSearchPlaceholder}
-                      value={marketplaceSearchQuery}
-                      onChange={(e) => setMarketplaceSearchQuery(e.target.value)}
-                      style={{ paddingRight: marketplaceSearchQuery ? '55px' : '12px' }}
-                    />
-                    {marketplaceSearchQuery && (
-                      <button
-                        type="button"
-                        onClick={() => setMarketplaceSearchQuery('')}
-                        style={{
-                          position: 'absolute',
-                          right: '8px',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          color: '#778078',
-                          fontSize: '11px',
-                          fontFamily: "'DM Mono', monospace",
-                          padding: '2px 6px',
-                          margin: 0,
-                          width: 'auto'
-                        }}
-                      >
-                        CLEAR
-                      </button>
-                    )}
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                    <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>{text.sortLabel}</span>
-                    <select
-                      className="field-input"
-                      value={marketplaceSortBy}
-                      onChange={(e) => setMarketplaceSortBy(e.target.value)}
-                      style={{ fontSize: '12px', padding: '7px 10px', width: 'auto', minWidth: '130px' }}
-                    >
-                      <option value="POPULAR">{text.mostActive}</option>
-                      <option value="PRICE_ASC">{text.priceLowHigh}</option>
-                      <option value="PRICE_DESC">{text.priceHighLow}</option>
-                      <option value="NAME_ASC">{text.nameAToZ}</option>
-                    </select>
-                  </div>
-                </div>
-
-                
-                <div className="category-filter-bar" style={{ margin: 0, paddingTop: '4px' }}>
-                  {CATEGORIES.map((cat) => (
-                    <button
-                      key={cat.value}
-                      type="button"
-                      className={`filter-chip ${selectedCategoryFilter === cat.value ? 'active' : ''}`}
-                      onClick={() => setSelectedCategoryFilter(cat.value)}
-                    >
-                      {getLocalizedText(cat.label, language)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              
-              <div className="produce-cards-grid">
-                {filteredCrops
-                  .filter(c => {
-                    const q = marketplaceSearchQuery.toLowerCase().trim();
-                    if (!q) return true;
-                    return c.name.toLowerCase().includes(q) || (c.category && c.category.toLowerCase().includes(q));
-                  })
-                  .sort((a, b) => {
-                    if (marketplaceSortBy === 'NAME_ASC') return a.name.localeCompare(b.name);
-                    return 0;
-                  })
-                  .map((crop) => {
-                    const isSelected = selectedPulseCropId === crop.id;
-                    const summary = cropPriceSummaries[crop.id];
-                    const baselineRate = summary?.latestModalPrice != null 
-                      ? Number(summary.latestModalPrice) 
-                      : (crop.name === 'Tomato' ? 24 : (crop.name === 'Potato' ? 18 : (crop.name === 'Rice' ? 27 : (crop.name === 'Wheat' ? 25 : (crop.name === 'Mustard Seeds' ? 58 : (crop.name === 'Lentil' ? 72 : 30))))));
-                    const trend = summary?.trend || 'STABLE';
-                    const changePct = summary?.changePercent != null ? Math.abs(summary.changePercent) : 0;
-                    const activeCount = summary?.activeListingsCount || 0;
-                    const msp = crop.mspPrice != null ? Number(crop.mspPrice) : (summary?.mspPrice != null ? Number(summary.mspPrice) : null);
-
-                    return (
-                      <div
-                        key={crop.id}
-                        className={`produce-market-card ${isSelected ? 'selected-card' : ''}`}
-                        onClick={() => handlePulseCropChange(crop.id)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-                            <div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                                <span className="category-badge" style={{ fontSize: '9px' }}>{crop.category || 'PRODUCE'}</span>
-                                {trend !== 'STABLE' && (
-                                  <span
-                                    style={{
-                                      font: "10px 'DM Mono', monospace",
-                                      fontWeight: 700,
-                                      padding: '1px 5px',
-                                      borderRadius: '3px',
-                                      background: trend === 'UPWARD' ? '#eef7ee' : '#fdf2f0',
-                                      color: trend === 'UPWARD' ? '#1b5e20' : '#b45a42'
-                                    }}
-                                  >
-                                    {trend === 'UPWARD' ? `+${changePct}% [UP]` : `-${changePct}% [DN]`}
-                                  </span>
-                                )}
-                              </div>
-                              <h3 style={{ margin: '4px 0 2px', fontSize: '15px', color: '#202a27' }}>{crop.name}</h3>
-                              <span style={{ font: "10px 'DM Mono', monospace", color: '#778078' }}>
-                                Unit: per {crop.unit} &middot; Live Mandi
-                              </span>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                              <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', display: 'block' }}>MODAL RATE</span>
-                              <strong style={{ fontSize: '16px', color: '#202a27' }}>₹{baselineRate}</strong>
-                            </div>
-                          </div>
-
-                          
-                          {msp != null && (
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px', padding: '4px 8px', background: '#f5faf6', border: '1px solid #dbeae0', borderRadius: '4px', fontSize: '11px' }}>
-                              <span style={{ color: '#2c4e36', fontWeight: 600 }}>MSP: ₹{msp}/{crop.unit}</span>
-                              <span style={{ fontWeight: 700, color: baselineRate >= msp ? '#1b5e20' : '#b45a42' }}>
-                                {baselineRate >= msp 
-                                  ? `+₹${(baselineRate - msp).toFixed(1)} vs MSP` 
-                                  : `-₹${(msp - baselineRate).toFixed(1)} below MSP`}
-                              </span>
-                            </div>
-                          )}
-
-                          
-                          {activeCount > 0 && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '6px', fontSize: '11px', color: '#1e5e3a', fontWeight: 600 }}>
-                              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2e7d32', display: 'inline-block' }}></span>
-                              {activeCount} active harvest lot{activeCount > 1 ? 's' : ''} available
-                            </div>
-                          )}
-                        </div>
-
-                        
-                        <div className="commodity-card-actions" onClick={(e) => e.stopPropagation()}>
-                          <button
-                            type="button"
-                            className="trade-btn trade-btn-primary commodity-action-btn"
-                            onClick={() => setQuickProduceModal({
-                              cropId: crop.id,
-                              cropName: crop.name,
-                              category: crop.category,
-                              unit: crop.unit,
-                              quantity: 100,
-                              quality: 'Grade A',
-                              harvestDate: new Date().toISOString().split('T')[0],
-                              expectedPrice: baselineRate,
-                              availableUntil: '',
-                              description: ''
-                            })}
-                          >
-                            Sell Lot
-                          </button>
-                          <button
-                            type="button"
-                            className="trade-btn trade-btn-secondary commodity-action-btn"
-                            onClick={() => setQuickRequirementModal({
-                              cropId: crop.id,
-                              cropName: crop.name,
-                              category: crop.category,
-                              unit: crop.unit,
-                              requiredQuantity: 50,
-                              offeredPrice: baselineRate,
-                              maxPrice: Math.round(baselineRate * 1.1),
-                              deliveryLocation: 'Main Market Hub'
-                            })}
-                          >
-                            Buy / Match
-                          </button>
-                          <button
-                            type="button"
-                            className="trade-btn trade-btn-secondary commodity-ml-btn"
-                            title="View AI price forecast"
-                            onClick={() => { handlePulseCropChange(crop.id); setCurrentView('predictions'); }}
-                          >
-                            ML &rarr;
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-
-
-              {filteredCrops.length === 0 && (
-                <p className="muted" style={{ padding: '24px 0', textAlign: 'center' }}>No commodities found in this category.</p>
-              )}
-            </article>
-          </section>
-
-        </div>
-      )}
-
-      
-      
-      
-      {currentView === 'inputs' && (
-        <div className="view-container">
-          <section className="panel" style={{ marginTop: '18px' }}>
-            <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
-              <div>
-                <p className="eyebrow">{text.inputsSectionTitle}</p>
-                <h2>{text.inputsSectionTitle}</h2>
-              </div>
-              <span className="count">
-                {crops.filter(c => ['FERTILIZER', 'PESTICIDE', 'BIO_INPUT', 'FARM_EQUIPMENT'].includes(c.category)).length} {text.inputsAvailable}
-              </span>
-            </div>
-            <p className="muted" style={{ margin: '4px 0 14px', fontSize: '13px' }}>
-              {text.inputsSectionSubtitle}
-            </p>
-
-            
-            <div className="marketplace-toolbar" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div className="category-filter-bar" style={{ margin: 0 }}>
-                {[
-                  { value: 'ALL', label: text.inputsCategoryAll || 'All' },
-                  { value: 'FERTILIZER', label: text.inputsCategoryFertilizers || 'Fertilizers' },
-                  { value: 'PESTICIDE', label: text.inputsCategoryPesticides || 'Pesticides' },
-                  { value: 'BIO_INPUT', label: text.inputsCategoryBioInputs || 'Bio-Inputs' },
-                  { value: 'FARM_EQUIPMENT', label: 'Farm Equipment' },
-                ].map((cat) => (
-                  <button
-                    key={cat.value}
-                    type="button"
-                    className={`filter-chip ${inputCategoryFilter === cat.value ? 'active' : ''}`}
-                    onClick={() => setInputCategoryFilter(cat.value)}
-                  >
-                    {cat.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            
-            <div className="agri-inputs-grid" style={{ marginTop: '16px' }}>
-              {crops
-                .filter((c) => {
-                  const isInput = ['FERTILIZER', 'PESTICIDE', 'BIO_INPUT', 'FARM_EQUIPMENT'].includes(c.category);
-                  if (!isInput) return false;
-                  if (inputCategoryFilter === 'ALL') return true;
-                  return c.category === inputCategoryFilter;
-                })
-                .map((item) => {
-                  const spec = AGRI_INPUT_SPECS[item.name] || {
-                    category: item.category,
-                    composition: 'Certified agricultural grade formulation',
-                    dosage: 'As recommended by agronomic officer',
-                    type: item.category,
-                    subsidized: false,
-                    indicativePrice: `Per ${item.unit || 'unit'}`,
-                    rating: '4.8/5',
-                    dealers: 'Authorized Agro-Dealers Network',
-                  };
-
-                  return (
-                    <div key={item.id} className="agri-input-card">
-                      <div className="agri-input-header">
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                            <span className={`category-badge category-${item.category?.toLowerCase()}`}>
-                              {item.category}
-                            </span>
-                            {spec.subsidized && (
-                              <span className="subsidized-pill">{text.inputsGovtSubsidized}</span>
-                            )}
-                          </div>
-                          <h3 style={{ margin: '4px 0 2px', fontSize: '15px' }}>{item.name}</h3>
-                          <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
-                            {text.inputsStandardUnit} {item.unit}
-                          </span>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', textTransform: 'uppercase', display: 'block' }}>{text.inputsIndicativeRate}</span>
-                          <strong style={{ fontSize: '15px', color: '#202a27' }}>{spec.indicativePrice}</strong>
-                        </div>
-                      </div>
-
-                      <div className="agri-input-specs">
-                        <div className="spec-row">
-                          <span className="spec-label">{text.inputsComposition}</span>
-                          <span className="spec-value">{spec.composition}</span>
-                        </div>
-                        <div className="spec-row">
-                          <span className="spec-label">{text.inputsDosage}</span>
-                          <span className="spec-value">{spec.dosage}</span>
-                        </div>
-                        <div className="spec-row">
-                          <span className="spec-label">{text.inputsDistributorHubs}</span>
-                          <span className="spec-value">{spec.dealers} ({spec.rating})</span>
-                        </div>
-                      </div>
-
-                      <div className="agri-input-actions">
-                        <button
-                          type="button"
-                          className="trade-btn trade-btn-primary"
-                          onClick={() => setQuickProcureInputModal({
-                            item,
-                            spec,
-                            quantity: 5,
-                            deliveryDistrict: 'Local Farm Depot'
-                          })}
-                        >
-                          {text.inputsProcure}
-                        </button>
-                        <button
-                          type="button"
-                          className="trade-btn trade-btn-secondary"
-                          onClick={() => handleSellInput(item, spec)}
-                        >
-                          {text.inputsListStock}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              {crops.filter(c => ['FERTILIZER', 'PESTICIDE', 'BIO_INPUT', 'FARM_EQUIPMENT'].includes(c.category)).length === 0 && (
-                <p className="muted" style={{ padding: '16px 0' }}>{text.inputsConnectingCatalog}</p>
-              )}
-            </div>
-          </section>
-
-          
-          {quickProcureInputModal && (
-            <div className="modal-backdrop" onClick={() => setQuickProcureInputModal(null)}>
-              <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
-                <div className="modal-header">
-                  <div>
-                    <p className="eyebrow">{text.inputProcurementTitle}</p>
-                    <h3 style={{ margin: '2px 0 0', fontSize: '16px' }}>{text.inputProcureItem.replace('{item}', quickProcureInputModal.item.name)}</h3>
-                  </div>
-                  <button type="button" className="close-btn" onClick={() => setQuickProcureInputModal(null)}>&times;</button>
-                </div>
-
-                <form onSubmit={handleQuickProcureInputSubmit} style={{ padding: '14px 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ background: '#faf9f5', border: '1px solid #d9d6cc', borderRadius: '4px', padding: '10px 12px' }}>
-                    <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>{text.inputUnitRate}</span>
-                    <strong style={{ marginLeft: '8px', fontSize: '13px' }}>{quickProcureInputModal.spec.indicativePrice}</strong>
-                    <div style={{ fontSize: '11px', color: '#566057', marginTop: '4px' }}>
-                      {text.inputDistributors} {quickProcureInputModal.spec.dealers}
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                    <div className="field-group">
-                      <label className="field-label">{text.inputOrderQuantity}</label>
-                      <input
-                        type="number"
-                        className="field-input"
-                        min="1"
-                        value={quickProcureInputModal.quantity}
-                        onChange={(e) => setQuickProcureInputModal(p => ({ ...p, quantity: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div className="field-group">
-                      <label className="field-label">{text.inputCalculatedTotal}</label>
-                      <input
-                        type="text"
-                        className="field-input"
-                        disabled
-                        value={`₹${(Number(quickProcureInputModal.spec.indicativePrice.replace(/[^0-9.]/g, '')) || 450) * Number(quickProcureInputModal.quantity || 1)}`}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="field-group">
-                    <label className="field-label">{text.inputDeliveryDistrict}</label>
-                    <input
-                      type="text"
-                      className="field-input"
-                      value={quickProcureInputModal.deliveryDistrict}
-                      onChange={(e) => setQuickProcureInputModal(p => ({ ...p, deliveryDistrict: e.target.value }))}
-                      required
-                    />
-                  </div>
-
-                  <div className="modal-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '6px' }}>
-                    <button type="button" className="trade-btn trade-btn-secondary" onClick={() => setQuickProcureInputModal(null)}>
-                      {text.inputCancel}
-                    </button>
-                    <button type="submit" className="trade-btn trade-btn-primary">
-                      {text.inputConfirmProcurement}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
+            </>
           )}
 
-        </div>
-      )}
 
-      
-      
-      
-      {currentView === 'diagnostics' && (
-        <div className="view-container">
-          <section className="panel" style={{ marginTop: '18px' }}>
-            <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
-              <div>
-                <p className="eyebrow">MobileNetV3-Large · 38 Disease Classes · CUDA Inference</p>
-                <h2>{text.cropDoctorSection}</h2>
-                <p className="muted" style={{ margin: '4px 0 0', fontSize: '13px' }}>
-                  {text.diagnosisIntro}
-                </p>
-              </div>
-              <span className="count" style={{ background: '#e8f3ea', color: '#2f6838' }}>AI SERVICE · 8000</span>
-            </div>
-
-            
-            <div style={{ background: '#f8faf7', border: '1px solid #d4dfd2', borderRadius: '6px', padding: '16px 20px', marginTop: '16px', marginBottom: '18px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#1c4923', color: '#ffffff', padding: '2px 7px', borderRadius: '3px' }}>
-                      SCIENTIFIC VALIDATION &amp; MODEL ARCHITECTURE
-                    </span>
-                    <span style={{ fontSize: '11px', color: '#2f6838', fontWeight: 600 }}>
-                      99.9% Test Accuracy Benchmark
-                    </span>
-                  </div>
-                  <h4 style={{ margin: '0 0 6px', fontSize: '15px', color: '#162b1a', fontWeight: 700 }}>
-                    MobileNetV3-Large · Squeeze-and-Excitation Attention · 38 Disease Classes
-                  </h4>
-                  <p style={{ margin: 0, fontSize: '12px', color: '#3a513e', lineHeight: 1.5, maxWidth: '780px' }}>
-                    Trained on 54,305 curated plant pathology samples from PlantVillage and ICAR regional agronomy datasets. Evaluated under strict 80/20 train/test stratified split yielding 99.9% classification accuracy across foliar pathogens.
-                  </p>
-                </div>
-                <div style={{ background: '#eaf4e8', border: '1px solid #b7d6b3', borderRadius: '4px', padding: '8px 12px', textAlign: 'right' }}>
-                  <span style={{ fontSize: '10px', color: '#385e3a', fontFamily: "'DM Mono', monospace", display: 'block' }}>INFERENCE PROFILE</span>
-                  <strong style={{ fontSize: '14px', color: '#1b3f1f' }}>22ms CUDA / 85ms CPU</strong>
-                  <span style={{ fontSize: '10px', color: '#4d6e4f', display: 'block' }}>15.2 MB Edge Footprint</span>
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid #dbe6da', fontSize: '11px', color: '#3e5842' }}>
-                <div>
-                  <strong style={{ color: '#1d3921', display: 'block' }}>Shannon Entropy Uncertainty Guard:</strong>
-                  <span>Rejects ambiguous or non-leaf photos when entropy H &gt; 1.2 nats or max confidence &lt; 60%.</span>
-                </div>
-                <div>
-                  <strong style={{ color: '#1d3921', display: 'block' }}>Dual-Tier Verification Pipeline:</strong>
-                  <span>High confidence cases generate instant treatment protocols; edge cases route to human agronomists.</span>
-                </div>
-                <div>
-                  <strong style={{ color: '#1d3921', display: 'block' }}>Agronomist Escalation Network:</strong>
-                  <span>Direct dispatch to verified ICAR / KVK crop specialists with full leaf imagery and metadata.</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="diagnostic-studio-grid" style={{ marginTop: '18px' }}>
-              <div className="diagnostic-console-panel">
-                <div className="source-toggle-bar">
-                  {[
-                    { value: 'sample', label: text.diagSourceSample },
-                    { value: 'upload', label: text.diagSourceUpload },
-                    { value: 'url', label: text.diagSourceUrl }
-                  ].map(mode => (
-                    <button
-                      key={mode.value}
-                      type="button"
-                      className={`source-toggle-btn ${imageInputMode === mode.value ? 'active' : ''}`}
-                      onClick={() => {
-                        setImageInputMode(mode.value);
-                        if (mode.value !== 'sample') {
-                          setDiagnosticFile(null);
-                        }
-                      }}
-                    >
-                      {mode.label}
-                    </button>
-                  ))}
-                </div>
-
-                {imageInputMode === 'upload' ? (
-                  <>
-                    <input
-                      ref={diagnosticFileInputRef}
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      onChange={handleImageFileUpload}
-                      style={{ display: 'none' }}
-                    />
-                    <button type="button" className="upload-dropzone-box" onClick={() => diagnosticFileInputRef.current?.click()}>
-                      <strong>{diagnosticFile ? diagnosticFile.name : text.diagChooseLeaf}</strong>
-                      <span style={{ display: 'block', marginTop: '6px', fontSize: '11px', color: '#778078' }}>{text.diagUploadFormats}</span>
-                    </button>
-                  </>
-                ) : imageInputMode === 'url' ? (
-                  <div className="diagnostic-url-row">
-                    <input
-                      type="url"
-                      className="field-input"
-                      placeholder="https://example.com/leaf.jpg"
-                      value={diagnosticForm.imageUrl}
-                      onChange={(e) => {
-                        const nextValue = e.target.value;
-                        setDiagnosticForm(prev => ({ ...prev, imageUrl: nextValue }));
-                        setDiagnosticFile(null);
-                        setPreviewImageUrl(nextValue && /^(https?:\/\/|data:image\/)/i.test(nextValue.trim()) ? nextValue.trim() : '');
-                      }}
-                    />
-                    <button type="button" className="trade-btn trade-btn-secondary diagnostic-url-load-btn" onClick={() => handleLoadImageUrl(diagnosticForm.imageUrl)}>{text.diagLoad}</button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    className="upload-dropzone-box"
-                    onClick={() => {
-                      const sampleUrl = 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=900&auto=format&fit=crop';
-                      setDiagnosticFile(null);
-                      setDiagnosticForm(prev => ({ ...prev, imageUrl: sampleUrl }));
-                      setPreviewImageUrl(`${sampleUrl}?v=${Date.now()}`);
-                    }}
-                  >
-                    <strong>{text.diagSampleTomatoLeaf}</strong>
-                    <span style={{ display: 'block', marginTop: '6px', fontSize: '11px', color: '#778078' }}>{text.diagQuickCheck}</span>
-                  </button>
-                )}
-
-                <div className="leaf-preview-frame" style={{ marginTop: '12px' }}>
-                  {previewImageUrl ? (
-                    <img
-                      key={previewImageUrl}
-                      className="leaf-img"
-                      src={previewImageUrl}
-                      alt="Selected crop leaf"
-                      onError={() => setPreviewImageUrl('')}
-                    />
-                  ) : (
-                    <span className="muted">{text.diagNoImage}</span>
-                  )}
-                  {previewImageUrl && <span className="leaf-tag">{text.diagSpecimenReady}</span>}
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '12px' }}>
-                  <div className="field-group">
-                    <label className="field-label" htmlFor="diagnostic-crop">{text.diagCropHint}</label>
-                    <select
-                      id="diagnostic-crop"
-                      className="field-input"
-                      value={diagnosticForm.cropId || ''}
-                      onChange={(e) => {
-                        const cropId = e.target.value ? Number(e.target.value) : null;
-                        const selected = crops.find(crop => crop.id === cropId);
-                        setDiagnosticForm(prev => ({ ...prev, cropId, cropName: selected?.name || '' }));
-                      }}
-                    >
-                      <option value="">{text.diagAutoDetect}</option>
-                      {crops.map(crop => <option key={crop.id} value={crop.id}>{crop.name}</option>)}
-                    </select>
-                  </div>
-                  <div className="field-group">
-                    <label className="field-label" htmlFor="diagnostic-notes">{text.diagFieldNotes}</label>
-                    <input
-                      id="diagnostic-notes"
-                      className="field-input"
-                      value={diagnosticForm.notes}
-                      onChange={(e) => setDiagnosticForm(prev => ({ ...prev, notes: e.target.value }))}
-                      placeholder={text.diagOptionalSymptoms}
-                    />
-                  </div>
-                </div>
-
-                <button type="button" className="trade-btn trade-btn-primary crop-doctor-submit-btn" onClick={runDiagnosticScan} disabled={diagnosticLoading}>
-                  {diagnosticLoading ? text.diagAnalyzing : text.diagAnalyze}
-                </button>
-              </div>
-
-              <div className="diagnostic-result-panel">
-                {diagnosticResult ? (
-                  <div className="diagnostic-card">
-                    <div className="diagnostic-header">
-                      <div>
-                        <span className="diag-section-title">{text.diagDiagnosisTitle}</span>
-                        <h3 style={{ margin: '4px 0 2px', fontSize: '21px', color: '#202a27' }}>{diagnosticResult.cropName}</h3>
-                        <p className="diag-text">
-                          {(() => {
-                            const diseaseFull = diagnosticResult.detectedDisease;
-                            const diseaseMatch = diseaseFull.match(/^([^(]+)/);
-                            const diseaseName = diseaseMatch ? diseaseMatch[1].trim() : diseaseFull;
-                            const scientificName = diseaseFull.match(/\(([^)]+)\)/);
-                            const translated = getLocalizedText(diseaseName, language);
-                            return scientificName ? `${translated} (${scientificName[1]})` : translated;
-                          })()}
-                        </p>
-                      </div>
-                      {diagnosticResult.confidenceScore != null ? (
-                        <div className="confidence-meter-box">
-                          <span className="confidence-num">{diagnosticResult.confidenceScore}%</span>
-                          <span className="confidence-label">{text.diagConfidence}</span>
-                        </div>
-                      ) : (
-                        <div className="confidence-meter-box" style={{ background: '#fef7e8', border: '1px solid #d4a34b', padding: '6px 12px', borderRadius: '4px', textAlign: 'center' }}>
-                          <span style={{ fontSize: '11px', fontWeight: 700, color: '#8a6218', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            Preliminary Heuristic
-                          </span>
-                          <span className="confidence-label" style={{ color: '#8a6218', fontSize: '10px' }}>
-                            Uncalibrated Screening
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {diagnosticResult.requiresExpertReview && (
-                      <div style={{ background: '#fdf7ea', border: '1px solid #ecc987', borderRadius: '6px', padding: '10px 14px', margin: '10px 0 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                        <div style={{ flex: 1, minWidth: '240px' }}>
-                          <strong style={{ fontSize: '12px', color: '#7a4e0a', display: 'block' }}>
-                            [DEMO DIAGNOSIS - Heuristic Fallback, Uncalibrated]
-                          </strong>
-                          <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#7a4e0a', lineHeight: 1.4 }}>
-                            Trained neural network checkpoint (crop_doctor_v1.pt) is not loaded. Diagnosis is generated via preliminary pixel-color heuristics. Expert review is advised before application of chemical treatments.
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          className="trade-btn trade-btn-primary"
-                          style={{ fontSize: '11px', padding: '6px 12px', whiteSpace: 'nowrap' }}
-                          onClick={() => escalateToAgronomist(diagnosticResult.id)}
-                        >
-                          Escalate to Expert Agronomist
-                        </button>
-                      </div>
-                    )}
-
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      <span className={`severity-badge severity-${String(diagnosticResult.severity).toLowerCase()}`}>{getLocalizedText(diagnosticResult.severity, language)}</span>
-                      <span className="severity-badge" style={{ background: '#eef2f8', color: '#204068' }}>{diagnosticResult.pathogenType}</span>
-                      <span className="severity-badge" style={{ background: '#eef3eb', color: '#2f6838' }}>{diagnosticResult.device}</span>
-                    </div>
-
-                    <div className="treatment-box">
-                      <span className="diag-section-title">{text.diagTreatmentProtocol}</span>
-                      <p className="diag-text" style={{ whiteSpace: 'pre-line' }}>{diagnosticResult.treatmentPlan}</p>
-                    </div>
-
-                    <div>
-                      <span className="diag-section-title">{text.diagRecommendedInputs}</span>
-                      <div className="prescription-input-list">
-                        {diagnosticResult.recommendedInputs.map(input => <div className="prescription-item" key={input}><span className="prescription-name">{input}</span></div>)}
-                      </div>
-                    </div>
-
-                    {diagnosticResult.topCandidates && diagnosticResult.topCandidates.length > 0 && (
-                      <div>
-                        <span className="diag-section-title">{text.diagTopCandidates}</span>
-                        {diagnosticResult.topCandidates.map(candidate => (
-                          <div key={candidate.raw_label || candidate.condition} style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', padding: '6px 0', borderBottom: '1px solid #eeeae1', fontSize: '12px' }}>
-                            <span>{candidate.crop} · {candidate.condition}</span><strong>{candidate.confidence != null ? `${candidate.confidence}%` : 'Uncalibrated'}</strong>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div style={{ minHeight: '440px', display: 'grid', placeItems: 'center', textAlign: 'center' }}>
-                    <div>
-                      <div style={{ fontSize: '34px', marginBottom: '10px' }}>+</div>
-                      <h3 style={{ margin: 0, color: '#202a27' }}>{text.diagEmptyStateTitle}</h3>
-                      <p className="muted" style={{ maxWidth: '280px', lineHeight: '1.5' }}>{text.diagEmptyStateText}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-        </div>
-      )}
-
-      {currentView === 'community' && (
-
-        <div className="view-container">
-          <section className="panel" style={{ marginTop: '18px' }}>
-            <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
-              <div>
-                <p className="eyebrow">{text.communityEyebrow}</p>
-                <h2>{text.communitySection}</h2>
-                <p className="muted" style={{ margin: '4px 0 0', fontSize: '13px' }}>
-                  Open bulletin for crop health discussions, procurement notices, and agronomic advisories.
-                </p>
-              </div>
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <button
-                  type="button"
-                  className="trade-btn trade-btn-primary"
-                  onClick={() => setNewPostModalOpen(true)}
-                  style={{ padding: '8px 18px', fontSize: '12px' }}
-                >
-                  {text.communityNewDiscussion}
-                </button>
-              </div>
-            </div>
-
-            
-            <div className="marketplace-toolbar" style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-                <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
-                  <input
-                    type="text"
-                    className="field-input"
-                    placeholder={text.communitySearchPlaceholder}
-                    value={communitySearchQuery}
-                    onChange={(e) => setCommunitySearchQuery(e.target.value)}
-                    style={{ fontSize: '13px', padding: '8px 12px' }}
-                  />
-                  {communitySearchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => setCommunitySearchQuery('')}
-                      style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#778078', fontSize: '11px', fontFamily: "'DM Mono', monospace" }}
-                    >
-                      {text.communityClear}
-                    </button>
-                  )}
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                  <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>{text.communityCommodity}</span>
-                  <select
-                    className="field-input"
-                    value={communityFilterCrop}
-                    onChange={(e) => setCommunityFilterCrop(e.target.value)}
-                    style={{ fontSize: '12px', padding: '7px 10px', width: 'auto', minWidth: '130px' }}
-                  >
-                    <option value="ALL">{text.communityAllCommodities}</option>
-                    <option value="Tomato">Tomato</option>
-                    <option value="Chilli">Chilli / Pepper</option>
-                    <option value="Rice">Rice / Paddy</option>
-                    <option value="Potato">Potato</option>
-                    <option value="Wheat">Wheat</option>
-                    <option value="Mustard">Mustard</option>
-                    <option value="Cotton">Cotton</option>
-                    <option value="Onion">Onion</option>
-                  </select>
-                </div>
-              </div>
-
-              
-              <div className="category-filter-bar" style={{ margin: 0, paddingTop: '2px' }}>
-                {[
-                  { value: 'ALL', label: text.communityAllTopics },
-                  { value: 'FARMER', label: text.communityFarmerQueries },
-                  { value: 'BUYER', label: text.communityBuyerNotices },
-                  { value: 'AGRONOMIST', label: text.communityAgronomistProtocols }
-                ].map(tab => (
-                  <button
-                    key={tab.value}
-                    type="button"
-                    className={`filter-chip ${communityParticipantFilter === tab.value ? 'active' : ''}`}
-                    onClick={() => setCommunityParticipantFilter(tab.value)}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            
-            <div className="community-feed">
-              {communityPosts
-                .filter(post => {
-                  const matchesParticipant = communityParticipantFilter === 'ALL' ||
-                    post.authorType === communityParticipantFilter ||
-                    post.answers.some(a => a.authorType === communityParticipantFilter);
-                  const matchesCrop = communityFilterCrop === 'ALL' ||
-                    post.cropName.toLowerCase().includes(communityFilterCrop.toLowerCase());
-                  const q = communitySearchQuery.toLowerCase().trim();
-                  const matchesSearch = !q ||
-                    post.title.toLowerCase().includes(q) ||
-                    post.description.toLowerCase().includes(q) ||
-                    post.authorName.toLowerCase().includes(q) ||
-                    post.cropName.toLowerCase().includes(q) ||
-                    post.answers.some(a => a.text.toLowerCase().includes(q) || a.authorName.toLowerCase().includes(q));
-                  return matchesParticipant && matchesCrop && matchesSearch;
-                })
-                .map((post) => {
-                  const postTypeLabel = post.postType === 'PROCUREMENT' ? 'BUYER PROCUREMENT' : (post.postType === 'QUALITY_ADVICE' ? 'QUALITY STANDARD' : (post.postType === 'AGRI_ADVICE' ? 'AGRONOMY ADVISORY' : 'CROP HEALTH'));
-
-                  return (
-                    <div key={post.id} className="community-post-card">
-                      
-                      
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div style={{ width: '30px', height: '30px', borderRadius: '4px', background: '#202a27', color: '#f6f5f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '12px' }}>
-                            {post.authorName.charAt(0)}
-                          </div>
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                              <strong style={{ fontSize: '13px', color: '#202a27' }}>{post.authorName}</strong>
-                              <span style={{
-                                fontSize: '9px',
-                                fontFamily: "'DM Mono', monospace",
-                                padding: '1px 5px',
-                                borderRadius: '2px',
-                                fontWeight: 600,
-                                background: post.authorType === 'BUYER' ? '#eef2f8' : (post.authorType === 'AGRONOMIST' ? '#f5f2e8' : '#eef4ec'),
-                                color: post.authorType === 'BUYER' ? '#204068' : (post.authorType === 'AGRONOMIST' ? '#685420' : '#2f6838')
-                              }}>
-                                {post.authorType} {post.authorRole ? `· ${post.authorRole}` : ''}
-                              </span>
-                            </div>
-                            <span style={{ font: "10px 'DM Mono', monospace", color: '#778078' }}>
-                              {post.location} &middot; {post.timestamp}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                          <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", background: '#f5f3eb', color: '#685420', padding: '2px 7px', borderRadius: '3px', fontWeight: 600 }}>
-                            {post.cropName.toUpperCase()}
-                          </span>
-                          <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", background: '#eceae2', color: '#333b35', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>
-                            [{postTypeLabel}]
-                          </span>
-                          {post.resolved && (
-                            <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", background: '#e8f4ea', color: '#226330', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>
-                              [RESOLVED]
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      
-                      <div>
-                        <h3 style={{ fontSize: '15px', margin: '4px 0 4px', color: '#202a27', lineHeight: '1.4' }}>
-                          {post.title}
-                        </h3>
-                        <p style={{ fontSize: '13px', color: '#444d47', lineHeight: '1.55', margin: 0 }}>
-                          {post.description}
-                        </p>
-                      </div>
-
-                      
-                      {post.imageUrl && (
-                        <div style={{ borderRadius: '4px', overflow: 'hidden', border: '1px solid #e2ded4', maxWidth: '340px' }}>
-                          <img
-                            src={post.imageUrl}
-                            alt={post.title}
-                            style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', display: 'block' }}
-                          />
-                        </div>
-                      )}
-
-                      
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #edeae2', paddingTop: '8px', marginTop: '2px' }}>
-                        <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-                          <button
-                            type="button"
-                            className={`endorse-btn ${post.userLiked ? 'endorsed' : ''}`}
-                            onClick={() => handleLikeCommunityPost(post.id)}
-                            title={post.userLiked ? 'Endorsed' : 'Endorse topic'}
-                          >
-                            <span style={{ fontSize: '12px' }}>{post.userLiked ? 'Γ£ô' : '+'}</span>
-                            <span>{post.likesCount}</span>
-                          </button>
-
-                          <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>
-                            {post.answers.length} {post.answers.length === 1 ? text.communityReplyCount : text.communityReplyCountPlural}
-                          </span>
-                        </div>
-
-                        {post.prescribedInput && (
-                          <button
-                            type="button"
-                            className="trade-btn trade-btn-primary"
-                            style={{ fontSize: '10px', padding: '3px 8px' }}
-                            onClick={() => handleOrderPrescriptionInput(post.prescribedInput)}
-                          >
-                            Order {post.prescribedInput.split(' ')[0]} &rarr;
-                          </button>
-                        )}
-                      </div>
-
-                      
-                      {post.answers.length > 0 && (
-                        <div className="reply-thread">
-                          {post.answers.map((ans) => (
-                            <div
-                              key={ans.id}
-                              className={`reply-item ${ans.isVerifiedSolution ? 'verified-reply' : ''}`}
-                            >
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '6px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <strong style={{ fontSize: '12px', color: '#202a27' }}>{ans.authorName}</strong>
-                                  <span style={{
-                                    fontSize: '9px',
-                                    fontFamily: "'DM Mono', monospace",
-                                    background: ans.authorType === 'BUYER' ? '#eef2f8' : (ans.authorType === 'AGRONOMIST' ? '#2f6838' : '#e4e2d8'),
-                                    color: ans.authorType === 'BUYER' ? '#204068' : (ans.authorType === 'AGRONOMIST' ? '#ffffff' : '#333b35'),
-                                    padding: '1px 4px',
-                                    borderRadius: '2px',
-                                    fontWeight: 600
-                                  }}>
-                                    {ans.authorRole.toUpperCase()}
-                                  </span>
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <span style={{ font: "10px 'DM Mono', monospace", color: '#778078' }}>
-                                    {ans.timestamp}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    className={`endorse-btn ${ans.userLiked ? 'endorsed' : ''}`}
-                                    onClick={() => handleUpvoteCommunityAnswer(post.id, ans.id)}
-                                    title="Endorse response"
-                                  >
-                                    <span style={{ fontSize: '11px' }}>{ans.userLiked ? 'Γ£ô' : '+'}</span>
-                                    <span>{ans.upvotes || 0}</span>
-                                  </button>
-                                </div>
-                              </div>
-
-                              {ans.isVerifiedSolution && (
-                                <div style={{ display: 'inline-block', background: '#2f6838', color: '#ffffff', fontSize: '8px', fontFamily: "'DM Mono', monospace", padding: '1px 5px', borderRadius: '2px', fontWeight: 600, width: 'fit-content' }}>
-                                  VERIFIED AGRONOMIST PROTOCOL
-                                </div>
-                              )}
-
-                              <p style={{ fontSize: '12px', color: '#2b332d', lineHeight: '1.5', margin: '2px 0', whiteSpace: 'pre-line' }}>
-                                {ans.text}
-                              </p>
-
-                              {ans.prescribedInput && (
-                                <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <span style={{ fontSize: '10px', color: '#566057' }}>Prescribed:</span>
-                                  <button
-                                    type="button"
-                                    className="prescription-btn"
-                                    style={{ padding: '2px 6px', fontSize: '9px' }}
-                                    onClick={() => handleOrderPrescriptionInput(ans.prescribedInput)}
-                                  >
-                                    Order {ans.prescribedInput} &rarr;
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      
-                      <div style={{ marginTop: '6px', display: 'flex', gap: '6px' }}>
-                        <input
-                          type="text"
-                          className="field-input"
-                          placeholder={text.communityAddReply}
-                          value={replyInputByPostId[post.id] || ''}
-                          onChange={(e) => setReplyInputByPostId(prev => ({ ...prev, [post.id]: e.target.value }))}
-                          onKeyDown={(e) => { if (e.key === 'Enter') handleAddCommunityReply(post.id); }}
-                          style={{ fontSize: '12px', padding: '6px 10px' }}
-                        />
-                        <button
-                          type="button"
-                          className="trade-btn trade-btn-secondary"
-                          onClick={() => handleAddCommunityReply(post.id)}
-                          style={{ padding: '6px 12px', fontSize: '11px', whiteSpace: 'nowrap' }}
-                        >
-                          {text.communityReply}
-                        </button>
-                      </div>
-
-                    </div>
-                  );
-                })}
-
-              {communityPosts.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '36px 20px', background: '#faf9f5', borderRadius: '4px', border: '1px dashed #d9d6cc' }}>
-                  <p style={{ fontSize: '14px', fontWeight: 600, color: '#202a27', margin: '0 0 4px' }}>
-                    {text.communityNoDiscussions}
-                  </p>
-                  <p style={{ fontSize: '12px', color: '#778078', margin: '0 0 12px' }}>
-                    {text.communityNoDiscussionsSub}
-                  </p>
-                  <button
-                    type="button"
-                    className="trade-btn trade-btn-primary"
-                    onClick={() => setNewPostModalOpen(true)}
-                  >
-                    {text.communityNewDiscussion}
-                  </button>
-                </div>
-              )}
-            </div>
-
-          </section>
-
-        </div>
-      )}
-
-      
-      
-      
-      {currentView === 'support-network' && (
-        <div className="view-container">
-          <section className="panel" style={{ marginTop: '18px' }}>
-            <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
-              <div>
-                <p className="eyebrow">Institutional &amp; Expert Field Directory</p>
-                <h2>{text.supportSectionTitle}</h2>
-                <p className="muted" style={{ margin: '4px 0 0', fontSize: '13px' }}>
-                  {text.supportSectionSubtitle}
-                </p>
-              </div>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                <span className="count" style={{ background: '#202a27', color: '#f6f5f0', fontSize: '11px' }}>
-                  {supportDirectoryData.filter(n => n.type === 'GOVT_KVK').length} {text.supportCenters}
-                </span>
-                <span className="count" style={{ background: '#2f6838', color: '#f6f5f0', fontSize: '11px' }}>
-                  {supportDirectoryData.filter(n => n.type === 'AGRONOMIST').length} {text.supportAgronomists}
-                </span>
-                <span className="count" style={{ background: '#35453e', color: '#f6f5f0', fontSize: '11px' }}>
-                  {supportDirectoryData.filter(n => n.type === 'SOIL_LAB').length} {text.supportSoilLabs}
-                </span>
-              </div>
-            </div>
-
-            
-            <div className="marketplace-toolbar" style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-                <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
-                  <input
-                    type="text"
-                    className="field-input"
-                    placeholder={text.supportSearchPlaceholder}
-                    value={supportSearchQuery}
-                    onChange={(e) => setSupportSearchQuery(e.target.value)}
-                    style={{ fontSize: '13px', padding: '8px 12px' }}
-                  />
-                  {supportSearchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => setSupportSearchQuery('')}
-                      style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#778078', fontSize: '11px', fontFamily: "'DM Mono', monospace" }}
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              
-              <div className="category-filter-bar" style={{ margin: 0, paddingTop: '2px' }}>
-                {[
-                  { value: 'ALL', label: 'All Directory' },
-                  { value: 'GOVT_KVK', label: 'Govt KVK & Research' },
-                  { value: 'AGRONOMIST', label: 'Certified Agronomists' },
-                  { value: 'SOIL_LAB', label: 'Soil & Testing Labs' },
-                  { value: 'FPO_HUB', label: 'FPO Hubs' },
-                  { value: 'HELPLINE', label: '24x7 Helplines' }
-                ].map(tab => (
-                  <button
-                    key={tab.value}
-                    type="button"
-                    className={`filter-chip ${supportCategoryFilter === tab.value ? 'active' : ''}`}
-                    onClick={() => setSupportCategoryFilter(tab.value)}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            
-            <div className="support-radar-container">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
-                <div>
-                  <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#889e92', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    {text.supportRadarViewLabel}
-                  </span>
-                  <p style={{ margin: '2px 0 0', fontSize: '13px', color: '#ffffff', fontWeight: 600 }}>
-                    {supportMapViewMode === 'RADAR'
-                      ? text.supportRadarSubtitle
-                      : `${text.supportMapSubtitle}: ${supportDirectoryData.find(n => n.id === selectedSupportNode)?.name || text.supportSectionTitle}`}
-                  </p>
-                </div>
-
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  
-                  <div style={{ display: 'inline-flex', gap: '4px', background: 'rgba(0,0,0,0.5)', padding: '3px', borderRadius: '4px', border: '1px solid #364840' }}>
-                    <button
-                      type="button"
-                      className="trade-btn"
-                      onClick={() => setSupportMapViewMode('RADAR')}
-                      style={{
-                        background: supportMapViewMode === 'RADAR' ? '#2f6838' : 'transparent',
-                        color: supportMapViewMode === 'RADAR' ? '#ffffff' : '#97ab9f',
-                        border: 'none',
-                        padding: '4px 10px',
-                        fontSize: '10px',
-                        borderRadius: '3px',
-                        cursor: 'pointer',
-                        lineHeight: 1.2
-                      }}
-                    >
-                      {text.supportRadarViewBtn}
-                    </button>
-                    <button
-                      type="button"
-                      className="trade-btn"
-                      onClick={() => setSupportMapViewMode('GOOGLE_MAP')}
-                      style={{
-                        background: supportMapViewMode === 'GOOGLE_MAP' ? '#2f6838' : 'transparent',
-                        color: supportMapViewMode === 'GOOGLE_MAP' ? '#ffffff' : '#97ab9f',
-                        border: 'none',
-                        padding: '4px 10px',
-                        fontSize: '10px',
-                        borderRadius: '3px',
-                        cursor: 'pointer',
-                        lineHeight: 1.2
-                      }}
-                    >
-                      {text.supportGoogleMapBtn}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-
-              {supportMapViewMode === 'RADAR' ? (
-                <div className="radar-canvas-box">
-                  
-                  <div className="radar-circle" style={{ width: '80px', height: '80px' }} />
-                  <div className="radar-circle" style={{ width: '160px', height: '160px' }} />
-                  <div className="radar-circle" style={{ width: '240px', height: '240px' }} />
-                  <div className="radar-crosshair-x" />
-                  <div className="radar-crosshair-y" />
-
-                  
-                  <span style={{ position: 'absolute', top: '52%', left: '56%', fontSize: '8px', fontFamily: "'DM Mono', monospace", color: 'rgba(110, 157, 104, 0.5)', pointerEvents: 'none' }}>5km</span>
-                  <span style={{ position: 'absolute', top: '52%', left: '68%', fontSize: '8px', fontFamily: "'DM Mono', monospace", color: 'rgba(110, 157, 104, 0.5)', pointerEvents: 'none' }}>15km</span>
-                  <span style={{ position: 'absolute', top: '52%', left: '80%', fontSize: '8px', fontFamily: "'DM Mono', monospace", color: 'rgba(110, 157, 104, 0.5)', pointerEvents: 'none' }}>25km</span>
-
-                  
-                  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 15, textAlign: 'center' }}>
-                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ffffff', margin: '0 auto', boxShadow: '0 0 12px #6e9d68' }} />
-                    <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#ffffff', background: 'rgba(0,0,0,0.7)', padding: '1px 4px', borderRadius: 2, display: 'inline-block', marginTop: 2 }}>
-                      {text.supportYourFarm}
-                    </span>
-                  </div>
-
-                  
-                  {supportDirectoryData.map((node) => {
-                    const isSelected = selectedSupportNode === node.id;
-                    const pinColor = node.type === 'GOVT_KVK' ? '#6e9d68' : (node.type === 'AGRONOMIST' ? '#4d88ff' : (node.type === 'SOIL_LAB' ? '#e5a93b' : (node.type === 'HELPLINE' ? '#ff6666' : '#20b2aa')));
-
-                    return (
-                      <div
-                        key={node.id}
-                        className={`radar-pin ${isSelected ? 'pin-active' : ''}`}
-                        style={{ top: `${node.mapCoords.y}%`, left: `${node.mapCoords.x}%` }}
-                        onClick={() => {
-                          setSelectedSupportNode(node.id);
-                          setGoogleMapModalNode(node);
-                        }}
-                        title={`${node.name} (${node.distanceKm} km away) - Click to view on Google Maps`}
-                      >
-                        <div className="radar-pin-dot" style={{ background: pinColor }}>
-                          <span style={{ fontSize: '8px', color: '#ffffff', fontWeight: 'bold' }}>·</span>
-                        </div>
-                        <span className="radar-pin-label">
-                          {node.name.split(' ')[0]} {node.name.split(' ')[1] || ''} ({node.distanceKm}km)
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                
-                <div style={{ position: 'relative', width: '100%', height: '320px', borderRadius: '4px', overflow: 'hidden', border: '1px solid #364840' }}>
-                  {(() => {
-                    const activeNode = supportDirectoryData.find(n => n.id === selectedSupportNode) || supportDirectoryData[0];
-                    return (
-                      <>
-                        <iframe
-                          title={`Google Map - ${activeNode.name}`}
-                          width="100%"
-                          height="100%"
-                          style={{ border: 0, display: 'block' }}
-                          loading="lazy"
-                          src={`https://maps.google.com/maps?q=${encodeURIComponent(activeNode.mapQuery || `${activeNode.lat},${activeNode.lng}`)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
-                        />
-                        <div style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'rgba(20, 26, 24, 0.92)', padding: '6px 12px', borderRadius: '4px', border: '1px solid #41554c', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          <span style={{ fontSize: '11px', color: '#f6f5f0', fontFamily: "'DM Mono', monospace" }}>
-                            {activeNode.name}
-                          </span>
-                          <a
-                            href={activeNode.googleMapsUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="trade-btn trade-btn-primary"
-                            style={{ padding: '4px 10px', fontSize: '10px', textDecoration: 'none' }}
-                          >
-                            {text.supportOpenMap}
-                          </a>
-                        </div>
-                      </>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
-
-            
-            <div className="support-directory-grid">
-              {supportDirectoryData
-                .filter(node => {
-                  if (supportCategoryFilter !== 'ALL' && node.type !== supportCategoryFilter) return false;
-                  const q = supportSearchQuery.toLowerCase().trim();
-                  if (!q) return true;
-                  return node.name.toLowerCase().includes(q) ||
-                    node.department.toLowerCase().includes(q) ||
-                    node.location.toLowerCase().includes(q) ||
-                    node.services.some(s => s.toLowerCase().includes(q));
-                })
-                .map(node => {
-                  const isSelected = selectedSupportNode === node.id;
-                  const badgeBg = node.type === 'GOVT_KVK' ? '#eef4ec' : (node.type === 'AGRONOMIST' ? '#eef2f8' : (node.type === 'SOIL_LAB' ? '#fdf5e8' : (node.type === 'HELPLINE' ? '#fbeeee' : '#eaf4f4')));
-                  const badgeColor = node.type === 'GOVT_KVK' ? '#2f6838' : (node.type === 'AGRONOMIST' ? '#204068' : (node.type === 'SOIL_LAB' ? '#7a5214' : (node.type === 'HELPLINE' ? '#a32020' : '#1b6b6b')));
-
-                  return (
-                    <div
-                      key={node.id}
-                      className={`support-card ${isSelected ? 'card-highlighted' : ''}`}
-                    >
-                      <div>
-                        
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '6px', marginBottom: '6px' }}>
-                          <span style={{
-                            fontSize: '9px',
-                            fontFamily: "'DM Mono', monospace",
-                            padding: '2px 6px',
-                            borderRadius: '3px',
-                            fontWeight: 700,
-                            background: badgeBg,
-                            color: badgeColor,
-                            letterSpacing: '0.3px'
-                          }}>
-                            {node.badge}
-                          </span>
-                          <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078', fontWeight: 600 }}>
-                            Γÿà {node.rating} &middot; {node.distanceKm} km
-                          </span>
-                        </div>
-
-                        
-                        <h3 style={{ fontSize: '15px', margin: '2px 0 2px', color: '#202a27', lineHeight: '1.3' }}>
-                          {node.name}
-                        </h3>
-                        <p style={{ margin: '0 0 6px', fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#667269' }}>
-                          {node.department}
-                        </p>
-                        <p style={{ margin: '0 0 8px', fontSize: '12px', color: '#444d47' }}>
-                          {node.location}
-                        </p>
-
-                        
-                        <div style={{ background: '#f8f7f2', borderRadius: '4px', padding: '6px 10px', fontSize: '11px', color: '#4d5750', marginBottom: '8px', border: '1px solid #eceae2' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span>{text.supportLead} <strong>{node.inCharge}</strong></span>
-                          </div>
-                          <div style={{ font: "10px 'DM Mono', monospace", color: '#778078', marginTop: '2px' }}>
-                            {text.supportHours} {node.hours}
-                          </div>
-                        </div>
-
-                        
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '6px' }}>
-                          {node.services.map((srv, idx) => (
-                            <span key={idx} style={{ fontSize: '10px', background: '#f0eee8', color: '#333b35', padding: '2px 6px', borderRadius: '3px' }}>
-                              {getLocalizedText(srv, language)}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      
-                      <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid #edebe4', paddingTop: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-
-                        <a
-                          href={`tel:${node.phone.replace(/[^0-9+]/g, '')}`}
-                          className="trade-btn trade-btn-primary"
-                          style={{ flex: '1 1 140px', padding: '7px 12px', fontSize: '11px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', whiteSpace: 'nowrap' }}
-                          onClick={(e) => {
-                            if (!node.phone.startsWith('+91') && !node.phone.startsWith('1800')) {
-                              e.preventDefault();
-                              setMessage(`Direct helpline: ${node.phone}`);
-                            }
-                          }}
-                        >
-                          {text.supportCallDesk} {node.phone}
-                        </a>
-
-                        <button
-                          type="button"
-                          className="trade-btn trade-btn-secondary"
-                          style={{ flex: '0 0 auto', padding: '7px 12px', fontSize: '11px', fontFamily: "'DM Mono', monospace", whiteSpace: 'nowrap' }}
-                          title="View on Google Maps"
-                          onClick={() => {
-                            setSelectedSupportNode(node.id);
-                            setGoogleMapModalNode(node);
-                          }}
-                        >
-                          {text.supportGoogleMapAction}
-                        </button>
-                      </div>
-
-                    </div>
-                  );
-                })}
-
-            </div>
-
-            {supportDirectoryData.length === 0 && (
-              <p className="muted" style={{ padding: '24px 0', textAlign: 'center' }}>No support directory nodes found.</p>
-            )}
-
-          </section>
-        </div>
-      )}
-
-      
-      
-      
-      {currentView === 'transporter-dashboard' && (
-        session?.role === 'TRANSPORTER' ? (
-          <TransporterDashboard
-            session={session}
-            apiUrl={API_URL}
-          />
-        ) : (
-          <div className="view-container">
-            <section className="panel" style={{ marginTop: '18px', textAlign: 'center', padding: '40px 16px' }}>
-              <h2>Transporter Portal Access Only</h2>
-              <p style={{ color: '#667269', marginTop: '8px', fontSize: '13px' }}>
-                This page is exclusively for registered commercial transporters to configure vehicles, set freight rates, and manage haul assignments.
-              </p>
-              <p style={{ color: '#667269', fontSize: '13px', marginTop: '4px' }}>
-                Farmers and buyers cannot manage transporter settings. As a farmer, you choose and book available transporters directly from your accepted trade deals.
-              </p>
-              <button
-                type="button"
-                className="trade-btn trade-btn-primary"
-                style={{ marginTop: '18px', padding: '8px 18px' }}
-                onClick={() => setCurrentView(session?.role === 'FARMER' ? 'my-orders' : 'prices')}
-              >
-                Go to {session?.role === 'FARMER' ? 'My Orders' : 'Marketplace'}
-              </button>
-            </section>
-          </div>
-        )
-      )}
-
-      
-      
-      
-      {currentView === 'trade-chat' && (
-        <TradeChatView
-          session={session}
-          apiUrl={API_URL}
-          onNavigate={(targetView) => setCurrentView(targetView)}
-          activeConversationId={activeChatConversationId}
-        />
-      )}
-
-      
-      
-      
-      {currentView === 'my-orders' && (
-        <div className="view-container">
-          
-          <section className="panel" style={{ marginBottom: '20px', border: '2px solid #2f6838', borderRadius: '8px', background: '#ffffff', padding: '20px 24px', boxShadow: '0 4px 18px rgba(47, 104, 56, 0.08)' }}>
-            <div className="panel-heading" style={{ borderBottom: '1px solid #eef2ee', paddingBottom: '12px', marginBottom: '16px' }}>
-              <div>
-                <p className="eyebrow" style={{ color: '#2f6838', fontWeight: 700 }}>Direct Farm Produce Sales Ledger</p>
-                <h2 style={{ margin: '2px 0 0', fontSize: '20px' }}>Active Crop Sales &amp; Direct Contracts</h2>
-                <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
-                  Live agricultural sales agreements, counterpart negotiations, transport tracking, and direct bank payouts.
-                </p>
-              </div>
-              <span className="count" style={{ background: '#2f6838', color: '#ffffff' }}>
-                {trades.length} {trades.length === 1 ? 'Contract' : 'Contracts'}
-              </span>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
-              {trades.map((t) => {
-                const statusKey = (t.status || 'PROPOSED').toLowerCase();
-                const gross = (t.quantity || 0) * (t.agreedPricePerKg || 0);
-                return (
-                  <div key={t.id} style={{ border: '1px solid #d4dfd4', borderRadius: '8px', padding: '16px', background: '#fafbfa', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                        <div>
-                          <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#2f6838' }}>
-                            Trade #{t.id}
-                          </span>
-                          <h3 style={{ margin: '2px 0', fontSize: '16px', color: '#202a27' }}>
-                            {t.cropName}
-                          </h3>
-                          <span style={{ fontSize: '12px', color: '#556557' }}>
-                            Buyer: <strong>{t.buyerName}</strong>
-                          </span>
-                        </div>
-                        <span className={`status-pill status-${statusKey}`}>
-                          {t.status}
-                        </span>
-                      </div>
-
-                      <div style={{ background: '#ffffff', border: '1px solid #eceae2', borderRadius: '6px', padding: '10px', margin: '10px 0', fontSize: '12px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                          <span style={{ color: '#667269' }}>Dispatched Lot:</span>
-                          <strong>{Number(t.quantity).toLocaleString()} kg ({(Number(t.quantity) / 1000).toFixed(1)} T)</strong>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                          <span style={{ color: '#667269' }}>Agreed Rate:</span>
-                          <strong style={{ color: '#2f6838' }}>₹{t.agreedPricePerKg}/kg</strong>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                          <span style={{ color: '#667269' }}>Gross Value:</span>
-                          <span>₹{gross.toLocaleString()}</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                          <span style={{ color: '#667269' }}>Freight Deduction:</span>
-                          <span style={{ color: '#b45a42' }}>-₹{Number(t.transportCost || 0).toLocaleString()}</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #eeeae1', paddingTop: '6px', marginTop: '4px' }}>
-                          <span style={{ color: '#202a27', fontWeight: 600 }}>Net Take-Home Payout:</span>
-                          <strong style={{ color: '#166534', fontSize: '14px' }}>₹{Number(t.netFarmerReturn || 0).toLocaleString()}</strong>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-                      <button
-                        type="button"
-                        className="trade-btn trade-btn-primary"
-                        style={{ flex: 1, padding: '8px 12px', fontSize: '12px' }}
-                        onClick={() => setCurrentView('matching')}
-                      >
-                        Manage &amp; Track &rarr;
-                      </button>
-                      <button
-                        type="button"
-                        className="trade-btn trade-btn-secondary"
-                        style={{ padding: '8px 12px', fontSize: '12px' }}
-                        onClick={() => setSelectedInvoiceTrade(t)}
-                      >
-                        Receipt
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
-          
-          <div style={{ background: '#f8f9f8', border: '1px solid #d4dfd4', borderRadius: '6px', padding: '10px 16px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#365c3b', color: '#ffffff', padding: '2px 6px', borderRadius: '3px' }}>
-                SANDBOX DEMO TEMPLATES
-              </span>
-              <p style={{ margin: 0, fontSize: '12px', color: '#445846' }}>
-                The sample orders below are simulated workflow templates for evaluating multi-stage tracking, POP/POD, and escrow lifecycles. Real deals appear automatically upon marketplace trading.
-              </p>
-            </div>
-            <span style={{ fontSize: '10px', color: '#687e6b', fontFamily: "'DM Mono', monospace" }}>
-              DEMO MODE · SIMULATION ONLY
-            </span>
-          </div>
-          <section className="panel" style={{ marginTop: '18px' }}>
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">{text.ordersTradeDeals}</p>
-                <h2>{text.ordersHeader}</h2>
-                <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
-                  Track active purchase orders, farmer harvest procurements, and escrow-guaranteed payments.
-                </p>
-              </div>
-              <span className="count">{userOrders.length} {text.ordersContracts}</span>
-            </div>
-
-            
-            <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', padding: '14px 0 8px' }}>
+          {currentView === 'inputs' && (
+            <div className="left-nav-sub">
               {[
-                { value: 'ALL', label: text.ordersStatusAll },
-                { value: 'IN_TRANSIT', label: text.ordersStatusInTransit },
-                { value: 'ESCROW_LOCKED', label: text.ordersStatusEscrowProtected },
-                { value: 'DELIVERED', label: text.ordersStatusCompleted },
-                { value: 'DISPUTED', label: text.ordersStatusDisputed }
-              ].map(f => (
+                { value: 'ALL', label: text.allInputs },
+                { value: 'FERTILIZER', label: 'Fertilizers' },
+                { value: 'PESTICIDE', label: 'Pesticides' },
+                { value: 'BIO_INPUT', label: 'Bio-Inputs' },
+              ].map(sub => (
                 <button
-                  key={f.value}
+                  key={sub.value}
                   type="button"
-                  className={`filter-chip ${orderStatusFilter === f.value ? 'active' : ''}`}
-                  onClick={() => setOrderStatusFilter(f.value)}
+                  className={`left-nav-sub-item ${inputCategoryFilter === sub.value ? 'active' : ''}`}
+                  onClick={() => { setInputCategoryFilter(sub.value); setMobileNavOpen(false); }}
                 >
-                  {f.label}
+                  {sub.label}
                 </button>
               ))}
             </div>
+          )}
 
-            
-            <div className="orders-grid">
-              {userOrders
-                .filter(o => {
-                  if (orderStatusFilter === 'ALL') return true;
-                  return o.escrowStatus === orderStatusFilter || o.orderStatus === orderStatusFilter;
-                })
-                .map(order => {
-                  const statusClass = order.escrowStatus === 'IN_TRANSIT' ? 'status-in-transit' :
-                                      order.escrowStatus === 'ESCROW_LOCKED' ? 'status-escrow-locked' :
-                                      order.escrowStatus === 'DELIVERED' ? 'status-delivered' :
-                                      order.escrowStatus === 'DISPUTED' ? 'status-disputed' : 'status-placed';
+          <p className="left-nav-heading" style={{ marginTop: '16px' }}>{text.sidebarTradeShop}</p>
 
-                  return (
-                    <div key={order.id} className="order-card">
-                      <div>
-                        
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '6px', marginBottom: '8px' }}>
-                          <div>
-                            <span style={{ fontSize: '12px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#202a27' }}>
-                              {order.id}
-                            </span>
-                            <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', display: 'block', marginTop: '1px' }}>
-                              {text.ordersPlacedOn} {order.orderDate}
-                            </span>
-                          </div>
-                          <span className={`order-status-badge ${statusClass}`}>
-                            {order.escrowStatus.replace('_', ' ')}
-                          </span>
-                        </div>
-
-                        
-                        <h3 style={{ fontSize: '16px', margin: '4px 0 2px', color: '#202a27', lineHeight: '1.3' }}>
-                          {order.commodity}
-                        </h3>
-                        <p style={{ margin: '0 0 10px', fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#667269' }}>
-                          {order.qualityCertificate}
-                        </p>
-
-                        
-                        <div style={{ background: '#faf9f5', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px 12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
-                          <div>
-                            <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>Volume</span>
-                            <p style={{ margin: '2px 0 0', fontSize: '13px', fontWeight: 700, color: '#202a27' }}>
-                              {order.quantity} {order.unit}
-                            </p>
-                          </div>
-                          <div>
-                            <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>Agreed Rate</span>
-                            <p style={{ margin: '2px 0 0', fontSize: '13px', fontWeight: 600, color: '#202a27' }}>
-                              ₹{order.pricePerUnit.toLocaleString()} <small style={{ fontSize: '10px', color: '#778078' }}>/ {order.unit.split(' ')[0]}</small>
-                            </p>
-                          </div>
-                          <div style={{ gridColumn: '1 / -1', borderTop: '1px solid #edeae2', paddingTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#556058' }}>Total Protected Escrow</span>
-                            <strong style={{ fontSize: '15px', color: '#2f6838', fontFamily: "'DM Mono', monospace" }}>
-                              ₹{order.totalAmount.toLocaleString()}
-                            </strong>
-                          </div>
-                        </div>
-
-                        
-                        <div style={{ fontSize: '11px', color: '#556058', marginBottom: '8px' }}>
-                          <p style={{ margin: '0 0 2px' }}>
-                            <strong>{text.ordersCounterpart}</strong> {order.counterpart}
-                          </p>
-                          <p style={{ margin: '0' }}>
-                            <strong>{text.ordersDestination}</strong> {order.deliveryLocation}
-                          </p>
-                        </div>
-                      </div>
-
-                      
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid #edebe4', paddingTop: '12px' }}>
-                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                          <button
-                            type="button"
-                            className="trade-btn trade-btn-primary"
-                            style={{ flex: 1, minWidth: '140px', padding: '8px 12px' }}
-                            onClick={() => handleTrackOrder(order.id)}
-                          >
-                            {text.ordersTrack}
-                          </button>
-                          {order.escrowStatus !== 'DELIVERED' && order.escrowStatus !== 'DISPUTED' && (
-                            <button
-                              type="button"
-                              className="trade-btn trade-btn-secondary"
-                              style={{ padding: '8px 12px', fontSize: '10px' }}
-                              onClick={() => handleReleaseEscrow(order.id)}
-                              title="Confirm receipt and release payment to seller"
-                            >
-                              {text.ordersReleaseEscrow}
-                            </button>
-                          )}
-                        </div>
-
-                        {order.escrowStatus !== 'DISPUTED' && order.escrowStatus !== 'DELIVERED' && (
-                          <button
-                            type="button"
-                            className="text-button"
-                            style={{ fontSize: '10px', color: '#a82020', textAlign: 'center', padding: '2px 0' }}
-                            onClick={() => handleRaiseDispute(order.id)}
-                          >
-                            {text.ordersRaiseDispute}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-
-            {userOrders.length === 0 && (
-              <p className="muted" style={{ padding: '30px 0', textAlign: 'center' }}>{text.ordersNoOrders}</p>
+          <button
+            type="button"
+            className={`left-nav-item ${(currentView === 'my-orders') ? 'active' : ''}`}
+            onClick={() => navigateFromMenu('my-orders')}
+          >
+            <span className="left-nav-icon"><NavIcon name="orders" /></span>
+            <span className="left-nav-label">
+              <strong>{text.sidebarOrders}</strong>
+              <small>{text.sidebarOrdersSmall}</small>
+            </span>
+            {userOrders.length > 0 && (
+              <span className="nav-counter-pill">{userOrders.length}</span>
             )}
-          </section>
-        </div>
-      )}
+          </button>
 
-      
-      
-      
-      {currentView === 'my-shop' && (
-        <div className="view-container">
-          <section className="panel" style={{ marginTop: '18px' }}>
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">Farmer Direct Storefront &amp; Stock Inventory</p>
-                <h2>{text.shopSectionTitle}</h2>
-                <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
-                  {text.shopSectionSubtitle}
-                </p>
-              </div>
+          <button
+            type="button"
+            className={`left-nav-item ${(currentView === 'my-shop') ? 'active' : ''}`}
+            onClick={() => navigateFromMenu('my-shop')}
+          >
+            <span className="left-nav-icon"><NavIcon name="shop" /></span>
+            <span className="left-nav-label">
+              <strong>{text.sidebarMyShop}</strong>
+              <small>{text.sidebarMyShopSmall}</small>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            className={`left-nav-item ${(currentView === 'order-progress') ? 'active' : ''}`}
+            onClick={() => navigateFromMenu('order-progress')}
+          >
+            <span className="left-nav-icon"><NavIcon name="progress" /></span>
+            <span className="left-nav-label">
+              <strong>{text.sidebarProgress}</strong>
+              <small>{text.sidebarProgressSmall}</small>
+            </span>
+          </button>
+
+          {(session?.role === 'FARMER' || session?.role === 'BUYER') && (
+            <button
+              type="button"
+              className={`left-nav-item ${(currentView === 'trade-chat') ? 'active' : ''}`}
+              onClick={() => navigateFromMenu('trade-chat')}
+            >
+              <span className="left-nav-icon"><NavIcon name="chat" /></span>
+              <span className="left-nav-label">
+                <strong>Trade Chat</strong>
+                <small>Offers &amp; Negotiations</small>
+              </span>
+            </button>
+          )}
+
+          {session?.role === 'TRANSPORTER' && (
+            <button
+              type="button"
+              className={`left-nav-item ${(currentView === 'transporter-dashboard') ? 'active' : ''}`}
+              onClick={() => navigateFromMenu('transporter-dashboard')}
+            >
+              <span className="left-nav-icon"><NavIcon name="transport" /></span>
+              <span className="left-nav-label">
+                <strong>Transport Hub</strong>
+                <small>Fleet &amp; Hauls</small>
+              </span>
+            </button>
+          )}
+
+
+          {(session?.role === 'FARMER' || !session || session?.role === 'FPO') && (
+            <button
+              type="button"
+              className={`left-nav-item ${(currentView === 'farmer-payouts') ? 'active' : ''}`}
+              onClick={() => navigateFromMenu('farmer-payouts')}
+            >
+              <span className="left-nav-icon"><NavIcon name="payouts" /></span>
+              <span className="left-nav-label">
+                <strong>Payouts &amp; Escrow</strong>
+                <small>Realized Rates &amp; UTR</small>
+              </span>
+            </button>
+          )}
+
+
+          {(session?.role === 'FPO' || session?.role === 'FARMER' || session?.role === 'BUYER' || session?.role === 'ADMIN') && (
+            <>
+              <hr className="left-nav-divider" />
+              <p className="left-nav-heading" style={{ marginTop: '8px', marginBottom: '4px' }}>
+                <span>FPO Operations</span>
+                <button
+                  type="button"
+                  className="left-nav-badge-btn"
+                  onClick={() => { setShowFpoRegisterModal(true); setMobileNavOpen(false); }}
+                  title="Register New FPO"
+                >
+                  + New
+                </button>
+              </p>
+
               <button
                 type="button"
-                className="trade-btn trade-btn-primary"
-                style={{ padding: '8px 16px', fontSize: '11px' }}
-                onClick={() => setQuickProduceModal({
-                  cropName: 'Nashik Red Onion',
-                  category: 'VEGETABLES',
-                  quantity: '',
-                  unit: 'Quintals',
-                  expectedPrice: '',
-                  location: 'Nashik Farm Gate'
-                })}
+                className={`left-nav-item ${(currentView === 'fpo-intake') ? 'active' : ''}`}
+                onClick={() => navigateFromMenu('fpo-intake', '#/fpo/collection')}
               >
-                {text.shopAddProduce}
+                <span className="left-nav-icon"><NavIcon name="intake" /></span>
+                <span className="left-nav-label">
+                  <strong>Village Intake Hub</strong>
+                  <small>Weigh-Slips &amp; Collection</small>
+                </span>
+                {fpoIntakes.filter(i => i.status === 'UNPOOLED').length > 0 && (
+                  <span className="nav-counter-pill">{fpoIntakes.filter(i => i.status === 'UNPOOLED').length}</span>
+                )}
               </button>
-            </div>
 
-            
-            <div className="shop-stats-grid">
-              <div className="shop-stat-card">
-                <span>{text.shopActiveListings}</span>
-                <strong>{shopInventory.filter(i => i.status === 'ACTIVE').length}</strong>
-                <small>{text.shopOnlineBuyers}</small>
-              </div>
-              <div className="shop-stat-card">
-                <span>{text.shopTotalHarvestStock}</span>
-                <strong>
-                  {shopInventory.reduce((acc, curr) => acc + curr.stockQuantity, 0).toLocaleString()} <span style={{ fontSize: '13px', fontWeight: 600 }}>Qtl</span>
-                </strong>
-                <small>{text.shopReadyStorage}</small>
-              </div>
-              <div className="shop-stat-card">
-                <span>{text.shopSalesRevenue}</span>
-                <strong>₹6,82,000</strong>
-                <small>{text.shopCompletedEscrow}</small>
-              </div>
-              <div className="shop-stat-card">
-                <span>{text.shopPendingEscrow}</span>
-                <strong style={{ color: '#2f6838' }}>₹3,88,000</strong>
-                <small>{text.shopUnderInspection}</small>
-              </div>
-            </div>
+              <button
+                type="button"
+                className={`left-nav-item ${(currentView === 'fpo-lots') ? 'active' : ''}`}
+                onClick={() => navigateFromMenu('fpo-lots', '#/fpo/lots')}
+              >
+                <span className="left-nav-icon"><NavIcon name="lots" /></span>
+                <span className="left-nav-label">
+                  <strong>FPO Lots &amp; Passports</strong>
+                  <small>Pooling &amp; Assay Quality</small>
+                </span>
+                {fpoLots.length > 0 && (
+                  <span className="nav-counter-pill">{fpoLots.length}</span>
+                )}
+              </button>
 
-            
-            <div style={{ marginTop: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-                <h3 style={{ margin: 0, fontSize: '16px', color: '#202a27' }}>
-                  {text.shopInventoryTitle}
-                </h3>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  {['ALL', 'GRAIN', 'VEGETABLES', 'FRUITS', 'OILSEED'].map(cat => (
-                    <button
-                      key={cat}
-                      type="button"
-                      className={`filter-chip ${shopCategoryFilter === cat ? 'active' : ''}`}
-                      onClick={() => setShopCategoryFilter(cat)}
-                      style={{ fontSize: '9px', padding: '4px 8px' }}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <button
+                type="button"
+                className={`left-nav-item ${(currentView === 'fpo-farmers') ? 'active' : ''}`}
+                onClick={() => navigateFromMenu('fpo-farmers', '#/fpo/farmers')}
+              >
+                <span className="left-nav-icon"><NavIcon name="farmers" /></span>
+                <span className="left-nav-label">
+                  <strong>Member Farmers</strong>
+                  <small>Traceability &amp; KYC</small>
+                </span>
+                {fpoFarmers.length > 0 && (
+                  <span className="nav-counter-pill">{fpoFarmers.length}</span>
+                )}
+              </button>
 
-              <div className="market-table-container">
-                <table className="market-table">
-                  <thead>
-                    <tr>
-                      <th>{text.shopCommodity}</th>
-                      <th>{text.shopQualityGrade}</th>
-                      <th>{text.shopStockSilo}</th>
-                      <th>{text.shopUnitPrice}</th>
-                      <th>{text.shopStorageHub}</th>
-                      <th>{text.shopInquiries}</th>
-                      <th>{text.shopStatus}</th>
-                      <th style={{ textAlign: 'right' }}>{text.shopActions}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {shopInventory
-                      .filter(item => shopCategoryFilter === 'ALL' || item.category === shopCategoryFilter)
-                      .map(item => (
-                        <tr key={item.id}>
-                          <td>
-                            <strong>{item.cropName}</strong>
-                            <small style={{ display: 'block', color: '#778078', fontSize: '10px' }}>Harvest: {item.harvestDate}</small>
-                          </td>
-                          <td>
-                            <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#444d47' }}>
-                              {item.qualityGrade}
-                            </span>
-                          </td>
-                          <td>
-                            <strong>{item.stockQuantity}</strong> <small style={{ color: '#778078' }}>{item.unit}</small>
-                          </td>
-                          <td>
-                            <strong style={{ color: '#2f6838' }}>₹{item.pricePerUnit}</strong> <small style={{ color: '#778078' }}>/ {item.unit.split(' ')[0]}</small>
-                          </td>
-                          <td style={{ fontSize: '11px', color: '#667269' }}>
-                            {item.storageLocation}
-                          </td>
-                          <td>
-                            <span style={{ font: "10px 'DM Mono', monospace", background: '#f0eee8', padding: '2px 6px', borderRadius: '3px' }}>
-                              {item.inquiriesCount} Leads ({item.viewsCount} views)
-                            </span>
-                          </td>
-                          <td>
-                            <span style={{
-                              fontSize: '9px',
-                              fontFamily: "'DM Mono', monospace",
-                              padding: '2px 6px',
-                              borderRadius: '3px',
-                              fontWeight: 700,
-                              background: item.status === 'ACTIVE' ? '#eef4ec' : '#f0eee8',
-                              color: item.status === 'ACTIVE' ? '#2f6838' : '#778078'
-                            }}>
-                              {item.status}
-                            </span>
-                          </td>
-                          <td style={{ textAlign: 'right' }}>
-                            <button
-                              type="button"
-                              className="trade-btn trade-btn-secondary"
-                              style={{ padding: '4px 8px', fontSize: '10px' }}
-                              onClick={() => handleToggleShopStatus(item.id)}
-                            >
-                              {item.status === 'ACTIVE' ? text.shopPauseListing : text.shopActivate}
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+              <button
+                type="button"
+                className={`left-nav-item ${(currentView === 'trade-chat') ? 'active' : ''}`}
+                onClick={() => navigateFromMenu('trade-chat', '#/fpo/offers')}
+              >
+                <span className="left-nav-icon"><NavIcon name="chat" /></span>
+                <span className="left-nav-label">
+                  <strong>Buyer Offers &amp; Chat</strong>
+                  <small>Negotiate &amp; Accept</small>
+                </span>
+              </button>
 
-            
-            <div style={{ marginTop: '28px', borderTop: '1px solid #e7e4db', paddingTop: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <button
+                type="button"
+                className={`left-nav-item ${(currentView === 'analytics' && session?.role === 'FPO') ? 'active' : ''}`}
+                onClick={() => {
+                  if (session?.role !== 'FPO') handleQuickLogin('FPO');
+                  navigateFromMenu('analytics', '#/fpo/dashboard');
+                }}
+              >
+                <span className="left-nav-icon"><NavIcon name="analytics" /></span>
+                <span className="left-nav-label">
+                  <strong>FPO Analytics</strong>
+                  <small>Lots, Sales &amp; Buyers</small>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className={`left-nav-item ${(currentView === 'profile' && session?.role === 'FPO') ? 'active' : ''}`}
+                onClick={() => {
+                  if (session?.role !== 'FPO') handleQuickLogin('FPO');
+                  navigateFromMenu('profile', '#/fpo/profile');
+                }}
+              >
+                <span className="left-nav-icon"><NavIcon name="trust" /></span>
+                <span className="left-nav-label">
+                  <strong>FPO Trust Score</strong>
+                  <small>NABL &amp; Fulfillment</small>
+                </span>
+              </button>
+            </>
+          )}
+
+          {session?.role === 'ADMIN' && (
+            <>
+              <p className="left-nav-heading" style={{ marginTop: '16px' }}>
+                Nodal Governance
+              </p>
+
+              <button
+                type="button"
+                className={`left-nav-item ${(currentView === 'admin-governance') ? 'active' : ''}`}
+                onClick={() => navigateFromMenu('admin-governance')}
+              >
+                <span className="left-nav-icon"><NavIcon name="governance" /></span>
+                <span className="left-nav-label">
+                  <strong>Governance Desk</strong>
+                  <small>Disputes &amp; NABL KYC</small>
+                </span>
+              </button>
+            </>
+          )}
+
+          <p className="left-nav-heading" style={{ marginTop: '16px' }}>{text.sidebarAdvisory}</p>
+
+          <button
+            type="button"
+            className={`left-nav-item ${currentView === 'community' ? 'active' : ''}`}
+            onClick={() => navigateFromMenu('community')}
+          >
+            <span className="left-nav-icon"><NavIcon name="community" /></span>
+            <span className="left-nav-label">
+              <strong>{text.sidebarCommunity}</strong>
+              <small>{text.sidebarCommunitySmall}</small>
+            </span>
+          </button>
+
+          {session?.role === 'FARMER' && (
+            <button
+              ref={(el) => { tutorialRefs.current.diagnostics = el; }}
+              type="button"
+              className={`left-nav-item ${currentView === 'diagnostics' ? 'active' : ''}`}
+              onClick={() => navigateFromMenu('diagnostics')}
+            >
+              <span className="left-nav-icon"><NavIcon name="diagnostics" /></span>
+              <span className="left-nav-label">
+                <strong>{text.sidebarDiagnostics}</strong>
+                <small>{text.sidebarDiagnosticsSmall}</small>
+              </span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            className={`left-nav-item ${currentView === 'support-network' ? 'active' : ''}`}
+            onClick={() => navigateFromMenu('support-network')}
+          >
+            <span className="left-nav-icon"><NavIcon name="support" /></span>
+            <span className="left-nav-label">
+              <strong>{text.sidebarNetwork}</strong>
+              <small>{text.sidebarNetworkSmall}</small>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            className={`left-nav-item ${currentView === 'about' ? 'active' : ''}`}
+            onClick={() => navigateFromMenu('about')}
+          >
+            <span className="left-nav-icon"><NavIcon name="about" /></span>
+            <span className="left-nav-label">
+              <strong>About Platform</strong>
+              <small>Ecosystem &amp; Specs</small>
+            </span>
+          </button>
+        </aside>
+
+
+
+
+
+
+
+
+
+        <div className="main-content">
+
+          {currentView === 'about' && (
+            <AboutPage
+              session={session}
+              language={language}
+              onLanguageChange={setLanguage}
+              onLaunchApp={() => setCurrentView('prices')}
+              onBackToApp={() => setCurrentView('prices')}
+              onSignIn={() => setCurrentView('prices')}
+              onSignUp={() => setCurrentView('prices')}
+            />
+          )}
+
+
+
+
+          {currentView === 'prices' && (
+            <div className="view-container">
+              <section className="hero">
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '16px', color: '#202a27' }}>
-                    {text.shopBuyerOffersTitle}
+                  <div className="eyebrow-badge">
+                    <span className="eyebrow-pulse-dot" />
+                    <span>{text.heroEyebrow}</span>
+                  </div>
+                  <h1 className="hero-main-title">
+                    {text.heroTitlePart1 || 'Better prices.'}{' '}
+                    <span className="hero-tagline-highlight">
+                      {text.heroTitlePart2 || 'Directly to the farm.'}
+                    </span>
+                  </h1>
+                  <p className="hero-copy">{text.heroCopy}</p>
+                </div>
+              </section>
+
+
+              {/* Consolidated Market Intelligence & Procurement Desk */}
+              <div className="market-intelligence-bar">
+                <div className="intel-left">
+                  <div className="intel-badge-row">
+                    <span className="intel-badge-live">● Agmarknet Live Feeds</span>
+                    <span className="intel-source-tag">Directorate of Marketing &amp; Inspection (DMI)</span>
+                  </div>
+                  <h3 className="intel-title">
+                    {session?.role === 'BUYER'
+                      ? `Procurement Quotas & Wholesale Linkages: ${pulseCrop?.name || 'Produce'}`
+                      : session?.role === 'TRANSPORTER'
+                        ? `Freight Linkage & Route Margins: ${pulseCrop?.name || 'Agricultural Freight'}`
+                        : `Direct Buyer Opportunity: ${pulseCrop?.name || 'Tomato'}`}
                   </h3>
-                  <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#667269' }}>
-                    {text.shopBuyerOffersSubtitle}
+                  <p className="intel-desc">
+                    {session?.role === 'BUYER'
+                      ? 'Plan bulk commodity procurement with verified farm origin, digital assay quality grading, and automated escrow lock.'
+                      : session?.role === 'TRANSPORTER'
+                        ? 'Access confirmed farm pickup requests with guaranteed escrow freight settlements and zero deadhead trips.'
+                        : <>Direct buyer procurement yields <strong>₹{((trend?.latestPrice || 25) * 1.08).toFixed(2)}/kg net</strong> (+₹{(((trend?.latestPrice || 25) * 1.08) - (trend?.latestPrice || 25)).toFixed(2)}/kg gain over nearest local mandi). Escrow protected.</>}
                   </p>
                 </div>
-                <span className="count" style={{ background: '#f5d9d0', color: '#b45a42' }}>
-                  {shopOffers.length} {text.shopPending}
-                </span>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '14px' }}>
-                {shopOffers.map(offer => (
-                  <div key={offer.id} style={{ background: '#ffffff', border: '1px solid #d9d6cc', borderRadius: '4px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '10px' }}>
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                          <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
-                            {offer.buyerType.replace('_', ' ')}
-                          </span>
-                          <h4 style={{ margin: '2px 0 0', fontSize: '14px', color: '#202a27' }}>
-                            {offer.buyerName}
-                          </h4>
-                        </div>
-                        <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>
-                          {offer.timestamp}
-                        </span>
-                      </div>
-
-                      <div style={{ background: '#faf9f5', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', marginTop: '10px' }}>
-                        <p style={{ margin: '0 0 4px', fontSize: '13px', fontWeight: 700, color: '#202a27' }}>
-                          {offer.offeredQuantity} {offer.unit} of {offer.cropName}
-                        </p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: '11px', color: '#556058' }}>Buyer Bid: <strong style={{ color: '#2f6838' }}>₹{offer.offeredPrice}</strong></span>
-                          <span style={{ fontSize: '11px', color: '#778078' }}>Asking: ₹{offer.askingPrice}</span>
-                        </div>
-                        <p style={{ margin: '4px 0 0', fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>
-                          Delivery to: {offer.destination}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '6px', borderTop: '1px solid #edeae2', paddingTop: '10px' }}>
-                      <button
-                        type="button"
-                        className="trade-btn trade-btn-primary"
-                        style={{ flex: 1, padding: '6px 10px', fontSize: '10px' }}
-                        onClick={() => handleAcceptOffer(offer)}
-                      >
-                        Accept &amp; Lock Escrow
-                      </button>
-                      <button
-                        type="button"
-                        className="trade-btn trade-btn-secondary"
-                        style={{ padding: '6px 10px', fontSize: '10px' }}
-                        onClick={() => handleDeclineOffer(offer.id)}
-                      >
-                        Decline
-                      </button>
-                    </div>
+                <div className="intel-actions">
+                  {session?.role === 'FARMER' && (
+                    <button
+                      type="button"
+                      className="trade-btn trade-btn-primary"
+                      onClick={() => setQuickProduceModal({
+                        cropId: pulseCrop?.id || 1,
+                        cropName: pulseCrop?.name || 'Tomato',
+                        category: pulseCrop?.category || 'VEGETABLE',
+                        unit: pulseCrop?.unit || 'kg',
+                        quantity: 500,
+                        expectedPrice: Number(((trend?.latestPrice || 25) * 1.08).toFixed(2)),
+                        availableUntil: '',
+                        description: 'Pre-graded harvest lot listed via Direct Buyer Recommendation with zero intermediary cut.'
+                      })}
+                    >
+                      List 500kg Lot (₹{((trend?.latestPrice || 25) * 1.08).toFixed(2)}/kg) →
+                    </button>
+                  )}
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      type="button"
+                      className="trade-btn trade-btn-secondary"
+                      onClick={() => setCurrentView('analytics')}
+                    >
+                      {session?.role === 'BUYER' ? 'Landed Cost Desk' : session?.role === 'TRANSPORTER' ? 'Trip Margins' : 'Net Calculator'}
+                    </button>
+                    <button
+                      type="button"
+                      className="trade-btn trade-btn-secondary"
+                      disabled={isSyncingAgmarknet}
+                      onClick={syncAgmarknetData}
+                    >
+                      {isSyncingAgmarknet ? 'Syncing...' : 'Sync Live Mandis'}
+                    </button>
                   </div>
-                ))}
+                </div>
               </div>
 
-              {shopOffers.length === 0 && (
-                <p className="muted" style={{ padding: '16px 0', textAlign: 'center' }}>No pending buyer bids.</p>
-              )}
-            </div>
-          </section>
-        </div>
-      )}
-
-      
-      
-      
-      {currentView === 'order-progress' && (
-        <div className="view-container">
-          <section className="panel" style={{ marginTop: '18px' }}>
-            {(() => {
-              const activeOrder = userOrders.find(o => o.id === selectedTrackingOrderId) || userOrders[0];
-              if (!activeOrder) return <p className="muted">No orders available for tracking.</p>;
-
-              return (
-                <>
+              <section className="dashboard-grid">
+                <article className="panel market-panel">
                   <div className="panel-heading">
-                    <div>
-                      <p className="eyebrow">Logistics Pipeline &amp; Escrow Milestone Tracker</p>
-                      <h2>Order Progress: {activeOrder.id}</h2>
-                      <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
-                        Real-time tracking of dispatch, weighbridge verification, and automated escrow payout.
-                      </p>
-                    </div>
-                    <span className="count" style={{ background: '#e0edf5', color: '#204b6e' }}>
-                      {activeOrder.orderStatus}
-                    </span>
-                  </div>
-
-                  
-                  <div className="order-selector-container">
-                    {userOrders.map(order => {
-                      const isSelected = order.id === activeOrder.id;
-                      const statusClass = order.escrowStatus === 'IN_TRANSIT' ? 'status-in-transit' :
-                                          order.escrowStatus === 'ESCROW_LOCKED' ? 'status-escrow-locked' :
-                                          order.escrowStatus === 'DELIVERED' ? 'status-delivered' :
-                                          order.escrowStatus === 'DISPUTED' ? 'status-disputed' : 'status-placed';
-
-                      return (
-                        <button
-                          key={order.id}
-                          type="button"
-                          className={`order-tab-btn ${isSelected ? 'active' : ''}`}
-                          onClick={() => setSelectedTrackingOrderId(order.id)}
-                          title={`Select ${order.id} (${order.commodity})`}
-                        >
-                          <div>
-                            <span className="order-tab-id">{order.id}</span>
-                            <span className="order-tab-name">
-                              {order.commodity.split(' ')[0]} &middot; {order.quantity} {order.unit.split(' ')[0]}
-                            </span>
-                          </div>
-                          <span className={`order-status-badge ${statusClass}`} style={{ fontSize: '8px', padding: '2px 5px' }}>
-                            {order.escrowStatus.replace('_', ' ')}
-                          </span>
-                        </button>
-                      );
-                    })}
+                    <div><p className="eyebrow">{text.panelPriceDiscovery}</p><h2>{text.panelMarketPulse}</h2></div>
+                    <span className="date-chip">{text.panelAnalytics}</span>
                   </div>
 
 
-                  
-                  <div className="progress-summary-card">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+                  <div className="pulse-controls" style={{ marginTop: '8px' }}>
+                    <select
+                      value={selectedPulseCropId || ''}
+                      onChange={(e) => handlePulseCropChange(e.target.value)}
+                    >
+                      {pulseFilteredCrops.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name} ({c.category})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {trend ? (
+                    <div className="price-feature">
                       <div>
-                        <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
-                          Protected Trade Order
+                        <span className="crop-label">
+                          {pulseCrop?.name || text.selectedCrop} <span className="category-badge">{pulseCrop?.category || text.produceUnit}</span>
                         </span>
-                        <h3 style={{ margin: '2px 0 0', fontSize: '17px', color: '#202a27' }}>
-                          {activeOrder.commodity} &middot; {activeOrder.quantity} {activeOrder.unit}
-                        </h3>
-                        <p style={{ margin: '3px 0 0', fontSize: '12px', color: '#556058' }}>
-                          {activeOrder.originLocation} &rarr; <strong>{activeOrder.deliveryLocation}</strong>
-                        </p>
+                        <strong>₹{trend.latestPrice}<small> / {pulseCrop?.unit || 'kg'}</small></strong>
                       </div>
-
-                      <div style={{ textAlign: 'right' }}>
-                        <span className="escrow-pill">
-                          Escrow Protected: ₹{activeOrder.totalAmount.toLocaleString()}
-                        </span>
-                        <p style={{ margin: '4px 0 0', fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>
-                          ETA: <strong>{activeOrder.estimatedDelivery}</strong>
-                        </p>
-                      </div>
+                      <span className={trend.trend === 'DOWNWARD' ? 'trend-down' : 'trend-up'}>
+                        {trend.trend === 'UPWARD' ? '+' : trend.trend === 'DOWNWARD' ? '-' : ''}{trend.changePercent}% {trend.trend}
+                      </span>
                     </div>
+                  ) : (
+                    <p className="muted">{text.loadingMarket}</p>
+                  )}
 
-                    
-                    <div>
-                      <div className="horizontal-step-track">
-                        {(() => {
-                          const completedCount = activeOrder.timeline.filter(t => t.completed).length;
-                          const progressPct = Math.min(100, Math.max(0, ((completedCount - 0.5) / (activeOrder.timeline.length - 1)) * 100));
+
+                  <div className="trend-chart-container">
+                    <div className="trend-bar-interactive">
+                      {pulsePrices.length > 0 ? (
+                        pulsePrices.map((p, idx) => {
+                          const val = Number(p.modalPrice || p.maxPrice || 20);
+                          const heightPercent = maxPrice > minPrice
+                            ? Math.round(((val - minPrice) / (maxPrice - minPrice)) * 60 + 25)
+                            : 50;
+                          const dateStr = p.date ? new Date(p.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : `Day ${idx + 1}`;
+                          const isLatest = idx === pulsePrices.length - 1;
                           return (
-                            <>
-                              <div className="track-progress-fill" style={{ width: `${progressPct}%` }} />
-                              {activeOrder.timeline.map((step, idx) => {
-                                const isCompleted = step.completed;
-                                const isActive = step.active;
-                                const shortLabel = ['Signed', 'Escrow', 'Assay', 'Transit', 'Weighbridge', 'Payout'][idx] || `S${idx + 1}`;
-
-                                return (
-                                  <div key={idx} className={`h-step-node ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}`}>
-                                    <div className="h-step-dot">
-                                      {isCompleted ? 'Γ£ô' : idx + 1}
-                                    </div>
-                                    <span className="h-step-label">{shortLabel}</span>
-                                  </div>
-                                );
-                              })}
-                            </>
-                          );
-                        })()}
-                      </div>
-                    </div>
-                  </div>
-
-                  
-                  <div className="logistics-card-minimal">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
-                      <div>
-                        <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
-                          Logistics &amp; Carrier Assignment
-                        </span>
-                        <h4 style={{ margin: '2px 0 0', fontSize: '14px', color: '#202a27' }}>
-                          {activeOrder.logistics.carrier} &middot; <span style={{ fontFamily: "'DM Mono', monospace" }}>{activeOrder.logistics.vehicleNo}</span>
-                        </h4>
-                      </div>
-                      <div>
-                        <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058' }}>
-                          Current GPS: <strong style={{ color: '#2f6838' }}>{activeOrder.logistics.currentLocation}</strong>
-                        </span>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', borderTop: '1px solid #e7e4db', paddingTop: '10px' }}>
-                      <div style={{ fontSize: '12px', color: '#444d47' }}>
-                        <span>Driver: <strong>{activeOrder.logistics.driverName}</strong> ({activeOrder.logistics.driverPhone})</span>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '6px' }}>
-                        <a
-                          href={`tel:${activeOrder.logistics.driverPhone.replace(/[^0-9+]/g, '')}`}
-                          className="trade-btn trade-btn-secondary"
-                          style={{ padding: '5px 12px', fontSize: '10px', textDecoration: 'none' }}
-                        >
-                          Call Driver
-                        </a>
-                        {activeOrder.escrowStatus !== 'DELIVERED' && (
-                          <button
-                            type="button"
-                            className="trade-btn trade-btn-primary"
-                            style={{ padding: '5px 12px', fontSize: '10px', background: '#2f6838 !important' }}
-                            onClick={() => handleReleaseEscrow(activeOrder.id)}
-                          >
-                            Release Escrow Payment
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  
-                  <div style={{ marginTop: '16px' }}>
-                    <h4 style={{ fontSize: '13px', margin: '0 0 8px', color: '#202a27', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", letterSpacing: '0.04em' }}>
-                      Stage Milestones &amp; Verification Log
-                    </h4>
-
-                    <div className="minimal-timeline-feed">
-                      {activeOrder.timeline.map((step, idx) => {
-                        const statusState = step.completed ? 'completed' : step.active ? 'active' : 'pending';
-
-                        return (
-                          <div key={idx} className={`timeline-row ${statusState}`}>
-                            <div className="timeline-badge">
-                              {step.completed ? 'Γ£ô' : idx + 1}
+                            <div className="bar-col" key={p.id || idx} title={`${dateStr}: ₹${val} (Min: ₹${p.minPrice || val - 2}, Max: ₹${p.maxPrice || val + 2})`}>
+                              <span className="bar-val">₹{val}</span>
+                              <div
+                                className={`bar-fill ${isLatest ? 'bar-latest' : ''}`}
+                                style={{
+                                  height: `${heightPercent}%`,
+                                  backgroundColor: isLatest ? '#15803d' : '#cbd5e1',
+                                }}
+                              />
+                              <span className="bar-date">{isLatest ? 'Today' : dateStr}</span>
                             </div>
-                            <div className="timeline-body">
-                              <div className="timeline-header">
-                                <span className="timeline-title">Stage {idx + 1}: {step.title}</span>
-                                <span className="timeline-time">{step.timestamp}</span>
+                          );
+                        })
+                      ) : (
+                        [20, 21, 22, 21, 23, 22, 24].map((v, i) => (
+                          <div className="bar-col" key={i}>
+                            <span className="bar-val">₹{v}</span>
+                            <div
+                              className={`bar-fill ${i === 6 ? 'bar-latest' : ''}`}
+                              style={{
+                                height: `${((v - 18) / 8) * 60 + 25}%`,
+                                backgroundColor: i === 6 ? '#15803d' : '#cbd5e1',
+                              }}
+                            />
+                            <span className="bar-date">{i === 6 ? 'Today' : `D-${6 - i}`}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="trend-caption">
+                    <span>{text.marketRange}: ₹{minPrice} - ₹{maxPrice}</span>
+                    <button
+                      type="button"
+                      className="text-button"
+                      onClick={() => setCurrentView('predictions')}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {text.viewPredictions}
+                    </button>
+                  </div>
+
+
+                  {pulseCrop?.mspPrice != null && (
+                    <div style={{ marginTop: '12px', padding: '10px 14px', background: '#f5faf6', border: '1px solid #cce5d4', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <span style={{ fontSize: '11px', color: '#2c4e36', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Statutory Benchmark (MSP)</span>
+                        <div style={{ fontSize: '15px', fontWeight: 700, color: '#163821', marginTop: '2px' }}>
+                          ₹{pulseCrop.mspPrice} <small style={{ fontWeight: 400, fontSize: '12px', color: '#556058' }}>/ {pulseCrop.unit || 'kg'}</small>
+                        </div>
+                      </div>
+                      {trend?.latestPrice != null && (
+                        <div style={{ textAlign: 'right' }}>
+                          <span style={{ fontSize: '11px', color: '#556058', display: 'block' }}>Net vs Guarantee</span>
+                          <span style={{
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            color: Number(trend.latestPrice) >= Number(pulseCrop.mspPrice) ? '#1b5e20' : '#b45a42'
+                          }}>
+                            {Number(trend.latestPrice) >= Number(pulseCrop.mspPrice)
+                              ? `+₹${(Number(trend.latestPrice) - Number(pulseCrop.mspPrice)).toFixed(2)} above MSP (+${(((Number(trend.latestPrice) - Number(pulseCrop.mspPrice)) / Number(pulseCrop.mspPrice)) * 100).toFixed(1)}%)`
+                              : `-₹${(Number(pulseCrop.mspPrice) - Number(trend.latestPrice)).toFixed(2)} below MSP (-${(((Number(pulseCrop.mspPrice) - Number(trend.latestPrice)) / Number(pulseCrop.mspPrice)) * 100).toFixed(1)}%)`}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </article>
+
+
+                <aside className="panel quick-trade-panel">
+                  <div>
+                    <div className="panel-heading">
+                      <p className="eyebrow">{text.panelQuickTrading}</p>
+                      <span className="date-chip">Direct Trade</span>
+                    </div>
+                    <h2>{text.panelInstantLinkage}</h2>
+                    <p className="panel-subtext">Post a harvest lot or publish a bulk procurement requirement in seconds with escrow guarantee.</p>
+                  </div>
+
+                  <div className="quick-trade-cards">
+                    <div
+                      className="quick-trade-action-card"
+                      onClick={() => setQuickProduceModal({
+                        cropId: pulseCrop?.id || 1,
+                        cropName: pulseCrop?.name || 'Tomato',
+                        category: pulseCrop?.category || 'VEGETABLE',
+                        unit: pulseCrop?.unit || 'kg',
+                        quantity: 100,
+                        quality: 'Grade A',
+                        harvestDate: new Date().toISOString().split('T')[0],
+                        expectedPrice: trend?.latestPrice || 25,
+                        availableUntil: '',
+                        description: ''
+                      })}
+                    >
+                      <div className="quick-trade-icon-wrap icon-sell">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                      </div>
+                      <div className="quick-trade-text">
+                        <strong>{text.sellProduceLot}</strong>
+                        <span>List available farm harvest lot with direct buyer connection</span>
+                      </div>
+                    </div>
+
+                    <div
+                      className="quick-trade-action-card"
+                      onClick={() => setQuickRequirementModal({
+                        cropId: pulseCrop?.id || 1,
+                        cropName: pulseCrop?.name || 'Tomato',
+                        category: pulseCrop?.category || 'VEGETABLE',
+                        unit: pulseCrop?.unit || 'kg',
+                        requiredQuantity: 50,
+                        offeredPrice: trend?.latestPrice || 25,
+                        maxPrice: (trend?.latestPrice || 25) + 5,
+                        deliveryLocation: 'Regional Market Hub'
+                      })}
+                    >
+                      <div className="quick-trade-icon-wrap icon-buy">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="9" cy="21" r="1" />
+                          <circle cx="20" cy="21" r="1" />
+                          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                        </svg>
+                      </div>
+                      <div className="quick-trade-text">
+                        <strong>{text.postBuyRequirement}</strong>
+                        <span>Request custom bulk quantity with preferred price limit</span>
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+              </section>
+
+
+              <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '16px' }}>
+
+
+                <article className="panel" style={{ margin: 0 }}>
+                  <div className="panel-heading" style={{ marginBottom: '12px' }}>
+                    <div>
+                      <p className="eyebrow">Regional Mandi Benchmarks</p>
+                      <h3 style={{ margin: '2px 0 0', fontSize: '16px', color: '#202a27' }}>
+                        {pulseCrop?.name || 'Crop'} Mandi Realization Comparison
+                      </h3>
+                    </div>
+                    <span className="date-chip">Net Realization</span>
+                  </div>
+
+                  {loadingMandiComparison ? (
+                    <p className="muted" style={{ padding: '16px 0', textAlign: 'center' }}>Calculating regional Mandi deductions...</p>
+                  ) : mandiComparisons.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {mandiComparisons.map((m, idx) => {
+                        const isBest = idx === 0 || m.estimatedNetRealization === Math.max(...mandiComparisons.map(x => Number(x.estimatedNetRealization || 0)));
+                        return (
+                          <div
+                            key={m.marketId || idx}
+                            style={{
+                              padding: '10px 12px',
+                              borderRadius: '6px',
+                              border: isBest ? '1.5px solid #2e7d32' : '1px solid #e2ebe0',
+                              background: isBest ? '#f6fbf6' : '#ffffff',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              gap: '12px'
+                            }}
+                          >
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <strong style={{ fontSize: '13px', color: '#202a27' }}>{m.marketName}</strong>
+                                {isBest && (
+                                  <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 5px', borderRadius: '3px', background: '#2e7d32', color: '#ffffff' }}>
+                                    BEST REALIZATION
+                                  </span>
+                                )}
                               </div>
-                              <p className="timeline-desc">{step.desc}</p>
+                              <span style={{ fontSize: '11px', color: '#68776d', display: 'block', marginTop: '2px' }}>
+                                {m.district}, {m.state} &middot; {m.distanceKm != null ? `${m.distanceKm} km away` : 'Regional yard'}
+                              </span>
+                            </div>
+
+                            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                              <div style={{ fontSize: '11px', color: '#778078' }}>
+                                Mandi: <strong>₹{m.modalPrice}</strong> &middot; Freight: -₹{m.estimatedFreightCost || '2.50'}/kg
+                              </div>
+                              <div style={{ fontSize: '14px', fontWeight: 700, color: isBest ? '#1b5e20' : '#202a27', marginTop: '2px' }}>
+                                Net: ₹{m.estimatedNetRealization}/{pulseCrop?.unit || 'kg'}
+                              </div>
                             </div>
                           </div>
                         );
                       })}
                     </div>
-                  </div>
-                </>
-              );
-            })()}
-          </section>
-        </div>
-      )}
-
-
-      
-      
-      
-      {currentView === 'predictions' && (
-
-
-        <div className="view-container">
-          <section className="panel" style={{ marginTop: '18px' }}>
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">Statistical Machine Intelligence &amp; Volatility</p>
-                <h2>Price Forecasting &amp; Confidence Bands</h2>
-              </div>
-              <span className="count">{forecast ? `${forecast.confidenceScore}% Certainty` : 'Analyzing'}</span>
-            </div>
-
-            
-            <div className="pulse-controls" style={{ marginTop: '14px', maxWidth: '400px' }}>
-              <select
-                value={selectedPulseCropId || ''}
-                onChange={(e) => handlePulseCropChange(e.target.value)}
-              >
-                {crops.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} ({c.category})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {forecast ? (
-              <div className="two-col-view-layout">
-                <div>
-                  <div className="prediction-deep-grid">
-                    <div className="stat-metric-card">
-                      <span>Next Day Target Price</span>
-                      <strong>₹{forecast.estimatedPrice} <small style={{ fontSize: '13px' }}>/ {pulseCrop?.unit || 'kg'}</small></strong>
-                    </div>
-                    <div className="stat-metric-card">
-                      <span>Trend &amp; Volatility</span>
-                      <strong style={{ color: forecast.trend === 'UPWARD' ? '#5a8e62' : forecast.trend === 'DOWNWARD' ? '#b45a42' : '#7f8981' }}>
-                        {forecast.trend === 'UPWARD' ? '↔ Bullish' : forecast.trend === 'DOWNWARD' ? '↘ Bearish' : '→ Stable'}
-                      </strong>
-                      <small style={{ font: "9px 'DM Mono', monospace", textTransform: 'uppercase', color: '#667269' }}>
-                        {forecast.volatilityLevel} Volatility · {forecast.historicalPointsCount} points
-                      </small>
-                    </div>
-                  </div>
-
-                  
-                  <div className="confidence-bands-visual" style={{ marginTop: '18px' }}>
-                    <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#5a665e', fontWeight: 'bold' }}>
-                      Labeled Confidence Intervals (Certainty Bounds)
-                    </p>
-                    {forecast.confidenceIntervals?.map((ci, idx) => (
-                      <div className="band-item" key={ci.label || idx}>
-                        <span className="band-label">{ci.label}</span>
-                        <div className="band-bar-wrap">
-                          <div
-                            className={`band-bar-fill ${idx === 0 ? 'band-fill-80' : idx === 1 ? 'band-fill-90' : 'band-fill-95'}`}
-                            style={{ width: `${Math.min(100, Math.max(30, ci.confidenceLevel * 100))}%` }}
-                          />
-                        </div>
-                        <span className="band-range-val">₹{ci.lowerBound} – ₹{ci.upperBound}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <p style={{ font: "10px 'DM Mono', monospace", color: '#77837a', marginTop: '12px' }}>
-                    <strong>Methodology:</strong> {forecast.methodology}
-                  </p>
-                </div>
-
-                
-                <div style={{ background: '#fffdf9', border: '1px solid #d9d6cc', borderRadius: '6px', padding: '16px' }}>
-                  <h3 style={{ margin: '0 0 10px', fontSize: '15px' }}>7-Day Price Trajectory</h3>
-                  <table className="trajectory-table">
-                    <thead>
-                      <tr>
-                        <th>Horizon</th>
-                        <th>Target</th>
-                        <th>90% Likely Range</th>
-                        <th>Trend</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {forecast.multiDayForecast?.map((fp) => (
-                        <tr key={fp.dayAhead}>
-                          <td><strong>+{fp.dayAhead}d</strong> ({new Date(fp.date).toLocaleDateString(undefined, { weekday: 'short' })})</td>
-                          <td><strong>₹{fp.predictedPrice}</strong></td>
-                          <td>₹{fp.interval90?.lowerBound} – ₹{fp.interval90?.upperBound}</td>
-                          <td style={{ color: fp.trend === 'UPWARD' ? '#5a8e62' : fp.trend === 'DOWNWARD' ? '#b45a42' : '#7f8981' }}>
-                            {fp.trend === 'UPWARD' ? '↔' : fp.trend === 'DOWNWARD' ? '↘' : '→'}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <p style={{ font: "9px 'DM Mono', monospace", color: '#88928a', marginTop: '10px' }}>
-                    * {forecast.disclaimer}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <p className="muted" style={{ padding: '30px 0' }}>Computing price trajectory and confidence intervals...</p>
-            )}
-          </section>
-        </div>
-      )}
-
-      
-      
-      
-      {currentView === 'weather' && (
-        <div className="view-container">
-          <section className="panel" style={{ marginTop: '18px' }}>
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">{text.weatherEyebrow}</p>
-                <h2>{text.weatherTitle}</h2>
-              </div>
-              <span className="count">{weatherData?.harvestSuitability || text.weatherAnalyzing}</span>
-            </div>
-
-            
-            <div className="location-presets-bar">
-              <span style={{ font: "10px 'DM Mono', monospace", color: '#6a766c', alignSelf: 'center', marginRight: '4px' }}>
-                {text.weatherOrigin} <strong>{mapCoords.label}</strong>
-              </span>
-              <button
-                type="button"
-                className={`location-pill ${mapCoords.label === 'Ranchi Center' ? 'active' : ''}`}
-                onClick={() => handleLocationPreset(23.3441, 85.3096, 'Ranchi Center')}
-              >
-                Ranchi
-              </button>
-              <button
-                type="button"
-                className={`location-pill ${mapCoords.label === 'Ramgarh' ? 'active' : ''}`}
-                onClick={() => handleLocationPreset(23.6332, 85.5149, 'Ramgarh')}
-              >
-                Ramgarh
-              </button>
-              <button
-                type="button"
-                className={`location-pill ${mapCoords.label === 'Bokaro' ? 'active' : ''}`}
-                onClick={() => handleLocationPreset(23.6693, 86.1511, 'Bokaro')}
-              >
-                Bokaro
-              </button>
-              <button
-                type="button"
-                className={`location-pill ${mapCoords.label === 'Jamshedpur' ? 'active' : ''}`}
-                onClick={() => handleLocationPreset(22.8046, 86.2029, 'Jamshedpur')}
-              >
-                Jamshedpur
-              </button>
-              {session && (
-                <button
-                  type="button"
-                  className="location-pill"
-                  style={{ background: '#dce7d3', color: '#3d5940', borderColor: '#b8cba8' }}
-                  onClick={handleUseProfileLocation}
-                >
-                  {text.weatherUseGps}
-                </button>
-              )}
-            </div>
-
-            
-            <div className="pulse-controls" style={{ marginTop: '10px', maxWidth: '380px' }}>
-              <select
-                value={weatherCropId || ''}
-                onChange={(e) => setWeatherCropId(e.target.value ? Number(e.target.value) : null)}
-              >
-                <option value="">{text.weatherGeneralConditions}</option>
-                {crops.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} ({c.category})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {weatherLoading ? (
-              <p className="muted" style={{ padding: '24px 0' }}>{text.weatherLoading}</p>
-            ) : weatherData ? (
-              <>
-                
-                <div className="weather-hero-card">
-                  <div>
-                    <p className="eyebrow">{weatherData.locationName} · GPS {weatherData.latitude.toFixed(2)}°N, {weatherData.longitude.toFixed(2)}°E</p>
-                    <h3>{weatherData.currentTemp}°C</h3>
-                    <p style={{ margin: '6px 0 0', font: "11px 'DM Mono', monospace", color: '#b9c5b7', textTransform: 'uppercase' }}>
-                      {text.weatherCondition}: <strong>{(weatherData.currentCondition || '').replace(/_/g, ' ')}</strong>
-                    </p>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span className="count" style={{ background: '#35453e', color: '#fffaf1' }}>
-                      {text.weatherSuitability}: {weatherData.harvestSuitability}
-                    </span>
-                  </div>
-                </div>
-
-                
-                <div className="weather-grid-metrics">
-                  <div className="weather-metric-item">
-                    <span>{text.weatherHumidity}</span>
-                    <strong>{weatherData.humidityPercent}%</strong>
-                  </div>
-                  <div className="weather-metric-item">
-                    <span>{text.weatherRainfall}</span>
-                    <strong>{weatherData.rainfallMm} mm</strong>
-                  </div>
-                  <div className="weather-metric-item">
-                    <span>{text.weatherWind}</span>
-                    <strong>{weatherData.windSpeedKmh} km/h</strong>
-                  </div>
-                  <div className="weather-metric-item">
-                    <span>{text.weatherSuitability}</span>
-                    <strong style={{ color: weatherData.harvestSuitability === 'EXCELLENT' ? '#5a8e62' : weatherData.harvestSuitability === 'HAZARDOUS' ? '#b45a42' : '#202a27' }}>
-                      {weatherData.harvestSuitability}
-                    </strong>
-                  </div>
-                </div>
-
-                <div className="two-col-view-layout" style={{ marginTop: '16px' }}>
-                  <div>
-                    
-                    <div className="harvest-box">
-                      <h4>{text.weatherHarvestWindow}</h4>
-                      <p><strong>{weatherData.recommendedHarvestWindow}</strong></p>
-                    </div>
-
-                    
-                    <div className="spoilage-card">
-                      <div className="spoilage-header">
-                        <h4>{text.weatherSpoilageRisk}</h4>
-                        <span className={`spoilage-badge spoilage-${weatherData.spoilageRiskIndex.toLowerCase()}`}>
-                          {weatherData.spoilageRiskIndex} {text.weatherRisk}
-                        </span>
-                      </div>
-                      <p style={{ margin: '10px 0 0', fontSize: '13px', color: '#5a665e', lineHeight: '1.5' }}>
-                        {weatherData.transitAdvisory}
-                      </p>
-                    </div>
-                  </div>
-
-                  
-                  <div className="advisory-list-box">
-                    <p style={{ margin: 0, font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981', fontWeight: 'bold' }}>
-                      {text.weatherGuidelines}
-                    </p>
-                    <ul>
-                      {weatherData.cropAdvisories?.map((adv, idx) => (
-                        <li key={idx}>{adv}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                
-                <div style={{ marginTop: '20px' }}>
-                  <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#5a665e', fontWeight: 'bold' }}>
-                    {text.weatherForecast}
-                  </p>
-                  <div className="five-day-forecast-grid">
-                    {weatherData.forecast?.map((day) => (
-                      <div className="forecast-card-item" key={day.date}>
-                        <span className="f-day">{day.dayName}</span>
-                        <div className="f-temp">{day.tempMax}° / {day.tempMin}°</div>
-                        <span className="f-rain">{day.precipitationProbability}% {text.weatherRain} · {(day.condition || '').replace(/_/g, ' ')}</span>
-                        <div className="f-adv">{day.advisory}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <p className="muted" style={{ padding: '24px 0' }}>
-                {weatherError || text.weatherUnavailable}
-              </p>
-            )}
-          </section>
-        </div>
-      )}
-
-      
-      
-      
-      {currentView === 'fpo-intake' && (
-        <FpoIntakeView
-          intakes={fpoIntakes}
-          farmers={fpoFarmers}
-          onAddIntake={(newIntake) => {
-            setFpoIntakes(prev => [newIntake, ...prev]);
-            setMessage(`Recorded intake ${newIntake.intakeId} (${newIntake.netWeightKg} kg) for ${newIntake.farmerName} with digital weigh-slip!`);
-          }}
-          onNavigateToLots={() => setCurrentView('fpo-lots')}
-        />
-      )}
-
-      
-      
-      
-      {currentView === 'farmer-payouts' && (
-        <FarmerPayoutsLedgerView
-          farmerId={session?.farmerId || 'FMR-FPO42-001'}
-          farmerName={session?.name || 'Ramesh Kumar'}
-          intakes={fpoIntakes}
-          collectionSchedule={collectionSchedule}
-          onNotifyHarvest={(harvest) => {
-            setMessage(`Sent harvest dispatch alert for ${harvest.estQuantityKg} kg ${harvest.crop} to Sahyadri FPO!`);
-          }}
-        />
-      )}
-
-      
-      
-      
-      {currentView === 'fpo-lots' && (
-        <FpoLotsAndPassportView
-          fpoProfile={fpoProfile}
-          lots={fpoLots}
-          fpoFarmers={fpoFarmers}
-          intakes={fpoIntakes}
-          initialAction={routeAction}
-          onNavigate={(v) => setCurrentView(v)}
-          onMatchLot={(lot) => {
-            setProduce({
-              cropId: crops[0]?.id || 1,
-              cropName: lot.cropName,
-              category: lot.category,
-              quantity: lot.quantityKg,
-              quality: lot.qualityChecklist?.grade || 'GRADE_A',
-              imageUrl: lot.images?.[0] || ''
-            });
-            setProduceSource('custom');
-            findRecommendationForProduce({
-              cropName: lot.cropName,
-              category: lot.category,
-              quantity: lot.quantityKg,
-              quality: lot.qualityChecklist?.grade || 'GRADE_A'
-            });
-            setMessage(`Pre-loaded ${lot.cropName} (${lot.quantityKg} kg) from ${lot.lotId} for institutional buyer matching.`);
-          }}
-          onCreateLot={(newLot) => {
-            setFpoLots(prev => [newLot, ...prev]);
-            setFpoIntakes(prev => prev.map(intake => {
-              if (newLot.contributingFarmers?.some(cf => cf.farmerId === intake.farmerId) && intake.cropName === newLot.cropName && intake.status === 'UNPOOLED') {
-                return { ...intake, status: 'POOLED', lotId: newLot.lotId };
-              }
-              return intake;
-            }));
-            setMessage(`Created Aggregated Lot ${newLot.lotId} with Digital Lot Passport!`);
-          }}
-        />
-      )}
-
-      
-      
-      
-      {currentView === 'fpo-farmers' && (
-        <FpoMemberFarmersView
-          farmers={fpoFarmers}
-          intakes={fpoIntakes}
-          initialAction={routeAction}
-          initialFarmerId={routeFarmerId}
-          onViewAsFarmer={(farmer) => {
-            setSession(prev => ({
-              ...(prev || {}),
-              token: 'demo-farmer-jwt',
-              userId: farmer.id || 1,
-              profileId: farmer.id || 1,
-              name: farmer.name,
-              email: `${farmer.name.toLowerCase().replace(/\s+/g, '.')}@kisanlink.in`,
-              role: 'FARMER',
-              farmerId: farmer.farmerId
-            }));
-            setCurrentView('farmer-payouts');
-            setMessage(`Switched to View as Farmer mode for ${farmer.name} (${farmer.farmerId})`);
-          }}
-          onAddFarmer={(newFarmer) => {
-            setFpoFarmers(prev => [...prev, newFarmer]);
-            setMessage(`Enrolled member smallholder ${newFarmer.name} (${newFarmer.farmerId})!`);
-          }}
-        />
-      )}
-
-      
-      
-      
-      {currentView === 'admin-governance' && (
-        <AdminGovernanceView
-          adminData={adminData}
-          onVerifyEntity={(id) => {
-            setAdminData(prev => ({
-              ...prev,
-              pendingVerifications: prev.pendingVerifications.map(v => v.id === id ? { ...v, status: 'VERIFIED' } : v)
-            }));
-            setMessage(`Entity #${id} granted official NABL verified badge.`);
-          }}
-          onResolveDispute={(disputeId) => {
-            setAdminData(prev => ({
-              ...prev,
-              disputesQueue: prev.disputesQueue.map(d => d.id === disputeId ? { ...d, status: 'RESOLVED' } : d)
-            }));
-            setMessage(`Dispute ${disputeId} arbitrated and escrow settled.`);
-          }}
-        />
-      )}
-
-      
-      
-      
-      {currentView === 'matching' && (
-        <div className="view-container">
-          
-          {(session.role === 'FARMER' || session.role === 'FPO' || !session.role) && (
-            <>
-                <section className="workspace-grid" style={{ marginTop: '18px' }}>
-                  <article className="panel workspace-panel">
-                    <div className="panel-heading">
-                      <div><p className="eyebrow">Farmer workspace</p><h2>List produce for selling</h2></div>
-                      <span className="count">Step 01</span>
-                    </div>
-
-                    <div className="tab-toggle-group">
-                      <button
-                        type="button"
-                        className={produceSource === 'catalog' ? 'active' : ''}
-                        onClick={() => setProduceSource('catalog')}
-                      >
-                        Choose from catalogue
-                      </button>
-                      <button
-                        type="button"
-                        className={produceSource === 'custom' ? 'active' : ''}
-                        onClick={() => setProduceSource('custom')}
-                      >
-                        + Custom product name
-                      </button>
-                    </div>
-
-                    <form onSubmit={saveProduce}>
-                      {produceSource === 'catalog' ? (
-                        <label>Select Produce / Crop
-                          <select value={produce.cropId} onChange={(event) => setProduce({ ...produce, cropId: event.target.value })}>
-                            {crops.map((crop) => (
-                              <option key={crop.id} value={crop.id}>
-                                {crop.name} ({crop.category})
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                      ) : (
-                        <>
-                          <label>Category
-                            <select
-                              value={produce.category}
-                              onChange={(event) => setProduce({ ...produce, category: event.target.value })}
-                            >
-                              <option value="VEGETABLE">Vegetables</option>
-                              <option value="FRUIT">Fruits</option>
-                              <option value="GRAIN">Grains</option>
-                              <option value="PULSE">Pulses</option>
-                              <option value="SEED">Seeds</option>
-                              <option value="SPICE">Spices</option>
-                              <option value="OIL_SEED">Oil Seeds</option>
-                              <option value="FERTILIZER">Fertilizers &amp; Soil Nutrients</option>
-                              <option value="PESTICIDE">Pesticides &amp; Crop Protection</option>
-                              <option value="BIO_INPUT">Bio-Inputs &amp; Stimulants</option>
-                              <option value="FARM_EQUIPMENT">Farm Equipment &amp; Tools</option>
-                              <option value="OTHER">Other</option>
-                            </select>
-                          </label>
-
-                          <label>Custom Product Name
-                            <input
-                              placeholder="e.g. Organic Chia Seeds, Alphonso Mango"
-                              value={produce.cropName}
-                              onChange={(event) => setProduce({ ...produce, cropName: event.target.value })}
-                              required
-                            />
-                          </label>
-                        </>
-                      )}
-
-                      <label>Quantity (kg)
-                        <input
-                          type="number"
-                          min="1"
-                          value={produce.quantity}
-                          onChange={(event) => setProduce({ ...produce, quantity: event.target.value })}
-                          required
-                        />
-                      </label>
-
-                      <label>Quality Grade
-                        <select value={produce.quality} onChange={(event) => setProduce({ ...produce, quality: event.target.value })}>
-                          <option value="GRADE_A">Grade A (Export / Premium)</option>
-                          <option value="GRADE_B">Grade B (Standard Market)</option>
-                          <option value="GRADE_C">Grade C (Processing)</option>
-                        </select>
-                      </label>
-
-                      <label>Product Photo (Image URL)
-                        <input
-                          placeholder="https://example.com/produce.jpg"
-                          value={produce.imageUrl}
-                          onChange={(event) => setProduce({ ...produce, imageUrl: event.target.value })}
-                        />
-                      </label>
-
-                      {produce.imageUrl && (
-                        <div className="image-preview-box">
-                          <img src={produce.imageUrl} alt="Produce Preview" onError={(e) => { e.target.style.display = 'none'; }} />
-                        </div>
-                      )}
-
-                      <button type="submit">List produce for selling <span>→</span></button>
-                    </form>
-
-                    {produceResult && (
-                      <div className="produce-card-meta">
-                        {produceResult.imageUrl ? (
-                          <img src={produceResult.imageUrl} alt={produceResult.crop?.name} />
-                        ) : (
-                          <span className="crop-icon">{produceResult.crop?.name?.slice(0, 1)}</span>
-                        )}
-                        <div>
-                          <strong>{produceResult.crop?.name}</strong> <span className="category-badge">{produceResult.crop?.category}</span>
-                          <small>{produceResult.quantity} kg · {produceResult.quality}</small>
-                        </div>
-                        <button
-                          type="button"
-                          className="secondary-button"
-                          style={{ width: 'auto', marginLeft: 'auto', padding: '8px 14px', marginTop: 0 }}
-                          onClick={findRecommendation}
-                        >
-                          Find best buyer <span>↔</span>
-                        </button>
-                      </div>
-                    )}
-                  </article>
-
-                  {recommendation ? (
-                    <article className="panel recommendation-panel" style={{ border: '2px solid #3b7444', borderRadius: '12px', background: '#ffffff', padding: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
-                        <div>
-                          <p className="eyebrow" style={{ color: '#2d6a36', fontWeight: 'bold' }}>
-                            KisanLink Signature &middot; Smart Logistics &amp; Net Profit Optimizer
-                          </p>
-                          <h2 style={{ margin: '4px 0 0', fontSize: '22px', color: '#1b2d20' }}>
-                            Best Deal Match: Maximum Take-Home Profit
-                          </h2>
-                          <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#526356' }}>
-                            Combined optimization: Buyer Offer &minus; Carrier Freight &minus; Escrow Fee = Highest Net Return
-                          </p>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <span style={{ display: 'inline-block', background: '#e8f5e9', color: '#2e7d32', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', border: '1px solid #c8e6c9' }}>
-                            Score: {recommendation.recommendedBuyer.score}/100 &middot; Best Deal
-                          </span>
-                        </div>
-                      </div>
-
-                      
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px', marginTop: '18px' }}>
-                        
-                        <div style={{ background: '#f8faf8', border: '1px solid #e1e8e2', borderRadius: '8px', padding: '14px' }}>
-                          <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#55695a', fontWeight: 'bold' }}>
-                            1. Recommended Buyer Partner
-                          </span>
-                          <h3 style={{ margin: '6px 0 2px', fontSize: '16px', color: '#1b2d20' }}>
-                            {recommendation.recommendedBuyer.buyerName}
-                          </h3>
-                          <div style={{ fontSize: '20px', fontWeight: '800', color: '#2d6a36', margin: '4px 0' }}>
-                            ₹{recommendation.recommendedBuyer.pricePerKg} <small style={{ fontSize: '12px', fontWeight: 'normal', color: '#667269' }}>/ kg</small>
-                          </div>
-                          <p style={{ margin: 0, fontSize: '12px', color: '#526356' }}>
-                            Gross Crop Value: <strong>₹{recommendation.recommendedBuyer.grossRevenue?.toLocaleString()}</strong> &middot; {recommendation.recommendedBuyer.distanceKm} km route
-                          </p>
-                        </div>
-
-                        
-                        <div style={{ background: '#f8faf8', border: '1px solid #e1e8e2', borderRadius: '8px', padding: '14px' }}>
-                          <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#55695a', fontWeight: 'bold' }}>
-                            2. Paired Fleet Transporter
-                          </span>
-                          <h3 style={{ margin: '6px 0 2px', fontSize: '16px', color: '#1b2d20' }}>
-                            {recommendation.recommendedBuyer.transporterName || 'Verified Regional Fleet'}
-                          </h3>
-                          <div style={{ fontSize: '20px', fontWeight: '800', color: '#b45309', margin: '4px 0' }}>
-                            ₹{recommendation.recommendedBuyer.transportCost?.toLocaleString()} <small style={{ fontSize: '12px', fontWeight: 'normal', color: '#667269' }}>freight quote</small>
-                          </div>
-                          <p style={{ margin: 0, fontSize: '12px', color: '#526356' }}>
-                            Vehicle: <strong>{recommendation.recommendedBuyer.vehicleType?.replace('_', ' ') || 'Mini Truck'}</strong> &middot; Rate: ₹{recommendation.recommendedBuyer.transporterRatePerKm || 15}/km
-                          </p>
-                        </div>
-                      </div>
-
-                      
-                      <div style={{ marginTop: '16px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '14px 18px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                          <div>
-                            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#166534', fontWeight: 'bold' }}>
-                              Itemized Take-Home Profit Formula
-                            </span>
-                            <div style={{ fontSize: '13px', color: '#374151', marginTop: '3px' }}>
-                              Gross (₹{recommendation.recommendedBuyer.grossRevenue?.toLocaleString()}) &minus; Freight (₹{recommendation.recommendedBuyer.transportCost?.toLocaleString()}) &minus; Escrow Fee (₹{recommendation.recommendedBuyer.platformFee || 100})
-                            </div>
-                          </div>
-                          <div style={{ textAlign: 'right' }}>
-                            <span style={{ fontSize: '11px', color: '#166534', textTransform: 'uppercase', fontWeight: 'bold' }}>
-                              Net Take-Home Earnings
-                            </span>
-                            <div style={{ fontSize: '24px', fontWeight: '900', color: '#15803d' }}>
-                              ₹{recommendation.recommendedBuyer.netReturn?.toLocaleString()}
-                            </div>
-                          </div>
-                        </div>
-                        {recommendation.recommendedBuyer.profitComparisonNote && (
-                          <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed #86efac', fontSize: '12px', color: '#166534', fontWeight: '600' }}>
-                            Key Insight: {recommendation.recommendedBuyer.profitComparisonNote}
-                          </div>
-                        )}
-                      </div>
-
-                      
-                      {recommendation.reason && recommendation.reason.length > 0 && (
-                        <div style={{ marginTop: '14px' }}>
-                          <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#374151' }}>Why this deal is recommended:</span>
-                          <ul style={{ margin: '6px 0 0 18px', padding: 0, fontSize: '12px', color: '#4b5563', lineHeight: '1.6' }}>
-                            {recommendation.reason.map((r, i) => (
-                              <li key={i}>{r}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      
-                      {recommendation.alternatives && recommendation.alternatives.length > 0 && (
-                        <div style={{ marginTop: '18px' }}>
-                          <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#374151', textTransform: 'uppercase' }}>
-                            Alternative Combinations Evaluated
-                          </span>
-                          <div style={{ overflowX: 'auto', marginTop: '6px' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
-                              <thead>
-                                <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                                  <th style={{ padding: '8px 10px', color: '#4b5563' }}>Option</th>
-                                  <th style={{ padding: '8px 10px', color: '#4b5563' }}>Buyer &amp; Rate</th>
-                                  <th style={{ padding: '8px 10px', color: '#4b5563' }}>Carrier &amp; Freight</th>
-                                  <th style={{ padding: '8px 10px', color: '#4b5563' }}>Net Return</th>
-                                  <th style={{ padding: '8px 10px', color: '#4b5563' }}>Comparison Insight</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {recommendation.alternatives.map((alt, idx) => (
-                                  <tr key={idx} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                                    <td style={{ padding: '8px 10px', fontWeight: 'bold', color: '#6b7280' }}>
-                                      #{idx + 2}
-                                    </td>
-                                    <td style={{ padding: '8px 10px', color: '#1f2937' }}>
-                                      <strong>{alt.buyerName}</strong>
-                                      <div style={{ color: '#6b7280', fontSize: '11px' }}>₹{alt.pricePerKg}/kg &middot; {alt.distanceKm} km</div>
-                                    </td>
-                                    <td style={{ padding: '8px 10px', color: '#1f2937' }}>
-                                      <strong>{alt.transporterName || 'Fleet Carrier'}</strong>
-                                      <div style={{ color: '#b45309', fontSize: '11px' }}>₹{alt.transportCost?.toLocaleString()} freight</div>
-                                    </td>
-                                    <td style={{ padding: '8px 10px', fontWeight: 'bold', color: '#1f2937' }}>
-                                      ₹{alt.netReturn?.toLocaleString()}
-                                    </td>
-                                    <td style={{ padding: '8px 10px', color: '#ef4444', fontSize: '11px' }}>
-                                      {alt.profitComparisonNote || 'Lower net take-home return'}
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      )}
-
-                      
-                      <div style={{ display: 'flex', gap: '10px', marginTop: '20px', flexWrap: 'wrap' }}>
-                        <button
-                          type="button"
-                          className="trade-btn trade-btn-primary"
-                          style={{ padding: '10px 20px', fontSize: '13px', fontWeight: 'bold' }}
-                          onClick={initiateTradeFromRecommendation}
-                        >
-                          Accept Best Deal &amp; Create Contract &rarr;
-                        </button>
-
-                        <button
-                          type="button"
-                          className="trade-btn"
-                          style={{ background: '#f0fdf4', borderColor: '#86efac', color: '#166534', padding: '10px 18px', fontSize: '13px', fontWeight: '600' }}
-                          onClick={() => {
-                            setActiveChatConversationId(recommendation.recommendedBuyer.buyerId);
-                            setCurrentView('trade-chat');
-                          }}
-                        >
-                          Chat &amp; Negotiate with Buyer &rarr;
-                        </button>
-
-                        <button
-                          type="button"
-                          className="trade-btn"
-                          style={{ background: '#ffffff', borderColor: '#d1d5db', color: '#4b5563', padding: '10px 16px', fontSize: '13px' }}
-                          onClick={() => setCurrentView('map')}
-                        >
-                          View Route Radar &nearr;
-                        </button>
-                      </div>
-                    </article>
                   ) : (
-                    <aside className="note-panel workspace-note">
-                      <p className="eyebrow">Matching Engine</p>
-                      <h2>Weighted multi-factor matching.</h2>
-                      <p>Once you list produce, our matching algorithm checks price offers, transport freight, haversine distance, and buyer verification to maximize your net take-home revenue.</p>
-                    </aside>
-                  )}
-                </section>
-
-                
-                <section className="panel" style={{ marginTop: '24px' }}>
-                  <div className="panel-heading">
-                    <div>
-                      <p className="eyebrow">Institutional Buyer Demand Signals</p>
-                      <h2>Active Buyer Procurement Requirements (Live RFQs)</h2>
-                      <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
-                        Direct purchase orders from verified retail chains, FPOs, and processing depots. Tap any order to auto-fill and lock a contract.
-                      </p>
+                    <div style={{ padding: '16px', background: '#f8faf7', borderRadius: '6px', textAlign: 'center', fontSize: '12px', color: '#68776d' }}>
+                      No regional Mandi price series currently logged for {pulseCrop?.name || 'this crop'}.
                     </div>
-                    <span className="count">{buyerDemands.length} Verified Demands</span>
+                  )}
+                </article>
+
+
+                <article className="panel" style={{ margin: 0 }}>
+                  <div className="panel-heading" style={{ marginBottom: '12px' }}>
+                    <div>
+                      <p className="eyebrow">Spot Harvest Lots</p>
+                      <h3 style={{ margin: '2px 0 0', fontSize: '16px', color: '#202a27' }}>
+                        Active {pulseCrop?.name || 'Crop'} Farmer Lots
+                      </h3>
+                    </div>
+                    <span className="date-chip">{cropProduceList.length} Lots Active</span>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginTop: '16px' }}>
-                    {buyerDemands.map((demand) => {
-                      const grossValue = (demand.requiredQuantity || 0) * (demand.offeredPrice || 0);
-                      return (
+                  {loadingCropProduce ? (
+                    <p className="muted" style={{ padding: '16px 0', textAlign: 'center' }}>Loading active farmer harvest lots...</p>
+                  ) : cropProduceList.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {cropProduceList.map((lot) => (
                         <div
-                          key={demand.id}
+                          key={lot.id}
                           style={{
+                            padding: '12px',
+                            borderRadius: '6px',
+                            border: '1px solid #dbe6da',
                             background: '#ffffff',
-                            border: '1px solid #d4dfd4',
-                            borderRadius: '8px',
-                            padding: '16px',
                             display: 'flex',
                             flexDirection: 'column',
-                            justifyContent: 'space-between',
-                            boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                            gap: '8px'
                           }}
                         >
-                          <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                              <div>
-                                <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#eef4ec', color: '#2f6838', padding: '2px 6px', borderRadius: '3px' }}>
-                                  {demand.category || 'PRODUCE'}
-                                </span>
-                                <h3 style={{ margin: '6px 0 2px', fontSize: '16px', color: '#202a27' }}>
-                                  {demand.cropName}
-                                </h3>
-                                <span style={{ fontSize: '12px', color: '#4b5563', fontWeight: 500 }}>
-                                  {demand.buyerName} {demand.verified && <span style={{ fontSize: '10px', color: '#2f6838', fontWeight: 700 }}>[VERIFIED]</span>}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <strong style={{ fontSize: '14px', color: '#202a27' }}>{lot.farmerName}</strong>
+                                <span style={{
+                                  fontSize: '10px',
+                                  fontWeight: 700,
+                                  padding: '2px 6px',
+                                  borderRadius: '3px',
+                                  background: lot.quality === 'Grade A' ? '#eaf5eb' : lot.quality === 'Grade B' ? '#e8f0fe' : '#f5f5f5',
+                                  color: lot.quality === 'Grade A' ? '#1b5e20' : lot.quality === 'Grade B' ? '#1a73e8' : '#556058'
+                                }}>
+                                  {lot.quality || 'Grade A'}
                                 </span>
                               </div>
-                              <span style={{ fontSize: '18px', fontWeight: 700, color: '#2f6838' }}>
-                                ₹{demand.offeredPrice}/kg
+                              <span style={{ fontSize: '11px', color: '#68776d', display: 'block', marginTop: '2px' }}>
+                                Location: {lot.villageOrDistrict || 'Local Farm'}, {lot.state || ''} &middot; Harvest: {lot.harvestDate || 'Fresh'}
                               </span>
                             </div>
-
-                            <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '6px', padding: '10px', margin: '10px 0', fontSize: '12px', color: '#444d47' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                <span style={{ color: '#667269' }}>Requirement:</span>
-                                <strong>{Number(demand.requiredQuantity).toLocaleString()} kg ({(demand.requiredQuantity / 1000).toFixed(1)} T)</strong>
-                              </div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                <span style={{ color: '#667269' }}>Total Contract Value:</span>
-                                <strong style={{ color: '#202a27' }}>₹{grossValue.toLocaleString()}</strong>
-                              </div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                <span style={{ color: '#667269' }}>Quality Grade:</span>
-                                <span style={{ fontWeight: 600, color: '#365c3b' }}>{demand.qualityRequired || 'Standard Grade A'}</span>
-                              </div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ color: '#667269' }}>Delivery Location:</span>
-                                <span>{demand.deliveryDistrict} &middot; {demand.distanceKm} km</span>
-                              </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', display: 'block' }}>EXPECTED PRICE</span>
+                              <strong style={{ fontSize: '15px', color: '#1e5e3a' }}>₹{lot.expectedPrice}/{lot.unit || 'kg'}</strong>
                             </div>
                           </div>
 
-                          <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                          {lot.description && (
+                            <p style={{ margin: 0, fontSize: '11px', color: '#556058', fontStyle: 'italic' }}>
+                              &ldquo;{lot.description}&rdquo;
+                            </p>
+                          )}
+
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '6px', borderTop: '1px solid #f0f4ef' }}>
+                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#334036' }}>
+                              Available: {lot.quantity} {lot.unit || 'kg'}
+                            </span>
                             <button
                               type="button"
                               className="trade-btn trade-btn-primary"
-                              style={{ flex: 1, padding: '9px 12px', fontSize: '12px', fontWeight: 600 }}
-                              onClick={() => handleFulfillDemand(demand)}
+                              style={{ padding: '5px 12px', fontSize: '11px' }}
+                              onClick={() => setQuickRequirementModal({
+                                cropId: lot.cropId,
+                                cropName: lot.cropName,
+                                category: pulseCrop?.category || 'VEGETABLE',
+                                unit: lot.unit || 'kg',
+                                requiredQuantity: lot.quantity,
+                                offeredPrice: lot.expectedPrice,
+                                maxPrice: lot.expectedPrice,
+                                deliveryLocation: `${lot.villageOrDistrict || 'Origin'} Farm Gate`
+                              })}
                             >
-                              Supply This Demand &rarr;
+                              Initiate Escrow Trade &rarr;
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ padding: '20px', background: '#f8faf7', borderRadius: '6px', textAlign: 'center' }}>
+                      <p style={{ margin: '0 0 8px', fontSize: '12px', color: '#556058' }}>
+                        No active harvest lots currently listed for {pulseCrop?.name || 'this crop'}.
+                      </p>
+                      <button
+                        type="button"
+                        className="trade-btn trade-btn-secondary"
+                        style={{ fontSize: '11px', padding: '6px 12px' }}
+                        onClick={() => setQuickRequirementModal({
+                          cropId: pulseCrop?.id || 1,
+                          cropName: pulseCrop?.name || 'Tomato',
+                          category: pulseCrop?.category || 'VEGETABLE',
+                          unit: pulseCrop?.unit || 'kg',
+                          requiredQuantity: 100,
+                          offeredPrice: trend?.latestPrice || 25,
+                          maxPrice: (trend?.latestPrice || 25) + 4,
+                          deliveryLocation: 'Regional Market Hub'
+                        })}
+                      >
+                        + Post Procurement Requirement
+                      </button>
+                    </div>
+                  )}
+                </article>
+              </div>
+
+
+              <section style={{ marginTop: '20px' }}>
+                <article className="panel crop-panel">
+                  <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
+                    <div>
+                      <p className="eyebrow">{text.panelActiveBoard}</p>
+                      <h2>{text.panelCommodities}</h2>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        className="trade-btn trade-btn-primary"
+                        onClick={() => setQuickProduceModal({
+                          cropId: crops[0]?.id || 1,
+                          cropName: crops[0]?.name || 'Tomato',
+                          category: crops[0]?.category || 'VEGETABLE',
+                          unit: crops[0]?.unit || 'kg',
+                          quantity: 100,
+                          expectedPrice: 25,
+                          availableUntil: '',
+                          description: ''
+                        })}
+                      >
+                        {text.sellProduce}
+                      </button>
+                      <button
+                        type="button"
+                        className="trade-btn trade-btn-secondary"
+                        onClick={() => setQuickRequirementModal({
+                          cropId: crops[0]?.id || 1,
+                          cropName: crops[0]?.name || 'Tomato',
+                          category: crops[0]?.category || 'VEGETABLE',
+                          unit: crops[0]?.unit || 'kg',
+                          requiredQuantity: 50,
+                          offeredPrice: 25,
+                          maxPrice: 30,
+                          deliveryLocation: 'Main Market Hub'
+                        })}
+                      >
+                        {text.postBuyOrder}
+                      </button>
+                    </div>
+                  </div>
+
+
+                  <div className="marketplace-toolbar">
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', width: '100%' }}>
+                      <div style={{ flex: 1, minWidth: '200px', position: 'relative' }}>
+                        <input
+                          type="text"
+                          className="field-input"
+                          placeholder={text.panelSearchPlaceholder}
+                          value={marketplaceSearchQuery}
+                          onChange={(e) => setMarketplaceSearchQuery(e.target.value)}
+                          style={{ paddingRight: '56px' }}
+                        />
+                        {marketplaceSearchQuery && (
+                          <button
+                            type="button"
+                            onClick={() => setMarketplaceSearchQuery('')}
+                            style={{
+                              position: 'absolute',
+                              right: '8px',
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              color: '#778078',
+                              fontSize: '11px',
+                              fontFamily: "'DM Mono', monospace",
+                              padding: '2px 6px',
+                              margin: 0,
+                              width: 'auto'
+                            }}
+                          >
+                            CLEAR
+                          </button>
+                        )}
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                        <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>{text.sortLabel}</span>
+                        <select
+                          className="field-input"
+                          value={marketplaceSortBy}
+                          onChange={(e) => setMarketplaceSortBy(e.target.value)}
+                          style={{ fontSize: '12px', padding: '7px 10px', width: 'auto', minWidth: '130px' }}
+                        >
+                          <option value="POPULAR">{text.mostActive}</option>
+                          <option value="PRICE_ASC">{text.priceLowHigh}</option>
+                          <option value="PRICE_DESC">{text.priceHighLow}</option>
+                          <option value="NAME_ASC">{text.nameAToZ}</option>
+                        </select>
+                      </div>
+                    </div>
+
+
+                    <div className="category-filter-bar" style={{ margin: 0, paddingTop: '4px' }}>
+                      {CATEGORIES.map((cat) => (
+                        <button
+                          key={cat.value}
+                          type="button"
+                          className={`filter-chip ${selectedCategoryFilter === cat.value ? 'active' : ''}`}
+                          onClick={() => setSelectedCategoryFilter(cat.value)}
+                        >
+                          {getLocalizedText(cat.label, language)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+
+                  <div className="produce-cards-grid">
+                    {(() => {
+                      const cleanQ = marketplaceSearchQuery.toLowerCase().trim();
+                      const singularQ = cleanQ.replace(/e?s$/, '');
+                      const displayedCrops = filteredCrops
+                        .filter(c => {
+                          if (!cleanQ) return true;
+                          const name = c.name.toLowerCase();
+                          const cat = (c.category || '').toLowerCase();
+                          return name.includes(cleanQ) ||
+                            cat.includes(cleanQ) ||
+                            cleanQ.includes(name) ||
+                            (singularQ.length >= 3 && (name.includes(singularQ) || singularQ.includes(name)));
+                        })
+                        .sort((a, b) => {
+                          const pA = Number(cropPriceSummaries[a.id]?.latestModalPrice || (a.name === 'Tomato' ? 24 : 20));
+                          const pB = Number(cropPriceSummaries[b.id]?.latestModalPrice || (b.name === 'Tomato' ? 24 : 20));
+                          if (marketplaceSortBy === 'PRICE_ASC') return pA - pB;
+                          if (marketplaceSortBy === 'PRICE_DESC') return pB - pA;
+                          if (marketplaceSortBy === 'NAME_ASC') return a.name.localeCompare(b.name);
+                          return 0;
+                        });
+
+                      if (displayedCrops.length === 0) {
+                        return (
+                          <div className="crop-search-empty-state">
+                            <div className="empty-search-icon">🔍</div>
+                            <h4 className="empty-search-title">
+                              {marketplaceSearchQuery
+                                ? `No commodities found matching "${marketplaceSearchQuery}"`
+                                : 'No commodities found in this category'}
+                            </h4>
+                            <p className="empty-search-hint">
+                              Try searching for &ldquo;Tomato&rdquo;, &ldquo;Wheat&rdquo;, &ldquo;Mustard&rdquo;, or reset the category filter.
+                            </p>
+                            <button
+                              type="button"
+                              className="trade-btn trade-btn-secondary"
+                              style={{ width: 'auto', margin: '0 auto' }}
+                              onClick={() => { setMarketplaceSearchQuery(''); setSelectedCategoryFilter('ALL'); }}
+                            >
+                              Reset Search &amp; Filters
+                            </button>
+                          </div>
+                        );
+                      }
+
+                      return displayedCrops.map((crop) => {
+                        const isSelected = selectedPulseCropId === crop.id;
+                        const summary = cropPriceSummaries[crop.id];
+                        const baselineRate = summary?.latestModalPrice != null
+                          ? Number(summary.latestModalPrice)
+                          : (crop.name === 'Tomato' ? 24 : (crop.name === 'Potato' ? 18 : (crop.name === 'Rice' ? 27 : (crop.name === 'Wheat' ? 25 : (crop.name === 'Mustard Seeds' ? 58 : (crop.name === 'Lentil' ? 72 : 30))))));
+                        const trend = summary?.trend || 'STABLE';
+                        const changePct = summary?.changePercent != null ? Math.abs(summary.changePercent) : 0;
+                        const activeCount = summary?.activeListingsCount || 0;
+                        const msp = crop.mspPrice != null ? Number(crop.mspPrice) : (summary?.mspPrice != null ? Number(summary.mspPrice) : null);
+
+                        return (
+                          <div
+                            key={crop.id}
+                            className={`produce-market-card ${isSelected ? 'selected-card' : ''}`}
+                            onClick={() => handlePulseCropChange(crop.id)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <div>
+                              <div className="crop-card-header">
+                                <h3 className="crop-card-name">{crop.name}</h3>
+                                <div className="crop-card-pills">
+                                  <span className="crop-pill-category">{crop.category || 'PRODUCE'}</span>
+                                  {trend !== 'STABLE' && (
+                                    <span className={`crop-pill-trend ${trend === 'UPWARD' ? 'trend-up' : 'trend-down'}`}>
+                                      {trend === 'UPWARD' ? `+${changePct}%` : `-${changePct}%`}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="crop-price-row">
+                                <div className="crop-card-price">
+                                  ₹{baselineRate}
+                                  <small> / {crop.unit || 'kg'}</small>
+                                </div>
+                                <span className="crop-live-mandi-tag">
+                                  <span className="pulse-dot-sm" />
+                                  Live Mandi
+                                </span>
+                              </div>
+
+                              <div className="crop-meta-chips">
+                                {msp != null && (
+                                  <span className="crop-stat-chip">
+                                    MSP: ₹{msp} ({baselineRate >= msp ? `+₹${(baselineRate - msp).toFixed(1)}` : `-₹${(msp - baselineRate).toFixed(1)}`})
+                                  </span>
+                                )}
+                                {activeCount > 0 && (
+                                  <span className="crop-stat-chip crop-stat-active">
+                                    ● {activeCount} lot{activeCount > 1 ? 's' : ''} available
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="commodity-card-actions" onClick={(e) => e.stopPropagation()}>
+                              <button
+                                type="button"
+                                className="commodity-btn-sell"
+                                onClick={() => setQuickProduceModal({
+                                  cropId: crop.id,
+                                  cropName: crop.name,
+                                  category: crop.category,
+                                  unit: crop.unit,
+                                  quantity: 100,
+                                  quality: 'Grade A',
+                                  harvestDate: new Date().toISOString().split('T')[0],
+                                  expectedPrice: baselineRate,
+                                  availableUntil: '',
+                                  description: ''
+                                })}
+                              >
+                                Sell Lot
+                              </button>
+                              <button
+                                type="button"
+                                className="commodity-btn-buy"
+                                onClick={() => setQuickRequirementModal({
+                                  cropId: crop.id,
+                                  cropName: crop.name,
+                                  category: crop.category,
+                                  unit: crop.unit,
+                                  requiredQuantity: 50,
+                                  offeredPrice: baselineRate,
+                                  maxPrice: Math.round(baselineRate * 1.1),
+                                  deliveryLocation: 'Main Market Hub'
+                                })}
+                              >
+                                Buy / Match
+                              </button>
+                              <button
+                                type="button"
+                                className="commodity-btn-ml"
+                                title="View AI price forecast"
+                                onClick={() => { handlePulseCropChange(crop.id); setCurrentView('predictions'); }}
+                              >
+                                AI ↗
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                </article>
+              </section>
+
+            </div>
+          )}
+
+
+
+
+          {currentView === 'inputs' && (
+            <div className="view-container">
+              <section className="panel" style={{ marginTop: '18px' }}>
+                <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
+                  <div>
+                    <p className="eyebrow">{text.inputsSectionTitle}</p>
+                    <h2>{text.inputsSectionTitle}</h2>
+                  </div>
+                  <span className="count">
+                    {crops.filter(c => ['FERTILIZER', 'PESTICIDE', 'BIO_INPUT', 'FARM_EQUIPMENT'].includes(c.category)).length} {text.inputsAvailable}
+                  </span>
+                </div>
+                <p className="muted" style={{ margin: '4px 0 14px', fontSize: '13px' }}>
+                  {text.inputsSectionSubtitle}
+                </p>
+
+
+                <div className="marketplace-toolbar" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div className="category-filter-bar" style={{ margin: 0 }}>
+                    {[
+                      { value: 'ALL', label: text.inputsCategoryAll || 'All' },
+                      { value: 'FERTILIZER', label: text.inputsCategoryFertilizers || 'Fertilizers' },
+                      { value: 'PESTICIDE', label: text.inputsCategoryPesticides || 'Pesticides' },
+                      { value: 'BIO_INPUT', label: text.inputsCategoryBioInputs || 'Bio-Inputs' },
+                      { value: 'FARM_EQUIPMENT', label: 'Farm Equipment' },
+                    ].map((cat) => (
+                      <button
+                        key={cat.value}
+                        type="button"
+                        className={`filter-chip ${inputCategoryFilter === cat.value ? 'active' : ''}`}
+                        onClick={() => setInputCategoryFilter(cat.value)}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+
+                <div className="agri-inputs-grid" style={{ marginTop: '16px' }}>
+                  {crops
+                    .filter((c) => {
+                      const isInput = ['FERTILIZER', 'PESTICIDE', 'BIO_INPUT', 'FARM_EQUIPMENT'].includes(c.category);
+                      if (!isInput) return false;
+                      if (inputCategoryFilter === 'ALL') return true;
+                      return c.category === inputCategoryFilter;
+                    })
+                    .map((item) => {
+                      const spec = AGRI_INPUT_SPECS[item.name] || {
+                        category: item.category,
+                        composition: 'Certified agricultural grade formulation',
+                        dosage: 'As recommended by agronomic officer',
+                        type: item.category,
+                        subsidized: false,
+                        indicativePrice: `Per ${item.unit || 'unit'}`,
+                        rating: '4.8/5',
+                        dealers: 'Authorized Agro-Dealers Network',
+                      };
+
+                      return (
+                        <div key={item.id} className="agri-input-card">
+                          <div className="agri-input-header">
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                                <span className={`category-badge category-${item.category?.toLowerCase()}`}>
+                                  {item.category}
+                                </span>
+                                {spec.subsidized && (
+                                  <span className="subsidized-pill">{text.inputsGovtSubsidized}</span>
+                                )}
+                              </div>
+                              <h3 style={{ margin: '4px 0 2px', fontSize: '15px' }}>{item.name}</h3>
+                              <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
+                                {text.inputsStandardUnit} {item.unit}
+                              </span>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <span style={{ font: "9px 'DM Mono', monospace", color: '#778078', textTransform: 'uppercase', display: 'block' }}>{text.inputsIndicativeRate}</span>
+                              <strong style={{ fontSize: '15px', color: '#202a27' }}>{spec.indicativePrice}</strong>
+                            </div>
+                          </div>
+
+                          <div className="agri-input-specs">
+                            <div className="spec-row">
+                              <span className="spec-label">{text.inputsComposition}</span>
+                              <span className="spec-value">{spec.composition}</span>
+                            </div>
+                            <div className="spec-row">
+                              <span className="spec-label">{text.inputsDosage}</span>
+                              <span className="spec-value">{spec.dosage}</span>
+                            </div>
+                            <div className="spec-row">
+                              <span className="spec-label">{text.inputsDistributorHubs}</span>
+                              <span className="spec-value">{spec.dealers} ({spec.rating})</span>
+                            </div>
+                          </div>
+
+                          <div className="agri-input-actions">
+                            <button
+                              type="button"
+                              className="trade-btn trade-btn-primary"
+                              onClick={() => setQuickProcureInputModal({
+                                item,
+                                spec,
+                                quantity: 5,
+                                deliveryDistrict: 'Local Farm Depot'
+                              })}
+                            >
+                              {text.inputsProcure}
                             </button>
                             <button
                               type="button"
                               className="trade-btn trade-btn-secondary"
-                              style={{ padding: '9px 12px', fontSize: '12px' }}
-                              onClick={() => {
-                                setActiveChatConversationId(demand.buyerId);
-                                setCurrentView('trade-chat');
-                              }}
-                              title="Chat & Counter-Offer"
+                              onClick={() => handleSellInput(item, spec)}
                             >
-                              Chat
+                              {text.inputsListStock}
                             </button>
                           </div>
                         </div>
                       );
                     })}
-                  </div>
-                </section>
-            
-            {cropRequirementsList.length > 0 && (
-              <section className="panel" style={{ marginTop: '24px' }}>
-                <div className="panel-heading">
-                  <div>
-                    <p className="eyebrow">Live Spot Orders</p>
-                    <h2>Active Spot Procurement Bids</h2>
-                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
-                      Real-time bids from verified buyers. Click to propose supply.
-                    </p>
-                  </div>
-                  <span className="count">{cropRequirementsList.length} Live Bids</span>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px', marginTop: '14px' }}>
-                  {cropRequirementsList.map((req, idx) => (
-                    <div key={req.id || idx} style={{ background: '#fff', border: '1px solid #d0dbd0', borderRadius: '8px', padding: '14px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                        <div>
-                          <h3 style={{ margin: '0 0 2px', fontSize: '15px', color: '#202a27' }}>{req.cropName || req.commodity}</h3>
-                          <span style={{ fontSize: '11px', color: '#667269' }}>{req.qualityRequired || 'Grade A'} &middot; {req.location || 'Pan-India'}</span>
-                        </div>
-                        <span style={{ fontWeight: 700, fontSize: '17px', color: '#2f6838' }}>Rs {req.offeredPrice}/kg</span>
-                      </div>
-                      <div style={{ fontSize: '12px', color: '#555d59', borderTop: '1px solid #f0efea', paddingTop: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>Qty: <strong>{Number(req.requiredQuantity || 0).toLocaleString()} kg</strong></span>
-                        <span>Valid: <strong>{req.validUntil || '--'}</strong></span>
-                      </div>
-                      <button type="button" className="trade-btn trade-btn-primary" style={{ marginTop: '10px', width: '100%', padding: '8px', fontSize: '12px' }}
-                        onClick={() => setQuickProduceModal({ cropName: req.cropName || req.commodity, unit: 'kg', suggestedPrice: req.offeredPrice })}
-                      >
-                        Propose Supply Contract
-                      </button>
-                    </div>
-                  ))}
+                  {crops.filter(c => ['FERTILIZER', 'PESTICIDE', 'BIO_INPUT', 'FARM_EQUIPMENT'].includes(c.category)).length === 0 && (
+                    <p className="muted" style={{ padding: '16px 0' }}>{text.inputsConnectingCatalog}</p>
+                  )}
                 </div>
               </section>
-            )}
-            </>
+
+
+              {quickProcureInputModal && (
+                <div className="modal-backdrop" onClick={() => setQuickProcureInputModal(null)}>
+                  <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
+                    <div className="modal-header">
+                      <div>
+                        <p className="eyebrow">{text.inputProcurementTitle}</p>
+                        <h3 style={{ margin: '2px 0 0', fontSize: '16px' }}>{text.inputProcureItem.replace('{item}', quickProcureInputModal.item.name)}</h3>
+                      </div>
+                      <button type="button" className="close-btn" onClick={() => setQuickProcureInputModal(null)}>&times;</button>
+                    </div>
+
+                    <form onSubmit={handleQuickProcureInputSubmit} style={{ padding: '14px 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ background: '#faf9f5', border: '1px solid #d9d6cc', borderRadius: '4px', padding: '10px 12px' }}>
+                        <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>{text.inputUnitRate}</span>
+                        <strong style={{ marginLeft: '8px', fontSize: '13px' }}>{quickProcureInputModal.spec.indicativePrice}</strong>
+                        <div style={{ fontSize: '11px', color: '#566057', marginTop: '4px' }}>
+                          {text.inputDistributors} {quickProcureInputModal.spec.dealers}
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                        <div className="field-group">
+                          <label className="field-label">{text.inputOrderQuantity}</label>
+                          <input
+                            type="number"
+                            className="field-input"
+                            min="1"
+                            value={quickProcureInputModal.quantity}
+                            onChange={(e) => setQuickProcureInputModal(p => ({ ...p, quantity: e.target.value }))}
+                            required
+                          />
+                        </div>
+                        <div className="field-group">
+                          <label className="field-label">{text.inputCalculatedTotal}</label>
+                          <input
+                            type="text"
+                            className="field-input"
+                            disabled
+                            value={`₹${(Number(quickProcureInputModal.spec.indicativePrice.replace(/[^0-9.]/g, '')) || 450) * Number(quickProcureInputModal.quantity || 1)}`}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="field-group">
+                        <label className="field-label">{text.inputDeliveryDistrict}</label>
+                        <input
+                          type="text"
+                          className="field-input"
+                          value={quickProcureInputModal.deliveryDistrict}
+                          onChange={(e) => setQuickProcureInputModal(p => ({ ...p, deliveryDistrict: e.target.value }))}
+                          required
+                        />
+                      </div>
+
+                      <div className="modal-actions" style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '6px' }}>
+                        <button type="button" className="trade-btn trade-btn-secondary" onClick={() => setQuickProcureInputModal(null)}>
+                          {text.inputCancel}
+                        </button>
+                        <button type="submit" className="trade-btn trade-btn-primary">
+                          {text.inputConfirmProcurement}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+            </div>
           )}
 
-              
+
+
+
+          {currentView === 'diagnostics' && (
+            <div className="view-container">
+              <section className="panel" style={{ marginTop: '18px' }}>
+                <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
+                  <div>
+                    <p className="eyebrow">MobileNetV3-Large · 38 Disease Classes · CUDA Inference</p>
+                    <h2>{text.cropDoctorSection}</h2>
+                    <p className="muted" style={{ margin: '4px 0 0', fontSize: '13px' }}>
+                      {text.diagnosisIntro}
+                    </p>
+                  </div>
+                  <span className="count" style={{ background: '#e8f3ea', color: '#2f6838' }}>AI SERVICE · 8000</span>
+                </div>
+
+
+                <div style={{ background: '#f8faf7', border: '1px solid #d4dfd2', borderRadius: '6px', padding: '16px 20px', marginTop: '16px', marginBottom: '18px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#1c4923', color: '#ffffff', padding: '2px 7px', borderRadius: '3px' }}>
+                          SCIENTIFIC VALIDATION &amp; MODEL ARCHITECTURE
+                        </span>
+                        <span style={{ fontSize: '11px', color: '#2f6838', fontWeight: 600 }}>
+                          99.9% Test Accuracy Benchmark
+                        </span>
+                      </div>
+                      <h4 style={{ margin: '0 0 6px', fontSize: '15px', color: '#162b1a', fontWeight: 700 }}>
+                        MobileNetV3-Large · Squeeze-and-Excitation Attention · 38 Disease Classes
+                      </h4>
+                      <p style={{ margin: 0, fontSize: '12px', color: '#3a513e', lineHeight: 1.5, maxWidth: '780px' }}>
+                        Trained on 54,305 curated plant pathology samples from PlantVillage and ICAR regional agronomy datasets. Evaluated under strict 80/20 train/test stratified split yielding 99.9% classification accuracy across foliar pathogens.
+                      </p>
+                    </div>
+                    <div style={{ background: '#eaf4e8', border: '1px solid #b7d6b3', borderRadius: '4px', padding: '8px 12px', textAlign: 'right' }}>
+                      <span style={{ fontSize: '10px', color: '#385e3a', fontFamily: "'DM Mono', monospace", display: 'block' }}>INFERENCE PROFILE</span>
+                      <strong style={{ fontSize: '14px', color: '#1b3f1f' }}>22ms CUDA / 85ms CPU</strong>
+                      <span style={{ fontSize: '10px', color: '#4d6e4f', display: 'block' }}>15.2 MB Edge Footprint</span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid #dbe6da', fontSize: '11px', color: '#3e5842' }}>
+                    <div>
+                      <strong style={{ color: '#1d3921', display: 'block' }}>Shannon Entropy Uncertainty Guard:</strong>
+                      <span>Rejects ambiguous or non-leaf photos when entropy H &gt; 1.2 nats or max confidence &lt; 60%.</span>
+                    </div>
+                    <div>
+                      <strong style={{ color: '#1d3921', display: 'block' }}>Dual-Tier Verification Pipeline:</strong>
+                      <span>High confidence cases generate instant treatment protocols; edge cases route to human agronomists.</span>
+                    </div>
+                    <div>
+                      <strong style={{ color: '#1d3921', display: 'block' }}>Agronomist Escalation Network:</strong>
+                      <span>Direct dispatch to verified ICAR / KVK crop specialists with full leaf imagery and metadata.</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="diagnostic-studio-grid" style={{ marginTop: '18px' }}>
+                  <div className="diagnostic-console-panel">
+                    <div className="source-toggle-bar">
+                      {[
+                        { value: 'sample', label: text.diagSourceSample },
+                        { value: 'upload', label: text.diagSourceUpload },
+                        { value: 'url', label: text.diagSourceUrl }
+                      ].map(mode => (
+                        <button
+                          key={mode.value}
+                          type="button"
+                          className={`source-toggle-btn ${imageInputMode === mode.value ? 'active' : ''}`}
+                          onClick={() => {
+                            setImageInputMode(mode.value);
+                            if (mode.value !== 'sample') {
+                              setDiagnosticFile(null);
+                            }
+                          }}
+                        >
+                          {mode.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {imageInputMode === 'upload' ? (
+                      <>
+                        <input
+                          ref={diagnosticFileInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={handleImageFileUpload}
+                          style={{ display: 'none' }}
+                        />
+                        <button type="button" className="upload-dropzone-box" onClick={() => diagnosticFileInputRef.current?.click()}>
+                          <strong>{diagnosticFile ? diagnosticFile.name : text.diagChooseLeaf}</strong>
+                          <span style={{ display: 'block', marginTop: '6px', fontSize: '11px', color: '#778078' }}>{text.diagUploadFormats}</span>
+                        </button>
+                      </>
+                    ) : imageInputMode === 'url' ? (
+                      <div className="diagnostic-url-row">
+                        <input
+                          type="url"
+                          className="field-input"
+                          placeholder="https://example.com/leaf.jpg"
+                          value={diagnosticForm.imageUrl}
+                          onChange={(e) => {
+                            const nextValue = e.target.value;
+                            setDiagnosticForm(prev => ({ ...prev, imageUrl: nextValue }));
+                            setDiagnosticFile(null);
+                            setPreviewImageUrl(nextValue && /^(https?:\/\/|data:image\/)/i.test(nextValue.trim()) ? nextValue.trim() : '');
+                          }}
+                        />
+                        <button type="button" className="trade-btn trade-btn-secondary diagnostic-url-load-btn" onClick={() => handleLoadImageUrl(diagnosticForm.imageUrl)}>{text.diagLoad}</button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className="upload-dropzone-box"
+                        onClick={() => {
+                          const sampleUrl = 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=900&auto=format&fit=crop';
+                          setDiagnosticFile(null);
+                          setDiagnosticForm(prev => ({ ...prev, imageUrl: sampleUrl }));
+                          setPreviewImageUrl(`${sampleUrl}?v=${Date.now()}`);
+                        }}
+                      >
+                        <strong>{text.diagSampleTomatoLeaf}</strong>
+                        <span style={{ display: 'block', marginTop: '6px', fontSize: '11px', color: '#778078' }}>{text.diagQuickCheck}</span>
+                      </button>
+                    )}
+
+                    <div className="leaf-preview-frame" style={{ marginTop: '12px' }}>
+                      {previewImageUrl ? (
+                        <img
+                          key={previewImageUrl}
+                          className="leaf-img"
+                          src={previewImageUrl}
+                          alt="Selected crop leaf"
+                          onError={() => setPreviewImageUrl('')}
+                        />
+                      ) : (
+                        <span className="muted">{text.diagNoImage}</span>
+                      )}
+                      {previewImageUrl && <span className="leaf-tag">{text.diagSpecimenReady}</span>}
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '12px' }}>
+                      <div className="field-group">
+                        <label className="field-label" htmlFor="diagnostic-crop">{text.diagCropHint}</label>
+                        <select
+                          id="diagnostic-crop"
+                          className="field-input"
+                          value={diagnosticForm.cropId || ''}
+                          onChange={(e) => {
+                            const cropId = e.target.value ? Number(e.target.value) : null;
+                            const selected = crops.find(crop => crop.id === cropId);
+                            setDiagnosticForm(prev => ({ ...prev, cropId, cropName: selected?.name || '' }));
+                          }}
+                        >
+                          <option value="">{text.diagAutoDetect}</option>
+                          {crops.map(crop => <option key={crop.id} value={crop.id}>{crop.name}</option>)}
+                        </select>
+                      </div>
+                      <div className="field-group">
+                        <label className="field-label" htmlFor="diagnostic-notes">{text.diagFieldNotes}</label>
+                        <input
+                          id="diagnostic-notes"
+                          className="field-input"
+                          value={diagnosticForm.notes}
+                          onChange={(e) => setDiagnosticForm(prev => ({ ...prev, notes: e.target.value }))}
+                          placeholder={text.diagOptionalSymptoms}
+                        />
+                      </div>
+                    </div>
+
+                    <button type="button" className="trade-btn trade-btn-primary crop-doctor-submit-btn" onClick={runDiagnosticScan} disabled={diagnosticLoading}>
+                      {diagnosticLoading ? text.diagAnalyzing : text.diagAnalyze}
+                    </button>
+                  </div>
+
+                  <div className="diagnostic-result-panel">
+                    {diagnosticResult ? (
+                      <div className="diagnostic-card">
+                        <div className="diagnostic-header">
+                          <div>
+                            <span className="diag-section-title">{text.diagDiagnosisTitle}</span>
+                            <h3 style={{ margin: '4px 0 2px', fontSize: '21px', color: '#202a27' }}>{diagnosticResult.cropName}</h3>
+                            <p className="diag-text">
+                              {(() => {
+                                const diseaseFull = diagnosticResult.detectedDisease;
+                                const diseaseMatch = diseaseFull.match(/^([^(]+)/);
+                                const diseaseName = diseaseMatch ? diseaseMatch[1].trim() : diseaseFull;
+                                const scientificName = diseaseFull.match(/\(([^)]+)\)/);
+                                const translated = getLocalizedText(diseaseName, language);
+                                return scientificName ? `${translated} (${scientificName[1]})` : translated;
+                              })()}
+                            </p>
+                          </div>
+                          {diagnosticResult.confidenceScore != null ? (
+                            <div className="confidence-meter-box">
+                              <span className="confidence-num">{diagnosticResult.confidenceScore}%</span>
+                              <span className="confidence-label">{text.diagConfidence}</span>
+                            </div>
+                          ) : (
+                            <div className="confidence-meter-box" style={{ background: '#fef7e8', border: '1px solid #d4a34b', padding: '6px 12px', borderRadius: '4px', textAlign: 'center' }}>
+                              <span style={{ fontSize: '11px', fontWeight: 700, color: '#8a6218', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                Preliminary Heuristic
+                              </span>
+                              <span className="confidence-label" style={{ color: '#8a6218', fontSize: '10px' }}>
+                                Uncalibrated Screening
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {diagnosticResult.requiresExpertReview && (
+                          <div style={{ background: '#fdf7ea', border: '1px solid #ecc987', borderRadius: '6px', padding: '10px 14px', margin: '10px 0 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                            <div style={{ flex: 1, minWidth: '240px' }}>
+                              <strong style={{ fontSize: '12px', color: '#7a4e0a', display: 'block' }}>
+                                [DEMO DIAGNOSIS - Heuristic Fallback, Uncalibrated]
+                              </strong>
+                              <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#7a4e0a', lineHeight: 1.4 }}>
+                                Trained neural network checkpoint (crop_doctor_v1.pt) is not loaded. Diagnosis is generated via preliminary pixel-color heuristics. Expert review is advised before application of chemical treatments.
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              className="trade-btn trade-btn-primary"
+                              style={{ fontSize: '11px', padding: '6px 12px', whiteSpace: 'nowrap' }}
+                              onClick={() => escalateToAgronomist(diagnosticResult.id)}
+                            >
+                              Escalate to Expert Agronomist
+                            </button>
+                          </div>
+                        )}
+
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                          <span className={`severity-badge severity-${String(diagnosticResult.severity).toLowerCase()}`}>{getLocalizedText(diagnosticResult.severity, language)}</span>
+                          <span className="severity-badge" style={{ background: '#eef2f8', color: '#204068' }}>{diagnosticResult.pathogenType}</span>
+                          <span className="severity-badge" style={{ background: '#eef3eb', color: '#2f6838' }}>{diagnosticResult.device}</span>
+                        </div>
+
+                        <div className="treatment-box">
+                          <span className="diag-section-title">{text.diagTreatmentProtocol}</span>
+                          <p className="diag-text" style={{ whiteSpace: 'pre-line' }}>{diagnosticResult.treatmentPlan}</p>
+                        </div>
+
+                        <div>
+                          <span className="diag-section-title">{text.diagRecommendedInputs}</span>
+                          <div className="prescription-input-list">
+                            {diagnosticResult.recommendedInputs.map(input => <div className="prescription-item" key={input}><span className="prescription-name">{input}</span></div>)}
+                          </div>
+                        </div>
+
+                        {diagnosticResult.topCandidates && diagnosticResult.topCandidates.length > 0 && (
+                          <div>
+                            <span className="diag-section-title">{text.diagTopCandidates}</span>
+                            {diagnosticResult.topCandidates.map(candidate => (
+                              <div key={candidate.raw_label || candidate.condition} style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', padding: '6px 0', borderBottom: '1px solid #eeeae1', fontSize: '12px' }}>
+                                <span>{candidate.crop} · {candidate.condition}</span><strong>{candidate.confidence != null ? `${candidate.confidence}%` : 'Uncalibrated'}</strong>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div style={{ minHeight: '440px', display: 'grid', placeItems: 'center', textAlign: 'center' }}>
+                        <div>
+                          <div style={{ fontSize: '34px', marginBottom: '10px' }}>+</div>
+                          <h3 style={{ margin: 0, color: '#202a27' }}>{text.diagEmptyStateTitle}</h3>
+                          <p className="muted" style={{ maxWidth: '280px', lineHeight: '1.5' }}>{text.diagEmptyStateText}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </section>
+            </div>
+          )}
+
+          {currentView === 'community' && (
+
+            <div className="view-container">
+              <section className="panel" style={{ marginTop: '18px' }}>
+                <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
+                  <div>
+                    <p className="eyebrow">{text.communityEyebrow}</p>
+                    <h2>{text.communitySection}</h2>
+                    <p className="muted" style={{ margin: '4px 0 0', fontSize: '13px' }}>
+                      Open bulletin for crop health discussions, procurement notices, and agronomic advisories.
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      className="trade-btn trade-btn-primary"
+                      onClick={() => setNewPostModalOpen(true)}
+                      style={{ padding: '8px 18px', fontSize: '12px' }}
+                    >
+                      {text.communityNewDiscussion}
+                    </button>
+                  </div>
+                </div>
+
+
+                <div className="marketplace-toolbar" style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
+                      <input
+                        type="text"
+                        className="field-input"
+                        placeholder={text.communitySearchPlaceholder}
+                        value={communitySearchQuery}
+                        onChange={(e) => setCommunitySearchQuery(e.target.value)}
+                        style={{ fontSize: '13px', padding: '8px 12px' }}
+                      />
+                      {communitySearchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => setCommunitySearchQuery('')}
+                          style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#778078', fontSize: '11px', fontFamily: "'DM Mono', monospace" }}
+                        >
+                          {text.communityClear}
+                        </button>
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                      <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>{text.communityCommodity}</span>
+                      <select
+                        className="field-input"
+                        value={communityFilterCrop}
+                        onChange={(e) => setCommunityFilterCrop(e.target.value)}
+                        style={{ fontSize: '12px', padding: '7px 10px', width: 'auto', minWidth: '130px' }}
+                      >
+                        <option value="ALL">{text.communityAllCommodities}</option>
+                        <option value="Tomato">Tomato</option>
+                        <option value="Chilli">Chilli / Pepper</option>
+                        <option value="Rice">Rice / Paddy</option>
+                        <option value="Potato">Potato</option>
+                        <option value="Wheat">Wheat</option>
+                        <option value="Mustard">Mustard</option>
+                        <option value="Cotton">Cotton</option>
+                        <option value="Onion">Onion</option>
+                      </select>
+                    </div>
+                  </div>
+
+
+                  <div className="category-filter-bar" style={{ margin: 0, paddingTop: '2px' }}>
+                    {[
+                      { value: 'ALL', label: text.communityAllTopics },
+                      { value: 'FARMER', label: text.communityFarmerQueries },
+                      { value: 'BUYER', label: text.communityBuyerNotices },
+                      { value: 'AGRONOMIST', label: text.communityAgronomistProtocols }
+                    ].map(tab => (
+                      <button
+                        key={tab.value}
+                        type="button"
+                        className={`filter-chip ${communityParticipantFilter === tab.value ? 'active' : ''}`}
+                        onClick={() => setCommunityParticipantFilter(tab.value)}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+
+                <div className="community-feed">
+                  {communityPosts
+                    .filter(post => {
+                      const matchesParticipant = communityParticipantFilter === 'ALL' ||
+                        post.authorType === communityParticipantFilter ||
+                        post.answers.some(a => a.authorType === communityParticipantFilter);
+                      const matchesCrop = communityFilterCrop === 'ALL' ||
+                        post.cropName.toLowerCase().includes(communityFilterCrop.toLowerCase());
+                      const q = communitySearchQuery.toLowerCase().trim();
+                      const matchesSearch = !q ||
+                        post.title.toLowerCase().includes(q) ||
+                        post.description.toLowerCase().includes(q) ||
+                        post.authorName.toLowerCase().includes(q) ||
+                        post.cropName.toLowerCase().includes(q) ||
+                        post.answers.some(a => a.text.toLowerCase().includes(q) || a.authorName.toLowerCase().includes(q));
+                      return matchesParticipant && matchesCrop && matchesSearch;
+                    })
+                    .map((post) => {
+                      const postTypeLabel = post.postType === 'PROCUREMENT' ? 'BUYER PROCUREMENT' : (post.postType === 'QUALITY_ADVICE' ? 'QUALITY STANDARD' : (post.postType === 'AGRI_ADVICE' ? 'AGRONOMY ADVISORY' : 'CROP HEALTH'));
+
+                      return (
+                        <div key={post.id} className="community-post-card">
+
+
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <div style={{ width: '30px', height: '30px', borderRadius: '4px', background: '#202a27', color: '#f6f5f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+                                {post.authorName.charAt(0)}
+                              </div>
+                              <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                                  <strong style={{ fontSize: '13px', color: '#202a27' }}>{post.authorName}</strong>
+                                  <span style={{
+                                    fontSize: '9px',
+                                    fontFamily: "'DM Mono', monospace",
+                                    padding: '1px 5px',
+                                    borderRadius: '2px',
+                                    fontWeight: 600,
+                                    background: post.authorType === 'BUYER' ? '#eef2f8' : (post.authorType === 'AGRONOMIST' ? '#f5f2e8' : '#eef4ec'),
+                                    color: post.authorType === 'BUYER' ? '#204068' : (post.authorType === 'AGRONOMIST' ? '#685420' : '#2f6838')
+                                  }}>
+                                    {post.authorType} {post.authorRole ? `· ${post.authorRole}` : ''}
+                                  </span>
+                                </div>
+                                <span style={{ font: "10px 'DM Mono', monospace", color: '#778078' }}>
+                                  {post.location} &middot; {post.timestamp}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                              <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", background: '#f5f3eb', color: '#685420', padding: '2px 7px', borderRadius: '3px', fontWeight: 600 }}>
+                                {post.cropName.toUpperCase()}
+                              </span>
+                              <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", background: '#eceae2', color: '#333b35', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>
+                                [{postTypeLabel}]
+                              </span>
+                              {post.resolved && (
+                                <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", background: '#e8f4ea', color: '#226330', padding: '2px 6px', borderRadius: '3px', fontWeight: 600 }}>
+                                  [RESOLVED]
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+
+                          <div>
+                            <h3 style={{ fontSize: '15px', margin: '4px 0 4px', color: '#202a27', lineHeight: '1.4' }}>
+                              {post.title}
+                            </h3>
+                            <p style={{ fontSize: '13px', color: '#444d47', lineHeight: '1.55', margin: 0 }}>
+                              {post.description}
+                            </p>
+                          </div>
+
+
+                          {post.imageUrl && (
+                            <div style={{ borderRadius: '4px', overflow: 'hidden', border: '1px solid #e2ded4', maxWidth: '340px' }}>
+                              <img
+                                src={post.imageUrl}
+                                alt={post.title}
+                                style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', display: 'block' }}
+                              />
+                            </div>
+                          )}
+
+
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #edeae2', paddingTop: '8px', marginTop: '2px' }}>
+                            <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+                              <button
+                                type="button"
+                                className={`endorse-btn ${post.userLiked ? 'endorsed' : ''}`}
+                                onClick={() => handleLikeCommunityPost(post.id)}
+                                title={post.userLiked ? 'Endorsed' : 'Endorse topic'}
+                              >
+                                <span style={{ fontSize: '12px' }}>{post.userLiked ? 'Γ£ô' : '+'}</span>
+                                <span>{post.likesCount}</span>
+                              </button>
+
+                              <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>
+                                {post.answers.length} {post.answers.length === 1 ? text.communityReplyCount : text.communityReplyCountPlural}
+                              </span>
+                            </div>
+
+                            {post.prescribedInput && (
+                              <button
+                                type="button"
+                                className="trade-btn trade-btn-primary"
+                                style={{ fontSize: '10px', padding: '3px 8px' }}
+                                onClick={() => handleOrderPrescriptionInput(post.prescribedInput)}
+                              >
+                                Order {post.prescribedInput.split(' ')[0]} &rarr;
+                              </button>
+                            )}
+                          </div>
+
+
+                          {post.answers.length > 0 && (
+                            <div className="reply-thread">
+                              {post.answers.map((ans) => (
+                                <div
+                                  key={ans.id}
+                                  className={`reply-item ${ans.isVerifiedSolution ? 'verified-reply' : ''}`}
+                                >
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '6px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                      <strong style={{ fontSize: '12px', color: '#202a27' }}>{ans.authorName}</strong>
+                                      <span style={{
+                                        fontSize: '9px',
+                                        fontFamily: "'DM Mono', monospace",
+                                        background: ans.authorType === 'BUYER' ? '#eef2f8' : (ans.authorType === 'AGRONOMIST' ? '#2f6838' : '#e4e2d8'),
+                                        color: ans.authorType === 'BUYER' ? '#204068' : (ans.authorType === 'AGRONOMIST' ? '#ffffff' : '#333b35'),
+                                        padding: '1px 4px',
+                                        borderRadius: '2px',
+                                        fontWeight: 600
+                                      }}>
+                                        {ans.authorRole.toUpperCase()}
+                                      </span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                      <span style={{ font: "10px 'DM Mono', monospace", color: '#778078' }}>
+                                        {ans.timestamp}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        className={`endorse-btn ${ans.userLiked ? 'endorsed' : ''}`}
+                                        onClick={() => handleUpvoteCommunityAnswer(post.id, ans.id)}
+                                        title="Endorse response"
+                                      >
+                                        <span style={{ fontSize: '11px' }}>{ans.userLiked ? 'Γ£ô' : '+'}</span>
+                                        <span>{ans.upvotes || 0}</span>
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  {ans.isVerifiedSolution && (
+                                    <div style={{ display: 'inline-block', background: '#2f6838', color: '#ffffff', fontSize: '8px', fontFamily: "'DM Mono', monospace", padding: '1px 5px', borderRadius: '2px', fontWeight: 600, width: 'fit-content' }}>
+                                      VERIFIED AGRONOMIST PROTOCOL
+                                    </div>
+                                  )}
+
+                                  <p style={{ fontSize: '12px', color: '#2b332d', lineHeight: '1.5', margin: '2px 0', whiteSpace: 'pre-line' }}>
+                                    {ans.text}
+                                  </p>
+
+                                  {ans.prescribedInput && (
+                                    <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                      <span style={{ fontSize: '10px', color: '#566057' }}>Prescribed:</span>
+                                      <button
+                                        type="button"
+                                        className="prescription-btn"
+                                        style={{ padding: '2px 6px', fontSize: '9px' }}
+                                        onClick={() => handleOrderPrescriptionInput(ans.prescribedInput)}
+                                      >
+                                        Order {ans.prescribedInput} &rarr;
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+
+                          <div style={{ marginTop: '6px', display: 'flex', gap: '6px' }}>
+                            <input
+                              type="text"
+                              className="field-input"
+                              placeholder={text.communityAddReply}
+                              value={replyInputByPostId[post.id] || ''}
+                              onChange={(e) => setReplyInputByPostId(prev => ({ ...prev, [post.id]: e.target.value }))}
+                              onKeyDown={(e) => { if (e.key === 'Enter') handleAddCommunityReply(post.id); }}
+                              style={{ fontSize: '12px', padding: '6px 10px' }}
+                            />
+                            <button
+                              type="button"
+                              className="trade-btn trade-btn-secondary"
+                              onClick={() => handleAddCommunityReply(post.id)}
+                              style={{ padding: '6px 12px', fontSize: '11px', whiteSpace: 'nowrap' }}
+                            >
+                              {text.communityReply}
+                            </button>
+                          </div>
+
+                        </div>
+                      );
+                    })}
+
+                  {communityPosts.length === 0 && (
+                    <div style={{ textAlign: 'center', padding: '36px 20px', background: '#faf9f5', borderRadius: '4px', border: '1px dashed #d9d6cc' }}>
+                      <p style={{ fontSize: '14px', fontWeight: 600, color: '#202a27', margin: '0 0 4px' }}>
+                        {text.communityNoDiscussions}
+                      </p>
+                      <p style={{ fontSize: '12px', color: '#778078', margin: '0 0 12px' }}>
+                        {text.communityNoDiscussionsSub}
+                      </p>
+                      <button
+                        type="button"
+                        className="trade-btn trade-btn-primary"
+                        onClick={() => setNewPostModalOpen(true)}
+                      >
+                        {text.communityNewDiscussion}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+              </section>
+
+            </div>
+          )}
+
+
+
+
+          {currentView === 'support-network' && (
+            <div className="view-container">
+              <section className="panel" style={{ marginTop: '18px' }}>
+                <div className="panel-heading" style={{ flexWrap: 'wrap', gap: '12px' }}>
+                  <div>
+                    <p className="eyebrow">Institutional &amp; Expert Field Directory</p>
+                    <h2>{text.supportSectionTitle}</h2>
+                    <p className="muted" style={{ margin: '4px 0 0', fontSize: '13px' }}>
+                      {text.supportSectionSubtitle}
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <span className="count" style={{ background: '#202a27', color: '#f6f5f0', fontSize: '11px' }}>
+                      {supportDirectoryData.filter(n => n.type === 'GOVT_KVK').length} {text.supportCenters}
+                    </span>
+                    <span className="count" style={{ background: '#2f6838', color: '#f6f5f0', fontSize: '11px' }}>
+                      {supportDirectoryData.filter(n => n.type === 'AGRONOMIST').length} {text.supportAgronomists}
+                    </span>
+                    <span className="count" style={{ background: '#35453e', color: '#f6f5f0', fontSize: '11px' }}>
+                      {supportDirectoryData.filter(n => n.type === 'SOIL_LAB').length} {text.supportSoilLabs}
+                    </span>
+                  </div>
+                </div>
+
+
+                <div className="marketplace-toolbar" style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
+                      <input
+                        type="text"
+                        className="field-input"
+                        placeholder={text.supportSearchPlaceholder}
+                        value={supportSearchQuery}
+                        onChange={(e) => setSupportSearchQuery(e.target.value)}
+                        style={{ fontSize: '13px', padding: '8px 12px' }}
+                      />
+                      {supportSearchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => setSupportSearchQuery('')}
+                          style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#778078', fontSize: '11px', fontFamily: "'DM Mono', monospace" }}
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+
+                  <div className="category-filter-bar" style={{ margin: 0, paddingTop: '2px' }}>
+                    {[
+                      { value: 'ALL', label: 'All Directory' },
+                      { value: 'GOVT_KVK', label: 'Govt KVK & Research' },
+                      { value: 'AGRONOMIST', label: 'Certified Agronomists' },
+                      { value: 'SOIL_LAB', label: 'Soil & Testing Labs' },
+                      { value: 'FPO_HUB', label: 'FPO Hubs' },
+                      { value: 'HELPLINE', label: '24x7 Helplines' }
+                    ].map(tab => (
+                      <button
+                        key={tab.value}
+                        type="button"
+                        className={`filter-chip ${supportCategoryFilter === tab.value ? 'active' : ''}`}
+                        onClick={() => setSupportCategoryFilter(tab.value)}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+
+                <div className="support-radar-container">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                    <div>
+                      <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#889e92', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        {text.supportRadarViewLabel}
+                      </span>
+                      <p style={{ margin: '2px 0 0', fontSize: '13px', color: '#ffffff', fontWeight: 600 }}>
+                        {supportMapViewMode === 'RADAR'
+                          ? text.supportRadarSubtitle
+                          : `${text.supportMapSubtitle}: ${supportDirectoryData.find(n => n.id === selectedSupportNode)?.name || text.supportSectionTitle}`}
+                      </p>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+
+                      <div style={{ display: 'inline-flex', gap: '4px', background: 'rgba(0,0,0,0.5)', padding: '3px', borderRadius: '4px', border: '1px solid #364840' }}>
+                        <button
+                          type="button"
+                          className="trade-btn"
+                          onClick={() => setSupportMapViewMode('RADAR')}
+                          style={{
+                            background: supportMapViewMode === 'RADAR' ? '#2f6838' : 'transparent',
+                            color: supportMapViewMode === 'RADAR' ? '#ffffff' : '#97ab9f',
+                            border: 'none',
+                            padding: '4px 10px',
+                            fontSize: '10px',
+                            borderRadius: '3px',
+                            cursor: 'pointer',
+                            lineHeight: 1.2
+                          }}
+                        >
+                          {text.supportRadarViewBtn}
+                        </button>
+                        <button
+                          type="button"
+                          className="trade-btn"
+                          onClick={() => setSupportMapViewMode('GOOGLE_MAP')}
+                          style={{
+                            background: supportMapViewMode === 'GOOGLE_MAP' ? '#2f6838' : 'transparent',
+                            color: supportMapViewMode === 'GOOGLE_MAP' ? '#ffffff' : '#97ab9f',
+                            border: 'none',
+                            padding: '4px 10px',
+                            fontSize: '10px',
+                            borderRadius: '3px',
+                            cursor: 'pointer',
+                            lineHeight: 1.2
+                          }}
+                        >
+                          {text.supportGoogleMapBtn}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  {supportMapViewMode === 'RADAR' ? (
+                    <div className="radar-canvas-box">
+
+                      <div className="radar-circle" style={{ width: '80px', height: '80px' }} />
+                      <div className="radar-circle" style={{ width: '160px', height: '160px' }} />
+                      <div className="radar-circle" style={{ width: '240px', height: '240px' }} />
+                      <div className="radar-crosshair-x" />
+                      <div className="radar-crosshair-y" />
+
+
+                      <span style={{ position: 'absolute', top: '52%', left: '56%', fontSize: '8px', fontFamily: "'DM Mono', monospace", color: 'rgba(110, 157, 104, 0.5)', pointerEvents: 'none' }}>5km</span>
+                      <span style={{ position: 'absolute', top: '52%', left: '68%', fontSize: '8px', fontFamily: "'DM Mono', monospace", color: 'rgba(110, 157, 104, 0.5)', pointerEvents: 'none' }}>15km</span>
+                      <span style={{ position: 'absolute', top: '52%', left: '80%', fontSize: '8px', fontFamily: "'DM Mono', monospace", color: 'rgba(110, 157, 104, 0.5)', pointerEvents: 'none' }}>25km</span>
+
+
+                      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 15, textAlign: 'center' }}>
+                        <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ffffff', margin: '0 auto', boxShadow: '0 0 12px #6e9d68' }} />
+                        <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#ffffff', background: 'rgba(0,0,0,0.7)', padding: '1px 4px', borderRadius: 2, display: 'inline-block', marginTop: 2 }}>
+                          {text.supportYourFarm}
+                        </span>
+                      </div>
+
+
+                      {supportDirectoryData.map((node) => {
+                        const isSelected = selectedSupportNode === node.id;
+                        const pinColor = node.type === 'GOVT_KVK' ? '#6e9d68' : (node.type === 'AGRONOMIST' ? '#4d88ff' : (node.type === 'SOIL_LAB' ? '#e5a93b' : (node.type === 'HELPLINE' ? '#ff6666' : '#20b2aa')));
+
+                        return (
+                          <div
+                            key={node.id}
+                            className={`radar-pin ${isSelected ? 'pin-active' : ''}`}
+                            style={{ top: `${node.mapCoords.y}%`, left: `${node.mapCoords.x}%` }}
+                            onClick={() => {
+                              setSelectedSupportNode(node.id);
+                              setGoogleMapModalNode(node);
+                            }}
+                            title={`${node.name} (${node.distanceKm} km away) - Click to view on Google Maps`}
+                          >
+                            <div className="radar-pin-dot" style={{ background: pinColor }}>
+                              <span style={{ fontSize: '8px', color: '#ffffff', fontWeight: 'bold' }}>·</span>
+                            </div>
+                            <span className="radar-pin-label">
+                              {node.name.split(' ')[0]} {node.name.split(' ')[1] || ''} ({node.distanceKm}km)
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+
+                    <div style={{ position: 'relative', width: '100%', height: '320px', borderRadius: '4px', overflow: 'hidden', border: '1px solid #364840' }}>
+                      {(() => {
+                        const activeNode = supportDirectoryData.find(n => n.id === selectedSupportNode) || supportDirectoryData[0];
+                        return (
+                          <>
+                            <iframe
+                              title={`Google Map - ${activeNode.name}`}
+                              width="100%"
+                              height="100%"
+                              style={{ border: 0, display: 'block' }}
+                              loading="lazy"
+                              src={`https://maps.google.com/maps?q=${encodeURIComponent(activeNode.mapQuery || `${activeNode.lat},${activeNode.lng}`)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                            />
+                            <div style={{ position: 'absolute', bottom: '10px', right: '10px', background: 'rgba(20, 26, 24, 0.92)', padding: '6px 12px', borderRadius: '4px', border: '1px solid #41554c', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                              <span style={{ fontSize: '11px', color: '#f6f5f0', fontFamily: "'DM Mono', monospace" }}>
+                                {activeNode.name}
+                              </span>
+                              <a
+                                href={activeNode.googleMapsUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="trade-btn trade-btn-primary"
+                                style={{ padding: '4px 10px', fontSize: '10px', textDecoration: 'none' }}
+                              >
+                                {text.supportOpenMap}
+                              </a>
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </div>
+
+
+                <div className="support-directory-grid">
+                  {supportDirectoryData
+                    .filter(node => {
+                      if (supportCategoryFilter !== 'ALL' && node.type !== supportCategoryFilter) return false;
+                      const q = supportSearchQuery.toLowerCase().trim();
+                      if (!q) return true;
+                      return node.name.toLowerCase().includes(q) ||
+                        node.department.toLowerCase().includes(q) ||
+                        node.location.toLowerCase().includes(q) ||
+                        node.services.some(s => s.toLowerCase().includes(q));
+                    })
+                    .map(node => {
+                      const isSelected = selectedSupportNode === node.id;
+                      const badgeBg = node.type === 'GOVT_KVK' ? '#eef4ec' : (node.type === 'AGRONOMIST' ? '#eef2f8' : (node.type === 'SOIL_LAB' ? '#fdf5e8' : (node.type === 'HELPLINE' ? '#fbeeee' : '#eaf4f4')));
+                      const badgeColor = node.type === 'GOVT_KVK' ? '#2f6838' : (node.type === 'AGRONOMIST' ? '#204068' : (node.type === 'SOIL_LAB' ? '#7a5214' : (node.type === 'HELPLINE' ? '#a32020' : '#1b6b6b')));
+
+                      return (
+                        <div
+                          key={node.id}
+                          className={`support-card ${isSelected ? 'card-highlighted' : ''}`}
+                        >
+                          <div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '6px', marginBottom: '6px' }}>
+                              <span style={{
+                                fontSize: '9px',
+                                fontFamily: "'DM Mono', monospace",
+                                padding: '2px 6px',
+                                borderRadius: '3px',
+                                fontWeight: 700,
+                                background: badgeBg,
+                                color: badgeColor,
+                                letterSpacing: '0.3px'
+                              }}>
+                                {node.badge}
+                              </span>
+                              <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078', fontWeight: 600 }}>
+                                Γÿà {node.rating} &middot; {node.distanceKm} km
+                              </span>
+                            </div>
+
+
+                            <h3 style={{ fontSize: '15px', margin: '2px 0 2px', color: '#202a27', lineHeight: '1.3' }}>
+                              {node.name}
+                            </h3>
+                            <p style={{ margin: '0 0 6px', fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#667269' }}>
+                              {node.department}
+                            </p>
+                            <p style={{ margin: '0 0 8px', fontSize: '12px', color: '#444d47' }}>
+                              {node.location}
+                            </p>
+
+
+                            <div style={{ background: '#f8f7f2', borderRadius: '4px', padding: '6px 10px', fontSize: '11px', color: '#4d5750', marginBottom: '8px', border: '1px solid #eceae2' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <span>{text.supportLead} <strong>{node.inCharge}</strong></span>
+                              </div>
+                              <div style={{ font: "10px 'DM Mono', monospace", color: '#778078', marginTop: '2px' }}>
+                                {text.supportHours} {node.hours}
+                              </div>
+                            </div>
+
+
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '6px' }}>
+                              {node.services.map((srv, idx) => (
+                                <span key={idx} style={{ fontSize: '10px', background: '#f0eee8', color: '#333b35', padding: '2px 6px', borderRadius: '3px' }}>
+                                  {getLocalizedText(srv, language)}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+
+                          <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid #edebe4', paddingTop: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+
+                            <a
+                              href={`tel:${node.phone.replace(/[^0-9+]/g, '')}`}
+                              className="trade-btn trade-btn-primary"
+                              style={{ flex: '1 1 140px', padding: '7px 12px', fontSize: '11px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', whiteSpace: 'nowrap' }}
+                              onClick={(e) => {
+                                if (!node.phone.startsWith('+91') && !node.phone.startsWith('1800')) {
+                                  e.preventDefault();
+                                  setMessage(`Direct helpline: ${node.phone}`);
+                                }
+                              }}
+                            >
+                              {text.supportCallDesk} {node.phone}
+                            </a>
+
+                            <button
+                              type="button"
+                              className="trade-btn trade-btn-secondary"
+                              style={{ flex: '0 0 auto', padding: '7px 12px', fontSize: '11px', fontFamily: "'DM Mono', monospace", whiteSpace: 'nowrap' }}
+                              title="View on Google Maps"
+                              onClick={() => {
+                                setSelectedSupportNode(node.id);
+                                setGoogleMapModalNode(node);
+                              }}
+                            >
+                              {text.supportGoogleMapAction}
+                            </button>
+                          </div>
+
+                        </div>
+                      );
+                    })}
+
+                </div>
+
+                {supportDirectoryData.length === 0 && (
+                  <p className="muted" style={{ padding: '24px 0', textAlign: 'center' }}>No support directory nodes found.</p>
+                )}
+
+              </section>
+            </div>
+          )}
+
+
+
+
+          {currentView === 'transporter-dashboard' && (
+            session?.role === 'TRANSPORTER' ? (
+              <TransporterDashboard
+                session={session}
+                apiUrl={API_URL}
+              />
+            ) : (
+              <div className="view-container">
+                <section className="panel" style={{ marginTop: '18px', textAlign: 'center', padding: '40px 16px' }}>
+                  <h2>Transporter Portal Access Only</h2>
+                  <p style={{ color: '#667269', marginTop: '8px', fontSize: '13px' }}>
+                    This page is exclusively for registered commercial transporters to configure vehicles, set freight rates, and manage haul assignments.
+                  </p>
+                  <p style={{ color: '#667269', fontSize: '13px', marginTop: '4px' }}>
+                    Farmers and buyers cannot manage transporter settings. As a farmer, you choose and book available transporters directly from your accepted trade deals.
+                  </p>
+                  <button
+                    type="button"
+                    className="trade-btn trade-btn-primary"
+                    style={{ marginTop: '18px', padding: '8px 18px' }}
+                    onClick={() => setCurrentView(session?.role === 'FARMER' ? 'my-orders' : 'prices')}
+                  >
+                    Go to {session?.role === 'FARMER' ? 'My Orders' : 'Marketplace'}
+                  </button>
+                </section>
+              </div>
+            )
+          )}
+
+
+
+
+          {currentView === 'trade-chat' && (
+            <TradeChatView
+              session={session}
+              apiUrl={API_URL}
+              onNavigate={(targetView) => setCurrentView(targetView)}
+              activeConversationId={activeChatConversationId}
+            />
+          )}
+
+
+
+
+          {currentView === 'my-orders' && (
+            <div className="view-container">
+
+              <section className="panel" style={{ marginBottom: '20px', border: '2px solid #2f6838', borderRadius: '8px', background: '#ffffff', padding: '20px 24px', boxShadow: '0 4px 18px rgba(47, 104, 56, 0.08)' }}>
+                <div className="panel-heading" style={{ borderBottom: '1px solid #eef2ee', paddingBottom: '12px', marginBottom: '16px' }}>
+                  <div>
+                    <p className="eyebrow" style={{ color: '#2f6838', fontWeight: 700 }}>Direct Farm Produce Sales Ledger</p>
+                    <h2 style={{ margin: '2px 0 0', fontSize: '20px' }}>Active Crop Sales &amp; Direct Contracts</h2>
+                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
+                      Live agricultural sales agreements, counterpart negotiations, transport tracking, and direct bank payouts.
+                    </p>
+                  </div>
+                  <span className="count" style={{ background: '#2f6838', color: '#ffffff' }}>
+                    {trades.length} {trades.length === 1 ? 'Contract' : 'Contracts'}
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+                  {trades.map((t) => {
+                    const statusKey = (t.status || 'PROPOSED').toLowerCase();
+                    const gross = (t.quantity || 0) * (t.agreedPricePerKg || 0);
+                    return (
+                      <div key={t.id} style={{ border: '1px solid #d4dfd4', borderRadius: '8px', padding: '16px', background: '#fafbfa', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                            <div>
+                              <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#2f6838' }}>
+                                Trade #{t.id}
+                              </span>
+                              <h3 style={{ margin: '2px 0', fontSize: '16px', color: '#202a27' }}>
+                                {t.cropName}
+                              </h3>
+                              <span style={{ fontSize: '12px', color: '#556557' }}>
+                                Buyer: <strong>{t.buyerName}</strong>
+                              </span>
+                            </div>
+                            <span className={`status-pill status-${statusKey}`}>
+                              {t.status}
+                            </span>
+                          </div>
+
+                          <div style={{ background: '#ffffff', border: '1px solid #eceae2', borderRadius: '6px', padding: '10px', margin: '10px 0', fontSize: '12px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                              <span style={{ color: '#667269' }}>Dispatched Lot:</span>
+                              <strong>{Number(t.quantity).toLocaleString()} kg ({(Number(t.quantity) / 1000).toFixed(1)} T)</strong>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                              <span style={{ color: '#667269' }}>Agreed Rate:</span>
+                              <strong style={{ color: '#2f6838' }}>₹{t.agreedPricePerKg}/kg</strong>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                              <span style={{ color: '#667269' }}>Gross Value:</span>
+                              <span>₹{gross.toLocaleString()}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                              <span style={{ color: '#667269' }}>Freight Deduction:</span>
+                              <span style={{ color: '#b45a42' }}>-₹{Number(t.transportCost || 0).toLocaleString()}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #eeeae1', paddingTop: '6px', marginTop: '4px' }}>
+                              <span style={{ color: '#202a27', fontWeight: 600 }}>Net Take-Home Payout:</span>
+                              <strong style={{ color: '#166534', fontSize: '14px' }}>₹{Number(t.netFarmerReturn || 0).toLocaleString()}</strong>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                          <button
+                            type="button"
+                            className="trade-btn trade-btn-primary"
+                            style={{ flex: 1, padding: '8px 12px', fontSize: '12px' }}
+                            onClick={() => setCurrentView('matching')}
+                          >
+                            Manage &amp; Track &rarr;
+                          </button>
+                          <button
+                            type="button"
+                            className="trade-btn trade-btn-secondary"
+                            style={{ padding: '8px 12px', fontSize: '12px' }}
+                            onClick={() => setSelectedInvoiceTrade(t)}
+                          >
+                            Receipt
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+
+
+              <div style={{ background: '#f8f9f8', border: '1px solid #d4dfd4', borderRadius: '6px', padding: '10px 16px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#365c3b', color: '#ffffff', padding: '2px 6px', borderRadius: '3px' }}>
+                    SANDBOX DEMO TEMPLATES
+                  </span>
+                  <p style={{ margin: 0, fontSize: '12px', color: '#445846' }}>
+                    The sample orders below are simulated workflow templates for evaluating multi-stage tracking, POP/POD, and escrow lifecycles. Real deals appear automatically upon marketplace trading.
+                  </p>
+                </div>
+                <span style={{ fontSize: '10px', color: '#687e6b', fontFamily: "'DM Mono', monospace" }}>
+                  DEMO MODE · SIMULATION ONLY
+                </span>
+              </div>
+              <section className="panel" style={{ marginTop: '18px' }}>
+                <div className="panel-heading">
+                  <div>
+                    <p className="eyebrow">{text.ordersTradeDeals}</p>
+                    <h2>{text.ordersHeader}</h2>
+                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
+                      Track active purchase orders, farmer harvest procurements, and escrow-guaranteed payments.
+                    </p>
+                  </div>
+                  <span className="count">{userOrders.length} {text.ordersContracts}</span>
+                </div>
+
+
+                <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', padding: '14px 0 8px' }}>
+                  {[
+                    { value: 'ALL', label: text.ordersStatusAll },
+                    { value: 'IN_TRANSIT', label: text.ordersStatusInTransit },
+                    { value: 'ESCROW_LOCKED', label: text.ordersStatusEscrowProtected },
+                    { value: 'DELIVERED', label: text.ordersStatusCompleted },
+                    { value: 'DISPUTED', label: text.ordersStatusDisputed }
+                  ].map(f => (
+                    <button
+                      key={f.value}
+                      type="button"
+                      className={`filter-chip ${orderStatusFilter === f.value ? 'active' : ''}`}
+                      onClick={() => setOrderStatusFilter(f.value)}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+
+
+                <div className="orders-grid">
+                  {userOrders
+                    .filter(o => {
+                      if (orderStatusFilter === 'ALL') return true;
+                      return o.escrowStatus === orderStatusFilter || o.orderStatus === orderStatusFilter;
+                    })
+                    .map(order => {
+                      const statusClass = order.escrowStatus === 'IN_TRANSIT' ? 'status-in-transit' :
+                        order.escrowStatus === 'ESCROW_LOCKED' ? 'status-escrow-locked' :
+                          order.escrowStatus === 'DELIVERED' ? 'status-delivered' :
+                            order.escrowStatus === 'DISPUTED' ? 'status-disputed' : 'status-placed';
+
+                      return (
+                        <div key={order.id} className="order-card">
+                          <div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '6px', marginBottom: '8px' }}>
+                              <div>
+                                <span style={{ fontSize: '12px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#202a27' }}>
+                                  {order.id}
+                                </span>
+                                <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', display: 'block', marginTop: '1px' }}>
+                                  {text.ordersPlacedOn} {order.orderDate}
+                                </span>
+                              </div>
+                              <span className={`order-status-badge ${statusClass}`}>
+                                {order.escrowStatus.replace('_', ' ')}
+                              </span>
+                            </div>
+
+
+                            <h3 style={{ fontSize: '16px', margin: '4px 0 2px', color: '#202a27', lineHeight: '1.3' }}>
+                              {order.commodity}
+                            </h3>
+                            <p style={{ margin: '0 0 10px', fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#667269' }}>
+                              {order.qualityCertificate}
+                            </p>
+
+
+                            <div style={{ background: '#faf9f5', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px 12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
+                              <div>
+                                <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>Volume</span>
+                                <p style={{ margin: '2px 0 0', fontSize: '13px', fontWeight: 700, color: '#202a27' }}>
+                                  {order.quantity} {order.unit}
+                                </p>
+                              </div>
+                              <div>
+                                <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>Agreed Rate</span>
+                                <p style={{ margin: '2px 0 0', fontSize: '13px', fontWeight: 600, color: '#202a27' }}>
+                                  ₹{order.pricePerUnit.toLocaleString()} <small style={{ fontSize: '10px', color: '#778078' }}>/ {order.unit.split(' ')[0]}</small>
+                                </p>
+                              </div>
+                              <div style={{ gridColumn: '1 / -1', borderTop: '1px solid #edeae2', paddingTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#556058' }}>Total Protected Escrow</span>
+                                <strong style={{ fontSize: '15px', color: '#2f6838', fontFamily: "'DM Mono', monospace" }}>
+                                  ₹{order.totalAmount.toLocaleString()}
+                                </strong>
+                              </div>
+                            </div>
+
+
+                            <div style={{ fontSize: '11px', color: '#556058', marginBottom: '8px' }}>
+                              <p style={{ margin: '0 0 2px' }}>
+                                <strong>{text.ordersCounterpart}</strong> {order.counterpart}
+                              </p>
+                              <p style={{ margin: '0' }}>
+                                <strong>{text.ordersDestination}</strong> {order.deliveryLocation}
+                              </p>
+                            </div>
+                          </div>
+
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid #edebe4', paddingTop: '12px' }}>
+                            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                              <button
+                                type="button"
+                                className="trade-btn trade-btn-primary"
+                                style={{ flex: 1, minWidth: '140px', padding: '8px 12px' }}
+                                onClick={() => handleTrackOrder(order.id)}
+                              >
+                                {text.ordersTrack}
+                              </button>
+                              {order.escrowStatus !== 'DELIVERED' && order.escrowStatus !== 'DISPUTED' && (
+                                <button
+                                  type="button"
+                                  className="trade-btn trade-btn-secondary"
+                                  style={{ padding: '8px 12px', fontSize: '10px' }}
+                                  onClick={() => handleReleaseEscrow(order.id)}
+                                  title="Confirm receipt and release payment to seller"
+                                >
+                                  {text.ordersReleaseEscrow}
+                                </button>
+                              )}
+                            </div>
+
+                            {order.escrowStatus !== 'DISPUTED' && order.escrowStatus !== 'DELIVERED' && (
+                              <button
+                                type="button"
+                                className="text-button"
+                                style={{ fontSize: '10px', color: '#a82020', textAlign: 'center', padding: '2px 0' }}
+                                onClick={() => handleRaiseDispute(order.id)}
+                              >
+                                {text.ordersRaiseDispute}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+
+                {userOrders.length === 0 && (
+                  <p className="muted" style={{ padding: '30px 0', textAlign: 'center' }}>{text.ordersNoOrders}</p>
+                )}
+              </section>
+            </div>
+          )}
+
+
+
+
+          {currentView === 'my-shop' && (
+            <div className="view-container">
+              <section className="panel" style={{ marginTop: '18px' }}>
+                <div className="panel-heading">
+                  <div>
+                    <p className="eyebrow">Farmer Direct Storefront &amp; Stock Inventory</p>
+                    <h2>{text.shopSectionTitle}</h2>
+                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
+                      {text.shopSectionSubtitle}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    className="trade-btn trade-btn-primary"
+                    style={{ padding: '8px 16px', fontSize: '11px' }}
+                    onClick={() => setQuickProduceModal({
+                      cropName: 'Nashik Red Onion',
+                      category: 'VEGETABLES',
+                      quantity: '',
+                      unit: 'Quintals',
+                      expectedPrice: '',
+                      location: 'Nashik Farm Gate'
+                    })}
+                  >
+                    {text.shopAddProduce}
+                  </button>
+                </div>
+
+
+                <div className="shop-stats-grid">
+                  <div className="shop-stat-card">
+                    <span>{text.shopActiveListings}</span>
+                    <strong>{shopInventory.filter(i => i.status === 'ACTIVE').length}</strong>
+                    <small>{text.shopOnlineBuyers}</small>
+                  </div>
+                  <div className="shop-stat-card">
+                    <span>{text.shopTotalHarvestStock}</span>
+                    <strong>
+                      {shopInventory.reduce((acc, curr) => acc + curr.stockQuantity, 0).toLocaleString()} <span style={{ fontSize: '13px', fontWeight: 600 }}>Qtl</span>
+                    </strong>
+                    <small>{text.shopReadyStorage}</small>
+                  </div>
+                  <div className="shop-stat-card">
+                    <span>{text.shopSalesRevenue}</span>
+                    <strong>₹6,82,000</strong>
+                    <small>{text.shopCompletedEscrow}</small>
+                  </div>
+                  <div className="shop-stat-card">
+                    <span>{text.shopPendingEscrow}</span>
+                    <strong style={{ color: '#2f6838' }}>₹3,88,000</strong>
+                    <small>{text.shopUnderInspection}</small>
+                  </div>
+                </div>
+
+
+                <div style={{ marginTop: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                    <h3 style={{ margin: 0, fontSize: '16px', color: '#202a27' }}>
+                      {text.shopInventoryTitle}
+                    </h3>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      {['ALL', 'GRAIN', 'VEGETABLES', 'FRUITS', 'OILSEED'].map(cat => (
+                        <button
+                          key={cat}
+                          type="button"
+                          className={`filter-chip ${shopCategoryFilter === cat ? 'active' : ''}`}
+                          onClick={() => setShopCategoryFilter(cat)}
+                          style={{ fontSize: '9px', padding: '4px 8px' }}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="market-table-container">
+                    <table className="market-table">
+                      <thead>
+                        <tr>
+                          <th>{text.shopCommodity}</th>
+                          <th>{text.shopQualityGrade}</th>
+                          <th>{text.shopStockSilo}</th>
+                          <th>{text.shopUnitPrice}</th>
+                          <th>{text.shopStorageHub}</th>
+                          <th>{text.shopInquiries}</th>
+                          <th>{text.shopStatus}</th>
+                          <th style={{ textAlign: 'right' }}>{text.shopActions}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {shopInventory
+                          .filter(item => shopCategoryFilter === 'ALL' || item.category === shopCategoryFilter)
+                          .map(item => (
+                            <tr key={item.id}>
+                              <td>
+                                <strong>{item.cropName}</strong>
+                                <small style={{ display: 'block', color: '#778078', fontSize: '10px' }}>Harvest: {item.harvestDate}</small>
+                              </td>
+                              <td>
+                                <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#444d47' }}>
+                                  {item.qualityGrade}
+                                </span>
+                              </td>
+                              <td>
+                                <strong>{item.stockQuantity}</strong> <small style={{ color: '#778078' }}>{item.unit}</small>
+                              </td>
+                              <td>
+                                <strong style={{ color: '#2f6838' }}>₹{item.pricePerUnit}</strong> <small style={{ color: '#778078' }}>/ {item.unit.split(' ')[0]}</small>
+                              </td>
+                              <td style={{ fontSize: '11px', color: '#667269' }}>
+                                {item.storageLocation}
+                              </td>
+                              <td>
+                                <span style={{ font: "10px 'DM Mono', monospace", background: '#f0eee8', padding: '2px 6px', borderRadius: '3px' }}>
+                                  {item.inquiriesCount} Leads ({item.viewsCount} views)
+                                </span>
+                              </td>
+                              <td>
+                                <span style={{
+                                  fontSize: '9px',
+                                  fontFamily: "'DM Mono', monospace",
+                                  padding: '2px 6px',
+                                  borderRadius: '3px',
+                                  fontWeight: 700,
+                                  background: item.status === 'ACTIVE' ? '#eef4ec' : '#f0eee8',
+                                  color: item.status === 'ACTIVE' ? '#2f6838' : '#778078'
+                                }}>
+                                  {item.status}
+                                </span>
+                              </td>
+                              <td style={{ textAlign: 'right' }}>
+                                <button
+                                  type="button"
+                                  className="trade-btn trade-btn-secondary"
+                                  style={{ padding: '4px 8px', fontSize: '10px' }}
+                                  onClick={() => handleToggleShopStatus(item.id)}
+                                >
+                                  {item.status === 'ACTIVE' ? text.shopPauseListing : text.shopActivate}
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+
+                <div style={{ marginTop: '28px', borderTop: '1px solid #e7e4db', paddingTop: '20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: '16px', color: '#202a27' }}>
+                        {text.shopBuyerOffersTitle}
+                      </h3>
+                      <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#667269' }}>
+                        {text.shopBuyerOffersSubtitle}
+                      </p>
+                    </div>
+                    <span className="count" style={{ background: '#f5d9d0', color: '#b45a42' }}>
+                      {shopOffers.length} {text.shopPending}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '14px' }}>
+                    {shopOffers.map(offer => (
+                      <div key={offer.id} style={{ background: '#ffffff', border: '1px solid #d9d6cc', borderRadius: '4px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '10px' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                              <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
+                                {offer.buyerType.replace('_', ' ')}
+                              </span>
+                              <h4 style={{ margin: '2px 0 0', fontSize: '14px', color: '#202a27' }}>
+                                {offer.buyerName}
+                              </h4>
+                            </div>
+                            <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>
+                              {offer.timestamp}
+                            </span>
+                          </div>
+
+                          <div style={{ background: '#faf9f5', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', marginTop: '10px' }}>
+                            <p style={{ margin: '0 0 4px', fontSize: '13px', fontWeight: 700, color: '#202a27' }}>
+                              {offer.offeredQuantity} {offer.unit} of {offer.cropName}
+                            </p>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontSize: '11px', color: '#556058' }}>Buyer Bid: <strong style={{ color: '#2f6838' }}>₹{offer.offeredPrice}</strong></span>
+                              <span style={{ fontSize: '11px', color: '#778078' }}>Asking: ₹{offer.askingPrice}</span>
+                            </div>
+                            <p style={{ margin: '4px 0 0', fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>
+                              Delivery to: {offer.destination}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '6px', borderTop: '1px solid #edeae2', paddingTop: '10px' }}>
+                          <button
+                            type="button"
+                            className="trade-btn trade-btn-primary"
+                            style={{ flex: 1, padding: '6px 10px', fontSize: '10px' }}
+                            onClick={() => handleAcceptOffer(offer)}
+                          >
+                            Accept &amp; Lock Escrow
+                          </button>
+                          <button
+                            type="button"
+                            className="trade-btn trade-btn-secondary"
+                            style={{ padding: '6px 10px', fontSize: '10px' }}
+                            onClick={() => handleDeclineOffer(offer.id)}
+                          >
+                            Decline
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {shopOffers.length === 0 && (
+                    <p className="muted" style={{ padding: '16px 0', textAlign: 'center' }}>No pending buyer bids.</p>
+                  )}
+                </div>
+              </section>
+            </div>
+          )}
+
+
+
+
+          {currentView === 'order-progress' && (
+            <div className="view-container">
+              <section className="panel" style={{ marginTop: '18px' }}>
+                {(() => {
+                  const activeOrder = userOrders.find(o => o.id === selectedTrackingOrderId) || userOrders[0];
+                  if (!activeOrder) return <p className="muted">No orders available for tracking.</p>;
+
+                  return (
+                    <>
+                      <div className="panel-heading">
+                        <div>
+                          <p className="eyebrow">Logistics Pipeline &amp; Escrow Milestone Tracker</p>
+                          <h2>Order Progress: {activeOrder.id}</h2>
+                          <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
+                            Real-time tracking of dispatch, weighbridge verification, and automated escrow payout.
+                          </p>
+                        </div>
+                        <span className="count" style={{ background: '#e0edf5', color: '#204b6e' }}>
+                          {activeOrder.orderStatus}
+                        </span>
+                      </div>
+
+
+                      <div className="order-selector-container">
+                        {userOrders.map(order => {
+                          const isSelected = order.id === activeOrder.id;
+                          const statusClass = order.escrowStatus === 'IN_TRANSIT' ? 'status-in-transit' :
+                            order.escrowStatus === 'ESCROW_LOCKED' ? 'status-escrow-locked' :
+                              order.escrowStatus === 'DELIVERED' ? 'status-delivered' :
+                                order.escrowStatus === 'DISPUTED' ? 'status-disputed' : 'status-placed';
+
+                          return (
+                            <button
+                              key={order.id}
+                              type="button"
+                              className={`order-tab-btn ${isSelected ? 'active' : ''}`}
+                              onClick={() => setSelectedTrackingOrderId(order.id)}
+                              title={`Select ${order.id} (${order.commodity})`}
+                            >
+                              <div>
+                                <span className="order-tab-id">{order.id}</span>
+                                <span className="order-tab-name">
+                                  {order.commodity.split(' ')[0]} &middot; {order.quantity} {order.unit.split(' ')[0]}
+                                </span>
+                              </div>
+                              <span className={`order-status-badge ${statusClass}`} style={{ fontSize: '8px', padding: '2px 5px' }}>
+                                {order.escrowStatus.replace('_', ' ')}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+
+
+                      <div className="progress-summary-card">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+                          <div>
+                            <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
+                              Protected Trade Order
+                            </span>
+                            <h3 style={{ margin: '2px 0 0', fontSize: '17px', color: '#202a27' }}>
+                              {activeOrder.commodity} &middot; {activeOrder.quantity} {activeOrder.unit}
+                            </h3>
+                            <p style={{ margin: '3px 0 0', fontSize: '12px', color: '#556058' }}>
+                              {activeOrder.originLocation} &rarr; <strong>{activeOrder.deliveryLocation}</strong>
+                            </p>
+                          </div>
+
+                          <div style={{ textAlign: 'right' }}>
+                            <span className="escrow-pill">
+                              Escrow Protected: ₹{activeOrder.totalAmount.toLocaleString()}
+                            </span>
+                            <p style={{ margin: '4px 0 0', fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#778078' }}>
+                              ETA: <strong>{activeOrder.estimatedDelivery}</strong>
+                            </p>
+                          </div>
+                        </div>
+
+
+                        <div>
+                          <div className="horizontal-step-track">
+                            {(() => {
+                              const completedCount = activeOrder.timeline.filter(t => t.completed).length;
+                              const progressPct = Math.min(100, Math.max(0, ((completedCount - 0.5) / (activeOrder.timeline.length - 1)) * 100));
+                              return (
+                                <>
+                                  <div className="track-progress-fill" style={{ width: `${progressPct}%` }} />
+                                  {activeOrder.timeline.map((step, idx) => {
+                                    const isCompleted = step.completed;
+                                    const isActive = step.active;
+                                    const shortLabel = ['Signed', 'Escrow', 'Assay', 'Transit', 'Weighbridge', 'Payout'][idx] || `S${idx + 1}`;
+
+                                    return (
+                                      <div key={idx} className={`h-step-node ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}`}>
+                                        <div className="h-step-dot">
+                                          {isCompleted ? 'Γ£ô' : idx + 1}
+                                        </div>
+                                        <span className="h-step-label">{shortLabel}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </>
+                              );
+                            })()}
+                          </div>
+                        </div>
+                      </div>
+
+
+                      <div className="logistics-card-minimal">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                          <div>
+                            <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', textTransform: 'uppercase' }}>
+                              Logistics &amp; Carrier Assignment
+                            </span>
+                            <h4 style={{ margin: '2px 0 0', fontSize: '14px', color: '#202a27' }}>
+                              {activeOrder.logistics.carrier} &middot; <span style={{ fontFamily: "'DM Mono', monospace" }}>{activeOrder.logistics.vehicleNo}</span>
+                            </h4>
+                          </div>
+                          <div>
+                            <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058' }}>
+                              Current GPS: <strong style={{ color: '#2f6838' }}>{activeOrder.logistics.currentLocation}</strong>
+                            </span>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', borderTop: '1px solid #e7e4db', paddingTop: '10px' }}>
+                          <div style={{ fontSize: '12px', color: '#444d47' }}>
+                            <span>Driver: <strong>{activeOrder.logistics.driverName}</strong> ({activeOrder.logistics.driverPhone})</span>
+                          </div>
+
+                          <div style={{ display: 'flex', gap: '6px' }}>
+                            <a
+                              href={`tel:${activeOrder.logistics.driverPhone.replace(/[^0-9+]/g, '')}`}
+                              className="trade-btn trade-btn-secondary"
+                              style={{ padding: '5px 12px', fontSize: '10px', textDecoration: 'none' }}
+                            >
+                              Call Driver
+                            </a>
+                            {activeOrder.escrowStatus !== 'DELIVERED' && (
+                              <button
+                                type="button"
+                                className="trade-btn trade-btn-primary"
+                                style={{ padding: '5px 12px', fontSize: '10px', background: '#2f6838 !important' }}
+                                onClick={() => handleReleaseEscrow(activeOrder.id)}
+                              >
+                                Release Escrow Payment
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+
+                      <div style={{ marginTop: '16px' }}>
+                        <h4 style={{ fontSize: '13px', margin: '0 0 8px', color: '#202a27', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", letterSpacing: '0.04em' }}>
+                          Stage Milestones &amp; Verification Log
+                        </h4>
+
+                        <div className="minimal-timeline-feed">
+                          {activeOrder.timeline.map((step, idx) => {
+                            const statusState = step.completed ? 'completed' : step.active ? 'active' : 'pending';
+
+                            return (
+                              <div key={idx} className={`timeline-row ${statusState}`}>
+                                <div className="timeline-badge">
+                                  {step.completed ? 'Γ£ô' : idx + 1}
+                                </div>
+                                <div className="timeline-body">
+                                  <div className="timeline-header">
+                                    <span className="timeline-title">Stage {idx + 1}: {step.title}</span>
+                                    <span className="timeline-time">{step.timestamp}</span>
+                                  </div>
+                                  <p className="timeline-desc">{step.desc}</p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
+              </section>
+            </div>
+          )}
+
+
+
+
+
+          {currentView === 'predictions' && (
+
+
+            <div className="view-container">
+              <section className="panel" style={{ marginTop: '18px' }}>
+                <div className="panel-heading">
+                  <div>
+                    <p className="eyebrow">Statistical Machine Intelligence &amp; Volatility</p>
+                    <h2>Price Forecasting &amp; Confidence Bands</h2>
+                  </div>
+                  <span className="count">{forecast ? `${forecast.confidenceScore}% Certainty` : 'Analyzing'}</span>
+                </div>
+
+
+                <div className="pulse-controls" style={{ marginTop: '14px', maxWidth: '400px' }}>
+                  <select
+                    value={selectedPulseCropId || ''}
+                    onChange={(e) => handlePulseCropChange(e.target.value)}
+                  >
+                    {crops.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} ({c.category})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {forecast ? (
+                  <div className="two-col-view-layout">
+                    <div>
+                      <div className="prediction-deep-grid">
+                        <div className="stat-metric-card">
+                          <span>Next Day Target Price</span>
+                          <strong>₹{forecast.estimatedPrice} <small style={{ fontSize: '13px' }}>/ {pulseCrop?.unit || 'kg'}</small></strong>
+                        </div>
+                        <div className="stat-metric-card">
+                          <span>Trend &amp; Volatility</span>
+                          <strong style={{ color: forecast.trend === 'UPWARD' ? '#5a8e62' : forecast.trend === 'DOWNWARD' ? '#b45a42' : '#7f8981' }}>
+                            {forecast.trend === 'UPWARD' ? '↔ Bullish' : forecast.trend === 'DOWNWARD' ? '↘ Bearish' : '→ Stable'}
+                          </strong>
+                          <small style={{ font: "9px 'DM Mono', monospace", textTransform: 'uppercase', color: '#667269' }}>
+                            {forecast.volatilityLevel} Volatility · {forecast.historicalPointsCount} points
+                          </small>
+                        </div>
+                      </div>
+
+
+                      <div className="confidence-bands-visual" style={{ marginTop: '18px' }}>
+                        <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#5a665e', fontWeight: 'bold' }}>
+                          Labeled Confidence Intervals (Certainty Bounds)
+                        </p>
+                        {forecast.confidenceIntervals?.map((ci, idx) => (
+                          <div className="band-item" key={ci.label || idx}>
+                            <span className="band-label">{ci.label}</span>
+                            <div className="band-bar-wrap">
+                              <div
+                                className={`band-bar-fill ${idx === 0 ? 'band-fill-80' : idx === 1 ? 'band-fill-90' : 'band-fill-95'}`}
+                                style={{ width: `${Math.min(100, Math.max(30, ci.confidenceLevel * 100))}%` }}
+                              />
+                            </div>
+                            <span className="band-range-val">₹{ci.lowerBound} – ₹{ci.upperBound}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <p style={{ font: "10px 'DM Mono', monospace", color: '#77837a', marginTop: '12px' }}>
+                        <strong>Methodology:</strong> {forecast.methodology}
+                      </p>
+                    </div>
+
+
+                    <div style={{ background: '#fffdf9', border: '1px solid #d9d6cc', borderRadius: '6px', padding: '16px' }}>
+                      <h3 style={{ margin: '0 0 10px', fontSize: '15px' }}>7-Day Price Trajectory</h3>
+                      <table className="trajectory-table">
+                        <thead>
+                          <tr>
+                            <th>Horizon</th>
+                            <th>Target</th>
+                            <th>90% Likely Range</th>
+                            <th>Trend</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {forecast.multiDayForecast?.map((fp) => (
+                            <tr key={fp.dayAhead}>
+                              <td><strong>+{fp.dayAhead}d</strong> ({new Date(fp.date).toLocaleDateString(undefined, { weekday: 'short' })})</td>
+                              <td><strong>₹{fp.predictedPrice}</strong></td>
+                              <td>₹{fp.interval90?.lowerBound} – ₹{fp.interval90?.upperBound}</td>
+                              <td style={{ color: fp.trend === 'UPWARD' ? '#5a8e62' : fp.trend === 'DOWNWARD' ? '#b45a42' : '#7f8981' }}>
+                                {fp.trend === 'UPWARD' ? '↔' : fp.trend === 'DOWNWARD' ? '↘' : '→'}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <p style={{ font: "9px 'DM Mono', monospace", color: '#88928a', marginTop: '10px' }}>
+                        * {forecast.disclaimer}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="muted" style={{ padding: '30px 0' }}>Computing price trajectory and confidence intervals...</p>
+                )}
+              </section>
+            </div>
+          )}
+
+
+
+
+          {currentView === 'weather' && (
+            <div className="view-container">
+              <section className="panel" style={{ marginTop: '18px' }}>
+                <div className="panel-heading">
+                  <div>
+                    <p className="eyebrow">{text.weatherEyebrow}</p>
+                    <h2>{text.weatherTitle}</h2>
+                  </div>
+                  <span className="count">{weatherData?.harvestSuitability || text.weatherAnalyzing}</span>
+                </div>
+
+
+                <div className="location-presets-bar">
+                  <span style={{ font: "10px 'DM Mono', monospace", color: '#6a766c', alignSelf: 'center', marginRight: '4px' }}>
+                    {text.weatherOrigin} <strong>{mapCoords.label}</strong>
+                  </span>
+                  <button
+                    type="button"
+                    className={`location-pill ${mapCoords.label === 'Ranchi Center' ? 'active' : ''}`}
+                    onClick={() => handleLocationPreset(23.3441, 85.3096, 'Ranchi Center')}
+                  >
+                    Ranchi
+                  </button>
+                  <button
+                    type="button"
+                    className={`location-pill ${mapCoords.label === 'Ramgarh' ? 'active' : ''}`}
+                    onClick={() => handleLocationPreset(23.6332, 85.5149, 'Ramgarh')}
+                  >
+                    Ramgarh
+                  </button>
+                  <button
+                    type="button"
+                    className={`location-pill ${mapCoords.label === 'Bokaro' ? 'active' : ''}`}
+                    onClick={() => handleLocationPreset(23.6693, 86.1511, 'Bokaro')}
+                  >
+                    Bokaro
+                  </button>
+                  <button
+                    type="button"
+                    className={`location-pill ${mapCoords.label === 'Jamshedpur' ? 'active' : ''}`}
+                    onClick={() => handleLocationPreset(22.8046, 86.2029, 'Jamshedpur')}
+                  >
+                    Jamshedpur
+                  </button>
+                  {session && (
+                    <button
+                      type="button"
+                      className="location-pill"
+                      style={{ background: '#dce7d3', color: '#3d5940', borderColor: '#b8cba8' }}
+                      onClick={handleUseProfileLocation}
+                    >
+                      {text.weatherUseGps}
+                    </button>
+                  )}
+                </div>
+
+
+                <div className="pulse-controls" style={{ marginTop: '10px', maxWidth: '380px' }}>
+                  <select
+                    value={weatherCropId || ''}
+                    onChange={(e) => setWeatherCropId(e.target.value ? Number(e.target.value) : null)}
+                  >
+                    <option value="">{text.weatherGeneralConditions}</option>
+                    {crops.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} ({c.category})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {weatherLoading ? (
+                  <p className="muted" style={{ padding: '24px 0' }}>{text.weatherLoading}</p>
+                ) : weatherData ? (
+                  <>
+
+                    <div className="weather-hero-card">
+                      <div>
+                        <p className="eyebrow">{weatherData.locationName} · GPS {weatherData.latitude.toFixed(2)}°N, {weatherData.longitude.toFixed(2)}°E</p>
+                        <h3>{weatherData.currentTemp}°C</h3>
+                        <p style={{ margin: '6px 0 0', font: "11px 'DM Mono', monospace", color: '#b9c5b7', textTransform: 'uppercase' }}>
+                          {text.weatherCondition}: <strong>{(weatherData.currentCondition || '').replace(/_/g, ' ')}</strong>
+                        </p>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <span className="count" style={{ background: '#35453e', color: '#fffaf1' }}>
+                          {text.weatherSuitability}: {weatherData.harvestSuitability}
+                        </span>
+                      </div>
+                    </div>
+
+
+                    <div className="weather-grid-metrics">
+                      <div className="weather-metric-item">
+                        <span>{text.weatherHumidity}</span>
+                        <strong>{weatherData.humidityPercent}%</strong>
+                      </div>
+                      <div className="weather-metric-item">
+                        <span>{text.weatherRainfall}</span>
+                        <strong>{weatherData.rainfallMm} mm</strong>
+                      </div>
+                      <div className="weather-metric-item">
+                        <span>{text.weatherWind}</span>
+                        <strong>{weatherData.windSpeedKmh} km/h</strong>
+                      </div>
+                      <div className="weather-metric-item">
+                        <span>{text.weatherSuitability}</span>
+                        <strong style={{ color: weatherData.harvestSuitability === 'EXCELLENT' ? '#5a8e62' : weatherData.harvestSuitability === 'HAZARDOUS' ? '#b45a42' : '#202a27' }}>
+                          {weatherData.harvestSuitability}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div className="two-col-view-layout" style={{ marginTop: '16px' }}>
+                      <div>
+
+                        <div className="harvest-box">
+                          <h4>{text.weatherHarvestWindow}</h4>
+                          <p><strong>{weatherData.recommendedHarvestWindow}</strong></p>
+                        </div>
+
+
+                        <div className="spoilage-card">
+                          <div className="spoilage-header">
+                            <h4>{text.weatherSpoilageRisk}</h4>
+                            <span className={`spoilage-badge spoilage-${weatherData.spoilageRiskIndex.toLowerCase()}`}>
+                              {weatherData.spoilageRiskIndex} {text.weatherRisk}
+                            </span>
+                          </div>
+                          <p style={{ margin: '10px 0 0', fontSize: '13px', color: '#5a665e', lineHeight: '1.5' }}>
+                            {weatherData.transitAdvisory}
+                          </p>
+                        </div>
+                      </div>
+
+
+                      <div className="advisory-list-box">
+                        <p style={{ margin: 0, font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981', fontWeight: 'bold' }}>
+                          {text.weatherGuidelines}
+                        </p>
+                        <ul>
+                          {weatherData.cropAdvisories?.map((adv, idx) => (
+                            <li key={idx}>{adv}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+
+                    <div style={{ marginTop: '20px' }}>
+                      <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#5a665e', fontWeight: 'bold' }}>
+                        {text.weatherForecast}
+                      </p>
+                      <div className="five-day-forecast-grid">
+                        {weatherData.forecast?.map((day) => (
+                          <div className="forecast-card-item" key={day.date}>
+                            <span className="f-day">{day.dayName}</span>
+                            <div className="f-temp">{day.tempMax}° / {day.tempMin}°</div>
+                            <span className="f-rain">{day.precipitationProbability}% {text.weatherRain} · {(day.condition || '').replace(/_/g, ' ')}</span>
+                            <div className="f-adv">{day.advisory}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <p className="muted" style={{ padding: '24px 0' }}>
+                    {weatherError || text.weatherUnavailable}
+                  </p>
+                )}
+              </section>
+            </div>
+          )}
+
+
+
+
+          {currentView === 'fpo-intake' && (
+            <FpoIntakeView
+              intakes={fpoIntakes}
+              farmers={fpoFarmers}
+              onAddIntake={(newIntake) => {
+                setFpoIntakes(prev => [newIntake, ...prev]);
+                setMessage(`Recorded intake ${newIntake.intakeId} (${newIntake.netWeightKg} kg) for ${newIntake.farmerName} with digital weigh-slip!`);
+              }}
+              onNavigateToLots={() => setCurrentView('fpo-lots')}
+            />
+          )}
+
+
+
+
+          {currentView === 'farmer-payouts' && (
+            <FarmerPayoutsLedgerView
+              farmerId={session?.farmerId || 'FMR-FPO42-001'}
+              farmerName={session?.name || 'Ramesh Kumar'}
+              intakes={fpoIntakes}
+              collectionSchedule={collectionSchedule}
+              onNotifyHarvest={(harvest) => {
+                setMessage(`Sent harvest dispatch alert for ${harvest.estQuantityKg} kg ${harvest.crop} to Sahyadri FPO!`);
+              }}
+            />
+          )}
+
+
+
+
+          {currentView === 'fpo-lots' && (
+            <FpoLotsAndPassportView
+              fpoProfile={fpoProfile}
+              lots={fpoLots}
+              fpoFarmers={fpoFarmers}
+              intakes={fpoIntakes}
+              initialAction={routeAction}
+              onNavigate={(v) => setCurrentView(v)}
+              onMatchLot={(lot) => {
+                setProduce({
+                  cropId: crops[0]?.id || 1,
+                  cropName: lot.cropName,
+                  category: lot.category,
+                  quantity: lot.quantityKg,
+                  quality: lot.qualityChecklist?.grade || 'GRADE_A',
+                  imageUrl: lot.images?.[0] || ''
+                });
+                setProduceSource('custom');
+                findRecommendationForProduce({
+                  cropName: lot.cropName,
+                  category: lot.category,
+                  quantity: lot.quantityKg,
+                  quality: lot.qualityChecklist?.grade || 'GRADE_A'
+                });
+                setMessage(`Pre-loaded ${lot.cropName} (${lot.quantityKg} kg) from ${lot.lotId} for institutional buyer matching.`);
+              }}
+              onCreateLot={(newLot) => {
+                setFpoLots(prev => [newLot, ...prev]);
+                setFpoIntakes(prev => prev.map(intake => {
+                  if (newLot.contributingFarmers?.some(cf => cf.farmerId === intake.farmerId) && intake.cropName === newLot.cropName && intake.status === 'UNPOOLED') {
+                    return { ...intake, status: 'POOLED', lotId: newLot.lotId };
+                  }
+                  return intake;
+                }));
+                setMessage(`Created Aggregated Lot ${newLot.lotId} with Digital Lot Passport!`);
+              }}
+            />
+          )}
+
+
+
+
+          {currentView === 'fpo-farmers' && (
+            <FpoMemberFarmersView
+              farmers={fpoFarmers}
+              intakes={fpoIntakes}
+              initialAction={routeAction}
+              initialFarmerId={routeFarmerId}
+              onViewAsFarmer={(farmer) => {
+                setSession(prev => ({
+                  ...(prev || {}),
+                  token: 'demo-farmer-jwt',
+                  userId: farmer.id || 1,
+                  profileId: farmer.id || 1,
+                  name: farmer.name,
+                  email: `${farmer.name.toLowerCase().replace(/\s+/g, '.')}@kisanlink.in`,
+                  role: 'FARMER',
+                  farmerId: farmer.farmerId
+                }));
+                setCurrentView('farmer-payouts');
+                setMessage(`Switched to View as Farmer mode for ${farmer.name} (${farmer.farmerId})`);
+              }}
+              onAddFarmer={(newFarmer) => {
+                setFpoFarmers(prev => [...prev, newFarmer]);
+                setMessage(`Enrolled member smallholder ${newFarmer.name} (${newFarmer.farmerId})!`);
+              }}
+            />
+          )}
+
+
+
+
+          {currentView === 'admin-governance' && (
+            <AdminGovernanceView
+              adminData={adminData}
+              onVerifyEntity={(id) => {
+                setAdminData(prev => ({
+                  ...prev,
+                  pendingVerifications: prev.pendingVerifications.map(v => v.id === id ? { ...v, status: 'VERIFIED' } : v)
+                }));
+                setMessage(`Entity #${id} granted official NABL verified badge.`);
+              }}
+              onResolveDispute={(disputeId) => {
+                setAdminData(prev => ({
+                  ...prev,
+                  disputesQueue: prev.disputesQueue.map(d => d.id === disputeId ? { ...d, status: 'RESOLVED' } : d)
+                }));
+                setMessage(`Dispute ${disputeId} arbitrated and escrow settled.`);
+              }}
+            />
+          )}
+
+
+
+
+          {currentView === 'matching' && (
+            <div className="view-container">
+
+              {(session.role === 'FARMER' || session.role === 'FPO' || !session.role) && (
+                <>
+                  <section className="workspace-grid" style={{ marginTop: '18px' }}>
+                    <article className="panel workspace-panel">
+                      <div className="panel-heading">
+                        <div><p className="eyebrow">Farmer workspace</p><h2>List produce for selling</h2></div>
+                        <span className="count">Step 01</span>
+                      </div>
+
+                      <div className="tab-toggle-group">
+                        <button
+                          type="button"
+                          className={produceSource === 'catalog' ? 'active' : ''}
+                          onClick={() => setProduceSource('catalog')}
+                        >
+                          Choose from catalogue
+                        </button>
+                        <button
+                          type="button"
+                          className={produceSource === 'custom' ? 'active' : ''}
+                          onClick={() => setProduceSource('custom')}
+                        >
+                          + Custom product name
+                        </button>
+                      </div>
+
+                      <form onSubmit={saveProduce}>
+                        {produceSource === 'catalog' ? (
+                          <label>Select Produce / Crop
+                            <select value={produce.cropId} onChange={(event) => setProduce({ ...produce, cropId: event.target.value })}>
+                              {crops.map((crop) => (
+                                <option key={crop.id} value={crop.id}>
+                                  {crop.name} ({crop.category})
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        ) : (
+                          <>
+                            <label>Category
+                              <select
+                                value={produce.category}
+                                onChange={(event) => setProduce({ ...produce, category: event.target.value })}
+                              >
+                                <option value="VEGETABLE">Vegetables</option>
+                                <option value="FRUIT">Fruits</option>
+                                <option value="GRAIN">Grains</option>
+                                <option value="PULSE">Pulses</option>
+                                <option value="SEED">Seeds</option>
+                                <option value="SPICE">Spices</option>
+                                <option value="OIL_SEED">Oil Seeds</option>
+                                <option value="FERTILIZER">Fertilizers &amp; Soil Nutrients</option>
+                                <option value="PESTICIDE">Pesticides &amp; Crop Protection</option>
+                                <option value="BIO_INPUT">Bio-Inputs &amp; Stimulants</option>
+                                <option value="FARM_EQUIPMENT">Farm Equipment &amp; Tools</option>
+                                <option value="OTHER">Other</option>
+                              </select>
+                            </label>
+
+                            <label>Custom Product Name
+                              <input
+                                placeholder="e.g. Organic Chia Seeds, Alphonso Mango"
+                                value={produce.cropName}
+                                onChange={(event) => setProduce({ ...produce, cropName: event.target.value })}
+                                required
+                              />
+                            </label>
+                          </>
+                        )}
+
+                        <label>Quantity (kg)
+                          <input
+                            type="number"
+                            min="1"
+                            value={produce.quantity}
+                            onChange={(event) => setProduce({ ...produce, quantity: event.target.value })}
+                            required
+                          />
+                        </label>
+
+                        <label>Quality Grade
+                          <select value={produce.quality} onChange={(event) => setProduce({ ...produce, quality: event.target.value })}>
+                            <option value="GRADE_A">Grade A (Export / Premium)</option>
+                            <option value="GRADE_B">Grade B (Standard Market)</option>
+                            <option value="GRADE_C">Grade C (Processing)</option>
+                          </select>
+                        </label>
+
+                        <label>Product Photo (Image URL)
+                          <input
+                            placeholder="https://example.com/produce.jpg"
+                            value={produce.imageUrl}
+                            onChange={(event) => setProduce({ ...produce, imageUrl: event.target.value })}
+                          />
+                        </label>
+
+                        {produce.imageUrl && (
+                          <div className="image-preview-box">
+                            <img src={produce.imageUrl} alt="Produce Preview" onError={(e) => { e.target.style.display = 'none'; }} />
+                          </div>
+                        )}
+
+                        <button type="submit">List produce for selling <span>→</span></button>
+                      </form>
+
+                      {produceResult && (
+                        <div className="produce-card-meta">
+                          {produceResult.imageUrl ? (
+                            <img src={produceResult.imageUrl} alt={produceResult.crop?.name} />
+                          ) : (
+                            <span className="crop-icon">{produceResult.crop?.name?.slice(0, 1)}</span>
+                          )}
+                          <div>
+                            <strong>{produceResult.crop?.name}</strong> <span className="category-badge">{produceResult.crop?.category}</span>
+                            <small>{produceResult.quantity} kg · {produceResult.quality}</small>
+                          </div>
+                          <button
+                            type="button"
+                            className="secondary-button"
+                            style={{ width: 'auto', marginLeft: 'auto', padding: '8px 14px', marginTop: 0 }}
+                            onClick={findRecommendation}
+                          >
+                            Find best buyer <span>↔</span>
+                          </button>
+                        </div>
+                      )}
+                    </article>
+
+                    {recommendation ? (
+                      <article className="panel recommendation-panel" style={{ border: '2px solid #3b7444', borderRadius: '12px', background: '#ffffff', padding: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+                          <div>
+                            <p className="eyebrow" style={{ color: '#2d6a36', fontWeight: 'bold' }}>
+                              KisanLink Signature &middot; Smart Logistics &amp; Net Profit Optimizer
+                            </p>
+                            <h2 style={{ margin: '4px 0 0', fontSize: '22px', color: '#1b2d20' }}>
+                              Best Deal Match: Maximum Take-Home Profit
+                            </h2>
+                            <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#526356' }}>
+                              Combined optimization: Buyer Offer &minus; Carrier Freight &minus; Escrow Fee = Highest Net Return
+                            </p>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <span style={{ display: 'inline-block', background: '#e8f5e9', color: '#2e7d32', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', border: '1px solid #c8e6c9' }}>
+                              Score: {recommendation.recommendedBuyer.score}/100 &middot; Best Deal
+                            </span>
+                          </div>
+                        </div>
+
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px', marginTop: '18px' }}>
+
+                          <div style={{ background: '#f8faf8', border: '1px solid #e1e8e2', borderRadius: '8px', padding: '14px' }}>
+                            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#55695a', fontWeight: 'bold' }}>
+                              1. Recommended Buyer Partner
+                            </span>
+                            <h3 style={{ margin: '6px 0 2px', fontSize: '16px', color: '#1b2d20' }}>
+                              {recommendation.recommendedBuyer.buyerName}
+                            </h3>
+                            <div style={{ fontSize: '20px', fontWeight: '800', color: '#2d6a36', margin: '4px 0' }}>
+                              ₹{recommendation.recommendedBuyer.pricePerKg} <small style={{ fontSize: '12px', fontWeight: 'normal', color: '#667269' }}>/ kg</small>
+                            </div>
+                            <p style={{ margin: 0, fontSize: '12px', color: '#526356' }}>
+                              Gross Crop Value: <strong>₹{recommendation.recommendedBuyer.grossRevenue?.toLocaleString()}</strong> &middot; {recommendation.recommendedBuyer.distanceKm} km route
+                            </p>
+                          </div>
+
+
+                          <div style={{ background: '#f8faf8', border: '1px solid #e1e8e2', borderRadius: '8px', padding: '14px' }}>
+                            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#55695a', fontWeight: 'bold' }}>
+                              2. Paired Fleet Transporter
+                            </span>
+                            <h3 style={{ margin: '6px 0 2px', fontSize: '16px', color: '#1b2d20' }}>
+                              {recommendation.recommendedBuyer.transporterName || 'Verified Regional Fleet'}
+                            </h3>
+                            <div style={{ fontSize: '20px', fontWeight: '800', color: '#b45309', margin: '4px 0' }}>
+                              ₹{recommendation.recommendedBuyer.transportCost?.toLocaleString()} <small style={{ fontSize: '12px', fontWeight: 'normal', color: '#667269' }}>freight quote</small>
+                            </div>
+                            <p style={{ margin: 0, fontSize: '12px', color: '#526356' }}>
+                              Vehicle: <strong>{recommendation.recommendedBuyer.vehicleType?.replace('_', ' ') || 'Mini Truck'}</strong> &middot; Rate: ₹{recommendation.recommendedBuyer.transporterRatePerKm || 15}/km
+                            </p>
+                          </div>
+                        </div>
+
+
+                        <div style={{ marginTop: '16px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '14px 18px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                            <div>
+                              <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#166534', fontWeight: 'bold' }}>
+                                Itemized Take-Home Profit Formula
+                              </span>
+                              <div style={{ fontSize: '13px', color: '#374151', marginTop: '3px' }}>
+                                Gross (₹{recommendation.recommendedBuyer.grossRevenue?.toLocaleString()}) &minus; Freight (₹{recommendation.recommendedBuyer.transportCost?.toLocaleString()}) &minus; Escrow Fee (₹{recommendation.recommendedBuyer.platformFee || 100})
+                              </div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <span style={{ fontSize: '11px', color: '#166534', textTransform: 'uppercase', fontWeight: 'bold' }}>
+                                Net Take-Home Earnings
+                              </span>
+                              <div style={{ fontSize: '24px', fontWeight: '900', color: '#15803d' }}>
+                                ₹{recommendation.recommendedBuyer.netReturn?.toLocaleString()}
+                              </div>
+                            </div>
+                          </div>
+                          {recommendation.recommendedBuyer.profitComparisonNote && (
+                            <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed #86efac', fontSize: '12px', color: '#166534', fontWeight: '600' }}>
+                              Key Insight: {recommendation.recommendedBuyer.profitComparisonNote}
+                            </div>
+                          )}
+                        </div>
+
+
+                        {recommendation.reason && recommendation.reason.length > 0 && (
+                          <div style={{ marginTop: '14px' }}>
+                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#374151' }}>Why this deal is recommended:</span>
+                            <ul style={{ margin: '6px 0 0 18px', padding: 0, fontSize: '12px', color: '#4b5563', lineHeight: '1.6' }}>
+                              {recommendation.reason.map((r, i) => (
+                                <li key={i}>{r}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+
+                        {recommendation.alternatives && recommendation.alternatives.length > 0 && (
+                          <div style={{ marginTop: '18px' }}>
+                            <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#374151', textTransform: 'uppercase' }}>
+                              Alternative Combinations Evaluated
+                            </span>
+                            <div style={{ overflowX: 'auto', marginTop: '6px' }}>
+                              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
+                                <thead>
+                                  <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+                                    <th style={{ padding: '8px 10px', color: '#4b5563' }}>Option</th>
+                                    <th style={{ padding: '8px 10px', color: '#4b5563' }}>Buyer &amp; Rate</th>
+                                    <th style={{ padding: '8px 10px', color: '#4b5563' }}>Carrier &amp; Freight</th>
+                                    <th style={{ padding: '8px 10px', color: '#4b5563' }}>Net Return</th>
+                                    <th style={{ padding: '8px 10px', color: '#4b5563' }}>Comparison Insight</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {recommendation.alternatives.map((alt, idx) => (
+                                    <tr key={idx} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                                      <td style={{ padding: '8px 10px', fontWeight: 'bold', color: '#6b7280' }}>
+                                        #{idx + 2}
+                                      </td>
+                                      <td style={{ padding: '8px 10px', color: '#1f2937' }}>
+                                        <strong>{alt.buyerName}</strong>
+                                        <div style={{ color: '#6b7280', fontSize: '11px' }}>₹{alt.pricePerKg}/kg &middot; {alt.distanceKm} km</div>
+                                      </td>
+                                      <td style={{ padding: '8px 10px', color: '#1f2937' }}>
+                                        <strong>{alt.transporterName || 'Fleet Carrier'}</strong>
+                                        <div style={{ color: '#b45309', fontSize: '11px' }}>₹{alt.transportCost?.toLocaleString()} freight</div>
+                                      </td>
+                                      <td style={{ padding: '8px 10px', fontWeight: 'bold', color: '#1f2937' }}>
+                                        ₹{alt.netReturn?.toLocaleString()}
+                                      </td>
+                                      <td style={{ padding: '8px 10px', color: '#ef4444', fontSize: '11px' }}>
+                                        {alt.profitComparisonNote || 'Lower net take-home return'}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        )}
+
+
+                        <div style={{ display: 'flex', gap: '10px', marginTop: '20px', flexWrap: 'wrap' }}>
+                          <button
+                            type="button"
+                            className="trade-btn trade-btn-primary"
+                            style={{ padding: '10px 20px', fontSize: '13px', fontWeight: 'bold' }}
+                            onClick={initiateTradeFromRecommendation}
+                          >
+                            Accept Best Deal &amp; Create Contract &rarr;
+                          </button>
+
+                          <button
+                            type="button"
+                            className="trade-btn"
+                            style={{ background: '#f0fdf4', borderColor: '#86efac', color: '#166534', padding: '10px 18px', fontSize: '13px', fontWeight: '600' }}
+                            onClick={() => {
+                              setActiveChatConversationId(recommendation.recommendedBuyer.buyerId);
+                              setCurrentView('trade-chat');
+                            }}
+                          >
+                            Chat &amp; Negotiate with Buyer &rarr;
+                          </button>
+
+                          <button
+                            type="button"
+                            className="trade-btn"
+                            style={{ background: '#ffffff', borderColor: '#d1d5db', color: '#4b5563', padding: '10px 16px', fontSize: '13px' }}
+                            onClick={() => setCurrentView('map')}
+                          >
+                            View Route Radar &nearr;
+                          </button>
+                        </div>
+                      </article>
+                    ) : (
+                      <aside className="note-panel workspace-note">
+                        <p className="eyebrow">Matching Engine</p>
+                        <h2>Weighted multi-factor matching.</h2>
+                        <p>Once you list produce, our matching algorithm checks price offers, transport freight, haversine distance, and buyer verification to maximize your net take-home revenue.</p>
+                      </aside>
+                    )}
+                  </section>
+
+
+                  <section className="panel" style={{ marginTop: '24px' }}>
+                    <div className="panel-heading">
+                      <div>
+                        <p className="eyebrow">Institutional Buyer Demand Signals</p>
+                        <h2>Active Buyer Procurement Requirements (Live RFQs)</h2>
+                        <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
+                          Direct purchase orders from verified retail chains, FPOs, and processing depots. Tap any order to auto-fill and lock a contract.
+                        </p>
+                      </div>
+                      <span className="count">{buyerDemands.length} Verified Demands</span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginTop: '16px' }}>
+                      {buyerDemands.map((demand) => {
+                        const grossValue = (demand.requiredQuantity || 0) * (demand.offeredPrice || 0);
+                        return (
+                          <div
+                            key={demand.id}
+                            style={{
+                              background: '#ffffff',
+                              border: '1px solid #d4dfd4',
+                              borderRadius: '8px',
+                              padding: '16px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              justifyContent: 'space-between',
+                              boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                            }}
+                          >
+                            <div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                                <div>
+                                  <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#eef4ec', color: '#2f6838', padding: '2px 6px', borderRadius: '3px' }}>
+                                    {demand.category || 'PRODUCE'}
+                                  </span>
+                                  <h3 style={{ margin: '6px 0 2px', fontSize: '16px', color: '#202a27' }}>
+                                    {demand.cropName}
+                                  </h3>
+                                  <span style={{ fontSize: '12px', color: '#4b5563', fontWeight: 500 }}>
+                                    {demand.buyerName} {demand.verified && <span style={{ fontSize: '10px', color: '#2f6838', fontWeight: 700 }}>[VERIFIED]</span>}
+                                  </span>
+                                </div>
+                                <span style={{ fontSize: '18px', fontWeight: 700, color: '#2f6838' }}>
+                                  ₹{demand.offeredPrice}/kg
+                                </span>
+                              </div>
+
+                              <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '6px', padding: '10px', margin: '10px 0', fontSize: '12px', color: '#444d47' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                  <span style={{ color: '#667269' }}>Requirement:</span>
+                                  <strong>{Number(demand.requiredQuantity).toLocaleString()} kg ({(demand.requiredQuantity / 1000).toFixed(1)} T)</strong>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                  <span style={{ color: '#667269' }}>Total Contract Value:</span>
+                                  <strong style={{ color: '#202a27' }}>₹{grossValue.toLocaleString()}</strong>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                  <span style={{ color: '#667269' }}>Quality Grade:</span>
+                                  <span style={{ fontWeight: 600, color: '#365c3b' }}>{demand.qualityRequired || 'Standard Grade A'}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <span style={{ color: '#667269' }}>Delivery Location:</span>
+                                  <span>{demand.deliveryDistrict} &middot; {demand.distanceKm} km</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                              <button
+                                type="button"
+                                className="trade-btn trade-btn-primary"
+                                style={{ flex: 1, padding: '9px 12px', fontSize: '12px', fontWeight: 600 }}
+                                onClick={() => handleFulfillDemand(demand)}
+                              >
+                                Supply This Demand &rarr;
+                              </button>
+                              <button
+                                type="button"
+                                className="trade-btn trade-btn-secondary"
+                                style={{ padding: '9px 12px', fontSize: '12px' }}
+                                onClick={() => {
+                                  setActiveChatConversationId(demand.buyerId);
+                                  setCurrentView('trade-chat');
+                                }}
+                                title="Chat & Counter-Offer"
+                              >
+                                Chat
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+
+                  {cropRequirementsList.length > 0 && (
+                    <section className="panel" style={{ marginTop: '24px' }}>
+                      <div className="panel-heading">
+                        <div>
+                          <p className="eyebrow">Live Spot Orders</p>
+                          <h2>Active Spot Procurement Bids</h2>
+                          <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
+                            Real-time bids from verified buyers. Click to propose supply.
+                          </p>
+                        </div>
+                        <span className="count">{cropRequirementsList.length} Live Bids</span>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px', marginTop: '14px' }}>
+                        {cropRequirementsList.map((req, idx) => (
+                          <div key={req.id || idx} style={{ background: '#fff', border: '1px solid #d0dbd0', borderRadius: '8px', padding: '14px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                              <div>
+                                <h3 style={{ margin: '0 0 2px', fontSize: '15px', color: '#202a27' }}>{req.cropName || req.commodity}</h3>
+                                <span style={{ fontSize: '11px', color: '#667269' }}>{req.qualityRequired || 'Grade A'} &middot; {req.location || 'Pan-India'}</span>
+                              </div>
+                              <span style={{ fontWeight: 700, fontSize: '17px', color: '#2f6838' }}>Rs {req.offeredPrice}/kg</span>
+                            </div>
+                            <div style={{ fontSize: '12px', color: '#555d59', borderTop: '1px solid #f0efea', paddingTop: '8px', display: 'flex', justifyContent: 'space-between' }}>
+                              <span>Qty: <strong>{Number(req.requiredQuantity || 0).toLocaleString()} kg</strong></span>
+                              <span>Valid: <strong>{req.validUntil || '--'}</strong></span>
+                            </div>
+                            <button type="button" className="trade-btn trade-btn-primary" style={{ marginTop: '10px', width: '100%', padding: '8px', fontSize: '12px' }}
+                              onClick={() => setQuickProduceModal({ cropName: req.cropName || req.commodity, unit: 'kg', suggestedPrice: req.offeredPrice })}
+                            >
+                              Propose Supply Contract
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                </>
+              )}
+
+
               {session.role === 'BUYER' && (
                 <section className="workspace-grid" style={{ marginTop: '18px' }}>
                   <article className="panel workspace-panel">
@@ -8016,7 +8238,7 @@ function App() {
                 </section>
               )}
 
-              
+
               <section className="trade-ledger-section">
                 <div className="panel-heading">
                   <div>
@@ -8054,7 +8276,7 @@ function App() {
                           <span className={`status-pill status-${statusKey}`}>{t.status}</span>
                         </div>
 
-                        
+
                         {!isCancelled && (
                           <div className="trade-stepper">
                             <div className={`step-node ${(isProposed || isNegotiating) ? 'active' : (isAccepted || isInTransit || isDelivered || isCompleted) ? 'done' : ''}`}>
@@ -8094,7 +8316,7 @@ function App() {
                           </p>
                         )}
 
-                        
+
                         {t.negotiations && t.negotiations.length > 0 && (
                           <div className="negotiation-section">
                             <div className="negotiation-title">
@@ -8120,7 +8342,7 @@ function App() {
                           </div>
                         )}
 
-                        
+
                         {isNegotiatingThis && (
                           <form className="counter-form-box" onSubmit={(e) => submitCounterOffer(t.id, e)}>
                             <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#dc664a', fontWeight: 'bold' }}>
@@ -8168,7 +8390,7 @@ function App() {
                           </form>
                         )}
 
-                        
+
                         {!isCancelled && (
                           <div className={`escrow-vault-card ${escrowMap[t.id]?.status === 'FUNDS_HELD_IN_ESCROW' ? 'locked' : (escrowMap[t.id]?.status === 'RELEASED_TO_FARMER' || isCompleted) ? 'released' : 'pending'}`}>
                             <div className="escrow-vault-header">
@@ -8189,7 +8411,7 @@ function App() {
                               <span style={{ fontFamily: "'DM Mono', monospace", fontWeight: 600, color: '#2b5231' }}>Compliant with RBI Payment Aggregator Norms</span>
                             </div>
 
-                            
+
                             <div className="escrow-milestone-grid">
                               <div className={`milestone-col ${(isAccepted || isInTransit || isDelivered || isCompleted) ? 'done' : 'active'}`}>
                                 <div className="milestone-dot" />
@@ -8213,7 +8435,7 @@ function App() {
                               </div>
                             </div>
 
-                            
+
                             <div className="escrow-details-row">
                               <span>Deal Value: <strong>₹{t.totalAmount}</strong></span>
                               <span>Farmer Net Return: <strong>₹{t.netFarmerReturn}</strong></span>
@@ -8267,7 +8489,7 @@ function App() {
                           </div>
                         )}
 
-                        
+
                         <div className="trade-actions">
                           {(isProposed || isNegotiating) && (
                             <>
@@ -8398,7 +8620,7 @@ function App() {
                             </span>
                           )}
 
-                          
+
                           <button
                             type="button"
                             className="trade-btn trade-btn-secondary"
@@ -8448,7 +8670,7 @@ function App() {
                 </div>
               </section>
 
-              
+
               {ratingCarrierModal && (
                 <div style={{
                   position: 'fixed',
@@ -8491,7 +8713,7 @@ function App() {
                     </p>
 
                     <form onSubmit={submitCarrierRating}>
-                      
+
                       <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '8px' }}>
                         Service Rating (1 to 5 Stars) *
                       </label>
@@ -8518,7 +8740,7 @@ function App() {
                         ))}
                       </div>
 
-                      
+
                       <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '6px' }}>
                         Highlight Carrier Strengths
                       </label>
@@ -8551,7 +8773,7 @@ function App() {
                         })}
                       </div>
 
-                      
+
                       <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>
                         Review &amp; Experience Notes
                       </label>
@@ -8598,7 +8820,7 @@ function App() {
                 </div>
               )}
 
-              
+
               {disputeModal && (
                 <div style={{
                   position: 'fixed',
@@ -8698,2917 +8920,2917 @@ function App() {
                   </div>
                 </div>
               )}
-        </div>
-      )}
-
-      
-      
-      
-      {currentView === 'analytics' && (
-        <div className="view-container">
-
-          
-          
-          
-          {session?.role === 'FPO' && (
-            <>
-              <section className="panel" style={{ marginTop: '18px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-                <div className="panel-heading" style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '14px' }}>
-                  <div>
-                    <p className="eyebrow" style={{ color: '#64748b', margin: '0 0 4px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: "'DM Mono', monospace" }}>
-                      FPO Institutional Analytics · {fpoProfile.name}
-                    </p>
-                    <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a', margin: 0 }}>
-                      Smallholder Aggregation, Sales &amp; Top Corporate Buyers
-                    </h2>
-                  </div>
-                  <span className="count" style={{ background: '#166534', color: '#ffffff', padding: '4px 10px', borderRadius: '4px', fontSize: '11px', fontWeight: 600 }}>
-                    +18.4% Realization Over APMC
-                  </span>
-                </div>
-
-                <div className="price-feature" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <span className="crop-label" style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase' }}>Total Aggregated Trade Volume</span>
-                    <strong style={{ display: 'block', fontSize: '40px', lineHeight: 1, color: '#0f172a', margin: '6px 0' }}>
-                      14.8 Tons
-                    </strong>
-                    <small style={{ font: "11px 'DM Mono', monospace", color: '#64748b' }}>
-                      {fpoProfile.activeMembersCount} smallholders contributing across {fpoLots.length} certified lot passports
-                    </small>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span className="crop-label" style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase' }}>Gross Trade Value</span>
-                    <strong style={{ display: 'block', fontSize: '32px', lineHeight: 1, color: '#166534', margin: '6px 0' }}>
-                      ₹4,18,500
-                    </strong>
-                    <small style={{ font: "11px 'DM Mono', monospace", color: '#64748b' }}>
-                      ₹3,95,200 (94.4%) disbursed directly to farmer bank accounts
-                    </small>
-                  </div>
-                </div>
-
-                <div className="prediction-deep-grid" style={{ marginTop: '16px' }}>
-                  <div className="stat-metric-card" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '12px' }}>
-                    <span style={{ fontSize: '11px', color: '#64748b' }}>Active Intake Pools</span>
-                    <strong style={{ fontSize: '18px', color: '#0f172a' }}>{fpoLots.length} Standardized Lots</strong>
-                    <small style={{ font: "10px 'DM Mono', monospace", color: '#64748b' }}>NABL Quality Assayed</small>
-                  </div>
-                  <div className="stat-metric-card" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '12px' }}>
-                    <span style={{ fontSize: '11px', color: '#64748b' }}>Avg. Realized Rate</span>
-                    <strong style={{ fontSize: '18px', color: '#166534' }}>₹28.28 / kg</strong>
-                    <small style={{ font: "10px 'DM Mono', monospace", color: '#64748b' }}>+₹4.40 vs Local APMC</small>
-                  </div>
-                  <div className="stat-metric-card" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '12px' }}>
-                    <span style={{ fontSize: '11px', color: '#64748b' }}>Smallholder Payout Timeliness</span>
-                    <strong style={{ fontSize: '18px', color: '#0284c7' }}>100% via UTR</strong>
-                    <small style={{ font: "10px 'DM Mono', monospace", color: '#64748b' }}>T+2 Direct Bank/UPI Transfer</small>
-                  </div>
-                  <div className="stat-metric-card" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '12px' }}>
-                    <span style={{ fontSize: '11px', color: '#64748b' }}>NABL Assay Reliability</span>
-                    <strong style={{ fontSize: '18px', color: '#166534' }}>98.4% Match</strong>
-                    <small style={{ font: "10px 'DM Mono', monospace", color: '#64748b' }}>Zero dock rejections</small>
-                  </div>
-                </div>
-
-                
-                <div style={{ marginTop: '20px', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
-                  <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', color: '#475569', fontWeight: 700, display: 'block', marginBottom: '10px' }}>
-                    Top Institutional &amp; Corporate Buyers (Feature B11)
-                  </span>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
-                    <thead>
-                      <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#64748b', font: "11px 'DM Mono', monospace" }}>
-                        <th style={{ padding: '8px 10px' }}>Buyer Name &amp; Division</th>
-                        <th style={{ padding: '8px 10px' }}>Sourced Crop</th>
-                        <th style={{ padding: '8px 10px' }}>Volume</th>
-                        <th style={{ padding: '8px 10px' }}>Gross Value</th>
-                        <th style={{ padding: '8px 10px' }}>Payment Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                        <td style={{ padding: '8px 10px', fontWeight: 600, color: '#0f172a' }}>Reliance Retail Wholesale Desk</td>
-                        <td style={{ padding: '8px 10px' }}>Tomato (Abhinav Hybrid)</td>
-                        <td style={{ padding: '8px 10px', fontWeight: 500 }}>8,400 kg</td>
-                        <td style={{ padding: '8px 10px', fontWeight: 600, color: '#166534' }}>₹2,35,200</td>
-                        <td style={{ padding: '8px 10px' }}>
-                          <span style={{ background: '#f0fdf4', color: '#166534', padding: '2px 8px', borderRadius: '4px', fontSize: '11px' }}>
-                            Settled via Escrow
-                          </span>
-                        </td>
-                      </tr>
-                      <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                        <td style={{ padding: '8px 10px', fontWeight: 600, color: '#0f172a' }}>BigBasket Western Hub</td>
-                        <td style={{ padding: '8px 10px' }}>Onion (Nashik Red)</td>
-                        <td style={{ padding: '8px 10px', fontWeight: 500 }}>4,200 kg</td>
-                        <td style={{ padding: '8px 10px', fontWeight: 600, color: '#166534' }}>₹1,17,600</td>
-                        <td style={{ padding: '8px 10px' }}>
-                          <span style={{ background: '#f0fdf4', color: '#166534', padding: '2px 8px', borderRadius: '4px', fontSize: '11px' }}>
-                            Settled via Escrow
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style={{ padding: '8px 10px', fontWeight: 600, color: '#0f172a' }}>ITC Agri Business Division</td>
-                        <td style={{ padding: '8px 10px' }}>Soybean (JS-335)</td>
-                        <td style={{ padding: '8px 10px', fontWeight: 500 }}>2,200 kg</td>
-                        <td style={{ padding: '8px 10px', fontWeight: 600, color: '#166534' }}>₹65,700</td>
-                        <td style={{ padding: '8px 10px' }}>
-                          <span style={{ background: '#f0fdf4', color: '#166534', padding: '2px 8px', borderRadius: '4px', fontSize: '11px' }}>
-                            Settled via Escrow
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            </>
+            </div>
           )}
 
-          
-          
-          
-          {session?.role === 'BUYER' && (
-            <>
-              <section className="panel" style={{ marginTop: '18px' }}>
-                <div className="panel-heading">
-                  <div>
-                    <p className="eyebrow">Procurement Intelligence · {profile.businessName || session.name || session.email}</p>
-                    <h2>Procurement Value &amp; Landed Margin Analytics</h2>
-                  </div>
-                  <span className="count" style={{ background: '#2f6838', color: '#ffffff' }}>
-                    +14.2% Saved vs Mandi Middlemen
-                  </span>
-                </div>
 
-                <div className="price-feature" style={{ borderBottom: '1px solid #d9d6cc', paddingBottom: '16px' }}>
-                  <div>
-                    <span className="crop-label">Total Sourcing Outlay (Lifetime)</span>
-                    <strong style={{ display: 'block', fontSize: '44px', lineHeight: 1, color: '#202a27' }}>
-                      ₹9,45,000
-                    </strong>
-                    <small style={{ font: "11px 'DM Mono', monospace", color: '#778078' }}>
-                      18 settled direct agreements &middot; 38.5 tons sourced directly from farmers
-                    </small>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span className="crop-label">Direct Sourcing Efficiency</span>
-                    <strong style={{ display: 'block', fontSize: '32px', lineHeight: 1, color: '#5a8e62' }}>
-                      +14.2%
-                    </strong>
-                    <small style={{ font: "11px 'DM Mono', monospace", color: '#778078' }}>
-                      ₹4.10/kg below terminal mandi wholesale benchmark
-                    </small>
-                  </div>
-                </div>
 
-                <div className="prediction-deep-grid" style={{ marginTop: '16px' }}>
-                  <div className="stat-metric-card">
-                    <span>Volume Procured</span>
-                    <strong>38.5 Tons</strong>
-                    <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>38,500 kg total lot</small>
-                  </div>
-                  <div className="stat-metric-card">
-                    <span>Avg Landed Cost</span>
-                    <strong style={{ color: '#5a8e62' }}>₹24.50/kg</strong>
-                    <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Net with door-to-door freight</small>
-                  </div>
-                  <div className="stat-metric-card">
-                    <span>Mandi Benchmark</span>
-                    <strong>₹28.60/kg</strong>
-                    <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Terminal market price</small>
-                  </div>
-                  <div className="stat-metric-card">
-                    <span>Intermediary Fees Saved</span>
-                    <strong style={{ color: '#2f6838' }}>+₹1,57,850</strong>
-                    <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Zero mandi middleman brokerage</small>
-                  </div>
-                </div>
 
-                <div style={{ marginTop: '20px', borderTop: '1px solid #d9d6cc', paddingTop: '16px' }}>
-                  <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981', fontWeight: 'bold' }}>
-                    Buyer Procurement Insights
-                  </p>
-                  <ul style={{ paddingLeft: '18px', color: '#404f43', fontSize: '13px', lineHeight: '1.7', margin: '0' }}>
-                    <li>Direct farmer contract linkage bypassed 6.5% APMC market charges &middot; preserving <strong>₹1,57,850</strong> in operating liquidity.</li>
-                    <li>NABL certified quality verification reduced inbound transit spoilage rate to <strong>1.8%</strong> (industry avg 6.4%).</li>
-                    <li>Escrow protection guaranteed 100% on-time farm harvest dispatch with zero payment disputes.</li>
-                  </ul>
-                </div>
-              </section>
+          {currentView === 'analytics' && (
+            <div className="view-container">
 
-              
-              <section className="panel" style={{ marginTop: '20px', border: '2px solid #204068', borderRadius: '8px', background: '#ffffff', padding: '20px 24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px', borderBottom: '1px solid #edebe4', paddingBottom: '12px' }}>
-                  <div>
-                    <span className="eyebrow" style={{ color: '#204068', fontWeight: 700 }}>
-                      Procurement Decision Engine &middot; Landed Sourcing &amp; Margins
-                    </span>
-                    <h2 style={{ margin: '2px 0 0', fontSize: '20px', color: '#202a27' }}>
-                      Buyer Procurement Landed Cost &amp; Wholesale Margin Calculator
-                    </h2>
-                    <p className="muted" style={{ margin: '3px 0 0', fontSize: '13px' }}>
-                      Computes real landed cost per kg including farm purchase price, inbound freight, sorting buffer, and holding costs vs target wholesale resale price.
-                    </p>
-                  </div>
-                  <span className="count" style={{ background: '#204068', color: '#ffffff', fontSize: '11px', padding: '4px 10px', borderRadius: '4px' }}>
-                    Wholesale Optimization
-                  </span>
-                </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '18px', background: '#f8f9fb', padding: '14px', borderRadius: '6px', border: '1px solid #e2e7ef' }}>
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#445163', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      COMMODITY
-                    </label>
-                    <select
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={buyerCalcCrop}
-                      onChange={(e) => setBuyerCalcCrop(e.target.value)}
-                    >
-                      <option value="Tomato">Tomato (Hybrid / Roma)</option>
-                      <option value="Onion">Nashik Red Onion</option>
-                      <option value="Wheat">Sharbati Durum Wheat</option>
-                      <option value="Soybean">Yellow Organic Soybean</option>
-                      <option value="Potato">Jyoti Table Potato</option>
-                      <option value="Green Grapes">Thompson Seedless Grapes</option>
-                    </select>
-                  </div>
 
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#445163', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      LOT QUANTITY (KG)
-                    </label>
-                    <input
-                      type="number"
-                      min="100"
-                      step="100"
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={buyerCalcQty}
-                      onChange={(e) => setBuyerCalcQty(Math.max(1, Number(e.target.value)))}
-                    />
-                  </div>
 
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#445163', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      SOURCING CHANNEL
-                    </label>
-                    <select
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={buyerCalcSource}
-                      onChange={(e) => setBuyerCalcSource(e.target.value)}
-                    >
-                      <option value="Direct Farm-Gate">Direct Farm-Gate (Farmer Sourced)</option>
-                      <option value="Aggregation Yard">Aggregation Yard (Graded Batch)</option>
-                      <option value="APMC Central Mandi">APMC Central Mandi (Auction)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#445163', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      INBOUND HAUL (KM)
-                    </label>
-                    <input
-                      type="number"
-                      min="5"
-                      step="5"
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={buyerCalcDistanceKm}
-                      onChange={(e) => setBuyerCalcDistanceKm(Math.max(1, Number(e.target.value)))}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#445163', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      HOLDING DAYS
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      step="1"
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={buyerCalcStorageDays}
-                      onChange={(e) => setBuyerCalcStorageDays(Math.max(1, Number(e.target.value)))}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#445163', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      TARGET RESALE (₹/KG)
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      step="0.5"
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={buyerCalcResaleRate}
-                      onChange={(e) => setBuyerCalcResaleRate(Math.max(0.1, Number(e.target.value)))}
-                    />
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-                  <div style={{ border: '2px solid #204068', borderRadius: '6px', padding: '16px', background: '#f5f7fa', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#204068', color: '#ffffff', padding: '3px 8px', borderRadius: '3px' }}>
-                        LANDED COST FORMULATION
-                      </span>
-                      <h3 style={{ margin: '8px 0 4px', fontSize: '16px', color: '#202a27' }}>
-                        Inbound Procurement Breakdown
-                      </h3>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: '#ffffff', padding: '10px', borderRadius: '4px', border: '1px solid #d4dce8', margin: '10px 0' }}>
-                        <div>
-                          <span style={{ fontSize: '10px', color: '#687588', display: 'block' }}>FARM ACQUISITION</span>
-                          <strong style={{ fontSize: '14px', color: '#202a27' }}>₹{buyerDecision.purchaseRatePerKg} <small style={{ fontSize: '11px', color: '#687588' }}>/ kg</small></strong>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10px', color: '#687588', display: 'block' }}>GROSS OUTLAY</span>
-                          <strong style={{ fontSize: '14px', color: '#202a27' }}>₹{buyerDecision.grossPurchaseCost.toLocaleString()}</strong>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10px', color: '#687588', display: 'block' }}>ROUTE FREIGHT</span>
-                          <span style={{ fontSize: '13px', color: '#204068' }}>+ ₹{buyerDecision.inboundFreight.toLocaleString()}</span>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10px', color: '#687588', display: 'block' }}>SPOILAGE &amp; HOLDING</span>
-                          <span style={{ fontSize: '13px', color: '#204068' }}>+ ₹{(buyerDecision.spoilageBuffer + buyerDecision.storageCost).toLocaleString()}</span>
-                        </div>
-                      </div>
-
-                      <div style={{ background: '#202a27', color: '#ffffff', padding: '10px 14px', borderRadius: '4px', marginBottom: '10px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#97a89e' }}>NET LANDED COST / KG</span>
-                          <strong style={{ fontSize: '18px', color: '#6e9d68' }}>₹{buyerDecision.landedCostPerKg} / kg</strong>
-                        </div>
-                        <div style={{ fontSize: '11px', color: '#b2c0b7', marginTop: '2px' }}>
-                          Total Landed Expenditure: <strong>₹{buyerDecision.totalLandedCost.toLocaleString()}</strong>
-                        </div>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      className="trade-btn trade-btn-primary"
-                      style={{ width: '100%', padding: '10px', fontSize: '13px', fontWeight: 700 }}
-                      onClick={() => {
-                        setCurrentView('matching');
-                        setMessage(`Initiated sourcing match for ${buyerCalcQty} kg of ${buyerCalcCrop} at target landed rate ₹${buyerDecision.landedCostPerKg}/kg.`);
-                      }}
-                    >
-                      Source This Lot &middot; Match Verified Farmers &rarr;
-                    </button>
-                  </div>
-
-                  <div style={{ border: '1px solid #e0ddd5', borderRadius: '6px', padding: '16px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#687588', fontWeight: 600, textTransform: 'uppercase' }}>
-                        WHOLESALE PROFIT MARGIN
-                      </span>
-                      <h3 style={{ margin: '8px 0 4px', fontSize: '16px', color: '#202a27' }}>
-                        Realized Commercial Spread
-                      </h3>
-
-                      <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', margin: '10px 0' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: '12px', color: '#444d47' }}>Target Wholesale Realization:</span>
-                          <strong style={{ fontSize: '14px', color: '#202a27' }}>₹{buyerDecision.projectedResaleRevenue.toLocaleString()}</strong>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
-                          <span style={{ fontSize: '12px', color: '#444d47' }}>Net Wholesale Margin:</span>
-                          <strong style={{ fontSize: '15px', color: '#2f6838' }}>+₹{buyerDecision.netGrossMargin.toLocaleString()}</strong>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '6px', marginTop: '6px' }}>
-                          <span style={{ fontSize: '11px', color: '#667269' }}>Realized Margin / Quintal:</span>
-                          <strong style={{ fontSize: '13px', color: '#202a27' }}>₹{buyerDecision.marginPerQuintal}/qtl ({buyerDecision.marginPercent}%)</strong>
-                        </div>
-                      </div>
-
-                      <div style={{ background: '#eef4ec', border: '1px solid #c7ddc5', borderRadius: '4px', padding: '10px 12px' }}>
-                        <strong style={{ fontSize: '12px', color: '#2f6838', display: 'block' }}>
-                          Middleman Avoidance Dividend: +₹{buyerDecision.apmcCommissionAvoided.toLocaleString()}
-                        </strong>
-                        <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#355339', lineHeight: 1.4 }}>
-                          Direct farmer sourcing bypasses commission agent deductions and mandi cess &middot; securing an extra ₹{buyerDecision.apmcCommissionAvoided.toLocaleString()} in net profit.
+              {session?.role === 'FPO' && (
+                <>
+                  <section className="panel" style={{ marginTop: '18px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                    <div className="panel-heading" style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '14px' }}>
+                      <div>
+                        <p className="eyebrow" style={{ color: '#64748b', margin: '0 0 4px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: "'DM Mono', monospace" }}>
+                          FPO Institutional Analytics · {fpoProfile.name}
                         </p>
+                        <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#0f172a', margin: 0 }}>
+                          Smallholder Aggregation, Sales &amp; Top Corporate Buyers
+                        </h2>
                       </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      className="trade-btn trade-btn-secondary"
-                      style={{ width: '100%', padding: '8px', fontSize: '11px', marginTop: '14px' }}
-                      onClick={() => setCurrentView('my-orders')}
-                    >
-                      View Active Purchase Contracts &rarr;
-                    </button>
-                  </div>
-                </div>
-              </section>
-            </>
-          )}
-
-          
-          
-          
-          {session?.role === 'TRANSPORTER' && (
-            <>
-              <section className="panel" style={{ marginTop: '18px' }}>
-                <div className="panel-heading">
-                  <div>
-                    <p className="eyebrow">Fleet Operations &middot; {profile.businessName || session.name || session.email}</p>
-                    <h2>Freight Operations &amp; Route Margin Analytics</h2>
-                  </div>
-                  <span className="count" style={{ background: '#8a6218', color: '#ffffff' }}>
-                    42.8% Fleet Operating Margin
-                  </span>
-                </div>
-
-                <div className="price-feature" style={{ borderBottom: '1px solid #d9d6cc', paddingBottom: '16px' }}>
-                  <div>
-                    <span className="crop-label">Total Gross Freight Billing</span>
-                    <strong style={{ display: 'block', fontSize: '44px', lineHeight: 1, color: '#202a27' }}>
-                      ₹1,48,200
-                    </strong>
-                    <small style={{ font: "11px 'DM Mono', monospace", color: '#778078' }}>
-                      42 completed commercial trips &middot; 12,850 ton-km logged across Jharkhand &amp; Maharashtra
-                    </small>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span className="crop-label">Average Route Realization</span>
-                    <strong style={{ display: 'block', fontSize: '32px', lineHeight: 1, color: '#8a6218' }}>
-                      ₹18.20/km
-                    </strong>
-                    <small style={{ font: "11px 'DM Mono', monospace", color: '#778078' }}>
-                      ₹63,430 net operating margin after diesel &amp; tolls
-                    </small>
-                  </div>
-                </div>
-
-                <div className="prediction-deep-grid" style={{ marginTop: '16px' }}>
-                  <div className="stat-metric-card">
-                    <span>Hauls Completed</span>
-                    <strong>42 Trips</strong>
-                    <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>100% on-time dispatch</small>
-                  </div>
-                  <div className="stat-metric-card">
-                    <span>Ton-Kilometers Logged</span>
-                    <strong style={{ color: '#8a6218' }}>12,850 Ton-km</strong>
-                    <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Agricultural haul work</small>
-                  </div>
-                  <div className="stat-metric-card">
-                    <span>Fuel Expense Ratio</span>
-                    <strong>31.5%</strong>
-                    <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>₹46,680 diesel outlay</small>
-                  </div>
-                  <div className="stat-metric-card">
-                    <span>Escrow Settlement</span>
-                    <strong style={{ color: '#2f6838' }}>100% Guaranteed</strong>
-                    <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Instant payout on OTP delivery</small>
-                  </div>
-                </div>
-
-                <div style={{ marginTop: '20px', borderTop: '1px solid #d9d6cc', paddingTop: '16px' }}>
-                  <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981', fontWeight: 'bold' }}>
-                    Fleet Operational Insights
-                  </p>
-                  <ul style={{ paddingLeft: '18px', color: '#404f43', fontSize: '13px', lineHeight: '1.7', margin: '0' }}>
-                    <li>Escrow delivery verification eliminated unpaid detention and payment disputes across all 42 dispatches.</li>
-                    <li>Mini-truck (2T) and pickup runs within 60 km achieved optimal fuel efficiency of <strong>9.2 km/L</strong>.</li>
-                    <li>Pre-booked return hauls reduced empty deadhead mileage by <strong>34%</strong>.</li>
-                  </ul>
-                </div>
-              </section>
-
-              
-              <section className="panel" style={{ marginTop: '20px', border: '2px solid #8a6218', borderRadius: '8px', background: '#ffffff', padding: '20px 24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px', borderBottom: '1px solid #edebe4', paddingBottom: '12px' }}>
-                  <div>
-                    <span className="eyebrow" style={{ color: '#8a6218', fontWeight: 700 }}>
-                      Logistics Decision Engine &middot; Escrow Payout &amp; Operating Margins
-                    </span>
-                    <h2 style={{ margin: '2px 0 0', fontSize: '20px', color: '#202a27' }}>
-                      Transporter Trip Operating Profit &amp; Freight Margin Calculator
-                    </h2>
-                    <p className="muted" style={{ margin: '3px 0 0', fontSize: '13px' }}>
-                      Computes both Escrow Net Bank Payout and real Economic Trip Profit after deducting diesel fuel, deadhead return risk, tolls, wear, driver wages, and permits.
-                    </p>
-                  </div>
-                  <span className="count" style={{ background: '#8a6218', color: '#ffffff', fontSize: '11px', padding: '4px 10px', borderRadius: '4px' }}>
-                    Fleet Profitability &amp; Risk Guard
-                  </span>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px', marginBottom: '14px', background: '#fdfbf7', padding: '14px', borderRadius: '6px', border: '1px solid #f0e9dd' }}>
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      HAUL DISTANCE (KM)
-                    </label>
-                    <input
-                      type="number"
-                      min="5"
-                      step="5"
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={transCalcDistanceKm}
-                      onChange={(e) => setTransCalcDistanceKm(Math.max(1, Number(e.target.value)))}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      CARGO PAYLOAD (KG)
-                    </label>
-                    <input
-                      type="number"
-                      min="100"
-                      step="100"
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={transCalcPayloadKg}
-                      onChange={(e) => setTransCalcPayloadKg(Math.max(1, Number(e.target.value)))}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      VEHICLE CATEGORY
-                    </label>
-                    <select
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={transCalcVehicleType}
-                      onChange={(e) => {
-                        setTransCalcVehicleType(e.target.value);
-                        setTransCalcDriverWage(null);
-                        setTransCalcPermitCost(null);
-                      }}
-                    >
-                      <option value="MINI_TRUCK">Mini-Truck (Tata Ace / 2T)</option>
-                      <option value="PICKUP">Pickup (Bolero Maxi / 1.5T)</option>
-                      <option value="MEDIUM_5T">Medium LCV (Eicher 5T)</option>
-                      <option value="HEAVY_10T">Multi-Axle Heavy (10T)</option>
-                      <option value="REEFER">Cold-Chain Reefer (Temperature Controlled)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      DIESEL PRICE (₹/L)
-                    </label>
-                    <input
-                      type="number"
-                      min="50"
-                      step="1"
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={transCalcDieselPrice}
-                      onChange={(e) => setTransCalcDieselPrice(Math.max(1, Number(e.target.value)))}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      TOLLS &amp; WEIGHBRIDGE (₹)
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="50"
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={transCalcTollCost}
-                      onChange={(e) => setTransCalcTollCost(Math.max(0, Number(e.target.value)))}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      DEADHEAD RETURN RISK
-                    </label>
-                    <select
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={transCalcDeadheadRisk}
-                      onChange={(e) => setTransCalcDeadheadRisk(Number(e.target.value))}
-                    >
-                      <option value="0">0% (Backhaul Return Load Secured)</option>
-                      <option value="0.20">20% (Partial Return Risk Buffer)</option>
-                      <option value="0.50">50% (High Unpaid Return Haul Risk)</option>
-                    </select>
-                  </div>
-                </div>
-
-                
-                <div style={{ marginBottom: '16px' }}>
-                  <button
-                    type="button"
-                    style={{ background: 'none', border: 'none', color: '#8a6218', fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
-                    onClick={() => setShowTransCostDetails(!showTransCostDetails)}
-                  >
-                    {showTransCostDetails ? '[-] Hide Driver Wage & RTO Permit Overrides' : '[+] Customize Driver Wages & RTO Permit Fees (Optional)'}
-                  </button>
-
-                  {showTransCostDetails && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginTop: '10px', background: '#faf6ee', padding: '12px', borderRadius: '6px', border: '1px solid #ebdcc5' }}>
-                      <div>
-                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
-                          DRIVER TRIP WAGE (₹)
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="50"
-                          className="field-input"
-                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
-                          value={transCalcDriverWage !== null ? transCalcDriverWage : transporterTripDecision.driverWages}
-                          onChange={(e) => setTransCalcDriverWage(e.target.value === '' ? '' : Number(e.target.value))}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
-                          PERMIT &amp; TRANSIT INSURANCE (₹)
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="20"
-                          className="field-input"
-                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
-                          value={transCalcPermitCost !== null ? transCalcPermitCost : transporterTripDecision.permitInsurance}
-                          onChange={(e) => setTransCalcPermitCost(e.target.value === '' ? '' : Number(e.target.value))}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-                  <div style={{ border: '2px solid #8a6218', borderRadius: '6px', padding: '16px', background: '#fdfbf7', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#8a6218', color: '#ffffff', padding: '3px 8px', borderRadius: '3px' }}>
-                        TRIP COST ACCOUNTING &amp; ESCROW DISBURSEMENT
+                      <span className="count" style={{ background: '#166534', color: '#ffffff', padding: '4px 10px', borderRadius: '4px', fontSize: '11px', fontWeight: 600 }}>
+                        +18.4% Realization Over APMC
                       </span>
-                      <h3 style={{ margin: '8px 0 4px', fontSize: '16px', color: '#202a27' }}>
-                        Operational Expense Breakdown
-                      </h3>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: '#ffffff', padding: '10px', borderRadius: '4px', border: '1px solid #ebdcc5', margin: '10px 0' }}>
-                        <div>
-                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>GROSS BILLING</span>
-                          <strong style={{ fontSize: '15px', color: '#202a27' }}>₹{transporterTripDecision.grossFreightRevenue.toLocaleString()}</strong>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>DIESEL OUTLAY</span>
-                          <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{transporterTripDecision.outwardFuelCost.toLocaleString()}</span>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>DEADHEAD CONTINGENCY</span>
-                          <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{transporterTripDecision.deadheadContingency.toLocaleString()}</span>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>DRIVER, TOLLS &amp; WEAR</span>
-                          <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{(transporterTripDecision.tolls + transporterTripDecision.maintenanceAndWear + transporterTripDecision.driverWages + transporterTripDecision.permitInsurance).toLocaleString()}</span>
-                        </div>
-                      </div>
-
-                      
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
-                        <div style={{ background: '#253529', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
-                          <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#8fb899', display: 'block', textTransform: 'uppercase' }}>
-                            ESCROW BANK PAYOUT
-                          </span>
-                          <strong style={{ fontSize: '17px', color: '#6e9d68' }}>₹{transporterTripDecision.escrowNetBankPayout.toLocaleString()}</strong>
-                          <small style={{ fontSize: '9px', color: '#b2c0b7', display: 'block', marginTop: '2px' }}>
-                            Direct bank credit (-2% fee: ₹{transporterTripDecision.escrowFee})
-                          </small>
-                        </div>
-                        <div style={{ background: '#202a27', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
-                          <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#c4ad83', display: 'block', textTransform: 'uppercase' }}>
-                            ECONOMIC NET PROFIT
-                          </span>
-                          <strong style={{ fontSize: '17px', color: transporterTripDecision.netTripProfit >= 0 ? '#d4a34b' : '#e66b6b' }}>
-                            ₹{transporterTripDecision.netTripProfit.toLocaleString()}
-                          </strong>
-                          <small style={{ fontSize: '9px', color: '#b2c0b7', display: 'block', marginTop: '2px' }}>
-                            Margin: {transporterTripDecision.profitMarginPercent}% after all expenses
-                          </small>
-                        </div>
-                      </div>
                     </div>
 
-                    <button
-                      type="button"
-                      className="trade-btn trade-btn-primary"
-                      style={{ width: '100%', padding: '10px', fontSize: '13px', fontWeight: 700 }}
-                      onClick={() => {
-                        setCurrentView('transporter-dashboard');
-                        setMessage(`Route configured: ${transCalcDistanceKm} km at quoted rate ₹${transporterTripDecision.grossFreightRevenue.toLocaleString()}.`);
-                      }}
-                    >
-                      Lock Fleet Route Rate &rarr;
-                    </button>
-                  </div>
-
-                  <div style={{ border: '1px solid #e0ddd5', borderRadius: '6px', padding: '16px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', fontWeight: 600, textTransform: 'uppercase' }}>
-                        FLEET BENCHMARK &amp; PERFORMANCE METRICS
-                      </span>
-                      <h3 style={{ margin: '8px 0 4px', fontSize: '16px', color: '#202a27' }}>
-                        Operating Efficiency Indicators
-                      </h3>
-
-                      
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', margin: '10px 0' }}>
-                        <div style={{ background: '#fdfbf7', border: '1px solid #ebdcc5', borderRadius: '4px', padding: '8px 10px' }}>
-                          <span style={{ fontSize: '9px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Net Profit / km</span>
-                          <strong style={{ fontSize: '14px', color: '#202a27' }}>₹{transporterTripDecision.netReturnPerKm} <small style={{ fontSize: '10px', color: '#778078' }}>/ km</small></strong>
-                        </div>
-                        <div style={{ background: '#fdfbf7', border: '1px solid #ebdcc5', borderRadius: '4px', padding: '8px 10px' }}>
-                          <span style={{ fontSize: '9px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Net Profit / kg</span>
-                          <strong style={{ fontSize: '14px', color: '#202a27' }}>₹{transporterTripDecision.netReturnPerKg} <small style={{ fontSize: '10px', color: '#778078' }}>/ kg</small></strong>
-                        </div>
-                        <div style={{ background: '#fdfbf7', border: '1px solid #ebdcc5', borderRadius: '4px', padding: '8px 10px' }}>
-                          <span style={{ fontSize: '9px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Break-Even Rate</span>
-                          <strong style={{ fontSize: '14px', color: '#8a2b2b' }}>₹{transporterTripDecision.breakEvenFreightRatePerKm} <small style={{ fontSize: '10px', color: '#778078' }}>/ km</small></strong>
-                        </div>
-                        <div style={{ background: '#fdfbf7', border: '1px solid #ebdcc5', borderRadius: '4px', padding: '8px 10px' }}>
-                          <span style={{ fontSize: '9px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Freight / Ton-km</span>
-                          <strong style={{ fontSize: '14px', color: '#8a6218' }}>₹{transporterTripDecision.revenuePerTonKm} <small style={{ fontSize: '10px', color: '#778078' }}>/ ton-km</small></strong>
-                        </div>
-                      </div>
-
-                      <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', marginBottom: '10px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: '12px', color: '#444d47' }}>Vehicle Class:</span>
-                          <strong style={{ fontSize: '13px', color: '#202a27' }}>{transporterTripDecision.specName}</strong>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
-                          <span style={{ fontSize: '12px', color: '#444d47' }}>Total Operating Expenses:</span>
-                          <span style={{ fontSize: '13px', color: '#8a2b2b' }}>₹{transporterTripDecision.totalOperatingCost.toLocaleString()}</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '6px', marginTop: '6px' }}>
-                          <span style={{ fontSize: '11px', color: '#667269' }}>Total Ton-Km Logged:</span>
-                          <strong style={{ fontSize: '13px', color: '#202a27' }}>{transporterTripDecision.tonKm} Ton-km ({transporterTripDecision.payloadTons}T &times; {transCalcDistanceKm}km)</strong>
-                        </div>
-                      </div>
-
-                      <div style={{ background: '#fef7e8', border: '1px solid #d4a34b', borderRadius: '4px', padding: '10px 12px' }}>
-                        <strong style={{ fontSize: '12px', color: '#8a6218', display: 'block' }}>
-                          Deadhead Risk Factor ({transCalcDeadheadRisk * 100}%)
-                        </strong>
-                        <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#7a540b', lineHeight: 1.4 }}>
-                          Operating floor is ₹{transporterTripDecision.breakEvenFreightRatePerKm}/km. Buffer of ₹{transporterTripDecision.deadheadContingency.toLocaleString()} safeguards against unpaid empty return haulage.
-                        </p>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      className="trade-btn trade-btn-secondary"
-                      style={{ width: '100%', padding: '8px', fontSize: '11px', marginTop: '14px' }}
-                      onClick={() => setCurrentView('transporter-dashboard')}
-                    >
-                      Open Live Haul Assignments &rarr;
-                    </button>
-                  </div>
-                </div>
-              </section>
-            </>
-          )}
-
-          
-          
-          
-          {(session?.role === 'FARMER' || !session?.role) && (
-            <>
-              <section className="panel" style={{ marginTop: '18px' }}>
-                <div className="panel-heading">
-                  <div>
-                    <p className="eyebrow">Realized Value · {analyticsData?.farmerName || session?.name || session?.email}</p>
-                    <h2>Farmer Earnings &amp; Premium Analytics</h2>
-                  </div>
-                  <span className="count">
-                    {analyticsData ? `+${analyticsData.kisanLinkPremiumIndexPercent}% vs Market` : '+18.4% vs Market'}
-                  </span>
-                </div>
-
-                {analyticsLoading && (
-                  <p className="muted" style={{ padding: '24px 0' }}>Aggregating trade records...</p>
-                )}
-
-                {!analyticsLoading && (
-                  <>
-                    <div className="price-feature" style={{ borderBottom: '1px solid #d9d6cc', paddingBottom: '16px' }}>
+                    <div className="price-feature" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
-                        <span className="crop-label">Total Net Take-Home Revenue</span>
-                        <strong style={{ display: 'block', fontSize: '44px', lineHeight: 1, color: '#202a27' }}>
-                          ₹{Number(analyticsData?.totalLifetimeRevenue || 284500).toLocaleString()}
+                        <span className="crop-label" style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase' }}>Total Aggregated Trade Volume</span>
+                        <strong style={{ display: 'block', fontSize: '40px', lineHeight: 1, color: '#0f172a', margin: '6px 0' }}>
+                          14.8 Tons
                         </strong>
-                        <small style={{ font: "11px 'DM Mono', monospace", color: '#778078' }}>
-                          {analyticsData?.completedTradesCount || 12} settled deals &middot; {analyticsData?.totalLifetimeVolumeTons || 14.8} tons dispatched
+                        <small style={{ font: "11px 'DM Mono', monospace", color: '#64748b' }}>
+                          {fpoProfile.activeMembersCount} smallholders contributing across {fpoLots.length} certified lot passports
                         </small>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <span className="crop-label">KisanLink Premium Index</span>
-                        <strong style={{ display: 'block', fontSize: '32px', lineHeight: 1, color: '#5a8e62' }}>
-                          +{analyticsData?.kisanLinkPremiumIndexPercent || 18.4}%
+                        <span className="crop-label" style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase' }}>Gross Trade Value</span>
+                        <strong style={{ display: 'block', fontSize: '32px', lineHeight: 1, color: '#166534', margin: '6px 0' }}>
+                          ₹4,18,500
+                        </strong>
+                        <small style={{ font: "11px 'DM Mono', monospace", color: '#64748b' }}>
+                          ₹3,95,200 (94.4%) disbursed directly to farmer bank accounts
+                        </small>
+                      </div>
+                    </div>
+
+                    <div className="prediction-deep-grid" style={{ marginTop: '16px' }}>
+                      <div className="stat-metric-card" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '12px' }}>
+                        <span style={{ fontSize: '11px', color: '#64748b' }}>Active Intake Pools</span>
+                        <strong style={{ fontSize: '18px', color: '#0f172a' }}>{fpoLots.length} Standardized Lots</strong>
+                        <small style={{ font: "10px 'DM Mono', monospace", color: '#64748b' }}>NABL Quality Assayed</small>
+                      </div>
+                      <div className="stat-metric-card" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '12px' }}>
+                        <span style={{ fontSize: '11px', color: '#64748b' }}>Avg. Realized Rate</span>
+                        <strong style={{ fontSize: '18px', color: '#166534' }}>₹28.28 / kg</strong>
+                        <small style={{ font: "10px 'DM Mono', monospace", color: '#64748b' }}>+₹4.40 vs Local APMC</small>
+                      </div>
+                      <div className="stat-metric-card" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '12px' }}>
+                        <span style={{ fontSize: '11px', color: '#64748b' }}>Smallholder Payout Timeliness</span>
+                        <strong style={{ fontSize: '18px', color: '#0284c7' }}>100% via UTR</strong>
+                        <small style={{ font: "10px 'DM Mono', monospace", color: '#64748b' }}>T+2 Direct Bank/UPI Transfer</small>
+                      </div>
+                      <div className="stat-metric-card" style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '12px' }}>
+                        <span style={{ fontSize: '11px', color: '#64748b' }}>NABL Assay Reliability</span>
+                        <strong style={{ fontSize: '18px', color: '#166534' }}>98.4% Match</strong>
+                        <small style={{ font: "10px 'DM Mono', monospace", color: '#64748b' }}>Zero dock rejections</small>
+                      </div>
+                    </div>
+
+
+                    <div style={{ marginTop: '20px', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
+                      <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', color: '#475569', fontWeight: 700, display: 'block', marginBottom: '10px' }}>
+                        Top Institutional &amp; Corporate Buyers (Feature B11)
+                      </span>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
+                        <thead>
+                          <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#64748b', font: "11px 'DM Mono', monospace" }}>
+                            <th style={{ padding: '8px 10px' }}>Buyer Name &amp; Division</th>
+                            <th style={{ padding: '8px 10px' }}>Sourced Crop</th>
+                            <th style={{ padding: '8px 10px' }}>Volume</th>
+                            <th style={{ padding: '8px 10px' }}>Gross Value</th>
+                            <th style={{ padding: '8px 10px' }}>Payment Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                            <td style={{ padding: '8px 10px', fontWeight: 600, color: '#0f172a' }}>Reliance Retail Wholesale Desk</td>
+                            <td style={{ padding: '8px 10px' }}>Tomato (Abhinav Hybrid)</td>
+                            <td style={{ padding: '8px 10px', fontWeight: 500 }}>8,400 kg</td>
+                            <td style={{ padding: '8px 10px', fontWeight: 600, color: '#166534' }}>₹2,35,200</td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <span style={{ background: '#f0fdf4', color: '#166534', padding: '2px 8px', borderRadius: '4px', fontSize: '11px' }}>
+                                Settled via Escrow
+                              </span>
+                            </td>
+                          </tr>
+                          <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                            <td style={{ padding: '8px 10px', fontWeight: 600, color: '#0f172a' }}>BigBasket Western Hub</td>
+                            <td style={{ padding: '8px 10px' }}>Onion (Nashik Red)</td>
+                            <td style={{ padding: '8px 10px', fontWeight: 500 }}>4,200 kg</td>
+                            <td style={{ padding: '8px 10px', fontWeight: 600, color: '#166534' }}>₹1,17,600</td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <span style={{ background: '#f0fdf4', color: '#166534', padding: '2px 8px', borderRadius: '4px', fontSize: '11px' }}>
+                                Settled via Escrow
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style={{ padding: '8px 10px', fontWeight: 600, color: '#0f172a' }}>ITC Agri Business Division</td>
+                            <td style={{ padding: '8px 10px' }}>Soybean (JS-335)</td>
+                            <td style={{ padding: '8px 10px', fontWeight: 500 }}>2,200 kg</td>
+                            <td style={{ padding: '8px 10px', fontWeight: 600, color: '#166534' }}>₹65,700</td>
+                            <td style={{ padding: '8px 10px' }}>
+                              <span style={{ background: '#f0fdf4', color: '#166534', padding: '2px 8px', borderRadius: '4px', fontSize: '11px' }}>
+                                Settled via Escrow
+                              </span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </section>
+                </>
+              )}
+
+
+
+
+              {session?.role === 'BUYER' && (
+                <>
+                  <section className="panel" style={{ marginTop: '18px' }}>
+                    <div className="panel-heading">
+                      <div>
+                        <p className="eyebrow">Procurement Intelligence · {profile.businessName || session.name || session.email}</p>
+                        <h2>Procurement Value &amp; Landed Margin Analytics</h2>
+                      </div>
+                      <span className="count" style={{ background: '#2f6838', color: '#ffffff' }}>
+                        +14.2% Saved vs Mandi Middlemen
+                      </span>
+                    </div>
+
+                    <div className="price-feature" style={{ borderBottom: '1px solid #d9d6cc', paddingBottom: '16px' }}>
+                      <div>
+                        <span className="crop-label">Total Sourcing Outlay (Lifetime)</span>
+                        <strong style={{ display: 'block', fontSize: '44px', lineHeight: 1, color: '#202a27' }}>
+                          ₹9,45,000
                         </strong>
                         <small style={{ font: "11px 'DM Mono', monospace", color: '#778078' }}>
-                          ₹{(Number(analyticsData?.averageRealizedPricePerKg || 27.5) - Number(analyticsData?.localMandiBenchmarkAvgPricePerKg || 23.2)).toFixed(2)}/kg above market
+                          18 settled direct agreements &middot; 38.5 tons sourced directly from farmers
+                        </small>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <span className="crop-label">Direct Sourcing Efficiency</span>
+                        <strong style={{ display: 'block', fontSize: '32px', lineHeight: 1, color: '#5a8e62' }}>
+                          +14.2%
+                        </strong>
+                        <small style={{ font: "11px 'DM Mono', monospace", color: '#778078' }}>
+                          ₹4.10/kg below terminal mandi wholesale benchmark
                         </small>
                       </div>
                     </div>
 
                     <div className="prediction-deep-grid" style={{ marginTop: '16px' }}>
                       <div className="stat-metric-card">
-                        <span>Volume Dispatched</span>
-                        <strong>{analyticsData?.totalLifetimeVolumeTons || 14.8} Tons</strong>
-                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>{analyticsData?.totalLifetimeVolumeKg?.toLocaleString() || '14,800'} kg</small>
+                        <span>Volume Procured</span>
+                        <strong>38.5 Tons</strong>
+                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>38,500 kg total lot</small>
                       </div>
                       <div className="stat-metric-card">
-                        <span>Avg Realized Rate</span>
-                        <strong style={{ color: '#5a8e62' }}>₹{analyticsData?.averageRealizedPricePerKg || 27.50}/kg</strong>
-                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Net after logistics</small>
+                        <span>Avg Landed Cost</span>
+                        <strong style={{ color: '#5a8e62' }}>₹24.50/kg</strong>
+                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Net with door-to-door freight</small>
                       </div>
                       <div className="stat-metric-card">
-                        <span>Local Market Benchmark</span>
-                        <strong>₹{analyticsData?.localMandiBenchmarkAvgPricePerKg || 23.20}/kg</strong>
-                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Market modal price</small>
+                        <span>Mandi Benchmark</span>
+                        <strong>₹28.60/kg</strong>
+                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Terminal market price</small>
                       </div>
                       <div className="stat-metric-card">
-                        <span>Extra Profit Earned</span>
-                        <strong style={{ color: '#dc664a' }}>+₹{Number(analyticsData?.totalExtraProfitEarned || 42800).toLocaleString()}</strong>
-                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>vs selling at local market</small>
+                        <span>Intermediary Fees Saved</span>
+                        <strong style={{ color: '#2f6838' }}>+₹1,57,850</strong>
+                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Zero mandi middleman brokerage</small>
                       </div>
-                    </div>
-
-                    
-                    <div style={{ marginTop: '24px', borderTop: '1px solid #d9d6cc', paddingTop: '20px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                        <div>
-                          <p className="eyebrow" style={{ margin: 0 }}>Monthly Progression</p>
-                          <h3 style={{ margin: '4px 0 0', fontSize: '17px' }}>Take-Home Revenue &amp; Volume Sold</h3>
-                        </div>
-                        <span style={{ font: "9px 'DM Mono', monospace", color: '#7f8981', textTransform: 'uppercase' }}>
-                          Green = Revenue &middot; Orange = Tons
-                        </span>
-                      </div>
-
-                      {analyticsData?.monthlyEarnings && analyticsData.monthlyEarnings.length > 0 ? (
-                        (() => {
-                          const maxRev = Math.max(...analyticsData.monthlyEarnings.map(m => Number(m.totalRevenue || 1)), 50000);
-                          return (
-                            <div className="monthly-bars-container">
-                              {analyticsData.monthlyEarnings.map((m) => {
-                                const heightPct = Math.max(12, Math.min(100, (Number(m.totalRevenue || 0) / maxRev) * 100));
-                                return (
-                                  <div className="monthly-bar-col" key={m.month}>
-                                    <span className="bar-value">₹{(Number(m.totalRevenue) / 1000).toFixed(1)}k</span>
-                                    <div className="bar-fill" style={{ height: `${heightPct}%` }} title={`₹${m.totalRevenue} (${m.totalVolumeTons} Tons)`} />
-                                    <span className="bar-label">{m.month}</span>
-                                    <span className="bar-tonnage">{m.totalVolumeTons}T</span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          );
-                        })()
-                      ) : (
-                        <div className="monthly-bars-container">
-                          {[
-                            { month: 'Jan', totalRevenue: 54000, totalVolumeTons: 2.5 },
-                            { month: 'Feb', totalRevenue: 68000, totalVolumeTons: 3.2 },
-                            { month: 'Mar', totalRevenue: 79500, totalVolumeTons: 4.1 },
-                            { month: 'Apr', totalRevenue: 83000, totalVolumeTons: 5.0 }
-                          ].map(m => (
-                            <div className="monthly-bar-col" key={m.month}>
-                              <span className="bar-value">₹{(m.totalRevenue / 1000).toFixed(1)}k</span>
-                              <div className="bar-fill" style={{ height: `${(m.totalRevenue / 90000) * 100}%` }} />
-                              <span className="bar-label">{m.month}</span>
-                              <span className="bar-tonnage">{m.totalVolumeTons}T</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
                     </div>
 
                     <div style={{ marginTop: '20px', borderTop: '1px solid #d9d6cc', paddingTop: '16px' }}>
                       <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981', fontWeight: 'bold' }}>
-                        Realized Premium Insights
+                        Buyer Procurement Insights
                       </p>
                       <ul style={{ paddingLeft: '18px', color: '#404f43', fontSize: '13px', lineHeight: '1.7', margin: '0' }}>
-                        <li>Direct buyer connections bypassed intermediary deductions &middot; realizing <strong>+{analyticsData?.kisanLinkPremiumIndexPercent || 18.4}% extra return</strong> vs local market.</li>
-                        <li>Freight optimization preserved <strong>₹{Number(analyticsData?.totalExtraProfitEarned || 42800).toLocaleString()}</strong> in net liquidity across dispatches.</li>
-                        <li>Grade A produce quality improved counter-offer acceptance rates by <strong>28%</strong>.</li>
+                        <li>Direct farmer contract linkage bypassed 6.5% APMC market charges &middot; preserving <strong>₹1,57,850</strong> in operating liquidity.</li>
+                        <li>NABL certified quality verification reduced inbound transit spoilage rate to <strong>1.8%</strong> (industry avg 6.4%).</li>
+                        <li>Escrow protection guaranteed 100% on-time farm harvest dispatch with zero payment disputes.</li>
                       </ul>
                     </div>
-                  </>
-                )}
-              </section>
+                  </section>
 
-              
-              <section className="panel" style={{ marginTop: '20px', border: '2px solid #2f6838', borderRadius: '8px', background: '#ffffff', padding: '20px 24px', boxShadow: '0 4px 18px rgba(47, 104, 56, 0.08)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px', borderBottom: '1px solid #edebe4', paddingBottom: '12px' }}>
-                  <div>
-                    <span className="eyebrow" style={{ color: '#2f6838', fontWeight: 700 }}>
-                      Farmer Decision Support Engine &middot; Real Net Realization &amp; Agronomic Profit
-                    </span>
-                    <h2 style={{ margin: '2px 0 0', fontSize: '20px', color: '#202a27' }}>
-                      Where Should This Farmer Sell? (Net Profit Calculator)
-                    </h2>
-                    <p className="muted" style={{ margin: '3px 0 0', fontSize: '13px' }}>
-                      Calculates both Escrow Net Bank Payout (take-home cash) and True Economic Farm Net Profit (gross revenue minus total cultivation and post-harvest costs).
-                    </p>
-                  </div>
-                  <span className="count" style={{ background: '#2f6838', color: '#ffffff', fontSize: '11px', padding: '4px 10px', borderRadius: '4px' }}>
-                    Optimized for Maximum Return
-                  </span>
-                </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px', marginBottom: '14px', background: '#f8f7f2', padding: '14px', borderRadius: '6px', border: '1px solid #eceae2' }}>
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      SELECT CROP
-                    </label>
-                    <select
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={sellCalcCrop}
-                      onChange={(e) => {
-                        const newCrop = e.target.value;
-                        setSellCalcCrop(newCrop);
-                        const b = CROP_PRODUCTION_BENCHMARKS[newCrop] || CROP_PRODUCTION_BENCHMARKS['Tomato'];
-                        setSellCalcAcres(b.defaultAcres);
-                        setSellCalcQty(b.defaultAcres * b.yieldPerAcreKg);
-                        setCustomCostOverrides({});
-                      }}
-                    >
-                      <option value="Tomato">Tomato (Hybrid / Roma)</option>
-                      <option value="Onion">Nashik Red Onion</option>
-                      <option value="Wheat">Sharbati Durum Wheat</option>
-                      <option value="Soybean">Yellow Organic Soybean</option>
-                      <option value="Potato">Jyoti Table Potato</option>
-                      <option value="Green Grapes">Thompson Seedless Grapes</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      CULTIVATION AREA (ACRES)
-                    </label>
-                    <input
-                      type="number"
-                      min="0.2"
-                      max="50"
-                      step="0.5"
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={sellCalcAcres}
-                      onChange={(e) => {
-                        const acres = Math.max(0.1, Number(e.target.value));
-                        setSellCalcAcres(acres);
-                        const b = CROP_PRODUCTION_BENCHMARKS[sellCalcCrop] || CROP_PRODUCTION_BENCHMARKS['Tomato'];
-                        setSellCalcQty(Math.round(acres * b.yieldPerAcreKg));
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      HARVEST QUANTITY (KG)
-                    </label>
-                    <input
-                      type="number"
-                      min="50"
-                      step="100"
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={sellCalcQty}
-                      onChange={(e) => setSellCalcQty(Math.max(1, Number(e.target.value)))}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      QUALITY GRADE
-                    </label>
-                    <select
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={sellCalcQuality}
-                      onChange={(e) => setSellCalcQuality(e.target.value)}
-                    >
-                      <option value="GRADE_APLUS">Grade A+ (Export / Premium Clean)</option>
-                      <option value="GRADE_A">Grade A (Standard Mandi Quality)</option>
-                      <option value="FAQ">Fair Average Quality (FAQ)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
-                      FARM ORIGIN CLUSTER
-                    </label>
-                    <select
-                      className="field-input"
-                      style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
-                      value={sellCalcCluster}
-                      onChange={(e) => setSellCalcCluster(e.target.value)}
-                    >
-                      <option value="Nashik Aggregation Yard">Nashik Aggregation Hub (MH)</option>
-                      <option value="Ranchi APMC Hub">Ranchi Mandi Corridor (JH)</option>
-                      <option value="Indore Agro Yard">Indore Quality Yard (MP)</option>
-                      <option value="Pune Terminal Market">Pune Market Yard (MH)</option>
-                    </select>
-                  </div>
-                </div>
-
-                
-                <div style={{ marginBottom: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-                    <button
-                      type="button"
-                      style={{ background: 'none', border: 'none', color: '#2f6838', fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
-                      onClick={() => setShowCultivationCosts(!showCultivationCosts)}
-                    >
-                      {showCultivationCosts ? '[-] Hide Cultivation Cost Breakdown' : '[+] Customize Cultivation Cost Benchmarks (Seeds, Fertilizer, Labour, Irrigation, Tillage)'}
-                    </button>
-                    <span style={{ fontSize: '11px', color: '#687588', fontFamily: "'DM Mono', monospace" }}>
-                      Total Production: <strong>₹{netSellDecision.totalCultivationCost.toLocaleString()}</strong> (₹{netSellDecision.totalCostPerAcre.toLocaleString()}/acre &middot; ₹{netSellDecision.productionCostPerKg}/kg)
-                    </span>
-                  </div>
-
-                  {showCultivationCosts && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px', marginTop: '10px', background: '#f0f5ee', padding: '12px', borderRadius: '6px', border: '1px solid #d4e3d1' }}>
+                  <section className="panel" style={{ marginTop: '20px', border: '2px solid #204068', borderRadius: '8px', background: '#ffffff', padding: '20px 24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px', borderBottom: '1px solid #edebe4', paddingBottom: '12px' }}>
                       <div>
-                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
-                          SEEDS / SEEDLINGS (₹/ACRE)
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="100"
-                          className="field-input"
-                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
-                          value={netSellDecision.seedCostPerAcre}
-                          onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, seedCost: Number(e.target.value) }))}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
-                          FERTILIZER &amp; PESTICIDES (₹/ACRE)
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="100"
-                          className="field-input"
-                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
-                          value={netSellDecision.fertCostPerAcre}
-                          onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, fertCost: Number(e.target.value) }))}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
-                          HIRED LABOUR (₹/ACRE)
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="100"
-                          className="field-input"
-                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
-                          value={netSellDecision.labourCostPerAcre}
-                          onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, labourCost: Number(e.target.value) }))}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
-                          TILLAGE &amp; TRACTOR (₹/ACRE)
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="100"
-                          className="field-input"
-                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
-                          value={netSellDecision.tillageCostPerAcre}
-                          onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, tillageCost: Number(e.target.value) }))}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
-                          IRRIGATION &amp; PUMP FUEL (₹/ACRE)
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="100"
-                          className="field-input"
-                          style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
-                          value={netSellDecision.irrigationCostPerAcre}
-                          onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, irrigationCost: Number(e.target.value) }))}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-                  <div style={{ border: '2px solid #2f6838', borderRadius: '6px', padding: '16px', background: '#f5faf5', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                        <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#2f6838', color: '#ffffff', padding: '3px 8px', borderRadius: '3px' }}>
-                          TOP RECOMMENDATION
+                        <span className="eyebrow" style={{ color: '#204068', fontWeight: 700 }}>
+                          Procurement Decision Engine &middot; Landed Sourcing &amp; Margins
                         </span>
-                        <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#2f6838', fontWeight: 700 }}>
-                          Match Score: {netSellDecision.buyer.matchScore}%
-                        </span>
-                      </div>
-
-                      <h3 style={{ margin: '4px 0 2px', fontSize: '16px', color: '#202a27' }}>
-                        {netSellDecision.buyer.buyerName}
-                      </h3>
-                      <p style={{ margin: '0 0 10px', fontSize: '12px', color: '#556058' }}>
-                        {netSellDecision.buyer.destinationName} ({netSellDecision.buyer.distanceKm} km away)
-                      </p>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: '#ffffff', padding: '10px', borderRadius: '4px', border: '1px solid #dbe6dc', marginBottom: '10px' }}>
-                        <div>
-                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>OFFERED PRICE</span>
-                          <strong style={{ fontSize: '15px', color: '#202a27' }}>₹{netSellDecision.buyer.pricePerKg} <small style={{ fontSize: '11px', color: '#778078' }}>/ kg</small></strong>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>GROSS VALUE</span>
-                          <strong style={{ fontSize: '15px', color: '#202a27' }}>₹{netSellDecision.buyer.grossRevenue.toLocaleString()}</strong>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>ROUTE FREIGHT</span>
-                          <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{netSellDecision.buyer.freight.toLocaleString()}</span>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>HANDLING / ESCROW</span>
-                          <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{netSellDecision.buyer.handlingFee.toLocaleString()}</span>
-                        </div>
-                      </div>
-
-                      
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
-                        <div style={{ background: '#253529', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
-                          <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#8fb899', display: 'block', textTransform: 'uppercase' }}>
-                            ESCROW BANK PAYOUT
-                          </span>
-                          <strong style={{ fontSize: '17px', color: '#6e9d68' }}>₹{netSellDecision.buyer.bankPayout.toLocaleString()}</strong>
-                          <small style={{ fontSize: '9px', color: '#b2c0b7', display: 'block', marginTop: '2px' }}>
-                            ₹{netSellDecision.buyer.netPerKg}/kg cash wired to bank
-                          </small>
-                        </div>
-                        <div style={{ background: '#202a27', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
-                          <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#c4ad83', display: 'block', textTransform: 'uppercase' }}>
-                            ECONOMIC NET PROFIT
-                          </span>
-                          <strong style={{ fontSize: '17px', color: netSellDecision.buyer.economicProfit >= 0 ? '#6e9d68' : '#e66b6b' }}>
-                            ₹{netSellDecision.buyer.economicProfit.toLocaleString()}
-                          </strong>
-                          <small style={{ fontSize: '9px', color: '#b2c0b7', display: 'block', marginTop: '2px' }}>
-                            Net after ₹{netSellDecision.totalCultivationCost.toLocaleString()} crop costs
-                          </small>
-                        </div>
-                      </div>
-
-                      
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '10px' }}>
-                        <div style={{ background: '#ffffff', border: '1px solid #dbe6dc', borderRadius: '4px', padding: '6px 4px', textAlign: 'center' }}>
-                          <span style={{ fontSize: '8px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>B:C Ratio</span>
-                          <strong style={{ fontSize: '12px', color: '#2f6838' }}>{netSellDecision.buyer.benefitCostRatio}:1</strong>
-                        </div>
-                        <div style={{ background: '#ffffff', border: '1px solid #dbe6dc', borderRadius: '4px', padding: '6px 4px', textAlign: 'center' }}>
-                          <span style={{ fontSize: '8px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Profit/Acre</span>
-                          <strong style={{ fontSize: '12px', color: '#202a27' }}>₹{netSellDecision.buyer.profitPerAcre.toLocaleString()}</strong>
-                        </div>
-                        <div style={{ background: '#ffffff', border: '1px solid #dbe6dc', borderRadius: '4px', padding: '6px 4px', textAlign: 'center' }}>
-                          <span style={{ fontSize: '8px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Margin %</span>
-                          <strong style={{ fontSize: '12px', color: '#202a27' }}>{netSellDecision.buyer.marginPercent}%</strong>
-                        </div>
-                        <div style={{ background: '#ffffff', border: '1px solid #dbe6dc', borderRadius: '4px', padding: '6px 4px', textAlign: 'center' }}>
-                          <span style={{ fontSize: '8px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Break-Even</span>
-                          <strong style={{ fontSize: '12px', color: '#8a2b2b' }}>₹{netSellDecision.buyer.breakEvenPricePerKg}/kg</strong>
-                        </div>
-                      </div>
-
-                      <div style={{ fontSize: '11px', color: '#444d47', lineHeight: 1.4 }}>
-                        &bull; Buyer Trust Rating: <strong>{netSellDecision.buyer.trustScore}/100</strong> (Verified NABL Partner)<br />
-                        &bull; Payment Guarantee: <strong>{netSellDecision.buyer.paymentTerms}</strong>
-                      </div>
-                    </div>
-
-                    <div style={{ marginTop: '14px', borderTop: '1px solid #dbe6dc', paddingTop: '10px' }}>
-                      <button
-                        type="button"
-                        className="trade-btn trade-btn-primary"
-                        style={{ width: '100%', padding: '10px', fontSize: '13px', fontWeight: 700 }}
-                        onClick={() => {
-                          setProduceForm(prev => ({
-                            ...prev,
-                            cropName: sellCalcCrop,
-                            quantity: sellCalcQty,
-                            quality: sellCalcQuality,
-                            pricePerKg: netSellDecision.buyer.pricePerKg
-                          }));
-                          setShowProduceModal(true);
-                          setMessage(`Pre-loaded ${sellCalcCrop} (${sellCalcQty} kg) at ₹${netSellDecision.buyer.pricePerKg}/kg for listing.`);
-                        }}
-                      >
-                        Sell Here &middot; Lock Best Net Return &rarr;
-                      </button>
-                    </div>
-                  </div>
-
-                  <div style={{ border: '1px solid #e0ddd5', borderRadius: '6px', padding: '16px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <div style={{ marginBottom: '8px' }}>
-                        <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', fontWeight: 600, textTransform: 'uppercase' }}>
-                          COMPARATIVE BENCHMARK
-                        </span>
-                        <h3 style={{ margin: '4px 0 2px', fontSize: '16px', color: '#202a27' }}>
-                          Local Mandi vs Farm-Gate Trader
-                        </h3>
-                      </div>
-
-                      <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', marginBottom: '10px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <strong style={{ fontSize: '13px', color: '#202a27' }}>{netSellDecision.mandi.destinationName}</strong>
-                          <span style={{ fontSize: '12px', fontWeight: 600, color: '#444d47' }}>₹{netSellDecision.mandi.pricePerKg}/kg</span>
-                        </div>
-                        <p style={{ margin: '2px 0 4px', fontSize: '11px', color: '#778078' }}>
-                          Gross: ₹{netSellDecision.mandi.grossRevenue.toLocaleString()} &minus; Freight: ₹{netSellDecision.mandi.freight} &minus; Mandi Cess: ₹{netSellDecision.mandi.commissionFee}
-                        </p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '4px' }}>
-                          <span style={{ fontSize: '11px', color: '#667269' }}>Bank Payout:</span>
-                          <strong style={{ fontSize: '12px', color: '#202a27' }}>₹{netSellDecision.mandi.bankPayout.toLocaleString()} (₹{netSellDecision.mandi.netPerKg}/kg)</strong>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
-                          <span style={{ fontSize: '11px', color: '#667269' }}>Economic Net Profit:</span>
-                          <strong style={{ fontSize: '12px', color: netSellDecision.mandi.economicProfit >= 0 ? '#2f6838' : '#8a2b2b' }}>
-                            ₹{netSellDecision.mandi.economicProfit.toLocaleString()} (B:C {netSellDecision.mandi.benefitCostRatio}:1)
-                          </strong>
-                        </div>
-                      </div>
-
-                      <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', marginBottom: '12px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <strong style={{ fontSize: '13px', color: '#202a27' }}>{netSellDecision.villageTrader.destinationName}</strong>
-                          <span style={{ fontSize: '12px', fontWeight: 600, color: '#444d47' }}>₹{netSellDecision.villageTrader.pricePerKg}/kg</span>
-                        </div>
-                        <p style={{ margin: '2px 0 4px', fontSize: '11px', color: '#778078' }}>
-                          Zero transport deduction &middot; Discounted farm-gate rate
-                        </p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '4px' }}>
-                          <span style={{ fontSize: '11px', color: '#667269' }}>Bank Payout:</span>
-                          <strong style={{ fontSize: '12px', color: '#8a2b2b' }}>₹{netSellDecision.villageTrader.bankPayout.toLocaleString()} (₹{netSellDecision.villageTrader.netPerKg}/kg)</strong>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
-                          <span style={{ fontSize: '11px', color: '#667269' }}>Economic Net Profit:</span>
-                          <strong style={{ fontSize: '12px', color: netSellDecision.villageTrader.economicProfit >= 0 ? '#2f6838' : '#8a2b2b' }}>
-                            ₹{netSellDecision.villageTrader.economicProfit.toLocaleString()} (B:C {netSellDecision.villageTrader.benefitCostRatio}:1)
-                          </strong>
-                        </div>
-                      </div>
-
-                      <div style={{ background: '#eef4ec', border: '1px solid #c7ddc5', borderRadius: '4px', padding: '10px 12px' }}>
-                        <strong style={{ fontSize: '12px', color: '#2f6838', display: 'block' }}>
-                          Decision Takeaway: +₹{netSellDecision.netAdvantage.toLocaleString()} Higher Economic Net Profit
-                        </strong>
-                        <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#355339', lineHeight: 1.4 }}>
-                          Selling directly through KisanLink institutional escrow yields ₹{netSellDecision.netAdvantage.toLocaleString()} more in real economic net profit than the local alternative, even after covering all door-to-door transport and platform fees.
+                        <h2 style={{ margin: '2px 0 0', fontSize: '20px', color: '#202a27' }}>
+                          Buyer Procurement Landed Cost &amp; Wholesale Margin Calculator
+                        </h2>
+                        <p className="muted" style={{ margin: '3px 0 0', fontSize: '13px' }}>
+                          Computes real landed cost per kg including farm purchase price, inbound freight, sorting buffer, and holding costs vs target wholesale resale price.
                         </p>
                       </div>
+                      <span className="count" style={{ background: '#204068', color: '#ffffff', fontSize: '11px', padding: '4px 10px', borderRadius: '4px' }}>
+                        Wholesale Optimization
+                      </span>
                     </div>
 
-                    <div style={{ marginTop: '14px', borderTop: '1px solid #edebe4', paddingTop: '10px' }}>
-                      <button
-                        type="button"
-                        className="trade-btn trade-btn-secondary"
-                        style={{ width: '100%', padding: '8px', fontSize: '11px' }}
-                        onClick={() => setCurrentView('matching')}
-                      >
-                        Explore Live Buyer Requirements &rarr;
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              
-              <section className="panel" style={{ marginTop: '24px' }}>
-                <div className="panel-heading">
-                  <div>
-                    <p className="eyebrow">Sales Ledger &amp; Settlement Journal</p>
-                    <h2>Recent Farm Sales &amp; Settled Deal Records</h2>
-                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
-                      Audit log of your direct farm sales, contracted rates, logistics deductions, and net escrow bank payouts.
-                    </p>
-                  </div>
-                  <span className="count">{trades.length} {trades.length === 1 ? 'Sale' : 'Sales'} Recorded</span>
-                </div>
-
-                
-                <div className="prediction-deep-grid" style={{ marginTop: '16px', marginBottom: '20px' }}>
-                  <div className="stat-metric-card">
-                    <span>Total Realized Sales</span>
-                    <strong style={{ color: '#202a27' }}>
-                      ₹{trades.reduce((sum, t) => sum + Number(t.netFarmerReturn || 0), 0).toLocaleString()}
-                    </strong>
-                    <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Net take-home</small>
-                  </div>
-                  <div className="stat-metric-card">
-                    <span>Dispatched Volume</span>
-                    <strong style={{ color: '#2f6838' }}>
-                      {(trades.reduce((sum, t) => sum + Number(t.quantity || 0), 0) / 1000).toFixed(1)} Tons
-                    </strong>
-                    <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>
-                      {trades.reduce((sum, t) => sum + Number(t.quantity || 0), 0).toLocaleString()} kg total
-                    </small>
-                  </div>
-                  <div className="stat-metric-card">
-                    <span>Active In-Transit</span>
-                    <strong style={{ color: '#2563eb' }}>
-                      {trades.filter(t => t.status === 'IN_TRANSIT' || t.status === 'ACCEPTED' || t.status === 'PROPOSED').length} Deals
-                    </strong>
-                    <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Escrow protected</small>
-                  </div>
-                  <div className="stat-metric-card">
-                    <span>Avg Realized Rate</span>
-                    <strong style={{ color: '#5a8e62' }}>
-                      ₹{(trades.length > 0 ? (trades.reduce((sum, t) => sum + Number(t.agreedPricePerKg || 0), 0) / trades.length).toFixed(1) : '28.5')}/kg
-                    </strong>
-                    <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Above market benchmark</small>
-                  </div>
-                </div>
-
-                
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
-                    <thead>
-                      <tr style={{ background: '#f5f7f5', borderBottom: '2px solid #d4dfd4', color: '#445846', font: "11px 'DM Mono', monospace", textTransform: 'uppercase' }}>
-                        <th style={{ padding: '12px 14px' }}>Deal ID</th>
-                        <th style={{ padding: '12px 14px' }}>Date</th>
-                        <th style={{ padding: '12px 14px' }}>Crop / Commodity</th>
-                        <th style={{ padding: '12px 14px' }}>Buyer &amp; Hub</th>
-                        <th style={{ padding: '12px 14px' }}>Quantity</th>
-                        <th style={{ padding: '12px 14px' }}>Contract Rate</th>
-                        <th style={{ padding: '12px 14px' }}>Gross Value</th>
-                        <th style={{ padding: '12px 14px' }}>Freight Fee</th>
-                        <th style={{ padding: '12px 14px' }}>Net Bank Payout</th>
-                        <th style={{ padding: '12px 14px' }}>Status</th>
-                        <th style={{ padding: '12px 14px' }}>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {trades.map((t) => {
-                        const statusKey = (t.status || 'PROPOSED').toLowerCase();
-                        const gross = (t.quantity || 0) * (t.agreedPricePerKg || 0);
-                        return (
-                          <tr key={t.id} style={{ borderBottom: '1px solid #eef2ee' }}>
-                            <td style={{ padding: '12px 14px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#2f6838' }}>
-                              #{t.id}
-                            </td>
-                            <td style={{ padding: '12px 14px', color: '#667269', fontSize: '12px' }}>
-                              {new Date(t.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
-                            </td>
-                            <td style={{ padding: '12px 14px', fontWeight: 600, color: '#202a27' }}>
-                              {t.cropName}
-                              <span style={{ display: 'block', fontSize: '10px', color: '#778078', fontWeight: 400 }}>
-                                {t.cropCategory || 'PRODUCE'}
-                              </span>
-                            </td>
-                            <td style={{ padding: '12px 14px', color: '#334135' }}>
-                              {t.buyerName}
-                            </td>
-                            <td style={{ padding: '12px 14px', fontWeight: 600 }}>
-                              {Number(t.quantity).toLocaleString()} kg
-                              <span style={{ display: 'block', fontSize: '10px', color: '#778078', fontWeight: 400 }}>
-                                ({(Number(t.quantity) / 1000).toFixed(1)} T)
-                              </span>
-                            </td>
-                            <td style={{ padding: '12px 14px', fontWeight: 600, color: '#2f6838' }}>
-                              ₹{t.agreedPricePerKg}/kg
-                            </td>
-                            <td style={{ padding: '12px 14px', color: '#4b5563' }}>
-                              ₹{gross.toLocaleString()}
-                            </td>
-                            <td style={{ padding: '12px 14px', color: '#b45a42' }}>
-                              -₹{Number(t.transportCost || 0).toLocaleString()}
-                            </td>
-                            <td style={{ padding: '12px 14px', fontWeight: 700, color: '#166534', fontSize: '14px' }}>
-                              ₹{Number(t.netFarmerReturn || 0).toLocaleString()}
-                            </td>
-                            <td style={{ padding: '12px 14px' }}>
-                              <span className={`status-pill status-${statusKey}`}>
-                                {t.status}
-                              </span>
-                            </td>
-                            <td style={{ padding: '12px 14px' }}>
-                              <div style={{ display: 'flex', gap: '6px' }}>
-                                <button
-                                  type="button"
-                                  className="trade-btn trade-btn-secondary"
-                                  style={{ padding: '5px 8px', fontSize: '11px' }}
-                                  onClick={() => setSelectedInvoiceTrade(t)}
-                                  title="Print Official Trade Receipt"
-                                >
-                                  Receipt
-                                </button>
-                                <button
-                                  type="button"
-                                  className="trade-btn"
-                                  style={{ padding: '5px 8px', fontSize: '11px', background: '#f0fdf4', borderColor: '#86efac', color: '#166534' }}
-                                  onClick={() => setCurrentView('matching')}
-                                  title="View in Active Trades"
-                                >
-                                  Manage &rarr;
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                      {trades.length === 0 && (
-                        <tr>
-                          <td colSpan={11} style={{ padding: '24px', textAlign: 'center', color: '#778078' }}>
-                            No sales records found. Initiate a deal from the Buyer Matching tab to record sales.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', background: '#f8faf8', padding: '12px 16px', borderRadius: '6px' }}>
-                  <span style={{ fontSize: '12px', color: '#556557' }}>
-                    Need to negotiate prices or book transport for an active deal?
-                  </span>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button
-                      type="button"
-                      className="trade-btn trade-btn-secondary"
-                      style={{ padding: '8px 14px', fontSize: '12px' }}
-                      onClick={() => setCurrentView('my-orders')}
-                    >
-                      View Order Lifecycles &rarr;
-                    </button>
-                    <button
-                      type="button"
-                      className="trade-btn trade-btn-primary"
-                      style={{ padding: '8px 14px', fontSize: '12px' }}
-                      onClick={() => setCurrentView('matching')}
-                    >
-                      Open Live Trading Desk &rarr;
-                    </button>
-                  </div>
-                </div>
-              </section>
-            </>
-          )}
-
-        </div>
-      )}
-
-      
-      
-      
-      {currentView === 'map' && (
-        <div className="view-container">
-          <section className="market-map-section">
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">Geographical Market Discovery &amp; Routing</p>
-                <h2>Nearby Markets &amp; Freight Radar</h2>
-              </div>
-              <span className="count">{nearbyMarkets.length} Markets within {mapRadius} km</span>
-            </div>
-
-            
-            <div className="location-presets-bar">
-              <span style={{ font: "10px 'DM Mono', monospace", color: '#6a766c', alignSelf: 'center', marginRight: '4px' }}>
-                {text.weatherOrigin} <strong>{mapCoords.label}</strong>
-              </span>
-              <button
-                type="button"
-                className={`location-pill ${mapCoords.label === 'Ranchi Center' ? 'active' : ''}`}
-                onClick={() => handleLocationPreset(23.3441, 85.3096, 'Ranchi Center')}
-              >
-                Ranchi
-              </button>
-              <button
-                type="button"
-                className={`location-pill ${mapCoords.label === 'Ramgarh' ? 'active' : ''}`}
-                onClick={() => handleLocationPreset(23.6332, 85.5149, 'Ramgarh')}
-              >
-                Ramgarh
-              </button>
-              <button
-                type="button"
-                className={`location-pill ${mapCoords.label === 'Bokaro' ? 'active' : ''}`}
-                onClick={() => handleLocationPreset(23.6693, 86.1511, 'Bokaro')}
-              >
-                Bokaro
-              </button>
-              <button
-                type="button"
-                className={`location-pill ${mapCoords.label === 'Jamshedpur' ? 'active' : ''}`}
-                onClick={() => handleLocationPreset(22.8046, 86.2029, 'Jamshedpur')}
-              >
-                Jamshedpur
-              </button>
-              {session && (
-                <button
-                  type="button"
-                  className="location-pill"
-                  style={{ background: '#dce7d3', color: '#3d5940', borderColor: '#b8cba8' }}
-                  onClick={handleUseProfileLocation}
-                >
-                  {text.weatherUseGps}
-                </button>
-              )}
-            </div>
-
-            <div className="market-map-layout">
-              
-              <div className="map-radar-container">
-                <svg className="map-radar-svg" viewBox="0 0 300 300">
-                  <defs>
-                    <radialGradient id="radarGlow" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stopColor="#2c4038" stopOpacity="0.8" />
-                      <stop offset="100%" stopColor="#141c19" stopOpacity="0.9" />
-                    </radialGradient>
-                  </defs>
-
-                  <rect width="300" height="300" rx="8" fill="url(#radarGlow)" />
-
-                  <line x1="150" y1="15" x2="150" y2="285" stroke="#2e4239" strokeWidth="1" strokeDasharray="2 2" />
-                  <line x1="15" y1="150" x2="285" y2="150" stroke="#2e4239" strokeWidth="1" strokeDasharray="2 2" />
-
-                  <circle cx="150" cy="150" r="40" fill="none" stroke="#2e4239" strokeWidth="1" />
-                  <circle cx="150" cy="150" r="80" fill="none" stroke="#2e4239" strokeWidth="1" />
-                  <circle cx="150" cy="150" r="120" fill="none" stroke="#375246" strokeWidth="1.2" />
-
-                  <text x="154" y="112" fill="#587567" fontSize="8" fontFamily="DM Mono">30 km</text>
-                  <text x="154" y="72" fill="#587567" fontSize="8" fontFamily="DM Mono">75 km</text>
-                  <text x="154" y="32" fill="#587567" fontSize="8" fontFamily="DM Mono">120+ km</text>
-
-                  <text x="146" y="24" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">N</text>
-                  <text x="278" y="153" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">E</text>
-                  <text x="146" y="280" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">S</text>
-                  <text x="18" y="153" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">W</text>
-
-                  
-                  {(() => {
-                    if (!selectedMapMarket) return null;
-                    const maxRange = Math.max(130, ...nearbyMarkets.map(m => Number(m.distanceKm || 0)));
-                    const scale = 115.0 / maxRange;
-                    const dx = (selectedMapMarket.longitude - mapCoords.lon) * 111.0 * Math.cos(mapCoords.lat * Math.PI / 180);
-                    const dy = -(selectedMapMarket.latitude - mapCoords.lat) * 111.0;
-                    const tx = Math.min(275, Math.max(25, 150 + dx * scale));
-                    const ty = Math.min(275, Math.max(25, 150 + dy * scale));
-                    return (
-                      <g>
-                        <line x1="150" y1="150" x2={tx} y2={ty} stroke="#dc664a" strokeWidth="2.5" strokeDasharray="4 2" />
-                        <circle cx={tx} cy={ty} r="12" fill="none" stroke="#dc664a" strokeWidth="1.5" opacity="0.6">
-                          <animate attributeName="r" values="8;16;8" dur="1.8s" repeatCount="indefinite" />
-                        </circle>
-                      </g>
-                    );
-                  })()}
-
-                  
-                  <circle cx="150" cy="150" r="7" fill="#f2c45f" stroke="#1d2724" strokeWidth="2" />
-                  <circle cx="150" cy="150" r="14" fill="none" stroke="#f2c45f" strokeWidth="1" opacity="0.4">
-                    <animate attributeName="r" values="7;18;7" dur="2.2s" repeatCount="indefinite" />
-                  </circle>
-                  <text x="150" y="172" fill="#f2c45f" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="DM Mono">
-                    ORIGIN (YOU)
-                  </text>
-
-                  
-                  {nearbyMarkets.map((m) => {
-                    const maxRange = Math.max(130, ...nearbyMarkets.map(item => Number(item.distanceKm || 0)));
-                    const scale = 115.0 / maxRange;
-                    const dx = (m.longitude - mapCoords.lon) * 111.0 * Math.cos(mapCoords.lat * Math.PI / 180);
-                    const dy = -(m.latitude - mapCoords.lat) * 111.0;
-                    const mx = Math.min(275, Math.max(25, 150 + dx * scale));
-                    const my = Math.min(275, Math.max(25, 150 + dy * scale));
-                    const isSelected = selectedMapMarket?.id === m.id;
-                    const pinColor = m.marketType === 'APMC' ? '#6ba3d6' : m.marketType === 'WHOLESALE' ? '#e5a84b' : '#78b87d';
-
-                    return (
-                      <g
-                        key={m.id}
-                        onClick={() => setSelectedMapMarket(m)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <circle
-                          cx={mx}
-                          cy={my}
-                          r={isSelected ? "7" : "5"}
-                          fill={pinColor}
-                          stroke="#ffffff"
-                          strokeWidth={isSelected ? "2" : "1"}
-                        />
-                        <text
-                          x={mx}
-                          y={my - 9}
-                          fill={isSelected ? '#fff' : '#c8d4cc'}
-                          fontSize={isSelected ? '9' : '7.5'}
-                          fontWeight={isSelected ? 'bold' : 'normal'}
-                          textAnchor="middle"
-                          fontFamily="DM Mono"
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '18px', background: '#f8f9fb', padding: '14px', borderRadius: '6px', border: '1px solid #e2e7ef' }}>
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#445163', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          COMMODITY
+                        </label>
+                        <select
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={buyerCalcCrop}
+                          onChange={(e) => setBuyerCalcCrop(e.target.value)}
                         >
-                          {m.name.split(' ')[0]} ({m.distanceKm}km)
-                        </text>
-                      </g>
-                    );
-                  })}
-                </svg>
-
-                <div className="map-radar-legend">
-                  <span><i style={{ background: '#78b87d' }} /> Market</span>
-                  <span><i style={{ background: '#6ba3d6' }} /> APMC Yard</span>
-                  <span><i style={{ background: '#e5a84b' }} /> Wholesale Yard</span>
-                  <span><i style={{ background: '#f2c45f' }} /> Your Origin</span>
-                </div>
-              </div>
-
-              
-              <div className="nearby-list-container">
-                {mapLoading ? (
-                  <p className="muted">Calculating distances and freight costs...</p>
-                ) : nearbyMarkets.length > 0 ? (
-                  nearbyMarkets.map((market) => {
-                    const isSelected = selectedMapMarket?.id === market.id;
-                    return (
-                      <div
-                        key={market.id}
-                        className={`nearby-card ${isSelected ? 'active' : ''}`}
-                        onClick={() => setSelectedMapMarket(market)}
-                      >
-                        <div className="nearby-header">
-                          <div>
-                            <h3>{market.name}</h3>
-                            <small style={{ color: '#778078', fontSize: '11px' }}>
-                              {market.address || market.district}, {market.state}
-                            </small>
-                          </div>
-                          <span className={`market-type-badge badge-${market.marketType?.toLowerCase()}`}>
-                            {market.marketType}
-                          </span>
-                        </div>
-
-                        <div className="nearby-meta-grid">
-                          <div className="nearby-meta-item">
-                            <span>Distance</span>
-                            <strong>{market.distanceKm} km {market.direction && `(${market.direction})`}</strong>
-                          </div>
-                          <div className="nearby-meta-item">
-                            <span>Est. Transit</span>
-                            <strong>~{market.estimatedDurationMinutes} mins</strong>
-                          </div>
-                          <div className="nearby-meta-item">
-                            <span>Freight Cost</span>
-                            <strong>₹{market.estimatedTransportCost}</strong>
-                          </div>
-                        </div>
-
-                        <div className="nearby-actions">
-                          <span className="route-summary-text">
-                            {market.routeSummary}
-                          </span>
-                          <a
-                            href={market.navigationUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="nav-link-btn"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            Navigate ↔
-                          </a>
-                        </div>
+                          <option value="Tomato">Tomato (Hybrid / Roma)</option>
+                          <option value="Onion">Nashik Red Onion</option>
+                          <option value="Wheat">Sharbati Durum Wheat</option>
+                          <option value="Soybean">Yellow Organic Soybean</option>
+                          <option value="Potato">Jyoti Table Potato</option>
+                          <option value="Green Grapes">Thompson Seedless Grapes</option>
+                        </select>
                       </div>
-                    );
-                  })
-                ) : (
-                  <p className="muted">No agricultural markets found in this radius.</p>
-                )}
-              </div>
-            </div>
-          </section>
-        </div>
-      )}
 
-      
-      
-      
-      {currentView === 'notifications' && (
-        <div className="view-container">
-          <section className="panel" style={{ marginTop: '18px' }}>
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">Market activity &amp; signals</p>
-                <h2>{text.labelNotifications}</h2>
-              </div>
-              <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-                {unreadCount > 0 && notifSubTab === 'app' && (
-                  <button type="button" className="text-button" onClick={markAllNotificationsRead} style={{ marginTop: 0 }}>
-                    Mark all read
-                  </button>
-                )}
-                <span className="count">{notifSubTab === 'app' ? `${unreadCount} unread` : `${smsLogs.length} field alerts`}</span>
-              </div>
-            </div>
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#445163', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          LOT QUANTITY (KG)
+                        </label>
+                        <input
+                          type="number"
+                          min="100"
+                          step="100"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={buyerCalcQty}
+                          onChange={(e) => setBuyerCalcQty(Math.max(1, Number(e.target.value)))}
+                        />
+                      </div>
 
-            
-            <div className="tab-toggle-group" style={{ marginBottom: '16px' }}>
-              <button
-                type="button"
-                className={notifSubTab === 'app' ? 'active' : ''}
-                onClick={() => setNotifSubTab('app')}
-              >
-                In-App Desk Feed ({unreadCount})
-              </button>
-              <button
-                type="button"
-                className={notifSubTab === 'sms' ? 'active' : ''}
-                onClick={() => { setNotifSubTab('sms'); loadSmsLogs(); }}
-              >
-                SMS &amp; WhatsApp Field Dispatch ({smsLogs.length})
-              </button>
-            </div>
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#445163', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          SOURCING CHANNEL
+                        </label>
+                        <select
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={buyerCalcSource}
+                          onChange={(e) => setBuyerCalcSource(e.target.value)}
+                        >
+                          <option value="Direct Farm-Gate">Direct Farm-Gate (Farmer Sourced)</option>
+                          <option value="Aggregation Yard">Aggregation Yard (Graded Batch)</option>
+                          <option value="APMC Central Mandi">APMC Central Mandi (Auction)</option>
+                        </select>
+                      </div>
 
-            
-            {notifSubTab === 'app' && (
-              <div className="notif-list">
-                {notifications.map((n) => (
-                  <div
-                    key={n.id}
-                    className={`notif-card ${n.unread ? 'unread' : ''}`}
-                    onClick={() => markNotificationRead(n.id)}
-                    style={{ cursor: 'default' }}
-                  >
-                    <span className={`notif-dot ${n.unread ? '' : 'read'}`} />
-                    <div className="notif-body">
-                      <p className="notif-title"><strong>{n.title}</strong> — {n.message}</p>
-                      <div className="notif-meta">
-                        <span>{n.time}</span>
-                        <span>·</span>
-                        <span>{n.type}</span>
-                        <span>·</span>
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#445163', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          INBOUND HAUL (KM)
+                        </label>
+                        <input
+                          type="number"
+                          min="5"
+                          step="5"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={buyerCalcDistanceKm}
+                          onChange={(e) => setBuyerCalcDistanceKm(Math.max(1, Number(e.target.value)))}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#445163', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          HOLDING DAYS
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          step="1"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={buyerCalcStorageDays}
+                          onChange={(e) => setBuyerCalcStorageDays(Math.max(1, Number(e.target.value)))}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#445163', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          TARGET RESALE (₹/KG)
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          step="0.5"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={buyerCalcResaleRate}
+                          onChange={(e) => setBuyerCalcResaleRate(Math.max(0.1, Number(e.target.value)))}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                      <div style={{ border: '2px solid #204068', borderRadius: '6px', padding: '16px', background: '#f5f7fa', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div>
+                          <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#204068', color: '#ffffff', padding: '3px 8px', borderRadius: '3px' }}>
+                            LANDED COST FORMULATION
+                          </span>
+                          <h3 style={{ margin: '8px 0 4px', fontSize: '16px', color: '#202a27' }}>
+                            Inbound Procurement Breakdown
+                          </h3>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: '#ffffff', padding: '10px', borderRadius: '4px', border: '1px solid #d4dce8', margin: '10px 0' }}>
+                            <div>
+                              <span style={{ fontSize: '10px', color: '#687588', display: 'block' }}>FARM ACQUISITION</span>
+                              <strong style={{ fontSize: '14px', color: '#202a27' }}>₹{buyerDecision.purchaseRatePerKg} <small style={{ fontSize: '11px', color: '#687588' }}>/ kg</small></strong>
+                            </div>
+                            <div>
+                              <span style={{ fontSize: '10px', color: '#687588', display: 'block' }}>GROSS OUTLAY</span>
+                              <strong style={{ fontSize: '14px', color: '#202a27' }}>₹{buyerDecision.grossPurchaseCost.toLocaleString()}</strong>
+                            </div>
+                            <div>
+                              <span style={{ fontSize: '10px', color: '#687588', display: 'block' }}>ROUTE FREIGHT</span>
+                              <span style={{ fontSize: '13px', color: '#204068' }}>+ ₹{buyerDecision.inboundFreight.toLocaleString()}</span>
+                            </div>
+                            <div>
+                              <span style={{ fontSize: '10px', color: '#687588', display: 'block' }}>SPOILAGE &amp; HOLDING</span>
+                              <span style={{ fontSize: '13px', color: '#204068' }}>+ ₹{(buyerDecision.spoilageBuffer + buyerDecision.storageCost).toLocaleString()}</span>
+                            </div>
+                          </div>
+
+                          <div style={{ background: '#202a27', color: '#ffffff', padding: '10px 14px', borderRadius: '4px', marginBottom: '10px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#97a89e' }}>NET LANDED COST / KG</span>
+                              <strong style={{ fontSize: '18px', color: '#6e9d68' }}>₹{buyerDecision.landedCostPerKg} / kg</strong>
+                            </div>
+                            <div style={{ fontSize: '11px', color: '#b2c0b7', marginTop: '2px' }}>
+                              Total Landed Expenditure: <strong>₹{buyerDecision.totalLandedCost.toLocaleString()}</strong>
+                            </div>
+                          </div>
+                        </div>
+
                         <button
                           type="button"
-                          className="notif-link"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            markNotificationRead(n.id);
-                            setCurrentView(n.viewTarget);
+                          className="trade-btn trade-btn-primary"
+                          style={{ width: '100%', padding: '10px', fontSize: '13px', fontWeight: 700 }}
+                          onClick={() => {
+                            setCurrentView('matching');
+                            setMessage(`Initiated sourcing match for ${buyerCalcQty} kg of ${buyerCalcCrop} at target landed rate ₹${buyerDecision.landedCostPerKg}/kg.`);
                           }}
                         >
-                          View ↔
+                          Source This Lot &middot; Match Verified Farmers &rarr;
+                        </button>
+                      </div>
+
+                      <div style={{ border: '1px solid #e0ddd5', borderRadius: '6px', padding: '16px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div>
+                          <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#687588', fontWeight: 600, textTransform: 'uppercase' }}>
+                            WHOLESALE PROFIT MARGIN
+                          </span>
+                          <h3 style={{ margin: '8px 0 4px', fontSize: '16px', color: '#202a27' }}>
+                            Realized Commercial Spread
+                          </h3>
+
+                          <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', margin: '10px 0' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontSize: '12px', color: '#444d47' }}>Target Wholesale Realization:</span>
+                              <strong style={{ fontSize: '14px', color: '#202a27' }}>₹{buyerDecision.projectedResaleRevenue.toLocaleString()}</strong>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                              <span style={{ fontSize: '12px', color: '#444d47' }}>Net Wholesale Margin:</span>
+                              <strong style={{ fontSize: '15px', color: '#2f6838' }}>+₹{buyerDecision.netGrossMargin.toLocaleString()}</strong>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '6px', marginTop: '6px' }}>
+                              <span style={{ fontSize: '11px', color: '#667269' }}>Realized Margin / Quintal:</span>
+                              <strong style={{ fontSize: '13px', color: '#202a27' }}>₹{buyerDecision.marginPerQuintal}/qtl ({buyerDecision.marginPercent}%)</strong>
+                            </div>
+                          </div>
+
+                          <div style={{ background: '#eef4ec', border: '1px solid #c7ddc5', borderRadius: '4px', padding: '10px 12px' }}>
+                            <strong style={{ fontSize: '12px', color: '#2f6838', display: 'block' }}>
+                              Middleman Avoidance Dividend: +₹{buyerDecision.apmcCommissionAvoided.toLocaleString()}
+                            </strong>
+                            <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#355339', lineHeight: 1.4 }}>
+                              Direct farmer sourcing bypasses commission agent deductions and mandi cess &middot; securing an extra ₹{buyerDecision.apmcCommissionAvoided.toLocaleString()} in net profit.
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="trade-btn trade-btn-secondary"
+                          style={{ width: '100%', padding: '8px', fontSize: '11px', marginTop: '14px' }}
+                          onClick={() => setCurrentView('my-orders')}
+                        >
+                          View Active Purchase Contracts &rarr;
                         </button>
                       </div>
                     </div>
-                  </div>
-                ))}
-                {notifications.length === 0 && (
-                  <p className="muted" style={{ padding: '16px 0' }}>No notifications received yet.</p>
-                )}
-              </div>
-            )}
+                  </section>
+                </>
+              )}
 
-            
-            {notifSubTab === 'sms' && (
-              <div>
-                <div style={{ borderBottom: '1px solid #d9d6cc', paddingBottom: '18px', marginBottom: '18px' }}>
-                  <p className="eyebrow" style={{ marginBottom: '6px' }}>Field Dispatch Gateway — Simulated</p>
-                  <p style={{ fontSize: '12px', color: '#647068', margin: '0 0 18px', lineHeight: '1.6' }}>
-                    Farmers receive SMS and WhatsApp alerts for trade proposals, escrow confirmations, and payouts. Replying <code>ACCEPT &lt;id&gt;</code> via SMS confirms a deal offline.
-                  </p>
 
-                  <form onSubmit={handleSendTestSms} style={{ marginTop: 0 }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
-                      <label style={{ marginTop: 0 }}>Recipient Phone
-                        <input
-                          value={testSmsForm.recipientPhone}
-                          onChange={(e) => setTestSmsForm({ ...testSmsForm, recipientPhone: e.target.value })}
-                          required
-                        />
-                      </label>
-                      <label style={{ marginTop: 0 }}>Channel
-                        <select
-                          value={testSmsForm.channel}
-                          onChange={(e) => setTestSmsForm({ ...testSmsForm, channel: e.target.value })}
-                        >
-                          <option value="SMS">SMS</option>
-                          <option value="WHATSAPP">WhatsApp</option>
-                        </select>
-                      </label>
+
+
+              {session?.role === 'TRANSPORTER' && (
+                <>
+                  <section className="panel" style={{ marginTop: '18px' }}>
+                    <div className="panel-heading">
+                      <div>
+                        <p className="eyebrow">Fleet Operations &middot; {profile.businessName || session.name || session.email}</p>
+                        <h2>Freight Operations &amp; Route Margin Analytics</h2>
+                      </div>
+                      <span className="count" style={{ background: '#8a6218', color: '#ffffff' }}>
+                        42.8% Fleet Operating Margin
+                      </span>
                     </div>
-                    <label>Message Text
-                      <input
-                        value={testSmsForm.text}
-                        onChange={(e) => setTestSmsForm({ ...testSmsForm, text: e.target.value })}
-                        required
-                      />
-                    </label>
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '18px', flexWrap: 'wrap' }}>
-                      <button type="submit" style={{ width: 'auto', margin: 0 }}>
-                        Send Test Alert &rarr;
-                      </button>
+
+                    <div className="price-feature" style={{ borderBottom: '1px solid #d9d6cc', paddingBottom: '16px' }}>
+                      <div>
+                        <span className="crop-label">Total Gross Freight Billing</span>
+                        <strong style={{ display: 'block', fontSize: '44px', lineHeight: 1, color: '#202a27' }}>
+                          ₹1,48,200
+                        </strong>
+                        <small style={{ font: "11px 'DM Mono', monospace", color: '#778078' }}>
+                          42 completed commercial trips &middot; 12,850 ton-km logged across Jharkhand &amp; Maharashtra
+                        </small>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <span className="crop-label">Average Route Realization</span>
+                        <strong style={{ display: 'block', fontSize: '32px', lineHeight: 1, color: '#8a6218' }}>
+                          ₹18.20/km
+                        </strong>
+                        <small style={{ font: "11px 'DM Mono', monospace", color: '#778078' }}>
+                          ₹63,430 net operating margin after diesel &amp; tolls
+                        </small>
+                      </div>
+                    </div>
+
+                    <div className="prediction-deep-grid" style={{ marginTop: '16px' }}>
+                      <div className="stat-metric-card">
+                        <span>Hauls Completed</span>
+                        <strong>42 Trips</strong>
+                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>100% on-time dispatch</small>
+                      </div>
+                      <div className="stat-metric-card">
+                        <span>Ton-Kilometers Logged</span>
+                        <strong style={{ color: '#8a6218' }}>12,850 Ton-km</strong>
+                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Agricultural haul work</small>
+                      </div>
+                      <div className="stat-metric-card">
+                        <span>Fuel Expense Ratio</span>
+                        <strong>31.5%</strong>
+                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>₹46,680 diesel outlay</small>
+                      </div>
+                      <div className="stat-metric-card">
+                        <span>Escrow Settlement</span>
+                        <strong style={{ color: '#2f6838' }}>100% Guaranteed</strong>
+                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Instant payout on OTP delivery</small>
+                      </div>
+                    </div>
+
+                    <div style={{ marginTop: '20px', borderTop: '1px solid #d9d6cc', paddingTop: '16px' }}>
+                      <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981', fontWeight: 'bold' }}>
+                        Fleet Operational Insights
+                      </p>
+                      <ul style={{ paddingLeft: '18px', color: '#404f43', fontSize: '13px', lineHeight: '1.7', margin: '0' }}>
+                        <li>Escrow delivery verification eliminated unpaid detention and payment disputes across all 42 dispatches.</li>
+                        <li>Mini-truck (2T) and pickup runs within 60 km achieved optimal fuel efficiency of <strong>9.2 km/L</strong>.</li>
+                        <li>Pre-booked return hauls reduced empty deadhead mileage by <strong>34%</strong>.</li>
+                      </ul>
+                    </div>
+                  </section>
+
+
+                  <section className="panel" style={{ marginTop: '20px', border: '2px solid #8a6218', borderRadius: '8px', background: '#ffffff', padding: '20px 24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px', borderBottom: '1px solid #edebe4', paddingBottom: '12px' }}>
+                      <div>
+                        <span className="eyebrow" style={{ color: '#8a6218', fontWeight: 700 }}>
+                          Logistics Decision Engine &middot; Escrow Payout &amp; Operating Margins
+                        </span>
+                        <h2 style={{ margin: '2px 0 0', fontSize: '20px', color: '#202a27' }}>
+                          Transporter Trip Operating Profit &amp; Freight Margin Calculator
+                        </h2>
+                        <p className="muted" style={{ margin: '3px 0 0', fontSize: '13px' }}>
+                          Computes both Escrow Net Bank Payout and real Economic Trip Profit after deducting diesel fuel, deadhead return risk, tolls, wear, driver wages, and permits.
+                        </p>
+                      </div>
+                      <span className="count" style={{ background: '#8a6218', color: '#ffffff', fontSize: '11px', padding: '4px 10px', borderRadius: '4px' }}>
+                        Fleet Profitability &amp; Risk Guard
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px', marginBottom: '14px', background: '#fdfbf7', padding: '14px', borderRadius: '6px', border: '1px solid #f0e9dd' }}>
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          HAUL DISTANCE (KM)
+                        </label>
+                        <input
+                          type="number"
+                          min="5"
+                          step="5"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={transCalcDistanceKm}
+                          onChange={(e) => setTransCalcDistanceKm(Math.max(1, Number(e.target.value)))}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          CARGO PAYLOAD (KG)
+                        </label>
+                        <input
+                          type="number"
+                          min="100"
+                          step="100"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={transCalcPayloadKg}
+                          onChange={(e) => setTransCalcPayloadKg(Math.max(1, Number(e.target.value)))}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          VEHICLE CATEGORY
+                        </label>
+                        <select
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={transCalcVehicleType}
+                          onChange={(e) => {
+                            setTransCalcVehicleType(e.target.value);
+                            setTransCalcDriverWage(null);
+                            setTransCalcPermitCost(null);
+                          }}
+                        >
+                          <option value="MINI_TRUCK">Mini-Truck (Tata Ace / 2T)</option>
+                          <option value="PICKUP">Pickup (Bolero Maxi / 1.5T)</option>
+                          <option value="MEDIUM_5T">Medium LCV (Eicher 5T)</option>
+                          <option value="HEAVY_10T">Multi-Axle Heavy (10T)</option>
+                          <option value="REEFER">Cold-Chain Reefer (Temperature Controlled)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          DIESEL PRICE (₹/L)
+                        </label>
+                        <input
+                          type="number"
+                          min="50"
+                          step="1"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={transCalcDieselPrice}
+                          onChange={(e) => setTransCalcDieselPrice(Math.max(1, Number(e.target.value)))}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          TOLLS &amp; WEIGHBRIDGE (₹)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="50"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={transCalcTollCost}
+                          onChange={(e) => setTransCalcTollCost(Math.max(0, Number(e.target.value)))}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          DEADHEAD RETURN RISK
+                        </label>
+                        <select
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={transCalcDeadheadRisk}
+                          onChange={(e) => setTransCalcDeadheadRisk(Number(e.target.value))}
+                        >
+                          <option value="0">0% (Backhaul Return Load Secured)</option>
+                          <option value="0.20">20% (Partial Return Risk Buffer)</option>
+                          <option value="0.50">50% (High Unpaid Return Haul Risk)</option>
+                        </select>
+                      </div>
+                    </div>
+
+
+                    <div style={{ marginBottom: '16px' }}>
                       <button
                         type="button"
-                        className="secondary-button"
-                        style={{ width: 'auto', margin: 0 }}
-                        onClick={() => handleSimulateInboundSms(testSmsForm.text)}
+                        style={{ background: 'none', border: 'none', color: '#8a6218', fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
+                        onClick={() => setShowTransCostDetails(!showTransCostDetails)}
                       >
-                        Simulate Inbound SMS Reply &rarr;
+                        {showTransCostDetails ? '[-] Hide Driver Wage & RTO Permit Overrides' : '[+] Customize Driver Wages & RTO Permit Fees (Optional)'}
                       </button>
-                    </div>
-                  </form>
-                </div>
 
-                <div className="sms-feed-grid">
-                  {smsLogLoading ? (
-                    <p className="muted">Loading field dispatch log...</p>
-                  ) : smsLogs.length > 0 ? (
-                    smsLogs.map((log) => {
-                      const isWa = log.channel === 'WHATSAPP';
-                      return (
-                        <div key={log.id} className={`sms-log-row ${isWa ? 'sms-log-wa' : 'sms-log-sms'}`}>
-                          <div className="sms-log-meta">
-                            <span className="sms-log-channel">{isWa ? 'WhatsApp' : 'SMS'}</span>
-                            <span>{log.recipientPhone}</span>
-                            <span>{new Date(log.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                            <span style={{ marginLeft: 'auto', color: '#5a8e62' }}>{log.status}</span>
+                      {showTransCostDetails && (
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginTop: '10px', background: '#faf6ee', padding: '12px', borderRadius: '6px', border: '1px solid #ebdcc5' }}>
+                          <div>
+                            <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                              DRIVER TRIP WAGE (₹)
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="50"
+                              className="field-input"
+                              style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                              value={transCalcDriverWage !== null ? transCalcDriverWage : transporterTripDecision.driverWages}
+                              onChange={(e) => setTransCalcDriverWage(e.target.value === '' ? '' : Number(e.target.value))}
+                            />
                           </div>
-                          <p className="sms-log-body">{log.body}</p>
-                          <div className="sms-log-ref">Ref: {log.providerMessageId || `MSG-${log.id}`} &middot; {log.messageType}</div>
+                          <div>
+                            <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                              PERMIT &amp; TRANSIT INSURANCE (₹)
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="20"
+                              className="field-input"
+                              style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                              value={transCalcPermitCost !== null ? transCalcPermitCost : transporterTripDecision.permitInsurance}
+                              onChange={(e) => setTransCalcPermitCost(e.target.value === '' ? '' : Number(e.target.value))}
+                            />
+                          </div>
                         </div>
-                      );
-                    })
-                  ) : (
-                    <p className="muted" style={{ paddingTop: '8px' }}>No field alerts dispatched yet. Use the form above to send a test.</p>
-                  )}
-                </div>
-              </div>
-            )}
-          </section>
-        </div>
-      )}
+                      )}
+                    </div>
 
-      
-      
-      
-      {currentView === 'profile' && (
-        <div className="view-container">
-          <section className="panel" style={{ marginTop: '18px' }}>
-            
-                        
-            <div style={{ background: '#f8f7f2', border: '1px solid #d9d6cc', borderRadius: '8px', padding: '12px 16px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-              <div>
-                <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#2f6838', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  Demo Account Persona Switcher
-                </span>
-                <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#667269' }}>
-                  Instantly switch between accounts to test role-specific dashboards, calculators, and workflows:
-                </p>
-              </div>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                <button
-                  type="button"
-                  className={`trade-btn ${session?.role === 'FPO' ? 'trade-btn-primary' : 'trade-btn-secondary'}`}
-                  style={{ fontSize: '11px', padding: '6px 12px' }}
-                  onClick={() => handleQuickLogin('FPO')}
-                >
-                  FPO (Sahyadri)
-                </button>
-                <button
-                  type="button"
-                  className={`trade-btn ${session?.role === 'BUYER' ? 'trade-btn-primary' : 'trade-btn-secondary'}`}
-                  style={{ fontSize: '11px', padding: '6px 12px' }}
-                  onClick={() => handleQuickLogin('BUYER')}
-                >
-                  Buyer (Priya)
-                </button>
-                <button
-                  type="button"
-                  className={`trade-btn ${session?.role === 'FARMER' ? 'trade-btn-primary' : 'trade-btn-secondary'}`}
-                  style={{ fontSize: '11px', padding: '6px 12px' }}
-                  onClick={() => handleQuickLogin('FARMER')}
-                >
-                  Farmer (Ramesh)
-                </button>
-                <button
-                  type="button"
-                  className={`trade-btn ${session?.role === 'TRANSPORTER' ? 'trade-btn-primary' : 'trade-btn-secondary'}`}
-                  style={{ fontSize: '11px', padding: '6px 12px' }}
-                  onClick={() => handleQuickLogin('TRANSPORTER')}
-                >
-                  Transporter (Suresh)
-                </button>
-                <button
-                  type="button"
-                  className={`trade-btn ${session?.role === 'ADMIN' ? 'trade-btn-primary' : 'trade-btn-secondary'}`}
-                  style={{ fontSize: '11px', padding: '6px 12px' }}
-                  onClick={() => handleQuickLogin('ADMIN')}
-                >
-                  Nodal Admin
-                </button>
-              </div>
-            </div>
-
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">Account &amp; Location Profile</p>
-                <h2>{(session.name || '').replace(/\s*\((farmer|buyer|agrotech)[^)]*\)/gi, '').trim()}</h2>
-              </div>
-              <button
-                type="button"
-                className="trade-btn trade-btn-secondary"
-                onClick={handleLogout}
-                style={{ width: 'auto', padding: '6px 14px', marginTop: 0, fontSize: '11px', color: '#b45a42' }}
-              >
-                Sign Out
-              </button>
-            </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                      <div style={{ border: '2px solid #8a6218', borderRadius: '6px', padding: '16px', background: '#fdfbf7', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div>
+                          <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#8a6218', color: '#ffffff', padding: '3px 8px', borderRadius: '3px' }}>
+                            TRIP COST ACCOUNTING &amp; ESCROW DISBURSEMENT
+                          </span>
+                          <h3 style={{ margin: '8px 0 4px', fontSize: '16px', color: '#202a27' }}>
+                            Operational Expense Breakdown
+                          </h3>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: '#ffffff', padding: '10px', borderRadius: '4px', border: '1px solid #ebdcc5', margin: '10px 0' }}>
+                            <div>
+                              <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>GROSS BILLING</span>
+                              <strong style={{ fontSize: '15px', color: '#202a27' }}>₹{transporterTripDecision.grossFreightRevenue.toLocaleString()}</strong>
+                            </div>
+                            <div>
+                              <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>DIESEL OUTLAY</span>
+                              <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{transporterTripDecision.outwardFuelCost.toLocaleString()}</span>
+                            </div>
+                            <div>
+                              <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>DEADHEAD CONTINGENCY</span>
+                              <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{transporterTripDecision.deadheadContingency.toLocaleString()}</span>
+                            </div>
+                            <div>
+                              <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>DRIVER, TOLLS &amp; WEAR</span>
+                              <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{(transporterTripDecision.tolls + transporterTripDecision.maintenanceAndWear + transporterTripDecision.driverWages + transporterTripDecision.permitInsurance).toLocaleString()}</span>
+                            </div>
+                          </div>
 
 
-              
-              <div className="profile-id-strip">
-                <div className="profile-id-item">
-                  <span>Email</span>
-                  <strong>{session.email}</strong>
-                </div>
-                <div className="profile-id-item">
-                  <span>Role</span>
-                  <strong>{session.role === 'FARMER' ? 'Farmer / Producer' : session.role === 'TRANSPORTER' ? 'Commercial Transporter / Fleet' : session.role === 'FPO' ? 'Farmer Producer Organization (FPO/FPC)' : session.role === 'ADMIN' ? 'State Agricultural Nodal Officer' : 'Wholesale Buyer / Food Processor'}</strong>
-                </div>
-                <div className="profile-id-item">
-                  <span>Profile ID</span>
-                  <strong>KL-{session.role?.charAt(0)}-{session.profileId}</strong>
-                </div>
-              </div>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
+                            <div style={{ background: '#253529', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
+                              <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#8fb899', display: 'block', textTransform: 'uppercase' }}>
+                                ESCROW BANK PAYOUT
+                              </span>
+                              <strong style={{ fontSize: '17px', color: '#6e9d68' }}>₹{transporterTripDecision.escrowNetBankPayout.toLocaleString()}</strong>
+                              <small style={{ fontSize: '9px', color: '#b2c0b7', display: 'block', marginTop: '2px' }}>
+                                Direct bank credit (-2% fee: ₹{transporterTripDecision.escrowFee})
+                              </small>
+                            </div>
+                            <div style={{ background: '#202a27', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
+                              <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#c4ad83', display: 'block', textTransform: 'uppercase' }}>
+                                ECONOMIC NET PROFIT
+                              </span>
+                              <strong style={{ fontSize: '17px', color: transporterTripDecision.netTripProfit >= 0 ? '#d4a34b' : '#e66b6b' }}>
+                                ₹{transporterTripDecision.netTripProfit.toLocaleString()}
+                              </strong>
+                              <small style={{ fontSize: '9px', color: '#b2c0b7', display: 'block', marginTop: '2px' }}>
+                                Margin: {transporterTripDecision.profitMarginPercent}% after all expenses
+                              </small>
+                            </div>
+                          </div>
+                        </div>
 
-              
-              {session?.role === 'FPO' && (
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '16px', margin: '16px 0' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-                    <div>
-                      <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#166534', textTransform: 'uppercase' }}>
-                        Statutory NABL FPO Trust Score (Feature B12)
-                      </span>
-                      <h4 style={{ margin: '2px 0 0', fontSize: '16px', fontWeight: 600, color: '#0f172a' }}>
-                        {fpoProfile.trustBadge}
-                      </h4>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <strong style={{ fontSize: '24px', fontWeight: 700, color: '#166534' }}>{fpoProfile.trustScore}</strong>
-                      <span style={{ fontSize: '12px', color: '#64748b' }}> / 5.0 Composite Rating</span>
-                    </div>
-                  </div>
+                        <button
+                          type="button"
+                          className="trade-btn trade-btn-primary"
+                          style={{ width: '100%', padding: '10px', fontSize: '13px', fontWeight: 700 }}
+                          onClick={() => {
+                            setCurrentView('transporter-dashboard');
+                            setMessage(`Route configured: ${transCalcDistanceKm} km at quoted rate ₹${transporterTripDecision.grossFreightRevenue.toLocaleString()}.`);
+                          }}
+                        >
+                          Lock Fleet Route Rate &rarr;
+                        </button>
+                      </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
-                    <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
-                      <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Quality Assay Match</span>
-                      <strong style={{ fontSize: '16px', color: '#0f172a' }}>98.4%</strong>
-                      <small style={{ display: 'block', fontSize: '10px', color: '#166534' }}>NABL Grade A/B Consistency</small>
+                      <div style={{ border: '1px solid #e0ddd5', borderRadius: '6px', padding: '16px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div>
+                          <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', fontWeight: 600, textTransform: 'uppercase' }}>
+                            FLEET BENCHMARK &amp; PERFORMANCE METRICS
+                          </span>
+                          <h3 style={{ margin: '8px 0 4px', fontSize: '16px', color: '#202a27' }}>
+                            Operating Efficiency Indicators
+                          </h3>
+
+
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', margin: '10px 0' }}>
+                            <div style={{ background: '#fdfbf7', border: '1px solid #ebdcc5', borderRadius: '4px', padding: '8px 10px' }}>
+                              <span style={{ fontSize: '9px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Net Profit / km</span>
+                              <strong style={{ fontSize: '14px', color: '#202a27' }}>₹{transporterTripDecision.netReturnPerKm} <small style={{ fontSize: '10px', color: '#778078' }}>/ km</small></strong>
+                            </div>
+                            <div style={{ background: '#fdfbf7', border: '1px solid #ebdcc5', borderRadius: '4px', padding: '8px 10px' }}>
+                              <span style={{ fontSize: '9px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Net Profit / kg</span>
+                              <strong style={{ fontSize: '14px', color: '#202a27' }}>₹{transporterTripDecision.netReturnPerKg} <small style={{ fontSize: '10px', color: '#778078' }}>/ kg</small></strong>
+                            </div>
+                            <div style={{ background: '#fdfbf7', border: '1px solid #ebdcc5', borderRadius: '4px', padding: '8px 10px' }}>
+                              <span style={{ fontSize: '9px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Break-Even Rate</span>
+                              <strong style={{ fontSize: '14px', color: '#8a2b2b' }}>₹{transporterTripDecision.breakEvenFreightRatePerKm} <small style={{ fontSize: '10px', color: '#778078' }}>/ km</small></strong>
+                            </div>
+                            <div style={{ background: '#fdfbf7', border: '1px solid #ebdcc5', borderRadius: '4px', padding: '8px 10px' }}>
+                              <span style={{ fontSize: '9px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Freight / Ton-km</span>
+                              <strong style={{ fontSize: '14px', color: '#8a6218' }}>₹{transporterTripDecision.revenuePerTonKm} <small style={{ fontSize: '10px', color: '#778078' }}>/ ton-km</small></strong>
+                            </div>
+                          </div>
+
+                          <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', marginBottom: '10px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontSize: '12px', color: '#444d47' }}>Vehicle Class:</span>
+                              <strong style={{ fontSize: '13px', color: '#202a27' }}>{transporterTripDecision.specName}</strong>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                              <span style={{ fontSize: '12px', color: '#444d47' }}>Total Operating Expenses:</span>
+                              <span style={{ fontSize: '13px', color: '#8a2b2b' }}>₹{transporterTripDecision.totalOperatingCost.toLocaleString()}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '6px', marginTop: '6px' }}>
+                              <span style={{ fontSize: '11px', color: '#667269' }}>Total Ton-Km Logged:</span>
+                              <strong style={{ fontSize: '13px', color: '#202a27' }}>{transporterTripDecision.tonKm} Ton-km ({transporterTripDecision.payloadTons}T &times; {transCalcDistanceKm}km)</strong>
+                            </div>
+                          </div>
+
+                          <div style={{ background: '#fef7e8', border: '1px solid #d4a34b', borderRadius: '4px', padding: '10px 12px' }}>
+                            <strong style={{ fontSize: '12px', color: '#8a6218', display: 'block' }}>
+                              Deadhead Risk Factor ({transCalcDeadheadRisk * 100}%)
+                            </strong>
+                            <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#7a540b', lineHeight: 1.4 }}>
+                              Operating floor is ₹{transporterTripDecision.breakEvenFreightRatePerKm}/km. Buffer of ₹{transporterTripDecision.deadheadContingency.toLocaleString()} safeguards against unpaid empty return haulage.
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="trade-btn trade-btn-secondary"
+                          style={{ width: '100%', padding: '8px', fontSize: '11px', marginTop: '14px' }}
+                          onClick={() => setCurrentView('transporter-dashboard')}
+                        >
+                          Open Live Haul Assignments &rarr;
+                        </button>
+                      </div>
                     </div>
-                    <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
-                      <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Dispatch Timeliness</span>
-                      <strong style={{ fontSize: '16px', color: '#0f172a' }}>99.1%</strong>
-                      <small style={{ display: 'block', fontSize: '10px', color: '#166534' }}>On-Time Packhouse Clearance</small>
-                    </div>
-                    <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
-                      <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Dispute &amp; Claim Rate</span>
-                      <strong style={{ fontSize: '16px', color: '#166534' }}>0.2%</strong>
-                      <small style={{ display: 'block', fontSize: '10px', color: '#64748b' }}>Near-Zero Buyer Deductions</small>
-                    </div>
-                    <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
-                      <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Smallholder Retention</span>
-                      <strong style={{ fontSize: '16px', color: '#0f172a' }}>97.8%</strong>
-                      <small style={{ display: 'block', fontSize: '10px', color: '#166534' }}>{fpoProfile.activeMembersCount} Supplying Members</small>
-                    </div>
-                  </div>
-                </div>
+                  </section>
+                </>
               )}
 
-              
-              {session?.role === 'BUYER' && (
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '16px', margin: '16px 0' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-                    <div>
-                      <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#0284c7', textTransform: 'uppercase' }}>
-                        Institutional Buyer Trust &amp; Settlement Score (Feature C10)
-                      </span>
-                      <h4 style={{ margin: '2px 0 0', fontSize: '16px', fontWeight: 600, color: '#0f172a' }}>
-                        Gold Procurement Partner · 100% On-Time Escrow
-                      </h4>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <strong style={{ fontSize: '24px', fontWeight: 700, color: '#0284c7' }}>4.9</strong>
-                      <span style={{ fontSize: '12px', color: '#64748b' }}> / 5.0 Buyer Rating</span>
-                    </div>
-                  </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
-                    <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
-                      <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Escrow Release Speed</span>
-                      <strong style={{ fontSize: '16px', color: '#0f172a' }}>100% Timely</strong>
-                      <small style={{ display: 'block', fontSize: '10px', color: '#166534' }}>Immediate Gate Handshake Release</small>
+
+
+              {(session?.role === 'FARMER' || !session?.role) && (
+                <>
+                  <section className="panel" style={{ marginTop: '18px' }}>
+                    <div className="panel-heading">
+                      <div>
+                        <p className="eyebrow">Realized Value · {analyticsData?.farmerName || session?.name || session?.email}</p>
+                        <h2>Farmer Earnings &amp; Premium Analytics</h2>
+                      </div>
+                      <span className="count">
+                        {analyticsData ? `+${analyticsData.kisanLinkPremiumIndexPercent}% vs Market` : '+18.4% vs Market'}
+                      </span>
                     </div>
-                    <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
-                      <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Settlement Fairness</span>
-                      <strong style={{ fontSize: '16px', color: '#0f172a' }}>4.9 / 5.0</strong>
-                      <small style={{ display: 'block', fontSize: '10px', color: '#166534' }}>Transparent Weighbridge Verification</small>
+
+                    {analyticsLoading && (
+                      <p className="muted" style={{ padding: '24px 0' }}>Aggregating trade records...</p>
+                    )}
+
+                    {!analyticsLoading && (
+                      <>
+                        <div className="price-feature" style={{ borderBottom: '1px solid #d9d6cc', paddingBottom: '16px' }}>
+                          <div>
+                            <span className="crop-label">Total Net Take-Home Revenue</span>
+                            <strong style={{ display: 'block', fontSize: '44px', lineHeight: 1, color: '#202a27' }}>
+                              ₹{Number(analyticsData?.totalLifetimeRevenue || 284500).toLocaleString()}
+                            </strong>
+                            <small style={{ font: "11px 'DM Mono', monospace", color: '#778078' }}>
+                              {analyticsData?.completedTradesCount || 12} settled deals &middot; {analyticsData?.totalLifetimeVolumeTons || 14.8} tons dispatched
+                            </small>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <span className="crop-label">KisanLink Premium Index</span>
+                            <strong style={{ display: 'block', fontSize: '32px', lineHeight: 1, color: '#5a8e62' }}>
+                              +{analyticsData?.kisanLinkPremiumIndexPercent || 18.4}%
+                            </strong>
+                            <small style={{ font: "11px 'DM Mono', monospace", color: '#778078' }}>
+                              ₹{(Number(analyticsData?.averageRealizedPricePerKg || 27.5) - Number(analyticsData?.localMandiBenchmarkAvgPricePerKg || 23.2)).toFixed(2)}/kg above market
+                            </small>
+                          </div>
+                        </div>
+
+                        <div className="prediction-deep-grid" style={{ marginTop: '16px' }}>
+                          <div className="stat-metric-card">
+                            <span>Volume Dispatched</span>
+                            <strong>{analyticsData?.totalLifetimeVolumeTons || 14.8} Tons</strong>
+                            <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>{analyticsData?.totalLifetimeVolumeKg?.toLocaleString() || '14,800'} kg</small>
+                          </div>
+                          <div className="stat-metric-card">
+                            <span>Avg Realized Rate</span>
+                            <strong style={{ color: '#5a8e62' }}>₹{analyticsData?.averageRealizedPricePerKg || 27.50}/kg</strong>
+                            <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Net after logistics</small>
+                          </div>
+                          <div className="stat-metric-card">
+                            <span>Local Market Benchmark</span>
+                            <strong>₹{analyticsData?.localMandiBenchmarkAvgPricePerKg || 23.20}/kg</strong>
+                            <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Market modal price</small>
+                          </div>
+                          <div className="stat-metric-card">
+                            <span>Extra Profit Earned</span>
+                            <strong style={{ color: '#dc664a' }}>+₹{Number(analyticsData?.totalExtraProfitEarned || 42800).toLocaleString()}</strong>
+                            <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>vs selling at local market</small>
+                          </div>
+                        </div>
+
+
+                        <div style={{ marginTop: '24px', borderTop: '1px solid #d9d6cc', paddingTop: '20px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                            <div>
+                              <p className="eyebrow" style={{ margin: 0 }}>Monthly Progression</p>
+                              <h3 style={{ margin: '4px 0 0', fontSize: '17px' }}>Take-Home Revenue &amp; Volume Sold</h3>
+                            </div>
+                            <span style={{ font: "9px 'DM Mono', monospace", color: '#7f8981', textTransform: 'uppercase' }}>
+                              Green = Revenue &middot; Orange = Tons
+                            </span>
+                          </div>
+
+                          {analyticsData?.monthlyEarnings && analyticsData.monthlyEarnings.length > 0 ? (
+                            (() => {
+                              const maxRev = Math.max(...analyticsData.monthlyEarnings.map(m => Number(m.totalRevenue || 1)), 50000);
+                              return (
+                                <div className="monthly-bars-container">
+                                  {analyticsData.monthlyEarnings.map((m) => {
+                                    const heightPct = Math.max(12, Math.min(100, (Number(m.totalRevenue || 0) / maxRev) * 100));
+                                    return (
+                                      <div className="monthly-bar-col" key={m.month}>
+                                        <span className="bar-value">₹{(Number(m.totalRevenue) / 1000).toFixed(1)}k</span>
+                                        <div className="bar-fill" style={{ height: `${heightPct}%` }} title={`₹${m.totalRevenue} (${m.totalVolumeTons} Tons)`} />
+                                        <span className="bar-label">{m.month}</span>
+                                        <span className="bar-tonnage">{m.totalVolumeTons}T</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              );
+                            })()
+                          ) : (
+                            <div className="monthly-bars-container">
+                              {[
+                                { month: 'Jan', totalRevenue: 54000, totalVolumeTons: 2.5 },
+                                { month: 'Feb', totalRevenue: 68000, totalVolumeTons: 3.2 },
+                                { month: 'Mar', totalRevenue: 79500, totalVolumeTons: 4.1 },
+                                { month: 'Apr', totalRevenue: 83000, totalVolumeTons: 5.0 }
+                              ].map(m => (
+                                <div className="monthly-bar-col" key={m.month}>
+                                  <span className="bar-value">₹{(m.totalRevenue / 1000).toFixed(1)}k</span>
+                                  <div className="bar-fill" style={{ height: `${(m.totalRevenue / 90000) * 100}%` }} />
+                                  <span className="bar-label">{m.month}</span>
+                                  <span className="bar-tonnage">{m.totalVolumeTons}T</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <div style={{ marginTop: '20px', borderTop: '1px solid #d9d6cc', paddingTop: '16px' }}>
+                          <p style={{ margin: '0 0 8px', font: "10px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981', fontWeight: 'bold' }}>
+                            Realized Premium Insights
+                          </p>
+                          <ul style={{ paddingLeft: '18px', color: '#404f43', fontSize: '13px', lineHeight: '1.7', margin: '0' }}>
+                            <li>Direct buyer connections bypassed intermediary deductions &middot; realizing <strong>+{analyticsData?.kisanLinkPremiumIndexPercent || 18.4}% extra return</strong> vs local market.</li>
+                            <li>Freight optimization preserved <strong>₹{Number(analyticsData?.totalExtraProfitEarned || 42800).toLocaleString()}</strong> in net liquidity across dispatches.</li>
+                            <li>Grade A produce quality improved counter-offer acceptance rates by <strong>28%</strong>.</li>
+                          </ul>
+                        </div>
+                      </>
+                    )}
+                  </section>
+
+
+                  <section className="panel" style={{ marginTop: '20px', border: '2px solid #2f6838', borderRadius: '8px', background: '#ffffff', padding: '20px 24px', boxShadow: '0 4px 18px rgba(47, 104, 56, 0.08)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '16px', borderBottom: '1px solid #edebe4', paddingBottom: '12px' }}>
+                      <div>
+                        <span className="eyebrow" style={{ color: '#2f6838', fontWeight: 700 }}>
+                          Farmer Decision Support Engine &middot; Real Net Realization &amp; Agronomic Profit
+                        </span>
+                        <h2 style={{ margin: '2px 0 0', fontSize: '20px', color: '#202a27' }}>
+                          Where Should This Farmer Sell? (Net Profit Calculator)
+                        </h2>
+                        <p className="muted" style={{ margin: '3px 0 0', fontSize: '13px' }}>
+                          Calculates both Escrow Net Bank Payout (take-home cash) and True Economic Farm Net Profit (gross revenue minus total cultivation and post-harvest costs).
+                        </p>
+                      </div>
+                      <span className="count" style={{ background: '#2f6838', color: '#ffffff', fontSize: '11px', padding: '4px 10px', borderRadius: '4px' }}>
+                        Optimized for Maximum Return
+                      </span>
                     </div>
-                    <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
-                      <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Direct Sourced Volume</span>
-                      <strong style={{ fontSize: '16px', color: '#0f172a' }}>38.5 Tons</strong>
-                      <small style={{ display: 'block', fontSize: '10px', color: '#64748b' }}>18 Settled Direct Contracts</small>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px', marginBottom: '14px', background: '#f8f7f2', padding: '14px', borderRadius: '6px', border: '1px solid #eceae2' }}>
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          SELECT CROP
+                        </label>
+                        <select
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={sellCalcCrop}
+                          onChange={(e) => {
+                            const newCrop = e.target.value;
+                            setSellCalcCrop(newCrop);
+                            const b = CROP_PRODUCTION_BENCHMARKS[newCrop] || CROP_PRODUCTION_BENCHMARKS['Tomato'];
+                            setSellCalcAcres(b.defaultAcres);
+                            setSellCalcQty(b.defaultAcres * b.yieldPerAcreKg);
+                            setCustomCostOverrides({});
+                          }}
+                        >
+                          <option value="Tomato">Tomato (Hybrid / Roma)</option>
+                          <option value="Onion">Nashik Red Onion</option>
+                          <option value="Wheat">Sharbati Durum Wheat</option>
+                          <option value="Soybean">Yellow Organic Soybean</option>
+                          <option value="Potato">Jyoti Table Potato</option>
+                          <option value="Green Grapes">Thompson Seedless Grapes</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          CULTIVATION AREA (ACRES)
+                        </label>
+                        <input
+                          type="number"
+                          min="0.2"
+                          max="50"
+                          step="0.5"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={sellCalcAcres}
+                          onChange={(e) => {
+                            const acres = Math.max(0.1, Number(e.target.value));
+                            setSellCalcAcres(acres);
+                            const b = CROP_PRODUCTION_BENCHMARKS[sellCalcCrop] || CROP_PRODUCTION_BENCHMARKS['Tomato'];
+                            setSellCalcQty(Math.round(acres * b.yieldPerAcreKg));
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          HARVEST QUANTITY (KG)
+                        </label>
+                        <input
+                          type="number"
+                          min="50"
+                          step="100"
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={sellCalcQty}
+                          onChange={(e) => setSellCalcQty(Math.max(1, Number(e.target.value)))}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          QUALITY GRADE
+                        </label>
+                        <select
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={sellCalcQuality}
+                          onChange={(e) => setSellCalcQuality(e.target.value)}
+                        >
+                          <option value="GRADE_APLUS">Grade A+ (Export / Premium Clean)</option>
+                          <option value="GRADE_A">Grade A (Standard Mandi Quality)</option>
+                          <option value="FAQ">Fair Average Quality (FAQ)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+                          FARM ORIGIN CLUSTER
+                        </label>
+                        <select
+                          className="field-input"
+                          style={{ width: '100%', fontSize: '13px', padding: '7px 10px' }}
+                          value={sellCalcCluster}
+                          onChange={(e) => setSellCalcCluster(e.target.value)}
+                        >
+                          <option value="Nashik Aggregation Yard">Nashik Aggregation Hub (MH)</option>
+                          <option value="Ranchi APMC Hub">Ranchi Mandi Corridor (JH)</option>
+                          <option value="Indore Agro Yard">Indore Quality Yard (MP)</option>
+                          <option value="Pune Terminal Market">Pune Market Yard (MH)</option>
+                        </select>
+                      </div>
                     </div>
-                  </div>
-                </div>
+
+
+                    <div style={{ marginBottom: '16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                        <button
+                          type="button"
+                          style={{ background: 'none', border: 'none', color: '#2f6838', fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
+                          onClick={() => setShowCultivationCosts(!showCultivationCosts)}
+                        >
+                          {showCultivationCosts ? '[-] Hide Cultivation Cost Breakdown' : '[+] Customize Cultivation Cost Benchmarks (Seeds, Fertilizer, Labour, Irrigation, Tillage)'}
+                        </button>
+                        <span style={{ fontSize: '11px', color: '#687588', fontFamily: "'DM Mono', monospace" }}>
+                          Total Production: <strong>₹{netSellDecision.totalCultivationCost.toLocaleString()}</strong> (₹{netSellDecision.totalCostPerAcre.toLocaleString()}/acre &middot; ₹{netSellDecision.productionCostPerKg}/kg)
+                        </span>
+                      </div>
+
+                      {showCultivationCosts && (
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px', marginTop: '10px', background: '#f0f5ee', padding: '12px', borderRadius: '6px', border: '1px solid #d4e3d1' }}>
+                          <div>
+                            <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                              SEEDS / SEEDLINGS (₹/ACRE)
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="100"
+                              className="field-input"
+                              style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                              value={netSellDecision.seedCostPerAcre}
+                              onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, seedCost: Number(e.target.value) }))}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                              FERTILIZER &amp; PESTICIDES (₹/ACRE)
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="100"
+                              className="field-input"
+                              style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                              value={netSellDecision.fertCostPerAcre}
+                              onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, fertCost: Number(e.target.value) }))}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                              HIRED LABOUR (₹/ACRE)
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="100"
+                              className="field-input"
+                              style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                              value={netSellDecision.labourCostPerAcre}
+                              onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, labourCost: Number(e.target.value) }))}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                              TILLAGE &amp; TRACTOR (₹/ACRE)
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="100"
+                              className="field-input"
+                              style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                              value={netSellDecision.tillageCostPerAcre}
+                              onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, tillageCost: Number(e.target.value) }))}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#445145', fontWeight: 600, display: 'block', marginBottom: '3px' }}>
+                              IRRIGATION &amp; PUMP FUEL (₹/ACRE)
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="100"
+                              className="field-input"
+                              style={{ width: '100%', fontSize: '12px', padding: '6px 8px' }}
+                              value={netSellDecision.irrigationCostPerAcre}
+                              onChange={(e) => setCustomCostOverrides(prev => ({ ...prev, irrigationCost: Number(e.target.value) }))}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                      <div style={{ border: '2px solid #2f6838', borderRadius: '6px', padding: '16px', background: '#f5faf5', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#2f6838', color: '#ffffff', padding: '3px 8px', borderRadius: '3px' }}>
+                              TOP RECOMMENDATION
+                            </span>
+                            <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#2f6838', fontWeight: 700 }}>
+                              Match Score: {netSellDecision.buyer.matchScore}%
+                            </span>
+                          </div>
+
+                          <h3 style={{ margin: '4px 0 2px', fontSize: '16px', color: '#202a27' }}>
+                            {netSellDecision.buyer.buyerName}
+                          </h3>
+                          <p style={{ margin: '0 0 10px', fontSize: '12px', color: '#556058' }}>
+                            {netSellDecision.buyer.destinationName} ({netSellDecision.buyer.distanceKm} km away)
+                          </p>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: '#ffffff', padding: '10px', borderRadius: '4px', border: '1px solid #dbe6dc', marginBottom: '10px' }}>
+                            <div>
+                              <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>OFFERED PRICE</span>
+                              <strong style={{ fontSize: '15px', color: '#202a27' }}>₹{netSellDecision.buyer.pricePerKg} <small style={{ fontSize: '11px', color: '#778078' }}>/ kg</small></strong>
+                            </div>
+                            <div>
+                              <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>GROSS VALUE</span>
+                              <strong style={{ fontSize: '15px', color: '#202a27' }}>₹{netSellDecision.buyer.grossRevenue.toLocaleString()}</strong>
+                            </div>
+                            <div>
+                              <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>ROUTE FREIGHT</span>
+                              <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{netSellDecision.buyer.freight.toLocaleString()}</span>
+                            </div>
+                            <div>
+                              <span style={{ fontSize: '10px', color: '#778078', display: 'block' }}>HANDLING / ESCROW</span>
+                              <span style={{ fontSize: '13px', color: '#8a2b2b' }}>- ₹{netSellDecision.buyer.handlingFee.toLocaleString()}</span>
+                            </div>
+                          </div>
+
+
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
+                            <div style={{ background: '#253529', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
+                              <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#8fb899', display: 'block', textTransform: 'uppercase' }}>
+                                ESCROW BANK PAYOUT
+                              </span>
+                              <strong style={{ fontSize: '17px', color: '#6e9d68' }}>₹{netSellDecision.buyer.bankPayout.toLocaleString()}</strong>
+                              <small style={{ fontSize: '9px', color: '#b2c0b7', display: 'block', marginTop: '2px' }}>
+                                ₹{netSellDecision.buyer.netPerKg}/kg cash wired to bank
+                              </small>
+                            </div>
+                            <div style={{ background: '#202a27', color: '#ffffff', padding: '10px 12px', borderRadius: '4px' }}>
+                              <span style={{ fontSize: '9px', fontFamily: "'DM Mono', monospace", color: '#c4ad83', display: 'block', textTransform: 'uppercase' }}>
+                                ECONOMIC NET PROFIT
+                              </span>
+                              <strong style={{ fontSize: '17px', color: netSellDecision.buyer.economicProfit >= 0 ? '#6e9d68' : '#e66b6b' }}>
+                                ₹{netSellDecision.buyer.economicProfit.toLocaleString()}
+                              </strong>
+                              <small style={{ fontSize: '9px', color: '#b2c0b7', display: 'block', marginTop: '2px' }}>
+                                Net after ₹{netSellDecision.totalCultivationCost.toLocaleString()} crop costs
+                              </small>
+                            </div>
+                          </div>
+
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '10px' }}>
+                            <div style={{ background: '#ffffff', border: '1px solid #dbe6dc', borderRadius: '4px', padding: '6px 4px', textAlign: 'center' }}>
+                              <span style={{ fontSize: '8px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>B:C Ratio</span>
+                              <strong style={{ fontSize: '12px', color: '#2f6838' }}>{netSellDecision.buyer.benefitCostRatio}:1</strong>
+                            </div>
+                            <div style={{ background: '#ffffff', border: '1px solid #dbe6dc', borderRadius: '4px', padding: '6px 4px', textAlign: 'center' }}>
+                              <span style={{ fontSize: '8px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Profit/Acre</span>
+                              <strong style={{ fontSize: '12px', color: '#202a27' }}>₹{netSellDecision.buyer.profitPerAcre.toLocaleString()}</strong>
+                            </div>
+                            <div style={{ background: '#ffffff', border: '1px solid #dbe6dc', borderRadius: '4px', padding: '6px 4px', textAlign: 'center' }}>
+                              <span style={{ fontSize: '8px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Margin %</span>
+                              <strong style={{ fontSize: '12px', color: '#202a27' }}>{netSellDecision.buyer.marginPercent}%</strong>
+                            </div>
+                            <div style={{ background: '#ffffff', border: '1px solid #dbe6dc', borderRadius: '4px', padding: '6px 4px', textAlign: 'center' }}>
+                              <span style={{ fontSize: '8px', color: '#778078', display: 'block', textTransform: 'uppercase' }}>Break-Even</span>
+                              <strong style={{ fontSize: '12px', color: '#8a2b2b' }}>₹{netSellDecision.buyer.breakEvenPricePerKg}/kg</strong>
+                            </div>
+                          </div>
+
+                          <div style={{ fontSize: '11px', color: '#444d47', lineHeight: 1.4 }}>
+                            &bull; Buyer Trust Rating: <strong>{netSellDecision.buyer.trustScore}/100</strong> (Verified NABL Partner)<br />
+                            &bull; Payment Guarantee: <strong>{netSellDecision.buyer.paymentTerms}</strong>
+                          </div>
+                        </div>
+
+                        <div style={{ marginTop: '14px', borderTop: '1px solid #dbe6dc', paddingTop: '10px' }}>
+                          <button
+                            type="button"
+                            className="trade-btn trade-btn-primary"
+                            style={{ width: '100%', padding: '10px', fontSize: '13px', fontWeight: 700 }}
+                            onClick={() => {
+                              setProduceForm(prev => ({
+                                ...prev,
+                                cropName: sellCalcCrop,
+                                quantity: sellCalcQty,
+                                quality: sellCalcQuality,
+                                pricePerKg: netSellDecision.buyer.pricePerKg
+                              }));
+                              setShowProduceModal(true);
+                              setMessage(`Pre-loaded ${sellCalcCrop} (${sellCalcQty} kg) at ₹${netSellDecision.buyer.pricePerKg}/kg for listing.`);
+                            }}
+                          >
+                            Sell Here &middot; Lock Best Net Return &rarr;
+                          </button>
+                        </div>
+                      </div>
+
+                      <div style={{ border: '1px solid #e0ddd5', borderRadius: '6px', padding: '16px', background: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div>
+                          <div style={{ marginBottom: '8px' }}>
+                            <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", color: '#778078', fontWeight: 600, textTransform: 'uppercase' }}>
+                              COMPARATIVE BENCHMARK
+                            </span>
+                            <h3 style={{ margin: '4px 0 2px', fontSize: '16px', color: '#202a27' }}>
+                              Local Mandi vs Farm-Gate Trader
+                            </h3>
+                          </div>
+
+                          <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', marginBottom: '10px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <strong style={{ fontSize: '13px', color: '#202a27' }}>{netSellDecision.mandi.destinationName}</strong>
+                              <span style={{ fontSize: '12px', fontWeight: 600, color: '#444d47' }}>₹{netSellDecision.mandi.pricePerKg}/kg</span>
+                            </div>
+                            <p style={{ margin: '2px 0 4px', fontSize: '11px', color: '#778078' }}>
+                              Gross: ₹{netSellDecision.mandi.grossRevenue.toLocaleString()} &minus; Freight: ₹{netSellDecision.mandi.freight} &minus; Mandi Cess: ₹{netSellDecision.mandi.commissionFee}
+                            </p>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '4px' }}>
+                              <span style={{ fontSize: '11px', color: '#667269' }}>Bank Payout:</span>
+                              <strong style={{ fontSize: '12px', color: '#202a27' }}>₹{netSellDecision.mandi.bankPayout.toLocaleString()} (₹{netSellDecision.mandi.netPerKg}/kg)</strong>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
+                              <span style={{ fontSize: '11px', color: '#667269' }}>Economic Net Profit:</span>
+                              <strong style={{ fontSize: '12px', color: netSellDecision.mandi.economicProfit >= 0 ? '#2f6838' : '#8a2b2b' }}>
+                                ₹{netSellDecision.mandi.economicProfit.toLocaleString()} (B:C {netSellDecision.mandi.benefitCostRatio}:1)
+                              </strong>
+                            </div>
+                          </div>
+
+                          <div style={{ background: '#fdfcf8', border: '1px solid #eceae2', borderRadius: '4px', padding: '10px', marginBottom: '12px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <strong style={{ fontSize: '13px', color: '#202a27' }}>{netSellDecision.villageTrader.destinationName}</strong>
+                              <span style={{ fontSize: '12px', fontWeight: 600, color: '#444d47' }}>₹{netSellDecision.villageTrader.pricePerKg}/kg</span>
+                            </div>
+                            <p style={{ margin: '2px 0 4px', fontSize: '11px', color: '#778078' }}>
+                              Zero transport deduction &middot; Discounted farm-gate rate
+                            </p>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #eeeae1', paddingTop: '4px' }}>
+                              <span style={{ fontSize: '11px', color: '#667269' }}>Bank Payout:</span>
+                              <strong style={{ fontSize: '12px', color: '#8a2b2b' }}>₹{netSellDecision.villageTrader.bankPayout.toLocaleString()} (₹{netSellDecision.villageTrader.netPerKg}/kg)</strong>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
+                              <span style={{ fontSize: '11px', color: '#667269' }}>Economic Net Profit:</span>
+                              <strong style={{ fontSize: '12px', color: netSellDecision.villageTrader.economicProfit >= 0 ? '#2f6838' : '#8a2b2b' }}>
+                                ₹{netSellDecision.villageTrader.economicProfit.toLocaleString()} (B:C {netSellDecision.villageTrader.benefitCostRatio}:1)
+                              </strong>
+                            </div>
+                          </div>
+
+                          <div style={{ background: '#eef4ec', border: '1px solid #c7ddc5', borderRadius: '4px', padding: '10px 12px' }}>
+                            <strong style={{ fontSize: '12px', color: '#2f6838', display: 'block' }}>
+                              Decision Takeaway: +₹{netSellDecision.netAdvantage.toLocaleString()} Higher Economic Net Profit
+                            </strong>
+                            <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#355339', lineHeight: 1.4 }}>
+                              Selling directly through KisanLink institutional escrow yields ₹{netSellDecision.netAdvantage.toLocaleString()} more in real economic net profit than the local alternative, even after covering all door-to-door transport and platform fees.
+                            </p>
+                          </div>
+                        </div>
+
+                        <div style={{ marginTop: '14px', borderTop: '1px solid #edebe4', paddingTop: '10px' }}>
+                          <button
+                            type="button"
+                            className="trade-btn trade-btn-secondary"
+                            style={{ width: '100%', padding: '8px', fontSize: '11px' }}
+                            onClick={() => setCurrentView('matching')}
+                          >
+                            Explore Live Buyer Requirements &rarr;
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+
+                  <section className="panel" style={{ marginTop: '24px' }}>
+                    <div className="panel-heading">
+                      <div>
+                        <p className="eyebrow">Sales Ledger &amp; Settlement Journal</p>
+                        <h2>Recent Farm Sales &amp; Settled Deal Records</h2>
+                        <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#667269' }}>
+                          Audit log of your direct farm sales, contracted rates, logistics deductions, and net escrow bank payouts.
+                        </p>
+                      </div>
+                      <span className="count">{trades.length} {trades.length === 1 ? 'Sale' : 'Sales'} Recorded</span>
+                    </div>
+
+
+                    <div className="prediction-deep-grid" style={{ marginTop: '16px', marginBottom: '20px' }}>
+                      <div className="stat-metric-card">
+                        <span>Total Realized Sales</span>
+                        <strong style={{ color: '#202a27' }}>
+                          ₹{trades.reduce((sum, t) => sum + Number(t.netFarmerReturn || 0), 0).toLocaleString()}
+                        </strong>
+                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Net take-home</small>
+                      </div>
+                      <div className="stat-metric-card">
+                        <span>Dispatched Volume</span>
+                        <strong style={{ color: '#2f6838' }}>
+                          {(trades.reduce((sum, t) => sum + Number(t.quantity || 0), 0) / 1000).toFixed(1)} Tons
+                        </strong>
+                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>
+                          {trades.reduce((sum, t) => sum + Number(t.quantity || 0), 0).toLocaleString()} kg total
+                        </small>
+                      </div>
+                      <div className="stat-metric-card">
+                        <span>Active In-Transit</span>
+                        <strong style={{ color: '#2563eb' }}>
+                          {trades.filter(t => t.status === 'IN_TRANSIT' || t.status === 'ACCEPTED' || t.status === 'PROPOSED').length} Deals
+                        </strong>
+                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Escrow protected</small>
+                      </div>
+                      <div className="stat-metric-card">
+                        <span>Avg Realized Rate</span>
+                        <strong style={{ color: '#5a8e62' }}>
+                          ₹{(trades.length > 0 ? (trades.reduce((sum, t) => sum + Number(t.agreedPricePerKg || 0), 0) / trades.length).toFixed(1) : '28.5')}/kg
+                        </strong>
+                        <small style={{ font: "9px 'DM Mono', monospace", color: '#7f8981' }}>Above market benchmark</small>
+                      </div>
+                    </div>
+
+
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
+                        <thead>
+                          <tr style={{ background: '#f5f7f5', borderBottom: '2px solid #d4dfd4', color: '#445846', font: "11px 'DM Mono', monospace", textTransform: 'uppercase' }}>
+                            <th style={{ padding: '12px 14px' }}>Deal ID</th>
+                            <th style={{ padding: '12px 14px' }}>Date</th>
+                            <th style={{ padding: '12px 14px' }}>Crop / Commodity</th>
+                            <th style={{ padding: '12px 14px' }}>Buyer &amp; Hub</th>
+                            <th style={{ padding: '12px 14px' }}>Quantity</th>
+                            <th style={{ padding: '12px 14px' }}>Contract Rate</th>
+                            <th style={{ padding: '12px 14px' }}>Gross Value</th>
+                            <th style={{ padding: '12px 14px' }}>Freight Fee</th>
+                            <th style={{ padding: '12px 14px' }}>Net Bank Payout</th>
+                            <th style={{ padding: '12px 14px' }}>Status</th>
+                            <th style={{ padding: '12px 14px' }}>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {trades.map((t) => {
+                            const statusKey = (t.status || 'PROPOSED').toLowerCase();
+                            const gross = (t.quantity || 0) * (t.agreedPricePerKg || 0);
+                            return (
+                              <tr key={t.id} style={{ borderBottom: '1px solid #eef2ee' }}>
+                                <td style={{ padding: '12px 14px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#2f6838' }}>
+                                  #{t.id}
+                                </td>
+                                <td style={{ padding: '12px 14px', color: '#667269', fontSize: '12px' }}>
+                                  {new Date(t.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                                </td>
+                                <td style={{ padding: '12px 14px', fontWeight: 600, color: '#202a27' }}>
+                                  {t.cropName}
+                                  <span style={{ display: 'block', fontSize: '10px', color: '#778078', fontWeight: 400 }}>
+                                    {t.cropCategory || 'PRODUCE'}
+                                  </span>
+                                </td>
+                                <td style={{ padding: '12px 14px', color: '#334135' }}>
+                                  {t.buyerName}
+                                </td>
+                                <td style={{ padding: '12px 14px', fontWeight: 600 }}>
+                                  {Number(t.quantity).toLocaleString()} kg
+                                  <span style={{ display: 'block', fontSize: '10px', color: '#778078', fontWeight: 400 }}>
+                                    ({(Number(t.quantity) / 1000).toFixed(1)} T)
+                                  </span>
+                                </td>
+                                <td style={{ padding: '12px 14px', fontWeight: 600, color: '#2f6838' }}>
+                                  ₹{t.agreedPricePerKg}/kg
+                                </td>
+                                <td style={{ padding: '12px 14px', color: '#4b5563' }}>
+                                  ₹{gross.toLocaleString()}
+                                </td>
+                                <td style={{ padding: '12px 14px', color: '#b45a42' }}>
+                                  -₹{Number(t.transportCost || 0).toLocaleString()}
+                                </td>
+                                <td style={{ padding: '12px 14px', fontWeight: 700, color: '#166534', fontSize: '14px' }}>
+                                  ₹{Number(t.netFarmerReturn || 0).toLocaleString()}
+                                </td>
+                                <td style={{ padding: '12px 14px' }}>
+                                  <span className={`status-pill status-${statusKey}`}>
+                                    {t.status}
+                                  </span>
+                                </td>
+                                <td style={{ padding: '12px 14px' }}>
+                                  <div style={{ display: 'flex', gap: '6px' }}>
+                                    <button
+                                      type="button"
+                                      className="trade-btn trade-btn-secondary"
+                                      style={{ padding: '5px 8px', fontSize: '11px' }}
+                                      onClick={() => setSelectedInvoiceTrade(t)}
+                                      title="Print Official Trade Receipt"
+                                    >
+                                      Receipt
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="trade-btn"
+                                      style={{ padding: '5px 8px', fontSize: '11px', background: '#f0fdf4', borderColor: '#86efac', color: '#166534' }}
+                                      onClick={() => setCurrentView('matching')}
+                                      title="View in Active Trades"
+                                    >
+                                      Manage &rarr;
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                          {trades.length === 0 && (
+                            <tr>
+                              <td colSpan={11} style={{ padding: '24px', textAlign: 'center', color: '#778078' }}>
+                                No sales records found. Initiate a deal from the Buyer Matching tab to record sales.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', background: '#f8faf8', padding: '12px 16px', borderRadius: '6px' }}>
+                      <span style={{ fontSize: '12px', color: '#556557' }}>
+                        Need to negotiate prices or book transport for an active deal?
+                      </span>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          type="button"
+                          className="trade-btn trade-btn-secondary"
+                          style={{ padding: '8px 14px', fontSize: '12px' }}
+                          onClick={() => setCurrentView('my-orders')}
+                        >
+                          View Order Lifecycles &rarr;
+                        </button>
+                        <button
+                          type="button"
+                          className="trade-btn trade-btn-primary"
+                          style={{ padding: '8px 14px', fontSize: '12px' }}
+                          onClick={() => setCurrentView('matching')}
+                        >
+                          Open Live Trading Desk &rarr;
+                        </button>
+                      </div>
+                    </div>
+                  </section>
+                </>
               )}
 
-              
-              <form className="profile-form" onSubmit={saveProfile} style={{ marginTop: '24px' }}>
+            </div>
+          )}
 
-                
-                {session.role === 'TRANSPORTER' && (
-                  <>
-                    <label>Fleet / Transport Name
-                      <input
-                        value={profile.businessName || ''}
-                        onChange={(e) => setProfile({ ...profile, businessName: e.target.value })}
-                        placeholder="e.g. Suresh Logistics &amp; Fleet Operations"
-                        required
-                      />
-                    </label>
-                    <label>Vehicle Category
-                      <select
-                        value={profile.vehicleType || 'MINI_TRUCK'}
-                        onChange={(e) => setProfile({ ...profile, vehicleType: e.target.value })}
-                      >
-                        <option value="MINI_TRUCK">Mini-Truck (Tata Ace / 2T)</option>
-                        <option value="PICKUP">Heavy Pickup (Bolero Maxi / 1.5T)</option>
-                        <option value="MEDIUM_5T">Intermediate LCV (Eicher 5T)</option>
-                        <option value="HEAVY_10T">Multi-Axle Heavy Truck (10T+)</option>
-                        <option value="REEFER">Reefer Container (Cold-Chain)</option>
-                      </select>
-                    </label>
-                    <label>Vehicle Registration Number
-                      <input
-                        value={profile.vehicleNumber || ''}
-                        onChange={(e) => setProfile({ ...profile, vehicleNumber: e.target.value })}
-                        placeholder="JH-01-TR-5892"
-                        required
-                      />
-                    </label>
-                    <label>Payload Capacity (kg)
-                      <input
-                        type="number"
-                        value={profile.capacityKg || '2500'}
-                        onChange={(e) => setProfile({ ...profile, capacityKg: e.target.value })}
-                        placeholder="2500"
-                        required
-                      />
-                    </label>
-                    <label>Base Freight Rate (₹/km)
-                      <input
-                        type="number"
-                        step="0.5"
-                        value={profile.ratePerKm || '16.5'}
-                        onChange={(e) => setProfile({ ...profile, ratePerKm: e.target.value })}
-                        placeholder="16.5"
-                        required
-                      />
-                    </label>
-                    <label>Base Pickup Charge (₹)
-                      <input
-                        type="number"
-                        value={profile.baseCharge || '150.0'}
-                        onChange={(e) => setProfile({ ...profile, baseCharge: e.target.value })}
-                        placeholder="150"
-                        required
-                      />
-                    </label>
-                  </>
-                )}
 
-                
-                {session.role === 'BUYER' && (
-                  <>
-                    <label>Business Name
-                      <input
-                        value={profile.businessName || ''}
-                        onChange={(e) => setProfile({ ...profile, businessName: e.target.value })}
-                        placeholder="e.g. Priya Agro Wholesale &amp; Retail Hub"
-                        required
-                      />
-                    </label>
-                    <label>Business Type
-                      <select
-                        value={profile.businessType || 'WHOLESALER'}
-                        onChange={(e) => setProfile({ ...profile, businessType: e.target.value })}
-                      >
-                        <option value="WHOLESALER">Wholesaler</option>
-                        <option value="RETAILER">Retailer / Supermarket</option>
-                        <option value="PROCESSOR">Food Processor</option>
-                        <option value="EXPORTER">Exporter</option>
-                        <option value="COLD_STORAGE">Cold Storage Operator</option>
-                        <option value="TRADER">Commission Trader</option>
-                      </select>
-                    </label>
-                    <label style={{ gridColumn: '1 / -1' }}>Trade License / GSTIN
-                      <input
-                        value={profile.tradeLicense || 'GSTIN27AABCP1234F1Z5'}
-                        onChange={(e) => setProfile({ ...profile, tradeLicense: e.target.value })}
-                        placeholder="GSTIN27AABCP1234F1Z5"
-                      />
-                    </label>
-                  </>
-                )}
 
-                
-                {session.role === 'FARMER' && (
-                  <>
-                    <label>Landholding (Acres)
-                      <input
-                        type="number"
-                        step="0.5"
-                        value={profile.landholdingAcres || '4.5'}
-                        onChange={(e) => setProfile({ ...profile, landholdingAcres: e.target.value })}
-                        placeholder="4.5"
-                      />
-                    </label>
-                    <label>Primary Crops
-                      <input
-                        value={profile.primaryCrops || 'Tomato, Onion, Wheat'}
-                        onChange={(e) => setProfile({ ...profile, primaryCrops: e.target.value })}
-                        placeholder="e.g. Tomato, Onion, Wheat"
-                      />
-                    </label>
-                    <label>Soil Type
-                      <input
-                        value={profile.soilType || 'Black Clay Loam'}
-                        onChange={(e) => setProfile({ ...profile, soilType: e.target.value })}
-                        placeholder="e.g. Black Clay Loam"
-                      />
-                    </label>
-                    <label>Irrigation Source
-                      <input
-                        value={profile.irrigationSource || 'Borewell &amp; Drip Network'}
-                        onChange={(e) => setProfile({ ...profile, irrigationSource: e.target.value })}
-                        placeholder="e.g. Borewell &amp; Drip"
-                      />
-                    </label>
-                  </>
-                )}
 
-                
-                <label style={{ gridColumn: '1 / -1' }}>Address / Operational Base
-                  <input
-                    value={profile.address || ''}
-                    onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-                    placeholder="Vill. Bariatu, Post Hatia / Plot 44 APMC Yard"
-                  />
-                </label>
-
-                <label>District
-                  <input
-                    value={profile.district || ''}
-                    onChange={(e) => setProfile({ ...profile, district: e.target.value })}
-                    placeholder="Ranchi / Nashik"
-                  />
-                </label>
-                <label>State
-                  <input
-                    value={profile.state || ''}
-                    onChange={(e) => setProfile({ ...profile, state: e.target.value })}
-                    placeholder="Jharkhand / Maharashtra"
-                  />
-                </label>
-
-                <label>Latitude
-                  <input
-                    type="number" step="any"
-                    value={profile.latitude || '23.3441'}
-                    onChange={(e) => setProfile({ ...profile, latitude: e.target.value })}
-                    placeholder="23.3441"
-                    required
-                  />
-                </label>
-                <label>Longitude
-                  <input
-                    type="number" step="any"
-                    value={profile.longitude || '85.3096'}
-                    onChange={(e) => setProfile({ ...profile, longitude: e.target.value })}
-                    placeholder="85.3096"
-                    required
-                  />
-                </label>
-
-                <div className="profile-section-divider">
-                  <span>Alert &amp; Notification Contacts</span>
+          {currentView === 'map' && (
+            <div className="view-container">
+              <section className="market-map-section">
+                <div className="panel-heading">
+                  <div>
+                    <p className="eyebrow">Geographical Market Discovery &amp; Routing</p>
+                    <h2>Nearby Markets &amp; Freight Radar</h2>
+                  </div>
+                  <span className="count">{nearbyMarkets.length} Markets within {mapRadius} km</span>
                 </div>
 
-                <label>Mobile / WhatsApp Number
-                  <input
-                    type="tel"
-                    value={profile.phone || ''}
-                    onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                    placeholder="+91 98765 43210"
-                  />
-                </label>
-                <label>Alert Email
-                  <input
-                    type="email"
-                    value={profile.alertEmail || ''}
-                    onChange={(e) => setProfile({ ...profile, alertEmail: e.target.value })}
-                    placeholder="alerts@email.com"
-                  />
-                </label>
 
-                <button type="submit">Save Profile &amp; Sync GPS <span>&rarr;</span></button>
-              </form>
-
-              
-              <div className="profile-alert-table">
-                <p className="eyebrow" style={{ marginBottom: '12px' }}>Notification Routing</p>
-                <table className="profile-routing-table">
-                  <tbody>
-                    <tr>
-                      <td>WhatsApp</td>
-                      <td>{profile.phone || <span style={{ color: '#aaa' }}>Not set</span>}</td>
-                      <td>Trade proposals &amp; escrow updates</td>
-                    </tr>
-                    <tr>
-                      <td>SMS</td>
-                      <td>{profile.phone || <span style={{ color: '#aaa' }}>Not set</span>}</td>
-                      <td>Offline fallback alerts</td>
-                    </tr>
-                    <tr>
-                      <td>Email</td>
-                      <td>{profile.alertEmail || <span style={{ color: '#aaa' }}>Not set</span>}</td>
-                      <td>Proposals, escrow receipts &amp; invoices</td>
-                    </tr>
-                    <tr>
-                      <td>In-App</td>
-                      <td>{session.email}</td>
-                      <td>Live push via WebSocket</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e7e4db', flexWrap: 'wrap', gap: '10px' }}>
+                <div className="location-presets-bar">
+                  <span style={{ font: "10px 'DM Mono', monospace", color: '#6a766c', alignSelf: 'center', marginRight: '4px' }}>
+                    {text.weatherOrigin} <strong>{mapCoords.label}</strong>
+                  </span>
                   <button
                     type="button"
-                    className="text-button"
-                    style={{ margin: 0 }}
-                    onClick={() => { setCurrentView('notifications'); setNotifSubTab('sms'); }}
+                    className={`location-pill ${mapCoords.label === 'Ranchi Center' ? 'active' : ''}`}
+                    onClick={() => handleLocationPreset(23.3441, 85.3096, 'Ranchi Center')}
                   >
-                    Open Field Dispatch Center &rarr;
+                    Ranchi
                   </button>
+                  <button
+                    type="button"
+                    className={`location-pill ${mapCoords.label === 'Ramgarh' ? 'active' : ''}`}
+                    onClick={() => handleLocationPreset(23.6332, 85.5149, 'Ramgarh')}
+                  >
+                    Ramgarh
+                  </button>
+                  <button
+                    type="button"
+                    className={`location-pill ${mapCoords.label === 'Bokaro' ? 'active' : ''}`}
+                    onClick={() => handleLocationPreset(23.6693, 86.1511, 'Bokaro')}
+                  >
+                    Bokaro
+                  </button>
+                  <button
+                    type="button"
+                    className={`location-pill ${mapCoords.label === 'Jamshedpur' ? 'active' : ''}`}
+                    onClick={() => handleLocationPreset(22.8046, 86.2029, 'Jamshedpur')}
+                  >
+                    Jamshedpur
+                  </button>
+                  {session && (
+                    <button
+                      type="button"
+                      className="location-pill"
+                      style={{ background: '#dce7d3', color: '#3d5940', borderColor: '#b8cba8' }}
+                      onClick={handleUseProfileLocation}
+                    >
+                      {text.weatherUseGps}
+                    </button>
+                  )}
+                </div>
 
+                <div className="market-map-layout">
+
+                  <div className="map-radar-container">
+                    <svg className="map-radar-svg" viewBox="0 0 300 300">
+                      <defs>
+                        <radialGradient id="radarGlow" cx="50%" cy="50%" r="50%">
+                          <stop offset="0%" stopColor="#2c4038" stopOpacity="0.8" />
+                          <stop offset="100%" stopColor="#141c19" stopOpacity="0.9" />
+                        </radialGradient>
+                      </defs>
+
+                      <rect width="300" height="300" rx="8" fill="url(#radarGlow)" />
+
+                      <line x1="150" y1="15" x2="150" y2="285" stroke="#2e4239" strokeWidth="1" strokeDasharray="2 2" />
+                      <line x1="15" y1="150" x2="285" y2="150" stroke="#2e4239" strokeWidth="1" strokeDasharray="2 2" />
+
+                      <circle cx="150" cy="150" r="40" fill="none" stroke="#2e4239" strokeWidth="1" />
+                      <circle cx="150" cy="150" r="80" fill="none" stroke="#2e4239" strokeWidth="1" />
+                      <circle cx="150" cy="150" r="120" fill="none" stroke="#375246" strokeWidth="1.2" />
+
+                      <text x="154" y="112" fill="#587567" fontSize="8" fontFamily="DM Mono">30 km</text>
+                      <text x="154" y="72" fill="#587567" fontSize="8" fontFamily="DM Mono">75 km</text>
+                      <text x="154" y="32" fill="#587567" fontSize="8" fontFamily="DM Mono">120+ km</text>
+
+                      <text x="146" y="24" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">N</text>
+                      <text x="278" y="153" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">E</text>
+                      <text x="146" y="280" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">S</text>
+                      <text x="18" y="153" fill="#759384" fontSize="9" fontWeight="bold" fontFamily="DM Mono">W</text>
+
+
+                      {(() => {
+                        if (!selectedMapMarket) return null;
+                        const maxRange = Math.max(130, ...nearbyMarkets.map(m => Number(m.distanceKm || 0)));
+                        const scale = 115.0 / maxRange;
+                        const dx = (selectedMapMarket.longitude - mapCoords.lon) * 111.0 * Math.cos(mapCoords.lat * Math.PI / 180);
+                        const dy = -(selectedMapMarket.latitude - mapCoords.lat) * 111.0;
+                        const tx = Math.min(275, Math.max(25, 150 + dx * scale));
+                        const ty = Math.min(275, Math.max(25, 150 + dy * scale));
+                        return (
+                          <g>
+                            <line x1="150" y1="150" x2={tx} y2={ty} stroke="#dc664a" strokeWidth="2.5" strokeDasharray="4 2" />
+                            <circle cx={tx} cy={ty} r="12" fill="none" stroke="#dc664a" strokeWidth="1.5" opacity="0.6">
+                              <animate attributeName="r" values="8;16;8" dur="1.8s" repeatCount="indefinite" />
+                            </circle>
+                          </g>
+                        );
+                      })()}
+
+
+                      <circle cx="150" cy="150" r="7" fill="#f2c45f" stroke="#1d2724" strokeWidth="2" />
+                      <circle cx="150" cy="150" r="14" fill="none" stroke="#f2c45f" strokeWidth="1" opacity="0.4">
+                        <animate attributeName="r" values="7;18;7" dur="2.2s" repeatCount="indefinite" />
+                      </circle>
+                      <text x="150" y="172" fill="#f2c45f" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="DM Mono">
+                        ORIGIN (YOU)
+                      </text>
+
+
+                      {nearbyMarkets.map((m) => {
+                        const maxRange = Math.max(130, ...nearbyMarkets.map(item => Number(item.distanceKm || 0)));
+                        const scale = 115.0 / maxRange;
+                        const dx = (m.longitude - mapCoords.lon) * 111.0 * Math.cos(mapCoords.lat * Math.PI / 180);
+                        const dy = -(m.latitude - mapCoords.lat) * 111.0;
+                        const mx = Math.min(275, Math.max(25, 150 + dx * scale));
+                        const my = Math.min(275, Math.max(25, 150 + dy * scale));
+                        const isSelected = selectedMapMarket?.id === m.id;
+                        const pinColor = m.marketType === 'APMC' ? '#6ba3d6' : m.marketType === 'WHOLESALE' ? '#e5a84b' : '#78b87d';
+
+                        return (
+                          <g
+                            key={m.id}
+                            onClick={() => setSelectedMapMarket(m)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <circle
+                              cx={mx}
+                              cy={my}
+                              r={isSelected ? "7" : "5"}
+                              fill={pinColor}
+                              stroke="#ffffff"
+                              strokeWidth={isSelected ? "2" : "1"}
+                            />
+                            <text
+                              x={mx}
+                              y={my - 9}
+                              fill={isSelected ? '#fff' : '#c8d4cc'}
+                              fontSize={isSelected ? '9' : '7.5'}
+                              fontWeight={isSelected ? 'bold' : 'normal'}
+                              textAnchor="middle"
+                              fontFamily="DM Mono"
+                            >
+                              {m.name.split(' ')[0]} ({m.distanceKm}km)
+                            </text>
+                          </g>
+                        );
+                      })}
+                    </svg>
+
+                    <div className="map-radar-legend">
+                      <span><i style={{ background: '#78b87d' }} /> Market</span>
+                      <span><i style={{ background: '#6ba3d6' }} /> APMC Yard</span>
+                      <span><i style={{ background: '#e5a84b' }} /> Wholesale Yard</span>
+                      <span><i style={{ background: '#f2c45f' }} /> Your Origin</span>
+                    </div>
+                  </div>
+
+
+                  <div className="nearby-list-container">
+                    {mapLoading ? (
+                      <p className="muted">Calculating distances and freight costs...</p>
+                    ) : nearbyMarkets.length > 0 ? (
+                      nearbyMarkets.map((market) => {
+                        const isSelected = selectedMapMarket?.id === market.id;
+                        return (
+                          <div
+                            key={market.id}
+                            className={`nearby-card ${isSelected ? 'active' : ''}`}
+                            onClick={() => setSelectedMapMarket(market)}
+                          >
+                            <div className="nearby-header">
+                              <div>
+                                <h3>{market.name}</h3>
+                                <small style={{ color: '#778078', fontSize: '11px' }}>
+                                  {market.address || market.district}, {market.state}
+                                </small>
+                              </div>
+                              <span className={`market-type-badge badge-${market.marketType?.toLowerCase()}`}>
+                                {market.marketType}
+                              </span>
+                            </div>
+
+                            <div className="nearby-meta-grid">
+                              <div className="nearby-meta-item">
+                                <span>Distance</span>
+                                <strong>{market.distanceKm} km {market.direction && `(${market.direction})`}</strong>
+                              </div>
+                              <div className="nearby-meta-item">
+                                <span>Est. Transit</span>
+                                <strong>~{market.estimatedDurationMinutes} mins</strong>
+                              </div>
+                              <div className="nearby-meta-item">
+                                <span>Freight Cost</span>
+                                <strong>₹{market.estimatedTransportCost}</strong>
+                              </div>
+                            </div>
+
+                            <div className="nearby-actions">
+                              <span className="route-summary-text">
+                                {market.routeSummary}
+                              </span>
+                              <a
+                                href={market.navigationUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="nav-link-btn"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                Navigate ↔
+                              </a>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <p className="muted">No agricultural markets found in this radius.</p>
+                    )}
+                  </div>
+                </div>
+              </section>
+            </div>
+          )}
+
+
+
+
+          {currentView === 'notifications' && (
+            <div className="view-container">
+              <section className="panel" style={{ marginTop: '18px' }}>
+                <div className="panel-heading">
+                  <div>
+                    <p className="eyebrow">Market activity &amp; signals</p>
+                    <h2>{text.labelNotifications}</h2>
+                  </div>
+                  <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+                    {unreadCount > 0 && notifSubTab === 'app' && (
+                      <button type="button" className="text-button" onClick={markAllNotificationsRead} style={{ marginTop: 0 }}>
+                        Mark all read
+                      </button>
+                    )}
+                    <span className="count">{notifSubTab === 'app' ? `${unreadCount} unread` : `${smsLogs.length} field alerts`}</span>
+                  </div>
+                </div>
+
+
+                <div className="tab-toggle-group" style={{ marginBottom: '16px' }}>
+                  <button
+                    type="button"
+                    className={notifSubTab === 'app' ? 'active' : ''}
+                    onClick={() => setNotifSubTab('app')}
+                  >
+                    In-App Desk Feed ({unreadCount})
+                  </button>
+                  <button
+                    type="button"
+                    className={notifSubTab === 'sms' ? 'active' : ''}
+                    onClick={() => { setNotifSubTab('sms'); loadSmsLogs(); }}
+                  >
+                    SMS &amp; WhatsApp Field Dispatch ({smsLogs.length})
+                  </button>
+                </div>
+
+
+                {notifSubTab === 'app' && (
+                  <div className="notif-list">
+                    {notifications.map((n) => (
+                      <div
+                        key={n.id}
+                        className={`notif-card ${n.unread ? 'unread' : ''}`}
+                        onClick={() => markNotificationRead(n.id)}
+                        style={{ cursor: 'default' }}
+                      >
+                        <span className={`notif-dot ${n.unread ? '' : 'read'}`} />
+                        <div className="notif-body">
+                          <p className="notif-title"><strong>{n.title}</strong> — {n.message}</p>
+                          <div className="notif-meta">
+                            <span>{n.time}</span>
+                            <span>·</span>
+                            <span>{n.type}</span>
+                            <span>·</span>
+                            <button
+                              type="button"
+                              className="notif-link"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                markNotificationRead(n.id);
+                                setCurrentView(n.viewTarget);
+                              }}
+                            >
+                              View ↔
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {notifications.length === 0 && (
+                      <p className="muted" style={{ padding: '16px 0' }}>No notifications received yet.</p>
+                    )}
+                  </div>
+                )}
+
+
+                {notifSubTab === 'sms' && (
+                  <div>
+                    <div style={{ borderBottom: '1px solid #d9d6cc', paddingBottom: '18px', marginBottom: '18px' }}>
+                      <p className="eyebrow" style={{ marginBottom: '6px' }}>Field Dispatch Gateway — Simulated</p>
+                      <p style={{ fontSize: '12px', color: '#647068', margin: '0 0 18px', lineHeight: '1.6' }}>
+                        Farmers receive SMS and WhatsApp alerts for trade proposals, escrow confirmations, and payouts. Replying <code>ACCEPT &lt;id&gt;</code> via SMS confirms a deal offline.
+                      </p>
+
+                      <form onSubmit={handleSendTestSms} style={{ marginTop: 0 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
+                          <label style={{ marginTop: 0 }}>Recipient Phone
+                            <input
+                              value={testSmsForm.recipientPhone}
+                              onChange={(e) => setTestSmsForm({ ...testSmsForm, recipientPhone: e.target.value })}
+                              required
+                            />
+                          </label>
+                          <label style={{ marginTop: 0 }}>Channel
+                            <select
+                              value={testSmsForm.channel}
+                              onChange={(e) => setTestSmsForm({ ...testSmsForm, channel: e.target.value })}
+                            >
+                              <option value="SMS">SMS</option>
+                              <option value="WHATSAPP">WhatsApp</option>
+                            </select>
+                          </label>
+                        </div>
+                        <label>Message Text
+                          <input
+                            value={testSmsForm.text}
+                            onChange={(e) => setTestSmsForm({ ...testSmsForm, text: e.target.value })}
+                            required
+                          />
+                        </label>
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '18px', flexWrap: 'wrap' }}>
+                          <button type="submit" style={{ width: 'auto', margin: 0 }}>
+                            Send Test Alert &rarr;
+                          </button>
+                          <button
+                            type="button"
+                            className="secondary-button"
+                            style={{ width: 'auto', margin: 0 }}
+                            onClick={() => handleSimulateInboundSms(testSmsForm.text)}
+                          >
+                            Simulate Inbound SMS Reply &rarr;
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+
+                    <div className="sms-feed-grid">
+                      {smsLogLoading ? (
+                        <p className="muted">Loading field dispatch log...</p>
+                      ) : smsLogs.length > 0 ? (
+                        smsLogs.map((log) => {
+                          const isWa = log.channel === 'WHATSAPP';
+                          return (
+                            <div key={log.id} className={`sms-log-row ${isWa ? 'sms-log-wa' : 'sms-log-sms'}`}>
+                              <div className="sms-log-meta">
+                                <span className="sms-log-channel">{isWa ? 'WhatsApp' : 'SMS'}</span>
+                                <span>{log.recipientPhone}</span>
+                                <span>{new Date(log.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                <span style={{ marginLeft: 'auto', color: '#5a8e62' }}>{log.status}</span>
+                              </div>
+                              <p className="sms-log-body">{log.body}</p>
+                              <div className="sms-log-ref">Ref: {log.providerMessageId || `MSG-${log.id}`} &middot; {log.messageType}</div>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <p className="muted" style={{ paddingTop: '8px' }}>No field alerts dispatched yet. Use the form above to send a test.</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </section>
+            </div>
+          )}
+
+
+
+
+          {currentView === 'profile' && (
+            <div className="view-container">
+              <section className="panel" style={{ marginTop: '18px' }}>
+
+
+                <div style={{ background: '#f8f7f2', border: '1px solid #d9d6cc', borderRadius: '8px', padding: '12px 16px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                  <div>
+                    <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#2f6838', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Demo Account Persona Switcher
+                    </span>
+                    <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#667269' }}>
+                      Instantly switch between accounts to test role-specific dashboards, calculators, and workflows:
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className={`trade-btn ${session?.role === 'FPO' ? 'trade-btn-primary' : 'trade-btn-secondary'}`}
+                      style={{ fontSize: '11px', padding: '6px 12px' }}
+                      onClick={() => handleQuickLogin('FPO')}
+                    >
+                      FPO (Sahyadri)
+                    </button>
+                    <button
+                      type="button"
+                      className={`trade-btn ${session?.role === 'BUYER' ? 'trade-btn-primary' : 'trade-btn-secondary'}`}
+                      style={{ fontSize: '11px', padding: '6px 12px' }}
+                      onClick={() => handleQuickLogin('BUYER')}
+                    >
+                      Buyer (Priya)
+                    </button>
+                    <button
+                      type="button"
+                      className={`trade-btn ${session?.role === 'FARMER' ? 'trade-btn-primary' : 'trade-btn-secondary'}`}
+                      style={{ fontSize: '11px', padding: '6px 12px' }}
+                      onClick={() => handleQuickLogin('FARMER')}
+                    >
+                      Farmer (Ramesh)
+                    </button>
+                    <button
+                      type="button"
+                      className={`trade-btn ${session?.role === 'TRANSPORTER' ? 'trade-btn-primary' : 'trade-btn-secondary'}`}
+                      style={{ fontSize: '11px', padding: '6px 12px' }}
+                      onClick={() => handleQuickLogin('TRANSPORTER')}
+                    >
+                      Transporter (Suresh)
+                    </button>
+                    <button
+                      type="button"
+                      className={`trade-btn ${session?.role === 'ADMIN' ? 'trade-btn-primary' : 'trade-btn-secondary'}`}
+                      style={{ fontSize: '11px', padding: '6px 12px' }}
+                      onClick={() => handleQuickLogin('ADMIN')}
+                    >
+                      Nodal Admin
+                    </button>
+                  </div>
+                </div>
+
+                <div className="panel-heading">
+                  <div>
+                    <p className="eyebrow">Account &amp; Location Profile</p>
+                    <h2>{(session.name || '').replace(/\s*\((farmer|buyer|agrotech)[^)]*\)/gi, '').trim()}</h2>
+                  </div>
                   <button
                     type="button"
                     className="trade-btn trade-btn-secondary"
-                    style={{ fontSize: '11px', padding: '6px 14px', color: '#b45a42', borderColor: '#e5d0cb' }}
                     onClick={handleLogout}
+                    style={{ width: 'auto', padding: '6px 14px', marginTop: 0, fontSize: '11px', color: '#b45a42' }}
                   >
-                    Sign Out of Trade Desk &rarr;
+                    Sign Out
+                  </button>
+                </div>
+
+
+
+                <div className="profile-id-strip">
+                  <div className="profile-id-item">
+                    <span>Email</span>
+                    <strong>{session.email}</strong>
+                  </div>
+                  <div className="profile-id-item">
+                    <span>Role</span>
+                    <strong>{session.role === 'FARMER' ? 'Farmer / Producer' : session.role === 'TRANSPORTER' ? 'Commercial Transporter / Fleet' : session.role === 'FPO' ? 'Farmer Producer Organization (FPO/FPC)' : session.role === 'ADMIN' ? 'State Agricultural Nodal Officer' : 'Wholesale Buyer / Food Processor'}</strong>
+                  </div>
+                  <div className="profile-id-item">
+                    <span>Profile ID</span>
+                    <strong>KL-{session.role?.charAt(0)}-{session.profileId}</strong>
+                  </div>
+                </div>
+
+
+                {session?.role === 'FPO' && (
+                  <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '16px', margin: '16px 0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                      <div>
+                        <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#166534', textTransform: 'uppercase' }}>
+                          Statutory NABL FPO Trust Score (Feature B12)
+                        </span>
+                        <h4 style={{ margin: '2px 0 0', fontSize: '16px', fontWeight: 600, color: '#0f172a' }}>
+                          {fpoProfile.trustBadge}
+                        </h4>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <strong style={{ fontSize: '24px', fontWeight: 700, color: '#166534' }}>{fpoProfile.trustScore}</strong>
+                        <span style={{ fontSize: '12px', color: '#64748b' }}> / 5.0 Composite Rating</span>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
+                        <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Quality Assay Match</span>
+                        <strong style={{ fontSize: '16px', color: '#0f172a' }}>98.4%</strong>
+                        <small style={{ display: 'block', fontSize: '10px', color: '#166534' }}>NABL Grade A/B Consistency</small>
+                      </div>
+                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
+                        <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Dispatch Timeliness</span>
+                        <strong style={{ fontSize: '16px', color: '#0f172a' }}>99.1%</strong>
+                        <small style={{ display: 'block', fontSize: '10px', color: '#166534' }}>On-Time Packhouse Clearance</small>
+                      </div>
+                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
+                        <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Dispute &amp; Claim Rate</span>
+                        <strong style={{ fontSize: '16px', color: '#166534' }}>0.2%</strong>
+                        <small style={{ display: 'block', fontSize: '10px', color: '#64748b' }}>Near-Zero Buyer Deductions</small>
+                      </div>
+                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
+                        <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Smallholder Retention</span>
+                        <strong style={{ fontSize: '16px', color: '#0f172a' }}>97.8%</strong>
+                        <small style={{ display: 'block', fontSize: '10px', color: '#166534' }}>{fpoProfile.activeMembersCount} Supplying Members</small>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+
+                {session?.role === 'BUYER' && (
+                  <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '16px', margin: '16px 0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                      <div>
+                        <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", fontWeight: 700, color: '#0284c7', textTransform: 'uppercase' }}>
+                          Institutional Buyer Trust &amp; Settlement Score (Feature C10)
+                        </span>
+                        <h4 style={{ margin: '2px 0 0', fontSize: '16px', fontWeight: 600, color: '#0f172a' }}>
+                          Gold Procurement Partner · 100% On-Time Escrow
+                        </h4>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <strong style={{ fontSize: '24px', fontWeight: 700, color: '#0284c7' }}>4.9</strong>
+                        <span style={{ fontSize: '12px', color: '#64748b' }}> / 5.0 Buyer Rating</span>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
+                        <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Escrow Release Speed</span>
+                        <strong style={{ fontSize: '16px', color: '#0f172a' }}>100% Timely</strong>
+                        <small style={{ display: 'block', fontSize: '10px', color: '#166534' }}>Immediate Gate Handshake Release</small>
+                      </div>
+                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
+                        <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Settlement Fairness</span>
+                        <strong style={{ fontSize: '16px', color: '#0f172a' }}>4.9 / 5.0</strong>
+                        <small style={{ display: 'block', fontSize: '10px', color: '#166534' }}>Transparent Weighbridge Verification</small>
+                      </div>
+                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
+                        <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', display: 'block' }}>Direct Sourced Volume</span>
+                        <strong style={{ fontSize: '16px', color: '#0f172a' }}>38.5 Tons</strong>
+                        <small style={{ display: 'block', fontSize: '10px', color: '#64748b' }}>18 Settled Direct Contracts</small>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+
+                <form className="profile-form" onSubmit={saveProfile} style={{ marginTop: '24px' }}>
+
+
+                  {session.role === 'TRANSPORTER' && (
+                    <>
+                      <label>Fleet / Transport Name
+                        <input
+                          value={profile.businessName || ''}
+                          onChange={(e) => setProfile({ ...profile, businessName: e.target.value })}
+                          placeholder="e.g. Suresh Logistics &amp; Fleet Operations"
+                          required
+                        />
+                      </label>
+                      <label>Vehicle Category
+                        <select
+                          value={profile.vehicleType || 'MINI_TRUCK'}
+                          onChange={(e) => setProfile({ ...profile, vehicleType: e.target.value })}
+                        >
+                          <option value="MINI_TRUCK">Mini-Truck (Tata Ace / 2T)</option>
+                          <option value="PICKUP">Heavy Pickup (Bolero Maxi / 1.5T)</option>
+                          <option value="MEDIUM_5T">Intermediate LCV (Eicher 5T)</option>
+                          <option value="HEAVY_10T">Multi-Axle Heavy Truck (10T+)</option>
+                          <option value="REEFER">Reefer Container (Cold-Chain)</option>
+                        </select>
+                      </label>
+                      <label>Vehicle Registration Number
+                        <input
+                          value={profile.vehicleNumber || ''}
+                          onChange={(e) => setProfile({ ...profile, vehicleNumber: e.target.value })}
+                          placeholder="JH-01-TR-5892"
+                          required
+                        />
+                      </label>
+                      <label>Payload Capacity (kg)
+                        <input
+                          type="number"
+                          value={profile.capacityKg || '2500'}
+                          onChange={(e) => setProfile({ ...profile, capacityKg: e.target.value })}
+                          placeholder="2500"
+                          required
+                        />
+                      </label>
+                      <label>Base Freight Rate (₹/km)
+                        <input
+                          type="number"
+                          step="0.5"
+                          value={profile.ratePerKm || '16.5'}
+                          onChange={(e) => setProfile({ ...profile, ratePerKm: e.target.value })}
+                          placeholder="16.5"
+                          required
+                        />
+                      </label>
+                      <label>Base Pickup Charge (₹)
+                        <input
+                          type="number"
+                          value={profile.baseCharge || '150.0'}
+                          onChange={(e) => setProfile({ ...profile, baseCharge: e.target.value })}
+                          placeholder="150"
+                          required
+                        />
+                      </label>
+                    </>
+                  )}
+
+
+                  {session.role === 'BUYER' && (
+                    <>
+                      <label>Business Name
+                        <input
+                          value={profile.businessName || ''}
+                          onChange={(e) => setProfile({ ...profile, businessName: e.target.value })}
+                          placeholder="e.g. Priya Agro Wholesale &amp; Retail Hub"
+                          required
+                        />
+                      </label>
+                      <label>Business Type
+                        <select
+                          value={profile.businessType || 'WHOLESALER'}
+                          onChange={(e) => setProfile({ ...profile, businessType: e.target.value })}
+                        >
+                          <option value="WHOLESALER">Wholesaler</option>
+                          <option value="RETAILER">Retailer / Supermarket</option>
+                          <option value="PROCESSOR">Food Processor</option>
+                          <option value="EXPORTER">Exporter</option>
+                          <option value="COLD_STORAGE">Cold Storage Operator</option>
+                          <option value="TRADER">Commission Trader</option>
+                        </select>
+                      </label>
+                      <label style={{ gridColumn: '1 / -1' }}>Trade License / GSTIN
+                        <input
+                          value={profile.tradeLicense || 'GSTIN27AABCP1234F1Z5'}
+                          onChange={(e) => setProfile({ ...profile, tradeLicense: e.target.value })}
+                          placeholder="GSTIN27AABCP1234F1Z5"
+                        />
+                      </label>
+                    </>
+                  )}
+
+
+                  {session.role === 'FARMER' && (
+                    <>
+                      <label>Landholding (Acres)
+                        <input
+                          type="number"
+                          step="0.5"
+                          value={profile.landholdingAcres || '4.5'}
+                          onChange={(e) => setProfile({ ...profile, landholdingAcres: e.target.value })}
+                          placeholder="4.5"
+                        />
+                      </label>
+                      <label>Primary Crops
+                        <input
+                          value={profile.primaryCrops || 'Tomato, Onion, Wheat'}
+                          onChange={(e) => setProfile({ ...profile, primaryCrops: e.target.value })}
+                          placeholder="e.g. Tomato, Onion, Wheat"
+                        />
+                      </label>
+                      <label>Soil Type
+                        <input
+                          value={profile.soilType || 'Black Clay Loam'}
+                          onChange={(e) => setProfile({ ...profile, soilType: e.target.value })}
+                          placeholder="e.g. Black Clay Loam"
+                        />
+                      </label>
+                      <label>Irrigation Source
+                        <input
+                          value={profile.irrigationSource || 'Borewell &amp; Drip Network'}
+                          onChange={(e) => setProfile({ ...profile, irrigationSource: e.target.value })}
+                          placeholder="e.g. Borewell &amp; Drip"
+                        />
+                      </label>
+                    </>
+                  )}
+
+
+                  <label style={{ gridColumn: '1 / -1' }}>Address / Operational Base
+                    <input
+                      value={profile.address || ''}
+                      onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+                      placeholder="Vill. Bariatu, Post Hatia / Plot 44 APMC Yard"
+                    />
+                  </label>
+
+                  <label>District
+                    <input
+                      value={profile.district || ''}
+                      onChange={(e) => setProfile({ ...profile, district: e.target.value })}
+                      placeholder="Ranchi / Nashik"
+                    />
+                  </label>
+                  <label>State
+                    <input
+                      value={profile.state || ''}
+                      onChange={(e) => setProfile({ ...profile, state: e.target.value })}
+                      placeholder="Jharkhand / Maharashtra"
+                    />
+                  </label>
+
+                  <label>Latitude
+                    <input
+                      type="number" step="any"
+                      value={profile.latitude || '23.3441'}
+                      onChange={(e) => setProfile({ ...profile, latitude: e.target.value })}
+                      placeholder="23.3441"
+                      required
+                    />
+                  </label>
+                  <label>Longitude
+                    <input
+                      type="number" step="any"
+                      value={profile.longitude || '85.3096'}
+                      onChange={(e) => setProfile({ ...profile, longitude: e.target.value })}
+                      placeholder="85.3096"
+                      required
+                    />
+                  </label>
+
+                  <div className="profile-section-divider">
+                    <span>Alert &amp; Notification Contacts</span>
+                  </div>
+
+                  <label>Mobile / WhatsApp Number
+                    <input
+                      type="tel"
+                      value={profile.phone || ''}
+                      onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                      placeholder="+91 98765 43210"
+                    />
+                  </label>
+                  <label>Alert Email
+                    <input
+                      type="email"
+                      value={profile.alertEmail || ''}
+                      onChange={(e) => setProfile({ ...profile, alertEmail: e.target.value })}
+                      placeholder="alerts@email.com"
+                    />
+                  </label>
+
+                  <button type="submit">Save Profile &amp; Sync GPS <span>&rarr;</span></button>
+                </form>
+
+
+                <div className="profile-alert-table">
+                  <p className="eyebrow" style={{ marginBottom: '12px' }}>Notification Routing</p>
+                  <table className="profile-routing-table">
+                    <tbody>
+                      <tr>
+                        <td>WhatsApp</td>
+                        <td>{profile.phone || <span style={{ color: '#aaa' }}>Not set</span>}</td>
+                        <td>Trade proposals &amp; escrow updates</td>
+                      </tr>
+                      <tr>
+                        <td>SMS</td>
+                        <td>{profile.phone || <span style={{ color: '#aaa' }}>Not set</span>}</td>
+                        <td>Offline fallback alerts</td>
+                      </tr>
+                      <tr>
+                        <td>Email</td>
+                        <td>{profile.alertEmail || <span style={{ color: '#aaa' }}>Not set</span>}</td>
+                        <td>Proposals, escrow receipts &amp; invoices</td>
+                      </tr>
+                      <tr>
+                        <td>In-App</td>
+                        <td>{session.email}</td>
+                        <td>Live push via WebSocket</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #e7e4db', flexWrap: 'wrap', gap: '10px' }}>
+                    <button
+                      type="button"
+                      className="text-button"
+                      style={{ margin: 0 }}
+                      onClick={() => { setCurrentView('notifications'); setNotifSubTab('sms'); }}
+                    >
+                      Open Field Dispatch Center &rarr;
+                    </button>
+
+                    <button
+                      type="button"
+                      className="trade-btn trade-btn-secondary"
+                      style={{ fontSize: '11px', padding: '6px 14px', color: '#b45a42', borderColor: '#e5d0cb' }}
+                      onClick={handleLogout}
+                    >
+                      Sign Out of Trade Desk &rarr;
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </div>
+          )}
+
+
+
+
+          {showFpoRegisterModal && (
+            <div style={{
+              position: 'fixed',
+              top: 0, left: 0, right: 0, bottom: 0,
+              background: 'rgba(15, 23, 42, 0.45)',
+              backdropFilter: 'blur(2px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000,
+              padding: '16px'
+            }}>
+              <div style={{
+                background: '#ffffff',
+                borderRadius: '8px',
+                maxWidth: '540px',
+                width: '100%',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                padding: '24px',
+                border: '1px solid #cbd5e1',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
+                  <div>
+                    <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#f0fdf4', color: '#166534', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
+                      Statutory Registration · /fpo/register (Feature B1)
+                    </span>
+                    <h3 style={{ margin: '4px 0 0', fontSize: '18px', fontWeight: 600, color: '#0f172a' }}>
+                      Register FPO &amp; Request NABL Accreditation
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    className="text-button"
+                    style={{ color: '#64748b', background: '#f1f5f9', border: 'none', borderRadius: '4px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                    onClick={() => setShowFpoRegisterModal(false)}
+                    aria-label="Close"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const fd = new FormData(e.target);
+                  const name = fd.get('fpoName') || 'Sahyadri Farmers Producer Co. (FPC Ltd)';
+                  const cin = fd.get('cin') || 'CIN: U01403MH2011PTC215682';
+                  const district = fd.get('district') || 'Nashik';
+                  const state = fd.get('state') || 'Maharashtra';
+                  const contactPerson = fd.get('contactPerson') || 'Vilas Shinde';
+                  const phone = fd.get('phone') || '+91 98220 44100';
+                  const nabl = fd.get('nabl') || 'NABL Quality Assayed Hub #4412';
+
+                  const updatedFpo = {
+                    ...fpoProfile,
+                    name,
+                    regNumber: cin,
+                    district,
+                    state,
+                    contactPerson,
+                    contactPhone: phone,
+                    nablAccreditation: nabl,
+                    verified: true
+                  };
+
+                  setFpoProfile(updatedFpo);
+                  setSession({
+                    token: 'demo-fpo-jwt',
+                    userId: 4,
+                    profileId: 1,
+                    name: `${contactPerson} (${name})`,
+                    email: 'fpo@kisanlink.in',
+                    role: 'FPO',
+                    fpoId: updatedFpo.fpoId,
+                    trustScore: 4.9,
+                    verified: true
+                  });
+                  setShowFpoRegisterModal(false);
+                  setCurrentView('fpo-lots');
+                  window.location.hash = '#/fpo/lots';
+                  setMessage(`Successfully registered and verified FPO "${name}" with NABL accreditation!`);
+                }}>
+                  <label style={{ fontSize: '12px', color: '#334155' }}>FPO / FPC Legal Entity Name
+                    <input
+                      name="fpoName"
+                      defaultValue={fpoProfile.name}
+                      placeholder="e.g. Sahyadri Farmers Producer Co. Ltd"
+                      required
+                    />
+                  </label>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <label style={{ fontSize: '12px', color: '#334155' }}>CIN / Registration Number
+                      <input
+                        name="cin"
+                        defaultValue={fpoProfile.regNumber}
+                        placeholder="CIN: U01403MH2011PTC215682"
+                        required
+                      />
+                    </label>
+                    <label style={{ fontSize: '12px', color: '#334155' }}>NABL Accreditation ID
+                      <input
+                        name="nabl"
+                        defaultValue={fpoProfile.nablAccreditation}
+                        placeholder="NABL Lab Assay #4412"
+                        required
+                      />
+                    </label>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <label style={{ fontSize: '12px', color: '#334155' }}>District Base
+                      <input
+                        name="district"
+                        defaultValue={fpoProfile.district}
+                        required
+                      />
+                    </label>
+                    <label style={{ fontSize: '12px', color: '#334155' }}>State
+                      <input
+                        name="state"
+                        defaultValue={fpoProfile.state}
+                        required
+                      />
+                    </label>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <label style={{ fontSize: '12px', color: '#334155' }}>Managing Director / CEO Name
+                      <input
+                        name="contactPerson"
+                        defaultValue={fpoProfile.contactPerson}
+                        required
+                      />
+                    </label>
+                    <label style={{ fontSize: '12px', color: '#334155' }}>Contact Phone
+                      <input
+                        name="phone"
+                        defaultValue={fpoProfile.contactPhone}
+                        required
+                      />
+                    </label>
+                  </div>
+
+                  <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px 12px', margin: '10px 0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '11px', color: '#475569', fontWeight: 600 }}>Statutory Verification Status:</span>
+                      <span style={{ fontSize: '11px', color: '#166534', background: '#f0fdf4', padding: '2px 8px', borderRadius: '4px', border: '1px solid #bbf7d0', fontWeight: 500 }}>
+                        Auto-Verified via MCA &amp; NABL Database
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
+                    <button type="button" className="trade-btn trade-btn-secondary" style={{ padding: '8px 14px', fontSize: '12px' }} onClick={() => setShowFpoRegisterModal(false)}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="trade-btn trade-btn-primary" style={{ padding: '8px 14px', fontSize: '12px' }}>
+                      Complete FPO Registration &rarr;
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+
+
+
+          {showBuyerRegisterModal && (
+            <div style={{
+              position: 'fixed',
+              top: 0, left: 0, right: 0, bottom: 0,
+              background: 'rgba(15, 23, 42, 0.45)',
+              backdropFilter: 'blur(2px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000,
+              padding: '16px'
+            }}>
+              <div style={{
+                background: '#ffffff',
+                borderRadius: '8px',
+                maxWidth: '540px',
+                width: '100%',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                padding: '24px',
+                border: '1px solid #cbd5e1',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
+                  <div>
+                    <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#f0f9ff', color: '#0369a1', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
+                      Institutional Onboarding · /buyer/register (Feature C1)
+                    </span>
+                    <h3 style={{ margin: '4px 0 0', fontSize: '18px', fontWeight: 600, color: '#0f172a' }}>
+                      Buyer Registration &amp; Trade License Verification
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    className="text-button"
+                    style={{ color: '#64748b', background: '#f1f5f9', border: 'none', borderRadius: '4px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                    onClick={() => setShowBuyerRegisterModal(false)}
+                    aria-label="Close"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const fd = new FormData(e.target);
+                  const companyName = fd.get('companyName') || 'Priya Agro Wholesale & Retail Hub';
+                  const buyerType = fd.get('buyerType') || 'WHOLESALER';
+                  const gstin = fd.get('gstin') || 'GSTIN27AABCP1234F1Z5';
+                  const district = fd.get('district') || 'Nashik';
+                  const state = fd.get('state') || 'Maharashtra';
+                  const contactPerson = fd.get('contactPerson') || 'Priya Sharma';
+                  const phone = fd.get('phone') || '+91 98220 55432';
+
+                  setProfile(prev => ({
+                    ...prev,
+                    businessName: companyName,
+                    businessType: buyerType,
+                    tradeLicense: gstin,
+                    district,
+                    state,
+                    phone
+                  }));
+
+                  setSession({
+                    token: 'demo-buyer-jwt',
+                    userId: 2,
+                    profileId: 1,
+                    name: contactPerson,
+                    email: 'procurement@priyaagro.com',
+                    role: 'BUYER',
+                    companyName,
+                    verified: true
+                  });
+
+                  setShowBuyerRegisterModal(false);
+                  setRequirementSource('custom');
+                  setCurrentView('matching');
+                  window.location.hash = '#/buyer/demands/create';
+                  setMessage(`Buyer account for "${companyName}" verified via GSTIN! You can now post demands and make direct offers.`);
+                }}>
+                  <label style={{ fontSize: '12px', color: '#334155' }}>Enterprise / Company Name
+                    <input
+                      name="companyName"
+                      defaultValue="Priya Agro Wholesale & Retail Hub"
+                      required
+                    />
+                  </label>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <label style={{ fontSize: '12px', color: '#334155' }}>Buyer Category
+                      <select name="buyerType" defaultValue="WHOLESALER">
+                        <option value="WHOLESALER">Wholesaler / APMC Trader</option>
+                        <option value="FOOD_PROCESSOR">Food Processing Enterprise</option>
+                        <option value="RETAILER">Modern Retail / Supermarket Chain</option>
+                        <option value="EXPORTER">Export Merchant</option>
+                      </select>
+                    </label>
+                    <label style={{ fontSize: '12px', color: '#334155' }}>GSTIN / FSSAI License
+                      <input
+                        name="gstin"
+                        defaultValue="GSTIN27AABCP1234F1Z5"
+                        required
+                      />
+                    </label>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <label style={{ fontSize: '12px', color: '#334155' }}>District Hub
+                      <input
+                        name="district"
+                        defaultValue="Nashik"
+                        required
+                      />
+                    </label>
+                    <label style={{ fontSize: '12px', color: '#334155' }}>State
+                      <input
+                        name="state"
+                        defaultValue="Maharashtra"
+                        required
+                      />
+                    </label>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <label style={{ fontSize: '12px', color: '#334155' }}>Procurement Lead Name
+                      <input
+                        name="contactPerson"
+                        defaultValue="Priya Sharma"
+                        required
+                      />
+                    </label>
+                    <label style={{ fontSize: '12px', color: '#334155' }}>Official Phone
+                      <input
+                        name="phone"
+                        defaultValue="+91 98220 55432"
+                        required
+                      />
+                    </label>
+                  </div>
+
+                  <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px 12px', margin: '10px 0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '11px', color: '#475569', fontWeight: 600 }}>Commercial KYC Status:</span>
+                      <span style={{ fontSize: '11px', color: '#0369a1', background: '#f0f9ff', padding: '2px 8px', borderRadius: '4px', border: '1px solid #bae6fd', fontWeight: 500 }}>
+                        Instant GSTIN &amp; Escrow Verification Active
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
+                    <button type="button" className="trade-btn trade-btn-secondary" style={{ padding: '8px 14px', fontSize: '12px' }} onClick={() => setShowBuyerRegisterModal(false)}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="trade-btn trade-btn-primary" style={{ padding: '8px 14px', fontSize: '12px' }}>
+                      Verify &amp; Activate Buyer Desk &rarr;
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+
+
+
+
+          {dealOtpModal && (
+            <div style={{
+              position: 'fixed',
+              top: 0, left: 0, right: 0, bottom: 0,
+              background: 'rgba(0,0,0,0.65)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 10000,
+              padding: '16px'
+            }}>
+              <div style={{
+                background: '#ffffff',
+                borderRadius: '12px',
+                maxWidth: '440px',
+                width: '100%',
+                padding: '24px',
+                boxShadow: '0 16px 40px rgba(0,0,0,0.25)',
+                border: '2px solid #2f6838',
+                textAlign: 'center'
+              }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                </div>
+                <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#eef4ec', color: '#2f6838', padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
+                  SMART INDIA HACKATHON · DIGITAL HANDSHAKE
+                </span>
+                <h3 style={{ margin: '8px 0 4px', fontSize: '18px', color: '#202a27' }}>
+                  Digital 2FA OTP Contract Sign-Off
+                </h3>
+                <p style={{ margin: '0 0 16px', fontSize: '12px', color: '#556557' }}>
+                  Signing digital sales agreement for <strong>Trade #{dealOtpModal.tradeId} ({dealOtpModal.trade?.cropName})</strong>. A one-time verification code has been dispatched to registered mobile.
+                </p>
+
+                <div style={{ background: '#fbfcfb', border: '1px dashed #2f6838', borderRadius: '8px', padding: '12px', marginBottom: '16px' }}>
+                  <span style={{ fontSize: '10px', color: '#778078', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", display: 'block', marginBottom: '4px' }}>
+                    Simulated 2FA SMS Code
+                  </span>
+                  <div style={{ fontSize: '24px', fontWeight: 800, fontFamily: "'DM Mono', monospace", letterSpacing: '4px', color: '#2f6838' }}>
+                    {dealOtpModal.otp}
+                  </div>
+                </div>
+
+                <label style={{ textAlign: 'left', display: 'block', marginBottom: '16px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 600, color: '#334135' }}>Enter 4-Digit Handshake OTP:</span>
+                  <input
+                    type="text"
+                    maxLength="4"
+                    style={{ textAlign: 'center', fontSize: '18px', letterSpacing: '6px', fontFamily: "'DM Mono', monospace", fontWeight: 700, padding: '8px' }}
+                    value={dealOtpModal.enteredOtp}
+                    onChange={(e) => setDealOtpModal({ ...dealOtpModal, enteredOtp: e.target.value })}
+                  />
+                </label>
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    className="trade-btn trade-btn-secondary"
+                    style={{ flex: 1, padding: '10px' }}
+                    onClick={() => setDealOtpModal(null)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="trade-btn trade-btn-primary"
+                    style={{ flex: 2, padding: '10px', fontWeight: 700 }}
+                    onClick={async () => {
+                      const trade = dealOtpModal.trade;
+                      const tId = dealOtpModal.tradeId;
+                      setDealOtpModal(null);
+                      await executeTradeStatusUpdate(tId, 'ACCEPTED');
+                      setSelectedInvoiceTrade(trade);
+                      setMessage(`Trade #${tId} contract digitally signed and escrow locked via OTP 2FA!`);
+                    }}
+                  >
+                    Verify &amp; Sign Contract Γ£ô
                   </button>
                 </div>
               </div>
-            </section>
-        </div>
-      )}
-
-      
-      
-      
-      {showFpoRegisterModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(15, 23, 42, 0.45)',
-          backdropFilter: 'blur(2px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 10000,
-          padding: '16px'
-        }}>
-          <div style={{
-            background: '#ffffff',
-            borderRadius: '8px',
-            maxWidth: '540px',
-            width: '100%',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            padding: '24px',
-            border: '1px solid #cbd5e1',
-            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
-              <div>
-                <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#f0fdf4', color: '#166534', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
-                  Statutory Registration · /fpo/register (Feature B1)
-                </span>
-                <h3 style={{ margin: '4px 0 0', fontSize: '18px', fontWeight: 600, color: '#0f172a' }}>
-                  Register FPO &amp; Request NABL Accreditation
-                </h3>
-              </div>
-              <button
-                type="button"
-                className="text-button"
-                style={{ color: '#64748b', background: '#f1f5f9', border: 'none', borderRadius: '4px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                onClick={() => setShowFpoRegisterModal(false)}
-                aria-label="Close"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
             </div>
+          )}
 
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const fd = new FormData(e.target);
-              const name = fd.get('fpoName') || 'Sahyadri Farmers Producer Co. (FPC Ltd)';
-              const cin = fd.get('cin') || 'CIN: U01403MH2011PTC215682';
-              const district = fd.get('district') || 'Nashik';
-              const state = fd.get('state') || 'Maharashtra';
-              const contactPerson = fd.get('contactPerson') || 'Vilas Shinde';
-              const phone = fd.get('phone') || '+91 98220 44100';
-              const nabl = fd.get('nabl') || 'NABL Quality Assayed Hub #4412';
-
-              const updatedFpo = {
-                ...fpoProfile,
-                name,
-                regNumber: cin,
-                district,
-                state,
-                contactPerson,
-                contactPhone: phone,
-                nablAccreditation: nabl,
-                verified: true
-              };
-
-              setFpoProfile(updatedFpo);
-              setSession({
-                token: 'demo-fpo-jwt',
-                userId: 4,
-                profileId: 1,
-                name: `${contactPerson} (${name})`,
-                email: 'fpo@kisanlink.in',
-                role: 'FPO',
-                fpoId: updatedFpo.fpoId,
-                trustScore: 4.9,
-                verified: true
-              });
-              setShowFpoRegisterModal(false);
-              setCurrentView('fpo-lots');
-              window.location.hash = '#/fpo/lots';
-              setMessage(`Successfully registered and verified FPO "${name}" with NABL accreditation!`);
-            }}>
-              <label style={{ fontSize: '12px', color: '#334155' }}>FPO / FPC Legal Entity Name
-                <input
-                  name="fpoName"
-                  defaultValue={fpoProfile.name}
-                  placeholder="e.g. Sahyadri Farmers Producer Co. Ltd"
-                  required
-                />
-              </label>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <label style={{ fontSize: '12px', color: '#334155' }}>CIN / Registration Number
-                  <input
-                    name="cin"
-                    defaultValue={fpoProfile.regNumber}
-                    placeholder="CIN: U01403MH2011PTC215682"
-                    required
-                  />
-                </label>
-                <label style={{ fontSize: '12px', color: '#334155' }}>NABL Accreditation ID
-                  <input
-                    name="nabl"
-                    defaultValue={fpoProfile.nablAccreditation}
-                    placeholder="NABL Lab Assay #4412"
-                    required
-                  />
-                </label>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <label style={{ fontSize: '12px', color: '#334155' }}>District Base
-                  <input
-                    name="district"
-                    defaultValue={fpoProfile.district}
-                    required
-                  />
-                </label>
-                <label style={{ fontSize: '12px', color: '#334155' }}>State
-                  <input
-                    name="state"
-                    defaultValue={fpoProfile.state}
-                    required
-                  />
-                </label>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <label style={{ fontSize: '12px', color: '#334155' }}>Managing Director / CEO Name
-                  <input
-                    name="contactPerson"
-                    defaultValue={fpoProfile.contactPerson}
-                    required
-                  />
-                </label>
-                <label style={{ fontSize: '12px', color: '#334155' }}>Contact Phone
-                  <input
-                    name="phone"
-                    defaultValue={fpoProfile.contactPhone}
-                    required
-                  />
-                </label>
-              </div>
-
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px 12px', margin: '10px 0' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11px', color: '#475569', fontWeight: 600 }}>Statutory Verification Status:</span>
-                  <span style={{ fontSize: '11px', color: '#166534', background: '#f0fdf4', padding: '2px 8px', borderRadius: '4px', border: '1px solid #bbf7d0', fontWeight: 500 }}>
-                    Auto-Verified via MCA &amp; NABL Database
+          {selectedInvoiceTrade && (
+            <div className="modal-backdrop" onClick={() => setSelectedInvoiceTrade(null)}>
+              <div className="invoice-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="invoice-header">
+                  <div>
+                    <p className="eyebrow" style={{ color: '#dc664a' }}>KisanLink Official Trade Certificate</p>
+                    <h2>Agronomic Trade Deal &amp; Settlement Receipt</h2>
+                    <p style={{ margin: '4px 0 0', font: "11px 'DM Mono', monospace", color: '#7f8981' }}>
+                      Contract Ref: <strong>#KL-TRD-{selectedInvoiceTrade.id}</strong> · Issued on {new Date(selectedInvoiceTrade.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                  </div>
+                  <span className={`status-pill status-${(selectedInvoiceTrade.status || 'PROPOSED').toLowerCase()}`} style={{ fontSize: '11px', padding: '5px 10px' }}>
+                    Status: {selectedInvoiceTrade.status}
                   </span>
                 </div>
-              </div>
 
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
-                <button type="button" className="trade-btn trade-btn-secondary" style={{ padding: '8px 14px', fontSize: '12px' }} onClick={() => setShowFpoRegisterModal(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="trade-btn trade-btn-primary" style={{ padding: '8px 14px', fontSize: '12px' }}>
-                  Complete FPO Registration &rarr;
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
-      
-      
-      
-      {showBuyerRegisterModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(15, 23, 42, 0.45)',
-          backdropFilter: 'blur(2px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 10000,
-          padding: '16px'
-        }}>
-          <div style={{
-            background: '#ffffff',
-            borderRadius: '8px',
-            maxWidth: '540px',
-            width: '100%',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            padding: '24px',
-            border: '1px solid #cbd5e1',
-            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
-              <div>
-                <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#f0f9ff', color: '#0369a1', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
-                  Institutional Onboarding · /buyer/register (Feature C1)
-                </span>
-                <h3 style={{ margin: '4px 0 0', fontSize: '18px', fontWeight: 600, color: '#0f172a' }}>
-                  Buyer Registration &amp; Trade License Verification
-                </h3>
-              </div>
-              <button
-                type="button"
-                className="text-button"
-                style={{ color: '#64748b', background: '#f1f5f9', border: 'none', borderRadius: '4px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
-                onClick={() => setShowBuyerRegisterModal(false)}
-                aria-label="Close"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            </div>
+                <div className="invoice-party-grid">
+                  <div className="party-block">
+                    <span style={{ font: "9px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981' }}>Seller / Producer</span>
+                    <p><strong>{selectedInvoiceTrade.farmerName}</strong></p>
+                    <p>District: {selectedInvoiceTrade.farmerDistrict || 'Jharkhand Region'}</p>
+                    <p>Role: Verified KisanLink Farmer</p>
+                  </div>
+                  <div className="party-block">
+                    <span style={{ font: "9px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981' }}>Purchaser / Buyer</span>
+                    <p><strong>{selectedInvoiceTrade.buyerName}</strong></p>
+                    <p>Entity: {selectedInvoiceTrade.buyerType || 'Commercial Buyer'}</p>
+                    <p>Delivery Destination: {selectedInvoiceTrade.deliveryAddress || 'Regional APMC / Warehouse'}</p>
+                  </div>
+                </div>
 
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const fd = new FormData(e.target);
-              const companyName = fd.get('companyName') || 'Priya Agro Wholesale & Retail Hub';
-              const buyerType = fd.get('buyerType') || 'WHOLESALER';
-              const gstin = fd.get('gstin') || 'GSTIN27AABCP1234F1Z5';
-              const district = fd.get('district') || 'Nashik';
-              const state = fd.get('state') || 'Maharashtra';
-              const contactPerson = fd.get('contactPerson') || 'Priya Sharma';
-              const phone = fd.get('phone') || '+91 98220 55432';
 
-              setProfile(prev => ({
-                ...prev,
-                businessName: companyName,
-                businessType: buyerType,
-                tradeLicense: gstin,
-                district,
-                state,
-                phone
-              }));
+                <table className="invoice-table">
+                  <thead>
+                    <tr>
+                      <th>Commodity Description</th>
+                      <th>Category</th>
+                      <th>Quantity (kg)</th>
+                      <th>Agreed Rate</th>
+                      <th style={{ textAlign: 'right' }}>Gross Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>{selectedInvoiceTrade.cropName}</strong>
+                        {selectedInvoiceTrade.notes && <div style={{ fontSize: '11px', color: '#778078' }}>Notes: {selectedInvoiceTrade.notes}</div>}
+                      </td>
+                      <td>{selectedInvoiceTrade.cropCategory || 'PRODUCE'}</td>
+                      <td>{selectedInvoiceTrade.quantity} kg ({(Number(selectedInvoiceTrade.quantity) / 100).toFixed(1)} Qtl)</td>
+                      <td>₹{selectedInvoiceTrade.agreedPricePerKg} / kg</td>
+                      <td style={{ textAlign: 'right', fontWeight: 'bold' }}>
+                        ₹{Number(selectedInvoiceTrade.totalAmount).toLocaleString()}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
 
-              setSession({
-                token: 'demo-buyer-jwt',
-                userId: 2,
-                profileId: 1,
-                name: contactPerson,
-                email: 'procurement@priyaagro.com',
-                role: 'BUYER',
-                companyName,
-                verified: true
-              });
 
-              setShowBuyerRegisterModal(false);
-              setRequirementSource('custom');
-              setCurrentView('matching');
-              window.location.hash = '#/buyer/demands/create';
-              setMessage(`Buyer account for "${companyName}" verified via GSTIN! You can now post demands and make direct offers.`);
-            }}>
-              <label style={{ fontSize: '12px', color: '#334155' }}>Enterprise / Company Name
-                <input
-                  name="companyName"
-                  defaultValue="Priya Agro Wholesale & Retail Hub"
-                  required
-                />
-              </label>
+                <div className="invoice-totals-box">
+                  <div className="invoice-totals-row">
+                    <span>Gross Value:</span>
+                    <strong>₹{Number(selectedInvoiceTrade.totalAmount || (Number(selectedInvoiceTrade.quantity || 0) * Number(selectedInvoiceTrade.agreedPricePerKg || 0))).toLocaleString()}</strong>
+                  </div>
+                  <div className="invoice-totals-row">
+                    <span>Logistics &amp; Freight Deduction:</span>
+                    <span style={{ color: '#dc664a' }}>- ₹{Number(selectedInvoiceTrade.transportCost).toLocaleString()}</span>
+                  </div>
+                  <div className="invoice-totals-row grand-total">
+                    <span>Net Farmer Payout:</span>
+                    <strong style={{ color: '#5a8e62' }}>₹{Number(selectedInvoiceTrade.netFarmerReturn).toLocaleString()}</strong>
+                  </div>
+                </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <label style={{ fontSize: '12px', color: '#334155' }}>Buyer Category
-                  <select name="buyerType" defaultValue="WHOLESALER">
-                    <option value="WHOLESALER">Wholesaler / APMC Trader</option>
-                    <option value="FOOD_PROCESSOR">Food Processing Enterprise</option>
-                    <option value="RETAILER">Modern Retail / Supermarket Chain</option>
-                    <option value="EXPORTER">Export Merchant</option>
-                  </select>
-                </label>
-                <label style={{ fontSize: '12px', color: '#334155' }}>GSTIN / FSSAI License
-                  <input
-                    name="gstin"
-                    defaultValue="GSTIN27AABCP1234F1Z5"
-                    required
-                  />
-                </label>
-              </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <label style={{ fontSize: '12px', color: '#334155' }}>District Hub
-                  <input
-                    name="district"
-                    defaultValue="Nashik"
-                    required
-                  />
-                </label>
-                <label style={{ fontSize: '12px', color: '#334155' }}>State
-                  <input
-                    name="state"
-                    defaultValue="Maharashtra"
-                    required
-                  />
-                </label>
-              </div>
+                <div style={{ background: '#faf7f0', padding: '12px 16px', borderRadius: '4px', border: '1px solid #ded9cc', fontSize: '11px', color: '#68776b', lineHeight: '1.5' }}>
+                  <p style={{ margin: 0 }}>
+                    <strong>Direct Trade Guarantee:</strong> This contract represents a direct farmer-to-buyer transaction facilitated via KisanLink's smart matching and freight calculation protocol. All settlements are tracked under digital hash <code>#KL-HASH-{selectedInvoiceTrade.id}-{Date.now().toString(36).toUpperCase()}</code>.
+                  </p>
+                </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <label style={{ fontSize: '12px', color: '#334155' }}>Procurement Lead Name
-                  <input
-                    name="contactPerson"
-                    defaultValue="Priya Sharma"
-                    required
-                  />
-                </label>
-                <label style={{ fontSize: '12px', color: '#334155' }}>Official Phone
-                  <input
-                    name="phone"
-                    defaultValue="+91 98220 55432"
-                    required
-                  />
-                </label>
-              </div>
 
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px 12px', margin: '10px 0' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11px', color: '#475569', fontWeight: 600 }}>Commercial KYC Status:</span>
-                  <span style={{ fontSize: '11px', color: '#0369a1', background: '#f0f9ff', padding: '2px 8px', borderRadius: '4px', border: '1px solid #bae6fd', fontWeight: 500 }}>
-                    Instant GSTIN &amp; Escrow Verification Active
-                  </span>
+                <div className="invoice-actions">
+                  <button
+                    type="button"
+                    className="action-button"
+                    style={{ width: 'auto', background: '#202a27' }}
+                    onClick={() => window.print()}
+                  >
+                    Print / Save PDF Receipt
+                  </button>
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    style={{ width: 'auto' }}
+                    onClick={() => setSelectedInvoiceTrade(null)}
+                  >
+                    Close
+                  </button>
                 </div>
               </div>
-
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
-                <button type="button" className="trade-btn trade-btn-secondary" style={{ padding: '8px 14px', fontSize: '12px' }} onClick={() => setShowBuyerRegisterModal(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="trade-btn trade-btn-primary" style={{ padding: '8px 14px', fontSize: '12px' }}>
-                  Verify &amp; Activate Buyer Desk &rarr;
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      
-      
-      
-      
-      {dealOtpModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.65)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 10000,
-          padding: '16px'
-        }}>
-          <div style={{
-            background: '#ffffff',
-            borderRadius: '12px',
-            maxWidth: '440px',
-            width: '100%',
-            padding: '24px',
-            boxShadow: '0 16px 40px rgba(0,0,0,0.25)',
-            border: '2px solid #2f6838',
-            textAlign: 'center'
-          }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-              </svg>
             </div>
-            <span style={{ fontSize: '10px', fontFamily: "'DM Mono', monospace", fontWeight: 700, background: '#eef4ec', color: '#2f6838', padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
-              SMART INDIA HACKATHON · DIGITAL HANDSHAKE
-            </span>
-            <h3 style={{ margin: '8px 0 4px', fontSize: '18px', color: '#202a27' }}>
-              Digital 2FA OTP Contract Sign-Off
-            </h3>
-            <p style={{ margin: '0 0 16px', fontSize: '12px', color: '#556557' }}>
-              Signing digital sales agreement for <strong>Trade #{dealOtpModal.tradeId} ({dealOtpModal.trade?.cropName})</strong>. A one-time verification code has been dispatched to registered mobile.
-            </p>
+          )}
 
-            <div style={{ background: '#fbfcfb', border: '1px dashed #2f6838', borderRadius: '8px', padding: '12px', marginBottom: '16px' }}>
-              <span style={{ fontSize: '10px', color: '#778078', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace", display: 'block', marginBottom: '4px' }}>
-                Simulated 2FA SMS Code
-              </span>
-              <div style={{ fontSize: '24px', fontWeight: 800, fontFamily: "'DM Mono', monospace", letterSpacing: '4px', color: '#2f6838' }}>
-                {dealOtpModal.otp}
-              </div>
-            </div>
 
-            <label style={{ textAlign: 'left', display: 'block', marginBottom: '16px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#334135' }}>Enter 4-Digit Handshake OTP:</span>
-              <input
-                type="text"
-                maxLength="4"
-                style={{ textAlign: 'center', fontSize: '18px', letterSpacing: '6px', fontFamily: "'DM Mono', monospace", fontWeight: 700, padding: '8px' }}
-                value={dealOtpModal.enteredOtp}
-                onChange={(e) => setDealOtpModal({ ...dealOtpModal, enteredOtp: e.target.value })}
-              />
-            </label>
 
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                type="button"
-                className="trade-btn trade-btn-secondary"
-                style={{ flex: 1, padding: '10px' }}
-                onClick={() => setDealOtpModal(null)}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="trade-btn trade-btn-primary"
-                style={{ flex: 2, padding: '10px', fontWeight: 700 }}
-                onClick={async () => {
-                  const trade = dealOtpModal.trade;
-                  const tId = dealOtpModal.tradeId;
-                  setDealOtpModal(null);
-                  await executeTradeStatusUpdate(tId, 'ACCEPTED');
-                  setSelectedInvoiceTrade(trade);
-                  setMessage(`Trade #${tId} contract digitally signed and escrow locked via OTP 2FA!`);
-                }}
-              >
-                Verify &amp; Sign Contract Γ£ô
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {selectedInvoiceTrade && (
-        <div className="modal-backdrop" onClick={() => setSelectedInvoiceTrade(null)}>
-          <div className="invoice-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="invoice-header">
-              <div>
-                <p className="eyebrow" style={{ color: '#dc664a' }}>KisanLink Official Trade Certificate</p>
-                <h2>Agronomic Trade Deal &amp; Settlement Receipt</h2>
-                <p style={{ margin: '4px 0 0', font: "11px 'DM Mono', monospace", color: '#7f8981' }}>
-                  Contract Ref: <strong>#KL-TRD-{selectedInvoiceTrade.id}</strong> · Issued on {new Date(selectedInvoiceTrade.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}
-                </p>
-              </div>
-              <span className={`status-pill status-${(selectedInvoiceTrade.status || 'PROPOSED').toLowerCase()}`} style={{ fontSize: '11px', padding: '5px 10px' }}>
-                Status: {selectedInvoiceTrade.status}
-              </span>
-            </div>
-
-            
-            <div className="invoice-party-grid">
-              <div className="party-block">
-                <span style={{ font: "9px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981' }}>Seller / Producer</span>
-                <p><strong>{selectedInvoiceTrade.farmerName}</strong></p>
-                <p>District: {selectedInvoiceTrade.farmerDistrict || 'Jharkhand Region'}</p>
-                <p>Role: Verified KisanLink Farmer</p>
-              </div>
-              <div className="party-block">
-                <span style={{ font: "9px 'DM Mono', monospace", textTransform: 'uppercase', color: '#7f8981' }}>Purchaser / Buyer</span>
-                <p><strong>{selectedInvoiceTrade.buyerName}</strong></p>
-                <p>Entity: {selectedInvoiceTrade.buyerType || 'Commercial Buyer'}</p>
-                <p>Delivery Destination: {selectedInvoiceTrade.deliveryAddress || 'Regional APMC / Warehouse'}</p>
-              </div>
-            </div>
-
-            
-            <table className="invoice-table">
-              <thead>
-                <tr>
-                  <th>Commodity Description</th>
-                  <th>Category</th>
-                  <th>Quantity (kg)</th>
-                  <th>Agreed Rate</th>
-                  <th style={{ textAlign: 'right' }}>Gross Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <strong>{selectedInvoiceTrade.cropName}</strong>
-                    {selectedInvoiceTrade.notes && <div style={{ fontSize: '11px', color: '#778078' }}>Notes: {selectedInvoiceTrade.notes}</div>}
-                  </td>
-                  <td>{selectedInvoiceTrade.cropCategory || 'PRODUCE'}</td>
-                  <td>{selectedInvoiceTrade.quantity} kg ({(Number(selectedInvoiceTrade.quantity) / 100).toFixed(1)} Qtl)</td>
-                  <td>₹{selectedInvoiceTrade.agreedPricePerKg} / kg</td>
-                  <td style={{ textAlign: 'right', fontWeight: 'bold' }}>
-                    ₹{Number(selectedInvoiceTrade.totalAmount).toLocaleString()}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            
-            <div className="invoice-totals-box">
-              <div className="invoice-totals-row">
-                <span>Gross Value:</span>
-                <strong>₹{Number(selectedInvoiceTrade.totalAmount || (Number(selectedInvoiceTrade.quantity || 0) * Number(selectedInvoiceTrade.agreedPricePerKg || 0))).toLocaleString()}</strong>
-              </div>
-              <div className="invoice-totals-row">
-                <span>Logistics &amp; Freight Deduction:</span>
-                <span style={{ color: '#dc664a' }}>- ₹{Number(selectedInvoiceTrade.transportCost).toLocaleString()}</span>
-              </div>
-              <div className="invoice-totals-row grand-total">
-                <span>Net Farmer Payout:</span>
-                <strong style={{ color: '#5a8e62' }}>₹{Number(selectedInvoiceTrade.netFarmerReturn).toLocaleString()}</strong>
-              </div>
-            </div>
-
-            
-            <div style={{ background: '#faf7f0', padding: '12px 16px', borderRadius: '4px', border: '1px solid #ded9cc', fontSize: '11px', color: '#68776b', lineHeight: '1.5' }}>
-              <p style={{ margin: 0 }}>
-                <strong>Direct Trade Guarantee:</strong> This contract represents a direct farmer-to-buyer transaction facilitated via KisanLink's smart matching and freight calculation protocol. All settlements are tracked under digital hash <code>#KL-HASH-{selectedInvoiceTrade.id}-{Date.now().toString(36).toUpperCase()}</code>.
-              </p>
-            </div>
-
-            
-            <div className="invoice-actions">
-              <button
-                type="button"
-                className="action-button"
-                style={{ width: 'auto', background: '#202a27' }}
-                onClick={() => window.print()}
-              >
-                Print / Save PDF Receipt
-              </button>
-              <button
-                type="button"
-                className="secondary-button"
-                style={{ width: 'auto' }}
-                onClick={() => setSelectedInvoiceTrade(null)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      
-      
-      
-      {escrowDepositModal && (
-        <div className="modal-backdrop" onClick={() => setEscrowDepositModal(null)}>
-          <div className="invoice-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
-            <div className="invoice-header">
-              <div>
-                <p className="eyebrow" style={{ color: '#5a8e62' }}>[SANDBOX ESCROW &amp; UPI SIMULATOR · RBI PPA COMPLIANT] KisanLink Digital Escrow Vault</p>
-                <h2>Lock Trade Payment in Escrow</h2>
-                <p style={{ margin: '4px 0 0', font: "11px 'DM Mono', monospace", color: '#7f8981' }}>
-                  Trade Deal <strong>#{escrowDepositModal.trade.id} · {escrowDepositModal.trade.cropName}</strong> ({escrowDepositModal.trade.quantity} kg)
-                </p>
-              </div>
-              <span className="escrow-status-pill escrow-status-pending">SANDBOX DEPOSIT</span>
-            </div>
-
-            <form onSubmit={submitEscrowDeposit} style={{ marginTop: '16px' }}>
-              <div style={{ background: '#faf7f0', padding: '14px 16px', borderRadius: '4px', border: '1px solid #ded9cc', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', font: "11px 'DM Mono', monospace" }}>
-                  <span>Total Deposit Amount:</span>
-                  <strong style={{ fontSize: '15px', color: '#202a27' }}>₹{escrowDepositModal.trade.totalAmount}</strong>
+          {escrowDepositModal && (
+            <div className="modal-backdrop" onClick={() => setEscrowDepositModal(null)}>
+              <div className="invoice-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
+                <div className="invoice-header">
+                  <div>
+                    <p className="eyebrow" style={{ color: '#5a8e62' }}>[SANDBOX ESCROW &amp; UPI SIMULATOR · RBI PPA COMPLIANT] KisanLink Digital Escrow Vault</p>
+                    <h2>Lock Trade Payment in Escrow</h2>
+                    <p style={{ margin: '4px 0 0', font: "11px 'DM Mono', monospace", color: '#7f8981' }}>
+                      Trade Deal <strong>#{escrowDepositModal.trade.id} · {escrowDepositModal.trade.cropName}</strong> ({escrowDepositModal.trade.quantity} kg)
+                    </p>
+                  </div>
+                  <span className="escrow-status-pill escrow-status-pending">SANDBOX DEPOSIT</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', font: "10px 'DM Mono', monospace", color: '#68776b' }}>
-                  <span>Farmer Guaranteed Payout:</span>
-                  <strong>₹{escrowDepositModal.trade.netFarmerReturn}</strong>
-                </div>
-                <p style={{ margin: '10px 0 0', fontSize: '10px', color: '#778078', lineHeight: '1.4' }}>
-                  Funds remain safely held in the escrow vault until you confirm physical produce delivery and quality inspection.
-                </p>
+
+                <form onSubmit={submitEscrowDeposit} style={{ marginTop: '16px' }}>
+                  <div style={{ background: '#faf7f0', padding: '14px 16px', borderRadius: '4px', border: '1px solid #ded9cc', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', font: "11px 'DM Mono', monospace" }}>
+                      <span>Total Deposit Amount:</span>
+                      <strong style={{ fontSize: '15px', color: '#202a27' }}>₹{escrowDepositModal.trade.totalAmount}</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', font: "10px 'DM Mono', monospace", color: '#68776b' }}>
+                      <span>Farmer Guaranteed Payout:</span>
+                      <strong>₹{escrowDepositModal.trade.netFarmerReturn}</strong>
+                    </div>
+                    <p style={{ margin: '10px 0 0', fontSize: '10px', color: '#778078', lineHeight: '1.4' }}>
+                      Funds remain safely held in the escrow vault until you confirm physical produce delivery and quality inspection.
+                    </p>
+                  </div>
+
+                  <label>Payment Method
+                    <select
+                      value={escrowDepositForm.paymentMethod}
+                      onChange={(e) => setEscrowDepositForm({ ...escrowDepositForm, paymentMethod: e.target.value })}
+                    >
+                      <option value="UPI_INSTANT">UPI Instant Transfer (GPay / PhonePe / Paytm / BHIM)</option>
+                      <option value="BANK_NEFT_RTGS">Virtual Escrow Bank Account (NEFT / RTGS / IMPS)</option>
+                      <option value="ESCROW_WALLET">KisanLink Buyer Pre-funded Balance</option>
+                    </select>
+                  </label>
+
+                  <label>Buyer UPI ID / VPA
+                    <input
+                      value={escrowDepositForm.buyerUpiId}
+                      onChange={(e) => setEscrowDepositForm({ ...escrowDepositForm, buyerUpiId: e.target.value })}
+                      placeholder="e.g. enterprise.buyer@okaxis"
+                      required
+                    />
+                  </label>
+
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '18px' }}>
+                    <button type="submit" className="action-button" style={{ background: '#202a27' }}>
+                      Confirm &amp; Lock ₹{escrowDepositModal.trade.totalAmount} in Vault <span>→</span>
+                    </button>
+                    <button type="button" className="secondary-button" onClick={() => setEscrowDepositModal(null)}>
+                      Cancel
+                    </button>
+                  </div>
+                </form>
               </div>
-
-              <label>Payment Method
-                <select
-                  value={escrowDepositForm.paymentMethod}
-                  onChange={(e) => setEscrowDepositForm({ ...escrowDepositForm, paymentMethod: e.target.value })}
-                >
-                  <option value="UPI_INSTANT">UPI Instant Transfer (GPay / PhonePe / Paytm / BHIM)</option>
-                  <option value="BANK_NEFT_RTGS">Virtual Escrow Bank Account (NEFT / RTGS / IMPS)</option>
-                  <option value="ESCROW_WALLET">KisanLink Buyer Pre-funded Balance</option>
-                </select>
-              </label>
-
-              <label>Buyer UPI ID / VPA
-                <input
-                  value={escrowDepositForm.buyerUpiId}
-                  onChange={(e) => setEscrowDepositForm({ ...escrowDepositForm, buyerUpiId: e.target.value })}
-                  placeholder="e.g. enterprise.buyer@okaxis"
-                  required
-                />
-              </label>
-
-              <div style={{ display: 'flex', gap: '10px', marginTop: '18px' }}>
-                <button type="submit" className="action-button" style={{ background: '#202a27' }}>
-                  Confirm &amp; Lock ₹{escrowDepositModal.trade.totalAmount} in Vault <span>→</span>
-                </button>
-                <button type="button" className="secondary-button" onClick={() => setEscrowDepositModal(null)}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            </div>
+          )}
 
         </div>
       </div>
 
-      
+
       {newPostModalOpen && (
         <div className={`drawer-backdrop ${closingDrawer === 'COMMUNITY' ? 'drawer-closing' : ''}`} onClick={closeCommunityDrawer}>
 
           <div className={`slide-drawer ${closingDrawer === 'COMMUNITY' ? 'drawer-closing' : ''}`} onClick={(e) => e.stopPropagation()}>
-            
-            
+
+
             <div className="drawer-header">
               <div>
                 <p className="eyebrow">Farmers Community</p>
@@ -11619,11 +11841,11 @@ function App() {
             </div>
 
             <form onSubmit={handleCreateCommunityPost} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-              
-              
+
+
               <div className="drawer-body">
-                
-                
+
+
                 <div className="field-group">
                   <label className="field-label">Posting Role</label>
                   <div className="role-segment-container">
@@ -11656,7 +11878,7 @@ function App() {
                   </p>
                 </div>
 
-                
+
                 <div className="field-group">
                   <label className="field-label">Topic Category</label>
                   <div className="modal-category-pills">
@@ -11678,7 +11900,7 @@ function App() {
                   </div>
                 </div>
 
-                
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div className="field-group">
                     <label className="field-label">Your Name / Organization</label>
@@ -11703,7 +11925,7 @@ function App() {
                   </div>
                 </div>
 
-                
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div className="field-group">
                     <label className="field-label">Commodity</label>
@@ -11736,7 +11958,7 @@ function App() {
                   </div>
                 </div>
 
-                
+
                 <div className="field-group">
                   <label className="field-label">Topic Title *</label>
                   <input
@@ -11746,8 +11968,8 @@ function App() {
                       newPostForm.authorType === 'BUYER'
                         ? 'e.g. Procurement requirement for 50 MT Grade-A Tomato...'
                         : newPostForm.authorType === 'AGRONOMIST'
-                        ? 'e.g. Protocol for Early Blight management and spray intervals...'
-                        : 'e.g. Dark spots and yellow halos on 30-day tomato leaves...'
+                          ? 'e.g. Protocol for Early Blight management and spray intervals...'
+                          : 'e.g. Dark spots and yellow halos on 30-day tomato leaves...'
                     }
                     value={newPostForm.title}
                     onChange={(e) => setNewPostForm(f => ({ ...f, title: e.target.value }))}
@@ -11755,7 +11977,7 @@ function App() {
                   />
                 </div>
 
-                
+
                 <div className="field-group">
                   <label className="field-label">Details / Terms / Symptoms</label>
                   <textarea
@@ -11767,7 +11989,7 @@ function App() {
                   />
                 </div>
 
-                
+
                 <div className="field-group">
                   <label className="field-label">Attach Leaf Photo / Quality Specimen (Optional)</label>
                   <div className="specimen-upload-box">
@@ -11811,7 +12033,7 @@ function App() {
 
               </div>
 
-              
+
               <div className="drawer-footer">
                 <button type="button" className="trade-btn trade-btn-secondary" onClick={closeCommunityDrawer}>
                   Cancel
@@ -11826,7 +12048,7 @@ function App() {
         </div>
       )}
 
-      
+
       {quickProduceModal && (
         <div className={`drawer-backdrop ${closingDrawer === 'PRODUCE' ? 'drawer-closing' : ''}`} onClick={closeProduceDrawer}>
           <div className={`slide-drawer ${closingDrawer === 'PRODUCE' ? 'drawer-closing' : ''}`} onClick={(e) => e.stopPropagation()}>
@@ -11952,7 +12174,7 @@ function App() {
         </div>
       )}
 
-      
+
       {quickRequirementModal && (
         <div className={`drawer-backdrop ${closingDrawer === 'REQUIREMENT' ? 'drawer-closing' : ''}`} onClick={closeRequirementDrawer}>
           <div className={`slide-drawer ${closingDrawer === 'REQUIREMENT' ? 'drawer-closing' : ''}`} onClick={(e) => e.stopPropagation()}>
@@ -12080,7 +12302,7 @@ function App() {
         </div>
       )}
 
-      
+
       {googleMapModalNode && (
         <div
           className={`drawer-backdrop ${closingDrawer === 'GOOGLE_MAP' ? 'drawer-closing' : ''}`}
@@ -12102,7 +12324,7 @@ function App() {
             </div>
 
             <div className="drawer-body">
-              
+
               <div style={{ borderRadius: '4px', overflow: 'hidden', border: '1px solid #d9d6cc', height: '270px', position: 'relative' }}>
                 <iframe
                   title={`Google Map - ${googleMapModalNode.name}`}
@@ -12114,7 +12336,7 @@ function App() {
                 />
               </div>
 
-              
+
               <div style={{ background: '#faf9f5', border: '1px solid #e7e4db', borderRadius: '4px', padding: '12px 14px', marginTop: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', gap: '8px' }}>
                   <div>
@@ -12144,7 +12366,7 @@ function App() {
                 </div>
               </div>
 
-              
+
               <div style={{ marginTop: '14px' }}>
                 <span style={{ fontSize: '11px', fontFamily: "'DM Mono', monospace", color: '#556058', fontWeight: 600, textTransform: 'uppercase' }}>
                   Services &amp; Key Focus Areas
